@@ -1,0 +1,25 @@
+{
+  "id": "T109",
+  "source_task": "M8-11",
+  "dependencies": [
+    "T108"
+  ],
+  "wave": 109,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "documentation/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

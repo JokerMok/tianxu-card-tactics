@@ -1,0 +1,25 @@
+{
+  "id": "T022",
+  "source_task": "M2-06",
+  "dependencies": [
+    "T021"
+  ],
+  "wave": 22,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/core/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

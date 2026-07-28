@@ -1,0 +1,25 @@
+{
+  "id": "T088",
+  "source_task": "M7-02",
+  "dependencies": [
+    "T087"
+  ],
+  "wave": 88,
+  "executor": "local",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "cocos-client/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

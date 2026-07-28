@@ -1,0 +1,30 @@
+{
+  "name": "summon-grid-battle-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 4173",
+    "build": "tsc --noEmit -p tsconfig.app.json && vite build",
+    "test": "vitest run",
+    "simulate:users": "vitest run tests/user-simulation.test.ts --reporter=verbose",
+    "balance:neutral": "BALANCE_BATTLES=10000 vitest run tests/neutral-balance.test.ts --reporter=verbose",
+    "balance:neutral:double": "BALANCE_BATTLES=10000 BALANCE_SEED_OFFSET=300000 vitest run tests/neutral-balance.test.ts --reporter=verbose && BALANCE_BATTLES=10000 BALANCE_SEED_OFFSET=900000 vitest run tests/neutral-balance.test.ts --reporter=verbose",
+    "verify:browser": "node scripts/verify.mjs",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "playwright": "^1.61.1",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}

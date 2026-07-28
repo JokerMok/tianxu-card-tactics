@@ -1,0 +1,15 @@
+{
+  "name": "tianxu-cocos-a0",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "validate:a0": "node tools/validate-a0.mjs",
+    "verify:web": "node tools/verify-web.mjs",
+    "verify:meta": "node tools/verify-meta.mjs",
+    "audit:image2": "node tools/audit-image2.mjs"
+  },
+  "creator": {
+    "version": "3.8.8"
+  },
+  "uuid": "fc1c0a89-56a2-4db3-ba9d-70172eb0cff2"
+}

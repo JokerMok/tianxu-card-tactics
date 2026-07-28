@@ -1,0 +1,56 @@
+[
+  {
+    "page": "home",
+    "meanAbsolute": 5.638,
+    "channelsOver16Pct": 8.51,
+    "max": 124
+  },
+  {
+    "page": "campaign",
+    "meanAbsolute": 5.5247,
+    "channelsOver16Pct": 7.8748,
+    "max": 124
+  },
+  {
+    "page": "cards",
+    "meanAbsolute": 6.156,
+    "channelsOver16Pct": 9.5602,
+    "max": 126
+  },
+  {
+    "page": "deck",
+    "meanAbsolute": 5.4393,
+    "channelsOver16Pct": 8.3581,
+    "max": 129
+  },
+  {
+    "page": "hero",
+    "meanAbsolute": 5.8092,
+    "channelsOver16Pct": 8.7803,
+    "max": 129
+  },
+  {
+    "page": "adventure",
+    "meanAbsolute": 6.6277,
+    "channelsOver16Pct": 10.9771,
+    "max": 134
+  },
+  {
+    "page": "city",
+    "meanAbsolute": 5.9219,
+    "channelsOver16Pct": 9.3022,
+    "max": 133
+  },
+  {
+    "page": "tasks",
+    "meanAbsolute": 5.2466,
+    "channelsOver16Pct": 7.7479,
+    "max": 131
+  },
+  {
+    "page": "inventory",
+    "meanAbsolute": 6.2685,
+    "channelsOver16Pct": 10.5752,
+    "max": 138
+  }
+]

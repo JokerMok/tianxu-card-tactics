@@ -1,0 +1,50 @@
+{
+  "version": "1.3",
+  "generated": "2026-07-15",
+  "route": "Cocos Creator 2D",
+  "stage": "A0-reference",
+  "assets": [
+    {
+      "id": "U002-CUTOUT-SHEET",
+      "path": "美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
+      "size": [1536, 1024],
+      "status": "reference-approved",
+      "sha256": "99e057143f1edbdb95235f0ac39057fe5efc3ea2ef3c872b1d3c509e09c7535b"
+    },
+    {
+      "id": "U008-CUTOUT-SHEET",
+      "path": "美术素材/A0/单位切片参考/U008-CUTOUT-SHEET.png",
+      "size": [1536, 1024],
+      "status": "reference-approved",
+      "sha256": "c155a58ed768878afcb36897b3e1fb5651bed927cbb99f9edf274dc995490287"
+    },
+    {
+      "id": "U002-ANIMATION-POSES",
+      "path": "美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
+      "size": [1983, 793],
+      "status": "reference-approved",
+      "sha256": "9507ca351922a5fe6302cbcdaeab4c9711869e40ec1950afd4959caa14f7f81f"
+    },
+    {
+      "id": "U008-ANIMATION-POSES",
+      "path": "美术素材/A0/动画关键姿势/U008-ANIMATION-POSES.png",
+      "size": [1983, 793],
+      "status": "reference-approved",
+      "sha256": "f83fd4b3c4b2f27eb43cdf88cd94f4d7590e3f2c6155976c83ec1f9836fa1da6"
+    },
+    {
+      "id": "E104-PARALLAX-BOARD",
+      "path": "美术素材/A0/场景/E104-PARALLAX-BOARD.png",
+      "size": [1672, 941],
+      "status": "reference-approved",
+      "sha256": "368ead21d68c2a202cbe76304e9dd7a33aa21cd5d7c1e296fcaf529b94790429"
+    },
+    {
+      "id": "UI01-BATTLE-MOCKUP",
+      "path": "美术素材/A0/UI/UI01-BATTLE-MOCKUP.png",
+      "size": [1672, 941],
+      "status": "layout-approved-style-pending",
+      "sha256": "8e6805955d88c690f7aa0c8551576afcdea9c1d6e924d7f8c8a3abfd498075bc"
+    }
+  ]
+}

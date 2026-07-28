@@ -1,0 +1,52 @@
+# OS and editor noise
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies and package caches
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Web prototype generated output
+web-prototype/dist/
+web-prototype/coverage/
+web-prototype/*.tsbuildinfo
+
+# Cocos Creator generated output
+cocos-client/library/
+cocos-client/temp/
+cocos-client/build/
+cocos-client/local/
+cocos-client/profiles/
+cocos-client/native/engine/android/**/assets/
+
+# Generic generated output and caches
+**/.cache/
+**/cache/
+**/logs/
+*.log
+*.tmp
+*.bak
+
+# Reproducible visual/test captures; keep JSON verification evidence
+**/screenshots/
+**/test-artifacts/**/*.png
+**/test-artifacts/**/*.jpg
+**/test-artifacts/**/*.jpeg
+**/test-artifacts/**/*.webp

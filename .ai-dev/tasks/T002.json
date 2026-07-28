@@ -1,0 +1,25 @@
+{
+  "id": "T002",
+  "source_task": "M0-02",
+  "dependencies": [
+    "T001"
+  ],
+  "wave": 2,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "scripts/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

@@ -1,0 +1,137 @@
+[
+  {
+    "page": "home",
+    "bestKernel": "cubic",
+    "mae": 5.638,
+    "rmse": 10.804,
+    "channelsOver16Pct": 8.51,
+    "meanBiasRGB": [
+      0.013,
+      0.009,
+      0.01
+    ],
+    "edgeEnergyReference": 7.534,
+    "edgeEnergyRuntime": 6.486,
+    "edgeRetentionPct": 86.09
+  },
+  {
+    "page": "campaign",
+    "bestKernel": "cubic",
+    "mae": 5.525,
+    "rmse": 10.593,
+    "channelsOver16Pct": 7.875,
+    "meanBiasRGB": [
+      0.027,
+      0.021,
+      0.016
+    ],
+    "edgeEnergyReference": 7.807,
+    "edgeEnergyRuntime": 6.675,
+    "edgeRetentionPct": 85.5
+  },
+  {
+    "page": "cards",
+    "bestKernel": "cubic",
+    "mae": 6.156,
+    "rmse": 11.402,
+    "channelsOver16Pct": 9.56,
+    "meanBiasRGB": [
+      0.019,
+      0.015,
+      0.014
+    ],
+    "edgeEnergyReference": 8.137,
+    "edgeEnergyRuntime": 7.038,
+    "edgeRetentionPct": 86.49
+  },
+  {
+    "page": "deck",
+    "bestKernel": "cubic",
+    "mae": 5.439,
+    "rmse": 10.707,
+    "channelsOver16Pct": 8.358,
+    "meanBiasRGB": [
+      0.011,
+      0.007,
+      0.004
+    ],
+    "edgeEnergyReference": 7.148,
+    "edgeEnergyRuntime": 6.157,
+    "edgeRetentionPct": 86.14
+  },
+  {
+    "page": "hero",
+    "bestKernel": "cubic",
+    "mae": 5.809,
+    "rmse": 11.07,
+    "channelsOver16Pct": 8.78,
+    "meanBiasRGB": [
+      0.061,
+      0.056,
+      0.053
+    ],
+    "edgeEnergyReference": 7.598,
+    "edgeEnergyRuntime": 6.567,
+    "edgeRetentionPct": 86.43
+  },
+  {
+    "page": "adventure",
+    "bestKernel": "cubic",
+    "mae": 6.628,
+    "rmse": 11.955,
+    "channelsOver16Pct": 10.977,
+    "meanBiasRGB": [
+      0.016,
+      0.013,
+      0.012
+    ],
+    "edgeEnergyReference": 8.899,
+    "edgeEnergyRuntime": 7.633,
+    "edgeRetentionPct": 85.77
+  },
+  {
+    "page": "city",
+    "bestKernel": "cubic",
+    "mae": 5.922,
+    "rmse": 10.986,
+    "channelsOver16Pct": 9.302,
+    "meanBiasRGB": [
+      0.027,
+      0.027,
+      0.027
+    ],
+    "edgeEnergyReference": 8.176,
+    "edgeEnergyRuntime": 6.998,
+    "edgeRetentionPct": 85.59
+  },
+  {
+    "page": "tasks",
+    "bestKernel": "cubic",
+    "mae": 5.247,
+    "rmse": 11.093,
+    "channelsOver16Pct": 7.748,
+    "meanBiasRGB": [
+      0.016,
+      0.013,
+      0.007
+    ],
+    "edgeEnergyReference": 6.808,
+    "edgeEnergyRuntime": 5.847,
+    "edgeRetentionPct": 85.88
+  },
+  {
+    "page": "inventory",
+    "bestKernel": "cubic",
+    "mae": 6.269,
+    "rmse": 12.009,
+    "channelsOver16Pct": 10.575,
+    "meanBiasRGB": [
+      0.035,
+      0.027,
+      0.022
+    ],
+    "edgeEnergyReference": 8.133,
+    "edgeEnergyRuntime": 7.057,
+    "edgeRetentionPct": 86.77
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "version": "A0.1",
+  "engine": "Cocos Creator 3.8.8",
+  "target": "web-desktop",
+  "designResolution": [1920, 1080],
+  "board": {
+    "lanes": 2,
+    "cellsPerLane": 12,
+    "summonDepth": 3,
+    "cellOccupancyLimit": 1
+  },
+  "commanders": {
+    "count": 2,
+    "fixedOutsideGrid": true,
+    "centerTolerancePx": 2,
+    "visuals": ["C009-BATTLE-SIDESLOT", "C001-BATTLE-SIDESLOT"],
+    "backgroundless": true,
+    "preserveSourceAspectRatio": true,
+    "animationContract": ["Idle", "HitLight", "HitHeavy", "Command", "Critical", "Defeat"]
+  },
+  "runtimeArt": {
+    "mode": "preview-pose",
+    "integrated": ["E104", "C009", "C001", "U002-POSE", "U008-POSE", "U001-CARD", "U002-CARD", "U004-CARD", "U008-CARD"],
+    "environmentLayers": ["E104-SKY-TERRACE", "E104-BOARD-ROAD", "E104-LOWER-GROUND"],
+    "spineAssets": 0,
+    "finalAnimationReady": false,
+    "replacementBoundary": "SpriteFrame/Spine SkeletonData adapter"
+  },
+  "metaGame": {
+    "status": "playable-shell",
+    "modules": ["home", "campaign", "cards", "deck", "hero", "adventure", "city", "tasks", "inventory"],
+    "battleContexts": ["campaign", "dungeon", "tower", "boss"],
+    "persistence": "localStorage",
+    "rewardIdempotency": true
+  },
+  "stress": {
+    "units": 24,
+    "targetFps": 60,
+    "minimumFps": 55,
+    "maximumP95FrameTimeMs": 22
+  },
+  "scope": ["U002", "U008", "E104", "UI01", "C009", "C001"]
+}

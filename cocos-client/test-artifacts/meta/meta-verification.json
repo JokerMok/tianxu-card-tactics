@@ -1,0 +1,1161 @@
+{
+  "initial": {
+    "page": "home",
+    "view": "meta",
+    "selectedCard": "U002",
+    "dynamicOverlays": [],
+    "state": {
+      "version": 1,
+      "player": {
+        "name": "岳沉戈",
+        "level": 8,
+        "xp": 320,
+        "power": 1680,
+        "profession": "镇军"
+      },
+      "resources": {
+        "silver": 12800,
+        "crystal": 460,
+        "stamina": 82,
+        "staminaMax": 100,
+        "towerTicket": 3
+      },
+      "cards": [
+        {
+          "id": "U002",
+          "name": "折锋枪兵",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 3,
+          "power": 116
+        },
+        {
+          "id": "U004",
+          "name": "岚羽游射手",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 2,
+          "level": 1,
+          "copies": 3,
+          "power": 108
+        },
+        {
+          "id": "U001",
+          "name": "铸壁守望者",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 124
+        },
+        {
+          "id": "U008",
+          "name": "霆脊巨兽",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 6,
+          "level": 1,
+          "copies": 2,
+          "power": 178
+        },
+        {
+          "id": "U003",
+          "name": "玄甲骑卫",
+          "kind": "unit",
+          "faction": "失位神将",
+          "cost": 4,
+          "level": 1,
+          "copies": 2,
+          "power": 146
+        },
+        {
+          "id": "U006",
+          "name": "灵符方士",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 151
+        },
+        {
+          "id": "U009",
+          "name": "山海药师",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 131
+        },
+        {
+          "id": "U013",
+          "name": "空册侍从",
+          "kind": "unit",
+          "faction": "无名者",
+          "cost": 2,
+          "level": 1,
+          "copies": 2,
+          "power": 102
+        },
+        {
+          "id": "S001",
+          "name": "烈纹天罚",
+          "kind": "skill",
+          "faction": "将印",
+          "cost": 3,
+          "level": 1,
+          "copies": 1,
+          "power": 138
+        },
+        {
+          "id": "S002",
+          "name": "凝霎",
+          "kind": "skill",
+          "faction": "方术",
+          "cost": 2,
+          "level": 1,
+          "copies": 1,
+          "power": 122
+        },
+        {
+          "id": "S003",
+          "name": "守土成城",
+          "kind": "skill",
+          "faction": "军略",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 142
+        },
+        {
+          "id": "S004",
+          "name": "归魂引",
+          "kind": "skill",
+          "faction": "神道",
+          "cost": 5,
+          "level": 1,
+          "copies": 1,
+          "power": 162
+        }
+      ],
+      "deck": [
+        "U002",
+        "U004",
+        "U001",
+        "U008",
+        "U003",
+        "U006",
+        "U009",
+        "U013",
+        "S001",
+        "S002"
+      ],
+      "equipment": {
+        "weapon": {
+          "name": "玄铁断刃",
+          "level": 5
+        },
+        "helmet": {
+          "name": "边军兜鍪",
+          "level": 3
+        },
+        "armor": {
+          "name": "赤纹战衣",
+          "level": 4
+        },
+        "cloak": {
+          "name": "无字披风",
+          "level": 2
+        }
+      },
+      "campaign": {
+        "unlocked": 4,
+        "stars": {
+          "1": 3,
+          "2": 3,
+          "3": 2
+        },
+        "selectedStage": 4
+      },
+      "tower": {
+        "floor": 7,
+        "best": 6
+      },
+      "buildings": {
+        "castle": 3,
+        "alchemy": 2,
+        "forge": 2,
+        "harbor": 1
+      },
+      "inventory": {
+        "强化石": 36,
+        "山海鳞片": 14,
+        "法印残片": 8,
+        "远征券": 5
+      },
+      "tasks": {
+        "stage": {
+          "progress": 3,
+          "target": 4,
+          "claimed": false
+        },
+        "upgrade": {
+          "progress": 0,
+          "target": 1,
+          "claimed": false
+        },
+        "tower": {
+          "progress": 6,
+          "target": 10,
+          "claimed": false
+        }
+      },
+      "expedition": {
+        "active": false,
+        "endsAt": 0,
+        "reward": 0
+      },
+      "transactions": []
+    }
+  },
+  "afterBattle": {
+    "page": "campaign",
+    "view": "meta",
+    "selectedCard": "U002",
+    "dynamicOverlays": [
+      "LiveStamina",
+      "LiveSilver",
+      "LiveStage"
+    ],
+    "state": {
+      "version": 1,
+      "player": {
+        "name": "岳沉戈",
+        "level": 8,
+        "xp": 380,
+        "power": 1680,
+        "profession": "镇军"
+      },
+      "resources": {
+        "silver": 13040,
+        "crystal": 460,
+        "stamina": 76,
+        "staminaMax": 100,
+        "towerTicket": 3
+      },
+      "cards": [
+        {
+          "id": "U002",
+          "name": "折锋枪兵",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 3,
+          "power": 116
+        },
+        {
+          "id": "U004",
+          "name": "岚羽游射手",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 2,
+          "level": 1,
+          "copies": 3,
+          "power": 108
+        },
+        {
+          "id": "U001",
+          "name": "铸壁守望者",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 124
+        },
+        {
+          "id": "U008",
+          "name": "霆脊巨兽",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 6,
+          "level": 1,
+          "copies": 2,
+          "power": 178
+        },
+        {
+          "id": "U003",
+          "name": "玄甲骑卫",
+          "kind": "unit",
+          "faction": "失位神将",
+          "cost": 4,
+          "level": 1,
+          "copies": 2,
+          "power": 146
+        },
+        {
+          "id": "U006",
+          "name": "灵符方士",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 151
+        },
+        {
+          "id": "U009",
+          "name": "山海药师",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 131
+        },
+        {
+          "id": "U013",
+          "name": "空册侍从",
+          "kind": "unit",
+          "faction": "无名者",
+          "cost": 2,
+          "level": 1,
+          "copies": 2,
+          "power": 102
+        },
+        {
+          "id": "S001",
+          "name": "烈纹天罚",
+          "kind": "skill",
+          "faction": "将印",
+          "cost": 3,
+          "level": 1,
+          "copies": 1,
+          "power": 138
+        },
+        {
+          "id": "S002",
+          "name": "凝霎",
+          "kind": "skill",
+          "faction": "方术",
+          "cost": 2,
+          "level": 1,
+          "copies": 1,
+          "power": 122
+        },
+        {
+          "id": "S003",
+          "name": "守土成城",
+          "kind": "skill",
+          "faction": "军略",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 142
+        },
+        {
+          "id": "S004",
+          "name": "归魂引",
+          "kind": "skill",
+          "faction": "神道",
+          "cost": 5,
+          "level": 1,
+          "copies": 1,
+          "power": 162
+        }
+      ],
+      "deck": [
+        "U002",
+        "U004",
+        "U001",
+        "U008",
+        "U003",
+        "U006",
+        "U009",
+        "U013",
+        "S001",
+        "S002"
+      ],
+      "equipment": {
+        "weapon": {
+          "name": "玄铁断刃",
+          "level": 5
+        },
+        "helmet": {
+          "name": "边军兜鍪",
+          "level": 3
+        },
+        "armor": {
+          "name": "赤纹战衣",
+          "level": 4
+        },
+        "cloak": {
+          "name": "无字披风",
+          "level": 2
+        }
+      },
+      "campaign": {
+        "unlocked": 4,
+        "stars": {
+          "1": 3,
+          "2": 3,
+          "3": 2
+        },
+        "selectedStage": 2
+      },
+      "tower": {
+        "floor": 7,
+        "best": 6
+      },
+      "buildings": {
+        "castle": 3,
+        "alchemy": 2,
+        "forge": 2,
+        "harbor": 1
+      },
+      "inventory": {
+        "强化石": 36,
+        "山海鳞片": 14,
+        "法印残片": 9,
+        "远征券": 5
+      },
+      "tasks": {
+        "stage": {
+          "progress": 4,
+          "target": 4,
+          "claimed": false
+        },
+        "upgrade": {
+          "progress": 0,
+          "target": 1,
+          "claimed": false
+        },
+        "tower": {
+          "progress": 6,
+          "target": 10,
+          "claimed": false
+        }
+      },
+      "expedition": {
+        "active": false,
+        "endsAt": 0,
+        "reward": 0
+      },
+      "transactions": [
+        "stage:1:1784455245514"
+      ]
+    }
+  },
+  "afterClaim": {
+    "page": "adventure",
+    "view": "meta",
+    "selectedCard": "U002",
+    "dynamicOverlays": [
+      "LiveStamina",
+      "LiveSilver"
+    ],
+    "state": {
+      "version": 1,
+      "player": {
+        "name": "岳沉戈",
+        "level": 8,
+        "xp": 550,
+        "power": 1680,
+        "profession": "镇军"
+      },
+      "resources": {
+        "silver": 15300,
+        "crystal": 490,
+        "stamina": 76,
+        "staminaMax": 100,
+        "towerTicket": 2
+      },
+      "cards": [
+        {
+          "id": "U002",
+          "name": "折锋枪兵",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 3,
+          "power": 116
+        },
+        {
+          "id": "U004",
+          "name": "岚羽游射手",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 2,
+          "level": 1,
+          "copies": 3,
+          "power": 108
+        },
+        {
+          "id": "U001",
+          "name": "铸壁守望者",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 124
+        },
+        {
+          "id": "U008",
+          "name": "霆脊巨兽",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 6,
+          "level": 1,
+          "copies": 2,
+          "power": 178
+        },
+        {
+          "id": "U003",
+          "name": "玄甲骑卫",
+          "kind": "unit",
+          "faction": "失位神将",
+          "cost": 4,
+          "level": 1,
+          "copies": 2,
+          "power": 146
+        },
+        {
+          "id": "U006",
+          "name": "灵符方士",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 151
+        },
+        {
+          "id": "U009",
+          "name": "山海药师",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 131
+        },
+        {
+          "id": "U013",
+          "name": "空册侍从",
+          "kind": "unit",
+          "faction": "无名者",
+          "cost": 2,
+          "level": 1,
+          "copies": 2,
+          "power": 102
+        },
+        {
+          "id": "S001",
+          "name": "烈纹天罚",
+          "kind": "skill",
+          "faction": "将印",
+          "cost": 3,
+          "level": 1,
+          "copies": 1,
+          "power": 138
+        },
+        {
+          "id": "S002",
+          "name": "凝霎",
+          "kind": "skill",
+          "faction": "方术",
+          "cost": 2,
+          "level": 1,
+          "copies": 1,
+          "power": 122
+        },
+        {
+          "id": "S003",
+          "name": "守土成城",
+          "kind": "skill",
+          "faction": "军略",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 142
+        },
+        {
+          "id": "S004",
+          "name": "归魂引",
+          "kind": "skill",
+          "faction": "神道",
+          "cost": 5,
+          "level": 1,
+          "copies": 1,
+          "power": 162
+        }
+      ],
+      "deck": [
+        "U002",
+        "U004",
+        "U001",
+        "U008",
+        "U003",
+        "U006",
+        "U009",
+        "U013",
+        "S001",
+        "S002"
+      ],
+      "equipment": {
+        "weapon": {
+          "name": "玄铁断刃",
+          "level": 5
+        },
+        "helmet": {
+          "name": "边军兜鍪",
+          "level": 3
+        },
+        "armor": {
+          "name": "赤纹战衣",
+          "level": 4
+        },
+        "cloak": {
+          "name": "无字披风",
+          "level": 2
+        }
+      },
+      "campaign": {
+        "unlocked": 4,
+        "stars": {
+          "1": 3,
+          "2": 3,
+          "3": 2
+        },
+        "selectedStage": 2
+      },
+      "tower": {
+        "floor": 8,
+        "best": 7
+      },
+      "buildings": {
+        "castle": 3,
+        "alchemy": 2,
+        "forge": 2,
+        "harbor": 1
+      },
+      "inventory": {
+        "强化石": 36,
+        "山海鳞片": 14,
+        "法印残片": 9,
+        "远征券": 5
+      },
+      "tasks": {
+        "stage": {
+          "progress": 4,
+          "target": 4,
+          "claimed": true
+        },
+        "upgrade": {
+          "progress": 0,
+          "target": 1,
+          "claimed": false
+        },
+        "tower": {
+          "progress": 7,
+          "target": 10,
+          "claimed": false
+        }
+      },
+      "expedition": {
+        "active": false,
+        "endsAt": 0,
+        "reward": 0
+      },
+      "transactions": [
+        "stage:1:1784455245514",
+        "tower:7",
+        "task:stage"
+      ]
+    }
+  },
+  "afterUpgrade": {
+    "page": "tasks",
+    "view": "meta",
+    "selectedCard": "U002",
+    "dynamicOverlays": [
+      "LiveStamina",
+      "LiveSilver",
+      "LiveCrystal",
+      "LiveTask-stage",
+      "LiveTaskClaimed-stage",
+      "LiveTask-tower"
+    ],
+    "state": {
+      "version": 1,
+      "player": {
+        "name": "岳沉戈",
+        "level": 8,
+        "xp": 550,
+        "power": 1698,
+        "profession": "镇军"
+      },
+      "resources": {
+        "silver": 14800,
+        "crystal": 490,
+        "stamina": 76,
+        "staminaMax": 100,
+        "towerTicket": 2
+      },
+      "cards": [
+        {
+          "id": "U002",
+          "name": "折锋枪兵",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 2,
+          "copies": 1,
+          "power": 146
+        },
+        {
+          "id": "U004",
+          "name": "岚羽游射手",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 2,
+          "level": 1,
+          "copies": 3,
+          "power": 108
+        },
+        {
+          "id": "U001",
+          "name": "铸壁守望者",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 124
+        },
+        {
+          "id": "U008",
+          "name": "霆脊巨兽",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 6,
+          "level": 1,
+          "copies": 2,
+          "power": 178
+        },
+        {
+          "id": "U003",
+          "name": "玄甲骑卫",
+          "kind": "unit",
+          "faction": "失位神将",
+          "cost": 4,
+          "level": 1,
+          "copies": 2,
+          "power": 146
+        },
+        {
+          "id": "U006",
+          "name": "灵符方士",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 151
+        },
+        {
+          "id": "U009",
+          "name": "山海药师",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 131
+        },
+        {
+          "id": "U013",
+          "name": "空册侍从",
+          "kind": "unit",
+          "faction": "无名者",
+          "cost": 2,
+          "level": 1,
+          "copies": 2,
+          "power": 102
+        },
+        {
+          "id": "S001",
+          "name": "烈纹天罚",
+          "kind": "skill",
+          "faction": "将印",
+          "cost": 3,
+          "level": 1,
+          "copies": 1,
+          "power": 138
+        },
+        {
+          "id": "S002",
+          "name": "凝霎",
+          "kind": "skill",
+          "faction": "方术",
+          "cost": 2,
+          "level": 1,
+          "copies": 1,
+          "power": 122
+        },
+        {
+          "id": "S003",
+          "name": "守土成城",
+          "kind": "skill",
+          "faction": "军略",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 142
+        },
+        {
+          "id": "S004",
+          "name": "归魂引",
+          "kind": "skill",
+          "faction": "神道",
+          "cost": 5,
+          "level": 1,
+          "copies": 1,
+          "power": 162
+        }
+      ],
+      "deck": [
+        "U002",
+        "U004",
+        "U001",
+        "U008",
+        "U003",
+        "U006",
+        "U009",
+        "U013",
+        "S001",
+        "S002"
+      ],
+      "equipment": {
+        "weapon": {
+          "name": "玄铁断刃",
+          "level": 5
+        },
+        "helmet": {
+          "name": "边军兜鍪",
+          "level": 3
+        },
+        "armor": {
+          "name": "赤纹战衣",
+          "level": 4
+        },
+        "cloak": {
+          "name": "无字披风",
+          "level": 2
+        }
+      },
+      "campaign": {
+        "unlocked": 4,
+        "stars": {
+          "1": 3,
+          "2": 3,
+          "3": 2
+        },
+        "selectedStage": 2
+      },
+      "tower": {
+        "floor": 8,
+        "best": 7
+      },
+      "buildings": {
+        "castle": 3,
+        "alchemy": 2,
+        "forge": 2,
+        "harbor": 1
+      },
+      "inventory": {
+        "强化石": 36,
+        "山海鳞片": 14,
+        "法印残片": 9,
+        "远征券": 5
+      },
+      "tasks": {
+        "stage": {
+          "progress": 4,
+          "target": 4,
+          "claimed": true
+        },
+        "upgrade": {
+          "progress": 1,
+          "target": 1,
+          "claimed": false
+        },
+        "tower": {
+          "progress": 7,
+          "target": 10,
+          "claimed": false
+        }
+      },
+      "expedition": {
+        "active": false,
+        "endsAt": 0,
+        "reward": 0
+      },
+      "transactions": [
+        "stage:1:1784455245514",
+        "tower:7",
+        "task:stage"
+      ]
+    }
+  },
+  "persisted": {
+    "page": "home",
+    "view": "meta",
+    "selectedCard": "U002",
+    "dynamicOverlays": [
+      "LiveStamina",
+      "LiveSilver",
+      "LiveCrystal"
+    ],
+    "state": {
+      "version": 1,
+      "player": {
+        "name": "岳沉戈",
+        "level": 8,
+        "xp": 550,
+        "power": 1698,
+        "profession": "镇军"
+      },
+      "resources": {
+        "silver": 14800,
+        "crystal": 490,
+        "stamina": 76,
+        "staminaMax": 100,
+        "towerTicket": 2
+      },
+      "cards": [
+        {
+          "id": "U002",
+          "name": "折锋枪兵",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 2,
+          "copies": 1,
+          "power": 146
+        },
+        {
+          "id": "U004",
+          "name": "岚羽游射手",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 2,
+          "level": 1,
+          "copies": 3,
+          "power": 108
+        },
+        {
+          "id": "U001",
+          "name": "铸壁守望者",
+          "kind": "unit",
+          "faction": "人间诸国",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 124
+        },
+        {
+          "id": "U008",
+          "name": "霆脊巨兽",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 6,
+          "level": 1,
+          "copies": 2,
+          "power": 178
+        },
+        {
+          "id": "U003",
+          "name": "玄甲骑卫",
+          "kind": "unit",
+          "faction": "失位神将",
+          "cost": 4,
+          "level": 1,
+          "copies": 2,
+          "power": 146
+        },
+        {
+          "id": "U006",
+          "name": "灵符方士",
+          "kind": "unit",
+          "faction": "仙门遗派",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 151
+        },
+        {
+          "id": "U009",
+          "name": "山海药师",
+          "kind": "unit",
+          "faction": "山海遗族",
+          "cost": 3,
+          "level": 1,
+          "copies": 2,
+          "power": 131
+        },
+        {
+          "id": "U013",
+          "name": "空册侍从",
+          "kind": "unit",
+          "faction": "无名者",
+          "cost": 2,
+          "level": 1,
+          "copies": 2,
+          "power": 102
+        },
+        {
+          "id": "S001",
+          "name": "烈纹天罚",
+          "kind": "skill",
+          "faction": "将印",
+          "cost": 3,
+          "level": 1,
+          "copies": 1,
+          "power": 138
+        },
+        {
+          "id": "S002",
+          "name": "凝霎",
+          "kind": "skill",
+          "faction": "方术",
+          "cost": 2,
+          "level": 1,
+          "copies": 1,
+          "power": 122
+        },
+        {
+          "id": "S003",
+          "name": "守土成城",
+          "kind": "skill",
+          "faction": "军略",
+          "cost": 4,
+          "level": 1,
+          "copies": 1,
+          "power": 142
+        },
+        {
+          "id": "S004",
+          "name": "归魂引",
+          "kind": "skill",
+          "faction": "神道",
+          "cost": 5,
+          "level": 1,
+          "copies": 1,
+          "power": 162
+        }
+      ],
+      "deck": [
+        "U002",
+        "U004",
+        "U001",
+        "U008",
+        "U003",
+        "U006",
+        "U009",
+        "U013",
+        "S001",
+        "S002"
+      ],
+      "equipment": {
+        "weapon": {
+          "name": "玄铁断刃",
+          "level": 5
+        },
+        "helmet": {
+          "name": "边军兜鍪",
+          "level": 3
+        },
+        "armor": {
+          "name": "赤纹战衣",
+          "level": 4
+        },
+        "cloak": {
+          "name": "无字披风",
+          "level": 2
+        }
+      },
+      "campaign": {
+        "unlocked": 4,
+        "stars": {
+          "1": 3,
+          "2": 3,
+          "3": 2
+        },
+        "selectedStage": 2
+      },
+      "tower": {
+        "floor": 8,
+        "best": 7
+      },
+      "buildings": {
+        "castle": 3,
+        "alchemy": 2,
+        "forge": 2,
+        "harbor": 1
+      },
+      "inventory": {
+        "强化石": 36,
+        "山海鳞片": 14,
+        "法印残片": 9,
+        "远征券": 5
+      },
+      "tasks": {
+        "stage": {
+          "progress": 4,
+          "target": 4,
+          "claimed": true
+        },
+        "upgrade": {
+          "progress": 1,
+          "target": 1,
+          "claimed": false
+        },
+        "tower": {
+          "progress": 7,
+          "target": 10,
+          "claimed": false
+        }
+      },
+      "expedition": {
+        "active": false,
+        "endsAt": 0,
+        "reward": 0
+      },
+      "transactions": [
+        "stage:1:1784455245514",
+        "tower:7",
+        "task:stage"
+      ]
+    }
+  },
+  "pages": [
+    "campaign",
+    "cards",
+    "deck",
+    "hero",
+    "adventure",
+    "city",
+    "tasks",
+    "inventory",
+    "home"
+  ],
+  "errors": []
+}

@@ -1,0 +1,25 @@
+{
+  "id": "T071",
+  "source_task": "M6-01",
+  "dependencies": [
+    "T070"
+  ],
+  "wave": 71,
+  "executor": "local",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

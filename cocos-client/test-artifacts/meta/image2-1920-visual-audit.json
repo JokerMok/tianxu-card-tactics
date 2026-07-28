@@ -1,0 +1,110 @@
+[
+  {
+    "page": "home",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "campaign",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "cards",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "deck",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "hero",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "adventure",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "city",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "tasks",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "page": "inventory",
+    "mae": 0,
+    "rmse": 0,
+    "channelsOver4Pct": 0,
+    "max": 0,
+    "meanBiasRGB": [
+      0,
+      0,
+      0
+    ]
+  }
+]

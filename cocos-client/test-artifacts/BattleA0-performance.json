@@ -1,0 +1,73 @@
+{
+  "initial": {
+    "ready": true,
+    "lanes": 2,
+    "cells": 24,
+    "legalDeploymentCells": 6,
+    "commanders": 2,
+    "commandersOutsideGrid": true,
+    "commanderCenterErrorPx": 0,
+    "activeUnits": 2,
+    "enemyHp": 3600,
+    "hitCount": 0,
+    "stressMode": false,
+    "assetsReady": true,
+    "loadedVisualAssets": 9,
+    "previewPoseAssets": 2,
+    "spineAssets": 0,
+    "artMode": "preview-pose",
+    "artIntegrationComplete": false,
+    "runtimeUnitSprites": 2,
+    "stressRenderer": "individual-sprites",
+    "unitMotion": "idle-breathing",
+    "selectedCard": -1,
+    "activeDeploymentMarkers": 0
+  },
+  "final": {
+    "ready": true,
+    "lanes": 2,
+    "cells": 24,
+    "legalDeploymentCells": 6,
+    "commanders": 2,
+    "commandersOutsideGrid": true,
+    "commanderCenterErrorPx": 0,
+    "activeUnits": 24,
+    "enemyHp": 3300,
+    "hitCount": 1,
+    "stressMode": true,
+    "assetsReady": true,
+    "loadedVisualAssets": 9,
+    "previewPoseAssets": 2,
+    "spineAssets": 0,
+    "artMode": "preview-pose",
+    "artIntegrationComplete": false,
+    "runtimeUnitSprites": 24,
+    "stressRenderer": "individual-sprites",
+    "unitMotion": "idle-breathing",
+    "selectedCard": -1,
+    "activeDeploymentMarkers": 0
+  },
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "bufferWidth": 1920,
+    "bufferHeight": 1080
+  },
+  "headless": true,
+  "environmentFrameSample": {
+    "fps": 121.93469719550194,
+    "p95FrameTimeMs": 8.799999999999955
+  },
+  "baselineFrameSample": {
+    "fps": 25.65345038907733,
+    "p95FrameTimeMs": 50
+  },
+  "stressFrameSample": {
+    "fps": 26.277755879647874,
+    "p95FrameTimeMs": 50
+  },
+  "relativePerformancePass": true,
+  "absolutePerformancePass": false,
+  "initialScreenshotPath": "/Users/jokermok/Documents/工作文件/臻一/游戏项目/横屏战术卡牌原型/cocos-client/test-artifacts/BattleA0-art-integration-1920x1080.png",
+  "screenshotPath": "/Users/jokermok/Documents/工作文件/臻一/游戏项目/横屏战术卡牌原型/cocos-client/test-artifacts/BattleA0-1920x1080.png"
+}

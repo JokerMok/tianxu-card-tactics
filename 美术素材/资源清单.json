@@ -1,0 +1,479 @@
+{
+  "version": "1.2",
+  "generated": "2026-07-15",
+  "runtimeRoute": "Cocos Creator 2D",
+  "qualityStatus": {
+    "coreFemale": "prototype-approved",
+    "coreMale": "candidate",
+    "unit": "prototype-approved",
+    "commercialMaster": "not-produced"
+  },
+  "runtimeProfiles": {
+    "large": [
+      768,
+      1152
+    ],
+    "thumb": [
+      256,
+      384
+    ]
+  },
+  "assets": [
+    {
+      "id": "C001",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C001-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C001-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C001-CARD.webp",
+      "sha256": "1caf1df80ff54123aa0a0c6061a4c88d7db10652c867db5b699696f6e71b5f97"
+    },
+    {
+      "id": "C002",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C002-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C002-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C002-CARD.webp",
+      "sha256": "438968e3104f51ce5192d2ab108a65a86cf7036bbc5beba258cbb1266e00af83"
+    },
+    {
+      "id": "C003",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C003-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C003-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C003-CARD.webp",
+      "sha256": "b99979b0992416b39aac7d0fb1349a9d705d7d02404bbb6b4cc3455faa985d0a"
+    },
+    {
+      "id": "C004",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C004-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C004-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C004-CARD.webp",
+      "sha256": "f2ce2bbaf06bf5fc290d00b2e3a0f6da2f07f0c5d86e6975a574953457d9da9e"
+    },
+    {
+      "id": "C005",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C005-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C005-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C005-CARD.webp",
+      "sha256": "d6c43146de12203385b1aef2042195902cc0b7d322506cd7c720e20c9efd398e"
+    },
+    {
+      "id": "C006",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C006-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C006-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C006-CARD.webp",
+      "sha256": "27aa0508375f2affe3683f84d66f1a6698d91120475813aae8b3b39821b18790"
+    },
+    {
+      "id": "C007",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C007-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C007-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C007-CARD.webp",
+      "sha256": "b8aabda0b71a50834166f760eb5ad9cd40c332dee31c77fa136ad310507e62eb"
+    },
+    {
+      "id": "C008",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C008-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C008-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C008-CARD.webp",
+      "sha256": "6c8d32882edc271deb0ec8724747e73592d6da3b4165bd2c6d0b750b224d620e"
+    },
+    {
+      "id": "C009",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C009-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C009-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C009-CARD.webp",
+      "sha256": "0d026af34a9c11e77dcddd79cf7f461f7976a6419d6f838ba9bf778b8e1b69c3"
+    },
+    {
+      "id": "C010",
+      "kind": "core",
+      "source": "美术素材/标准版/核心角色卡面/C010-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/core/large/C010-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/core/thumb/C010-CARD.webp",
+      "sha256": "c935b188de38cc91c5b84862c256ff2904f77fddc4f9ecd4a2a3fc565a9680d9"
+    },
+    {
+      "id": "U001",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U001-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U001-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U001-CARD.webp",
+      "sha256": "b0cb27e10511c01c039046b070476ee1e9245b5a96df14c7a84b7ae804f6eb86"
+    },
+    {
+      "id": "U002",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U002-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U002-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U002-CARD.webp",
+      "sha256": "8a2ba25ad70152d98144b388a467b31ec5f3355a91f68afe08e0ccf78516f13c"
+    },
+    {
+      "id": "U003",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U003-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U003-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U003-CARD.webp",
+      "sha256": "749913a91a823bd36fbcf3f07a219fa84e6c21297c6a8c57d77336b89b171d8e"
+    },
+    {
+      "id": "U004",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U004-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U004-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U004-CARD.webp",
+      "sha256": "570e835357a503ce3c76e835883d63fe3587b85a9978d8ca7af5d3eb7683fa04"
+    },
+    {
+      "id": "U005",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U005-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U005-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U005-CARD.webp",
+      "sha256": "4493474a79f30ac4fe38f2a4e620409d1a531b009457d92fc5a2ba1cdc47f61f"
+    },
+    {
+      "id": "U006",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U006-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U006-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U006-CARD.webp",
+      "sha256": "7a62fb1d1e805328b650395aa017a3e9081b738a30033d10570b554c958d5396"
+    },
+    {
+      "id": "U007",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U007-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U007-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U007-CARD.webp",
+      "sha256": "8e698d1848b8881d405933573a22157d4360fcd304fc918271ddaf1d51c54758"
+    },
+    {
+      "id": "U008",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U008-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U008-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U008-CARD.webp",
+      "sha256": "728f8d252021fc9f641c839a2691b3294c2268fe1db2a260fde0e20bad59e0eb"
+    },
+    {
+      "id": "U009",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U009-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U009-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U009-CARD.webp",
+      "sha256": "202710727ec37e989ecb654bb50eb3723167020af8f4b060567bee1a6f7007cd"
+    },
+    {
+      "id": "U010",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U010-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U010-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U010-CARD.webp",
+      "sha256": "3c5937d720a1d60094296056557d369de13076f9b1756cf6ee3e1bc373f044d4"
+    },
+    {
+      "id": "U011",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U011-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U011-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U011-CARD.webp",
+      "sha256": "efa16188c8c0c27367f975170b96cabc55c7ff98c270758e464ea8e972a165f0"
+    },
+    {
+      "id": "U012",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U012-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U012-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U012-CARD.webp",
+      "sha256": "b13c30b8e6772f7418d0ea1f3576531cc048460fa39e6cc6386ca180ca90f1a0"
+    },
+    {
+      "id": "U013",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U013-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U013-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U013-CARD.webp",
+      "sha256": "3373970bc30acfddea509fbf00a14e7981de950ba6c7fe8435d5e21635a681bb"
+    },
+    {
+      "id": "U014",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U014-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U014-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U014-CARD.webp",
+      "sha256": "4709d80e8d0b9c196961ddb95427396254f0f93234aff8464c552402c90ec1e0"
+    },
+    {
+      "id": "U015",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U015-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U015-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U015-CARD.webp",
+      "sha256": "0e9de8117ebfbe76e217fa364f08a25b579c19af66b6ccefabd8f4b9ffa9a555"
+    },
+    {
+      "id": "U016",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U016-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U016-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U016-CARD.webp",
+      "sha256": "cbec8be57c80ac085f280963de5fe0b7f4316f6667cb3baa3acc8f7a024b26e3"
+    },
+    {
+      "id": "U017",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U017-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U017-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U017-CARD.webp",
+      "sha256": "912eeb8c89a7bc9e88bc119831d7713bb2a319379cfe5b06be820a1d1483d9ea"
+    },
+    {
+      "id": "U018",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U018-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U018-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U018-CARD.webp",
+      "sha256": "74027751c6c2480741a52ff44b2b84d206d0d84a6286f42b5a0aeeccfeabf263"
+    },
+    {
+      "id": "U019",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U019-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U019-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U019-CARD.webp",
+      "sha256": "ade197f6ddac09aae412fa26cc202a92438bedbb4f971c81b5e14ba805a114c9"
+    },
+    {
+      "id": "U020",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U020-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U020-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U020-CARD.webp",
+      "sha256": "3b17c6125fc07295e39b7744f2cb8d1579c47e7491cd4be5f21eb8837113abab"
+    },
+    {
+      "id": "U021",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U021-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U021-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U021-CARD.webp",
+      "sha256": "18e9ed1d8c33356dfa2dd79e7862eb328cd435be13e84648610133288c2dd2cf"
+    },
+    {
+      "id": "U022",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U022-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U022-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U022-CARD.webp",
+      "sha256": "88098d9d8670e5925357b96602b79910c05756c42860b4e9e177e6402e8b0450"
+    },
+    {
+      "id": "U023",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U023-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U023-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U023-CARD.webp",
+      "sha256": "fb9b1582c6a10a29f14417615dfbdcf681744a44797e27744695e3cdc941a674"
+    },
+    {
+      "id": "U024",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U024-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U024-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U024-CARD.webp",
+      "sha256": "1047e2b7758eff641642aff13ca4aab80eca917296668424586c5095c1dd38da"
+    },
+    {
+      "id": "U025",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U025-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U025-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U025-CARD.webp",
+      "sha256": "96a3996af518b5dbc8f6394b835117e677c7b8ced9b25820f912eb07a6b6d5b5"
+    },
+    {
+      "id": "U026",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U026-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U026-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U026-CARD.webp",
+      "sha256": "8046b2a8a3d4aec8157a0db81c4646fa22748eff8f65d6650bf819632b4e2f6a"
+    },
+    {
+      "id": "U027",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U027-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U027-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U027-CARD.webp",
+      "sha256": "4951552f7e2be2b72bf97625e0d0905ed55667c9bf81f692957d919b0a79485c"
+    },
+    {
+      "id": "U028",
+      "kind": "unit",
+      "source": "美术素材/标准版/单位卡面/U028-CARD.png",
+      "sourceSize": [
+        1024,
+        1536
+      ],
+      "large": "美术素材/运行时/卡面/unit/large/U028-CARD.webp",
+      "thumb": "美术素材/运行时/卡面/unit/thumb/U028-CARD.webp",
+      "sha256": "b7662bf02058d1035cd403e6a95d875eaab14fa760d9c3392acef3cdcd160fb8"
+    }
+  ]
+}
