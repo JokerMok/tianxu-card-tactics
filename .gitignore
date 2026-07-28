@@ -27,6 +27,7 @@ pnpm-debug.log*
 web-prototype/dist/
 web-prototype/coverage/
 web-prototype/*.tsbuildinfo
+web-prototype/artifacts/
 
 # Cocos Creator generated output
 cocos-client/library/
