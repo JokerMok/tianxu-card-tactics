@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "tables": {
+    "units": [{ "id": "unit-1", "role": "frontline", "maxHp": 100, "effects": ["effect-1"] }],
+    "effects": [{ "id": "effect-1", "type": "teleport", "value": 10, "nextEffectId": null }]
+  }
+}
