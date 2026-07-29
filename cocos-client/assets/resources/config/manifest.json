@@ -6,7 +6,10 @@
   "enabled": true,
   "tables": {
     "units": "config/units",
-    "cards": "config/cards"
+    "cards": "config/cards",
+    "skills": "config/skills",
+    "effects": "config/effects",
+    "statuses": "config/statuses"
   },
   "idPolicy": {
     "scope": "global",

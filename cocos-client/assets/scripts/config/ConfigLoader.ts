@@ -11,6 +11,9 @@ export interface ConfigManifest {
   tables: {
     units: string;
     cards: string;
+    skills: string;
+    effects: string;
+    statuses: string;
   };
   idPolicy: {
     scope: string;
@@ -112,8 +115,12 @@ export function assertConfigManifest(value: unknown, configPath = 'config/manife
   if (!isRecord(tables)) throw new ConfigLoadError(tablesPath, '必须是 object');
   stringField(tables, 'units', tablesPath);
   stringField(tables, 'cards', tablesPath);
-  if (tables.units !== 'config/units' || tables.cards !== 'config/cards') {
-    throw new ConfigLoadError(tablesPath, '只允许加载 config/units 与 config/cards');
+  const expectedTables = ['units', 'cards', 'skills', 'effects', 'statuses'] as const;
+  for (const tableName of expectedTables) {
+    const tablePath = stringField(tables, tableName, tablesPath);
+    if (tablePath !== `config/${tableName}`) {
+      throw new ConfigLoadError(`${tablesPath}.${tableName}`, `只允许加载 config/${tableName}`);
+    }
   }
 
   const policyPath = `${configPath}.idPolicy`;
@@ -142,10 +149,10 @@ export function loadConfigManifest(): Promise<ConfigManifest> {
       try {
         assertConfigManifest(asset?.json);
         const manifest = asset.json;
-        void Promise.all([
-          loadJsonAsset(manifest.tables.units).then((table) => assertTable(table, 'units', manifest.tables.units)),
-          loadJsonAsset(manifest.tables.cards).then((table) => assertTable(table, 'cards', manifest.tables.cards)),
-        ]).then(() => resolve(manifest), reject);
+        const tableLoads = (['units', 'cards', 'skills', 'effects', 'statuses'] as const).map((tableName) =>
+          loadJsonAsset(manifest.tables[tableName]).then((table) => assertTable(table, tableName, manifest.tables[tableName]))
+        );
+        void Promise.all(tableLoads).then(() => resolve(manifest), reject);
       } catch (validationError) {
         reject(validationError);
       }

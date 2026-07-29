@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1, "table": "statuses", "evidenceLevel": "C", "version": 1, "enabled": true,
+  "statuses": [
+    {"id":"ST001","statusType":"BURN","element":"FIRE","maxStacks":3,"durationRounds":2,"stackPolicy":"REFRESH"},
+    {"id":"ST002","statusType":"FROZEN","element":"WATER","maxStacks":1,"durationRounds":1,"stackPolicy":"REPLACE"},
+    {"id":"ST003","statusType":"ATTACK_UP","element":"WOOD","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"},
+    {"id":"ST004","statusType":"BARRIER","element":"EARTH","maxStacks":1,"durationRounds":0,"stackPolicy":"REPLACE"},
+    {"id":"ST005","statusType":"VULNERABLE","element":"METAL","maxStacks":3,"durationRounds":2,"stackPolicy":"REFRESH"},
+    {"id":"ST006","statusType":"STUNNED","element":"NONE","maxStacks":1,"durationRounds":1,"stackPolicy":"REPLACE"},
+    {"id":"ST007","statusType":"ARMOR_DOWN","element":"METAL","maxStacks":3,"durationRounds":0,"stackPolicy":"MAX"},
+    {"id":"ST008","statusType":"ARMOR_UP","element":"EARTH","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"},
+    {"id":"ST009","statusType":"DAMAGE_REDUCTION","element":"EARTH","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"}
+  ]
+}
