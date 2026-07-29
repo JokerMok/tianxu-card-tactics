@@ -24,13 +24,15 @@ export class TimeService {
   weekKey(at = this.now()): string {
     const p = this.localParts(at); const date = new Date(Date.UTC(p.year, p.month - 1, p.day));
     const weekday = date.getUTCDay() || 7; date.setUTCDate(date.getUTCDate() - weekday + 1);
-    return `${date.getUTCFullYear()}-W${String(this.isoWeek(date)).padStart(2, '0')}`;
+    const thursday = new Date(date); thursday.setUTCDate(date.getUTCDate() + 3);
+    return `${thursday.getUTCFullYear()}-W${String(this.isoWeek(date)).padStart(2, '0')}`;
   }
 
   private isoWeek(date: Date): number {
-    const thursday = new Date(date); thursday.setUTCDate(date.getUTCDate() + 3 - (date.getUTCDay() || 7));
+    const thursday = new Date(date); thursday.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
     const first = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 4));
-    return 1 + Math.round(((thursday.getTime() - first.getTime()) / 86400000 - 3 + (first.getUTCDay() || 7)) / 7);
+    first.setUTCDate(first.getUTCDate() + 3 - (first.getUTCDay() || 7));
+    return Math.floor((thursday.getTime() - first.getTime()) / 604800000) + 1;
   }
 
   offlineDurationMs(lastSeen: number, at = this.now(), maxMs = 24 * 60 * 60 * 1000): number {
