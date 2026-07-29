@@ -57,6 +57,7 @@ for (const unit of units) {
   assert.equal(elements.has(unit.element), true, `${unit.id}.element`);
   assert.equal(archetypes.has(unit.visualArchetype), true, `${unit.id}.visualArchetype`);
   assert.equal(Array.isArray(unit.abilityIds) && unit.abilityIds.length > 0, true, `${unit.id}.abilityIds`);
+  assert.equal(unit.abilityIds.every((id) => /^A\d{3}$/.test(id)), true, `${unit.id}.abilityIds format`);
   if (unit.role === 'RANGED') assert.equal(unit.maxHp <= 6, true, `${unit.id} ranged durability cap`);
 }
 

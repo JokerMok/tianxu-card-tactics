@@ -8,6 +8,10 @@ export interface ConfigManifest {
   evidenceLevel: EvidenceLevel;
   version: number;
   enabled: boolean;
+  tables: {
+    units: string;
+    cards: string;
+  };
   idPolicy: {
     scope: string;
     format: string;
@@ -55,6 +59,32 @@ function evidenceLevel(value: unknown, configPath: string): EvidenceLevel {
   return value;
 }
 
+function loadJsonAsset(configPath: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    resources.load(configPath, JsonAsset, (error, asset) => {
+      if (error) {
+        reject(new ConfigLoadError(configPath, error.message || '资源读取失败', { cause: error }));
+        return;
+      }
+      resolve(asset?.json);
+    });
+  });
+}
+
+function assertTable(value: unknown, tableName: string, configPath: string): void {
+  if (!isRecord(value)) throw new ConfigLoadError(configPath, '根值必须是 JSON object');
+  if (value.table !== tableName) throw new ConfigLoadError(`${configPath}.table`, `必须是 ${tableName}`);
+  const rows = value[tableName];
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new ConfigLoadError(`${configPath}.${tableName}`, '必须是非空 array');
+  }
+  rows.forEach((row, index) => {
+    if (!isRecord(row) || typeof row.id !== 'string' || row.id.length === 0) {
+      throw new ConfigLoadError(`${configPath}.${tableName}[${index}].id`, '必须是非空 string');
+    }
+  });
+}
+
 export function isConfigManifest(value: unknown): value is ConfigManifest {
   try {
     assertConfigManifest(value);
@@ -76,6 +106,12 @@ export function assertConfigManifest(value: unknown, configPath = 'config/manife
     throw new ConfigLoadError(`${configPath}.version`, '必须是正整数');
   }
   booleanField(value, 'enabled', configPath);
+
+  const tablesPath = `${configPath}.tables`;
+  const tables = required(value, 'tables', configPath);
+  if (!isRecord(tables)) throw new ConfigLoadError(tablesPath, '必须是 object');
+  stringField(tables, 'units', tablesPath);
+  stringField(tables, 'cards', tablesPath);
 
   const policyPath = `${configPath}.idPolicy`;
   const policy = required(value, 'idPolicy', configPath);
@@ -102,7 +138,11 @@ export function loadConfigManifest(): Promise<ConfigManifest> {
       }
       try {
         assertConfigManifest(asset?.json);
-        resolve(asset.json);
+        const manifest = asset.json;
+        void Promise.all([
+          loadJsonAsset(manifest.tables.units).then((table) => assertTable(table, 'units', manifest.tables.units)),
+          loadJsonAsset(manifest.tables.cards).then((table) => assertTable(table, 'cards', manifest.tables.cards)),
+        ]).then(() => resolve(manifest), reject);
       } catch (validationError) {
         reject(validationError);
       }
