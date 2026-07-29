@@ -38,16 +38,16 @@ export interface CardInstance {
 }
 
 export interface BattleEvent {
-  readonly id: number;
+  readonly eventId: number;
   readonly round: number;
   readonly turn: number;
+  readonly activeSide: Side;
   readonly rngCursor: number;
   readonly type: string;
-  readonly message: string;
   readonly side?: Side;
   readonly sourceId?: string;
   readonly targetId?: string;
-  readonly value?: number;
+  readonly payload: Readonly<Record<string, unknown>>;
 }
 
 export interface BattleState {

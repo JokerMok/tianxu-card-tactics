@@ -62,12 +62,13 @@ const fixture: BattleStateInput = {
   ],
   events: [
     {
-      id: 1,
+      eventId: 1,
       round: 1,
       turn: 1,
+      activeSide: 'player',
       rngCursor: 0,
       type: 'BATTLE_START',
-      message: '战斗开始',
+      payload: {},
     },
   ],
   status: 'playing',
@@ -99,14 +100,13 @@ const updated = updateBattleState(initial, (state) => ({
   events: [
     ...state.events,
     {
-      id: state.nextEventId,
+      eventId: state.nextEventId,
       round: state.round,
       turn: state.turn,
+      activeSide: state.activeSide,
       rngCursor: state.rngCursor,
       type: 'HERO_DAMAGED',
-      message: '敌方主将受到 3 点伤害',
-      side: 'enemy',
-      value: 3,
+      payload: { damage: 3, message: '敌方主将受到 3 点伤害' },
     },
   ],
   nextEventId: state.nextEventId + 1,
