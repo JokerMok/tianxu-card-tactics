@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import path from 'node:path';
-import vm from 'node:vm';
 
 const root = path.resolve(import.meta.dirname, '..');
 const configPath = path.join(root, 'assets/resources/config/manifest.json');
@@ -12,37 +11,25 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const loaderSource = fs.readFileSync(loaderPath, 'utf8');
 const bootstrap = fs.readFileSync(bootstrapPath, 'utf8');
 
-const requireFromWebPrototype = createRequire(new URL('../../web-prototype/package.json', import.meta.url));
-const typescript = requireFromWebPrototype('typescript');
-const compiled = typescript.transpileModule(loaderSource, {
-  compilerOptions: {
-    module: typescript.ModuleKind.CommonJS,
-    target: typescript.ScriptTarget.ES2020,
-  },
-  fileName: loaderPath,
-}).outputText;
-const module = { exports: {} };
+const mockCcSource = `
+const manifest = ${JSON.stringify(config)};
 const mockCc = {
   JsonAsset: class JsonAsset {},
   resources: {
     load(_path, _assetType, callback) {
-      callback(null, { json: config });
+      callback(null, { json: manifest });
     },
   },
 };
-const sandbox = {
-  console,
-  module,
-  exports: module.exports,
-  require: (specifier) => {
-    if (specifier === 'cc') return mockCc;
-    throw new Error(`unexpected dependency: ${specifier}`);
-  },
-};
-vm.runInNewContext(`(function (require, module, exports) {\n${compiled}\n})(require, module, exports);`, sandbox, {
-  filename: loaderPath,
-});
-const { assertConfigManifest, ConfigLoadError, loadConfigManifest } = module.exports;
+`;
+const sourceWithMockCc = loaderSource.replace(
+  "import { JsonAsset, resources } from 'cc';",
+  `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`,
+);
+assert.notEqual(sourceWithMockCc, loaderSource, 'the loader must have the expected sole cc import');
+const executableSource = stripTypeScriptTypes(sourceWithMockCc, { mode: 'transform' });
+const loaderModule = await import(`data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}`);
+const { assertConfigManifest, ConfigLoadError, loadConfigManifest } = loaderModule;
 assert.equal(typeof assertConfigManifest, 'function', 'must execute real assertConfigManifest export');
 assert.equal(typeof ConfigLoadError, 'function', 'must execute real ConfigLoadError export');
 assert.deepEqual(assertConfigManifest(config), undefined, 'valid manifest must be accepted');
