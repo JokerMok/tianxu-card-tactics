@@ -1,9 +1,9 @@
 # Cocos 巨型文件拆分方案
 
-版本：v1.0  
-任务：T005 / M0-05  
-需求：REQ-R0  
-状态：方案已登记，未执行代码迁移  
+版本：v1.0
+任务：T005 / M0-05
+需求：REQ-R0
+状态：方案已登记，未执行代码迁移
 基线：`cocos-client/assets/scripts/meta/GameShell.ts`、`cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts`、`cocos-client/assets/scripts/meta/GameState.ts`
 
 ## 1. 范围与判断
