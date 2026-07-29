@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "validate:a0": "node tools/validate-a0.mjs",
+    "validate:config-loader": "node tools/validate-config-loader.mjs",
     "verify:web": "node tools/verify-web.mjs",
     "verify:meta": "node tools/verify-meta.mjs",
     "audit:image2": "node tools/audit-image2.mjs"

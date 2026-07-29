@@ -23,6 +23,7 @@ import {
   view,
 } from 'cc';
 import { GameShell } from '../meta/GameShell';
+import { loadConfigManifest } from '../config/ConfigLoader';
 
 const { ccclass } = _decorator;
 
@@ -117,8 +118,26 @@ export class BattleA0Bootstrap extends Component {
   }>();
   private metrics!: A0Metrics;
   private gameShell!: GameShell;
+  private startupBlocked = false;
+  private startupToken = 0;
 
   onLoad(): void {
+    void this.start(++this.startupToken);
+  }
+
+  private isStartupActive(token: number): boolean {
+    return token === this.startupToken && this.node.isValid;
+  }
+
+  private async start(token: number): Promise<void> {
+    try {
+      await loadConfigManifest();
+    } catch (error) {
+      if (!this.isStartupActive(token)) return;
+      this.blockStartup(error);
+      return;
+    }
+    if (!this.isStartupActive(token)) return;
     view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
     this.node.getComponent(UITransform)!.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
     this.node.setPosition(DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2);
@@ -128,14 +147,34 @@ export class BattleA0Bootstrap extends Component {
     this.addTransform(this.root, DESIGN_WIDTH, DESIGN_HEIGHT);
     this.buildScene();
     this.publishHarness();
-    void this.loadRuntimeArt();
+    void this.loadRuntimeArt(token);
     this.gameShell = new GameShell(this.node, this.root);
     this.gameShell.mount();
   }
 
+  private blockStartup(error: unknown): void {
+    this.startupBlocked = true;
+    const message = error instanceof Error ? error.message : String(error);
+    const runtime = globalThis as Record<string, unknown>;
+    runtime.__A0_STARTUP_ERROR__ = message;
+    console.error(`[A0] 启动已阻断：${message}`);
+    const errorNode = new Node('StartupBlocked');
+    errorNode.setParent(this.node);
+    const transform = errorNode.addComponent(UITransform);
+    transform.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    const label = errorNode.addComponent(Label);
+    label.string = `启动失败\n${message}`;
+    label.fontSize = 32;
+    label.lineHeight = 48;
+    label.horizontalAlign = HorizontalTextAlignment.CENTER;
+    label.verticalAlign = VerticalTextAlignment.CENTER;
+  }
+
   onDestroy(): void {
+    this.startupToken += 1;
     const runtime = globalThis as Record<string, unknown>;
     delete runtime.__A0_METRICS__;
+    delete runtime.__A0_STARTUP_ERROR__;
     delete runtime.__A0_ENABLE_STRESS__;
     delete runtime.__A0_TRIGGER_HIT__;
     delete runtime.__A0_SELECT_CARD__;
@@ -150,6 +189,7 @@ export class BattleA0Bootstrap extends Component {
   }
 
   update(deltaTime: number): void {
+    if (this.startupBlocked) return;
     for (const [art, idle] of this.unitPreviewEntries) {
       idle.phase += deltaTime * idle.speed;
       const breath = (Math.sin(idle.phase) + 1) * 0.5;
@@ -589,7 +629,7 @@ export class BattleA0Bootstrap extends Component {
     this.metrics.activeDeploymentMarkers = this.deploymentMarkers.filter((marker) => marker.active).length;
   }
 
-  private async loadRuntimeArt(): Promise<void> {
+  private async loadRuntimeArt(token: number): Promise<void> {
     const entries = await Promise.all([
       this.loadSpriteFrame('a0/background/E104-PARALLAX-BOARD/spriteFrame'),
       this.loadSpriteFrame('a0/commanders/C009-BATTLE-SIDESLOT/spriteFrame'),
@@ -601,6 +641,7 @@ export class BattleA0Bootstrap extends Component {
       this.loadSpriteFrame('a0/cards/U001-CARD-THUMB/spriteFrame'),
       this.loadSpriteFrame('a0/cards/U008-CARD-THUMB/spriteFrame'),
     ]);
+    if (!this.isStartupActive(token)) return;
 
     const [background, player, enemy, u002Sheet, u008Sheet, u002Card, u004Card, u001Card, u008Card] = entries;
     this.attachBackgroundArt(background);
