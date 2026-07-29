@@ -23,6 +23,7 @@ import {
   view,
 } from 'cc';
 import { GameShell } from '../meta/GameShell';
+import { loadConfigManifest } from '../config/ConfigLoader';
 
 const { ccclass } = _decorator;
 
@@ -117,8 +118,19 @@ export class BattleA0Bootstrap extends Component {
   }>();
   private metrics!: A0Metrics;
   private gameShell!: GameShell;
+  private startupBlocked = false;
 
   onLoad(): void {
+    void this.start();
+  }
+
+  private async start(): Promise<void> {
+    try {
+      await loadConfigManifest();
+    } catch (error) {
+      this.blockStartup(error);
+      return;
+    }
     view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
     this.node.getComponent(UITransform)!.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
     this.node.setPosition(DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2);
@@ -133,9 +145,28 @@ export class BattleA0Bootstrap extends Component {
     this.gameShell.mount();
   }
 
+  private blockStartup(error: unknown): void {
+    this.startupBlocked = true;
+    const message = error instanceof Error ? error.message : String(error);
+    const runtime = globalThis as Record<string, unknown>;
+    runtime.__A0_STARTUP_ERROR__ = message;
+    console.error(`[A0] 启动已阻断：${message}`);
+    const errorNode = new Node('StartupBlocked');
+    errorNode.setParent(this.node);
+    const transform = errorNode.addComponent(UITransform);
+    transform.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+    const label = errorNode.addComponent(Label);
+    label.string = `启动失败\n${message}`;
+    label.fontSize = 32;
+    label.lineHeight = 48;
+    label.horizontalAlign = HorizontalTextAlignment.CENTER;
+    label.verticalAlign = VerticalTextAlignment.CENTER;
+  }
+
   onDestroy(): void {
     const runtime = globalThis as Record<string, unknown>;
     delete runtime.__A0_METRICS__;
+    delete runtime.__A0_STARTUP_ERROR__;
     delete runtime.__A0_ENABLE_STRESS__;
     delete runtime.__A0_TRIGGER_HIT__;
     delete runtime.__A0_SELECT_CARD__;
@@ -150,6 +181,7 @@ export class BattleA0Bootstrap extends Component {
   }
 
   update(deltaTime: number): void {
+    if (this.startupBlocked) return;
     for (const [art, idle] of this.unitPreviewEntries) {
       idle.phase += deltaTime * idle.speed;
       const breath = (Math.sin(idle.phase) + 1) * 0.5;
