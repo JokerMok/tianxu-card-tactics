@@ -21,6 +21,7 @@ assert(!isSummonCell('player', 0, 3));
 assert(!isSummonCell('enemy', 0, 8));
 assert(!isSummonCell('player', -1, 0));
 assert(!isSummonCell('player', 2, 0));
+assert(!isSummonCell('spectator' as 'player', 0, 11));
 
 const deployed = deployUnit(empty, unit('p1', 'player', 0, 0));
 assert.equal(deployed.units.length, 1);
@@ -28,6 +29,7 @@ assert.equal(empty.units.length, 0);
 assert.equal(getLegalDeploymentCells(deployed, 'player').length, 5);
 assert.throws(() => deployUnit(deployed, unit('p2', 'player', 0, 0)), /occupied/);
 assert.throws(() => deployUnit(empty, unit('bad', 'player', 0, 3)), /invalid/);
+assert.throws(() => deployUnit(empty, unit('bad-side', 'spectator' as 'player', 0, 11)), /invalid/);
 assert.throws(() => deployUnit(deployed, unit('p1', 'player', 0, 1)), /already exists/);
 
 const dead = deployUnit(empty, unit('dead', 'player', 0, 0));

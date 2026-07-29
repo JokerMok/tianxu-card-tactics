@@ -19,12 +19,14 @@ function validLane(lane: number): boolean { return Number.isInteger(lane) && lan
 function validCell(cell: number): boolean { return Number.isInteger(cell) && cell >= 0 && cell < CELLS_PER_LANE; }
 
 export function summonCells(side: Side): readonly number[] {
+  if (side !== 'player' && side !== 'enemy') throw new Error('side is invalid');
   return side === 'player'
     ? [0, 1, 2]
     : [CELLS_PER_LANE - 1, CELLS_PER_LANE - 2, CELLS_PER_LANE - 3];
 }
 
 export function isSummonCell(side: Side, lane: number, cell: number): boolean {
+  if (side !== 'player' && side !== 'enemy') return false;
   return validLane(lane) && validCell(cell) && summonCells(side).includes(cell);
 }
 
