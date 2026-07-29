@@ -14,7 +14,8 @@
   ],
   "allowed_paths": [
     "文档/数值与阵营配置-v1.0.md",
-    "cocos-client/assets/resources/config/"
+    "cocos-client/assets/resources/config/",
+    "cocos-client/assets/scripts/config/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",
