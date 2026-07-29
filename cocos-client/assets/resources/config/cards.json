@@ -678,6 +678,196 @@
       "evidenceLevel": "C",
       "version": 1,
       "enabled": true
+    },
+    {
+      "id": "S007",
+      "nameKey": "skill.S007.name",
+      "descriptionKey": "skill.S007.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S007",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S008",
+      "nameKey": "skill.S008.name",
+      "descriptionKey": "skill.S008.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S008",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S009",
+      "nameKey": "skill.S009.name",
+      "descriptionKey": "skill.S009.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S009",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S010",
+      "nameKey": "skill.S010.name",
+      "descriptionKey": "skill.S010.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S010",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S011",
+      "nameKey": "skill.S011.name",
+      "descriptionKey": "skill.S011.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S011",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S012",
+      "nameKey": "skill.S012.name",
+      "descriptionKey": "skill.S012.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S012",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S013",
+      "nameKey": "skill.S013.name",
+      "descriptionKey": "skill.S013.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S013",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S014",
+      "nameKey": "skill.S014.name",
+      "descriptionKey": "skill.S014.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S014",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S015",
+      "nameKey": "skill.S015.name",
+      "descriptionKey": "skill.S015.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S015",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S016",
+      "nameKey": "skill.S016.name",
+      "descriptionKey": "skill.S016.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S016",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
     }
   ]
 }

@@ -38,9 +38,9 @@ assert.deepEqual(units.map((unit) => unit.id), ids, 'units must contain U001-U02
 const unitCards = cards.filter((card) => card.cardType === 'UNIT');
 const skillCards = cards.filter((card) => card.cardType === 'SKILL');
 assert.deepEqual(unitCards.map((card) => card.id), ids, 'unit cards must contain U001-U028 in order');
-assert.deepEqual(skillCards.map((card) => card.id), ['S001','S002','S003','S004','S005','S006'], 'skill cards must be stable');
+assert.deepEqual(skillCards.map((card) => card.id), Array.from({length: 16}, (_, i) => `S${String(i + 1).padStart(3, '0')}`), 'skill cards must be stable');
 assert.equal(new Set(units.map((unit) => unit.id)).size, 28, 'unit IDs must be unique');
-assert.equal(new Set(cards.map((card) => card.id)).size, 34, 'card IDs must be unique');
+assert.equal(new Set(cards.map((card) => card.id)).size, 44, 'card IDs must be unique');
 
 for (const unit of units) {
   for (const [field, min, max] of [['maxHp', 1, 99], ['attack', 0, 30], ['armor', 0, 20], ['spellResist', 0, 20], ['move', 0, 4], ['range', 1, 12]]) {

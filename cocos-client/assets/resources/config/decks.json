@@ -1,7 +1,142 @@
 {
-  "schemaVersion": 1, "table": "decks", "evidenceLevel": "C", "version": 1, "enabled": true,
+  "schemaVersion": 1,
+  "table": "decks",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
   "decks": [
-    {"id":"D001","profession":"P001","cardEntries":[
-      {"cardId":"U001","count":1},{"cardId":"U002","count":1},{"cardId":"U003","count":1},{"cardId":"U004","count":1},{"cardId":"U005","count":1},{"cardId":"U006","count":1},{"cardId":"U007","count":1},{"cardId":"U008","count":1},{"cardId":"U009","count":1},{"cardId":"U010","count":1},{"cardId":"U011","count":1},{"cardId":"U012","count":1},{"cardId":"U013","count":1},{"cardId":"U014","count":1},{"cardId":"U015","count":1},{"cardId":"U016","count":1},{"cardId":"U017","count":1},{"cardId":"U018","count":1},{"cardId":"U019","count":1},{"cardId":"U020","count":1},{"cardId":"U021","count":1},{"cardId":"U022","count":1},{"cardId":"U023","count":1},{"cardId":"U024","count":1},{"cardId":"S001","count":1},{"cardId":"S002","count":1},{"cardId":"S003","count":1},{"cardId":"S004","count":1},{"cardId":"S005","count":1},{"cardId":"S006","count":1}],"totalCards":30,"minUnitCards":24,"maxSkillCards":6,"purposeTags":["基础验证","双路"]}
+    {
+      "id": "D001",
+      "profession": "P001",
+      "cardEntries": [
+        {
+          "cardId": "U001",
+          "count": 1
+        },
+        {
+          "cardId": "U002",
+          "count": 1
+        },
+        {
+          "cardId": "U003",
+          "count": 1
+        },
+        {
+          "cardId": "U004",
+          "count": 1
+        },
+        {
+          "cardId": "U005",
+          "count": 1
+        },
+        {
+          "cardId": "U006",
+          "count": 1
+        },
+        {
+          "cardId": "U007",
+          "count": 1
+        },
+        {
+          "cardId": "U008",
+          "count": 1
+        },
+        {
+          "cardId": "U009",
+          "count": 1
+        },
+        {
+          "cardId": "U010",
+          "count": 1
+        },
+        {
+          "cardId": "U011",
+          "count": 1
+        },
+        {
+          "cardId": "U012",
+          "count": 1
+        },
+        {
+          "cardId": "U013",
+          "count": 1
+        },
+        {
+          "cardId": "U014",
+          "count": 1
+        },
+        {
+          "cardId": "U015",
+          "count": 1
+        },
+        {
+          "cardId": "U016",
+          "count": 1
+        },
+        {
+          "cardId": "U017",
+          "count": 1
+        },
+        {
+          "cardId": "U018",
+          "count": 1
+        },
+        {
+          "cardId": "U019",
+          "count": 1
+        },
+        {
+          "cardId": "U020",
+          "count": 1
+        },
+        {
+          "cardId": "U021",
+          "count": 1
+        },
+        {
+          "cardId": "U022",
+          "count": 1
+        },
+        {
+          "cardId": "U023",
+          "count": 1
+        },
+        {
+          "cardId": "U024",
+          "count": 1
+        },
+        {
+          "cardId": "S004",
+          "count": 1
+        },
+        {
+          "cardId": "S006",
+          "count": 1
+        },
+        {
+          "cardId": "S014",
+          "count": 1
+        },
+        {
+          "cardId": "U025",
+          "count": 1
+        },
+        {
+          "cardId": "U026",
+          "count": 1
+        },
+        {
+          "cardId": "U027",
+          "count": 1
+        }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": [
+        "基础验证",
+        "双路"
+      ]
+    }
   ]
 }
