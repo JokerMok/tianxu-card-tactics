@@ -147,7 +147,7 @@ export class BattleA0Bootstrap extends Component {
     this.addTransform(this.root, DESIGN_WIDTH, DESIGN_HEIGHT);
     this.buildScene();
     this.publishHarness();
-    void this.loadRuntimeArt();
+    void this.loadRuntimeArt(token);
     this.gameShell = new GameShell(this.node, this.root);
     this.gameShell.mount();
   }
@@ -629,7 +629,7 @@ export class BattleA0Bootstrap extends Component {
     this.metrics.activeDeploymentMarkers = this.deploymentMarkers.filter((marker) => marker.active).length;
   }
 
-  private async loadRuntimeArt(): Promise<void> {
+  private async loadRuntimeArt(token: number): Promise<void> {
     const entries = await Promise.all([
       this.loadSpriteFrame('a0/background/E104-PARALLAX-BOARD/spriteFrame'),
       this.loadSpriteFrame('a0/commanders/C009-BATTLE-SIDESLOT/spriteFrame'),
@@ -641,6 +641,7 @@ export class BattleA0Bootstrap extends Component {
       this.loadSpriteFrame('a0/cards/U001-CARD-THUMB/spriteFrame'),
       this.loadSpriteFrame('a0/cards/U008-CARD-THUMB/spriteFrame'),
     ]);
+    if (!this.isStartupActive(token)) return;
 
     const [background, player, enemy, u002Sheet, u008Sheet, u002Card, u004Card, u001Card, u008Card] = entries;
     this.attachBackgroundArt(background);
