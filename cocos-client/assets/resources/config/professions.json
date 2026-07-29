@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1, "table": "professions", "evidenceLevel": "C", "version": 1, "enabled": true,
+  "professions": [
+    {"id":"P001","nameKey":"profession.commander.name","skillIds":["S004","S006","S014"],"evidenceLevel":"C","version":1,"enabled":true},
+    {"id":"P002","nameKey":"profession.arcanist.name","skillIds":["S001","S002","S003","S013"],"evidenceLevel":"C","version":1,"enabled":true},
+    {"id":"P003","nameKey":"profession.pact.name","skillIds":["S007","S008","S015","S016"],"evidenceLevel":"C","version":1,"enabled":true},
+    {"id":"P004","nameKey":"profession.shadow.name","skillIds":["S005","S009","S010","S011","S012"],"evidenceLevel":"C","version":1,"enabled":true}
+  ]
+}

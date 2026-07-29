@@ -5,33 +5,679 @@
   "version": 1,
   "enabled": true,
   "cards": [
-    {"id":"U001","nameKey":"unit.U001.name","descriptionKey":"unit.U001.description","cardType":"UNIT","race":"人族","politicalFaction":"朔垣军府","profession":"NONE","rarity":4,"prepare":3,"copyLimit":4,"unitId":"U001","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U002","nameKey":"unit.U002.name","descriptionKey":"unit.U002.description","cardType":"UNIT","race":"人族","politicalFaction":"朔垣军府","profession":"NONE","rarity":4,"prepare":2,"copyLimit":4,"unitId":"U002","tags":["unit","striker"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U003","nameKey":"unit.U003.name","descriptionKey":"unit.U003.description","cardType":"UNIT","race":"人族","politicalFaction":"朔垣军府","profession":"NONE","rarity":3,"prepare":4,"copyLimit":3,"unitId":"U003","tags":["unit","healer"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U004","nameKey":"unit.U004.name","descriptionKey":"unit.U004.description","cardType":"UNIT","race":"羽民","politicalFaction":"山海诸庭","profession":"NONE","rarity":4,"prepare":3,"copyLimit":4,"unitId":"U004","tags":["unit","ranged"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U005","nameKey":"unit.U005.name","descriptionKey":"unit.U005.description","cardType":"UNIT","race":"羽民","politicalFaction":"山海诸庭","profession":"NONE","rarity":3,"prepare":2,"copyLimit":3,"unitId":"U005","tags":["unit","fast"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U006","nameKey":"unit.U006.name","descriptionKey":"unit.U006.description","cardType":"UNIT","race":"羽民","politicalFaction":"山海诸庭","profession":"NONE","rarity":2,"prepare":1,"copyLimit":2,"unitId":"U006","tags":["unit","fast"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U007","nameKey":"unit.U007.name","descriptionKey":"unit.U007.description","cardType":"UNIT","race":"异兽","politicalFaction":"山海诸庭","profession":"NONE","rarity":3,"prepare":2,"copyLimit":3,"unitId":"U007","tags":["unit","fast"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U008","nameKey":"unit.U008.name","descriptionKey":"unit.U008.description","cardType":"UNIT","race":"异兽","politicalFaction":"山海诸庭","profession":"NONE","rarity":1,"prepare":5,"copyLimit":1,"unitId":"U008","tags":["unit","anchor"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U009","nameKey":"unit.U009.name","descriptionKey":"unit.U009.description","cardType":"UNIT","race":"冥裔","politicalFaction":"归墟会","profession":"NONE","rarity":3,"prepare":3,"copyLimit":3,"unitId":"U009","tags":["unit","striker"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U010","nameKey":"unit.U010.name","descriptionKey":"unit.U010.description","cardType":"UNIT","race":"冥裔","politicalFaction":"归墟会","profession":"NONE","rarity":2,"prepare":3,"copyLimit":3,"unitId":"U010","tags":["unit","ranged"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U011","nameKey":"unit.U011.name","descriptionKey":"unit.U011.description","cardType":"UNIT","race":"山灵","politicalFaction":"山海诸庭","profession":"NONE","rarity":2,"prepare":3,"copyLimit":2,"unitId":"U011","tags":["unit","striker"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U012","nameKey":"unit.U012.name","descriptionKey":"unit.U012.description","cardType":"UNIT","race":"山灵","politicalFaction":"山海诸庭","profession":"NONE","rarity":2,"prepare":4,"copyLimit":2,"unitId":"U012","tags":["unit","ranged"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U013","nameKey":"unit.U013.name","descriptionKey":"unit.U013.description","cardType":"UNIT","race":"人族","politicalFaction":"朔垣军府","profession":"NONE","rarity":3,"prepare":4,"copyLimit":3,"unitId":"U013","tags":["unit","support"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U014","nameKey":"unit.U014.name","descriptionKey":"unit.U014.description","cardType":"UNIT","race":"羽民","politicalFaction":"无籍行营","profession":"NONE","rarity":3,"prepare":4,"copyLimit":2,"unitId":"U014","tags":["unit","control"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U015","nameKey":"unit.U015.name","descriptionKey":"unit.U015.description","cardType":"UNIT","race":"鳞民","politicalFaction":"山海诸庭","profession":"NONE","rarity":3,"prepare":3,"copyLimit":3,"unitId":"U015","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U016","nameKey":"unit.U016.name","descriptionKey":"unit.U016.description","cardType":"UNIT","race":"鳞民","politicalFaction":"山海诸庭","profession":"NONE","rarity":3,"prepare":2,"copyLimit":3,"unitId":"U016","tags":["unit","striker"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U017","nameKey":"unit.U017.name","descriptionKey":"unit.U017.description","cardType":"UNIT","race":"鳞民","politicalFaction":"无籍行营","profession":"NONE","rarity":3,"prepare":4,"copyLimit":2,"unitId":"U017","tags":["unit","healer"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U018","nameKey":"unit.U018.name","descriptionKey":"unit.U018.description","cardType":"UNIT","race":"鳞民","politicalFaction":"归墟会","profession":"NONE","rarity":3,"prepare":4,"copyLimit":2,"unitId":"U018","tags":["unit","control"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U019","nameKey":"unit.U019.name","descriptionKey":"unit.U019.description","cardType":"UNIT","race":"山灵","politicalFaction":"朔垣军府","profession":"NONE","rarity":3,"prepare":4,"copyLimit":2,"unitId":"U019","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U020","nameKey":"unit.U020.name","descriptionKey":"unit.U020.description","cardType":"UNIT","race":"山灵","politicalFaction":"山海诸庭","profession":"NONE","rarity":4,"prepare":6,"copyLimit":1,"unitId":"U020","tags":["unit","anchor"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U021","nameKey":"unit.U021.name","descriptionKey":"unit.U021.description","cardType":"UNIT","race":"冥裔","politicalFaction":"归墟会","profession":"NONE","rarity":3,"prepare":4,"copyLimit":2,"unitId":"U021","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U022","nameKey":"unit.U022.name","descriptionKey":"unit.U022.description","cardType":"UNIT","race":"冥裔","politicalFaction":"天序神庭","profession":"NONE","rarity":4,"prepare":5,"copyLimit":1,"unitId":"U022","tags":["unit","support"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U023","nameKey":"unit.U023.name","descriptionKey":"unit.U023.description","cardType":"UNIT","race":"巧民","politicalFaction":"离山仙盟","profession":"NONE","rarity":2,"prepare":2,"copyLimit":3,"unitId":"U023","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U024","nameKey":"unit.U024.name","descriptionKey":"unit.U024.description","cardType":"UNIT","race":"巧民","politicalFaction":"离山仙盟","profession":"NONE","rarity":3,"prepare":3,"copyLimit":2,"unitId":"U024","tags":["unit","ranged"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U025","nameKey":"unit.U025.name","descriptionKey":"unit.U025.description","cardType":"UNIT","race":"巧民","politicalFaction":"河中诸国","profession":"NONE","rarity":3,"prepare":3,"copyLimit":2,"unitId":"U025","tags":["unit","summoner"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U026","nameKey":"unit.U026.name","descriptionKey":"unit.U026.description","cardType":"UNIT","race":"巧民","politicalFaction":"离山仙盟","profession":"NONE","rarity":4,"prepare":5,"copyLimit":1,"unitId":"U026","tags":["unit","anchor"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U027","nameKey":"unit.U027.name","descriptionKey":"unit.U027.description","cardType":"UNIT","race":"异兽","politicalFaction":"山海诸庭","profession":"NONE","rarity":3,"prepare":3,"copyLimit":2,"unitId":"U027","tags":["unit","fast"],"evidenceLevel":"C","version":1,"enabled":true},
-    {"id":"U028","nameKey":"unit.U028.name","descriptionKey":"unit.U028.description","cardType":"UNIT","race":"异兽","politicalFaction":"山海诸庭","profession":"NONE","rarity":4,"prepare":5,"copyLimit":1,"unitId":"U028","tags":["unit","guard"],"evidenceLevel":"C","version":1,"enabled":true}
+    {
+      "id": "U001",
+      "nameKey": "unit.U001.name",
+      "descriptionKey": "unit.U001.description",
+      "cardType": "UNIT",
+      "race": "人族",
+      "politicalFaction": "朔垣军府",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 3,
+      "copyLimit": 4,
+      "unitId": "U001",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U002",
+      "nameKey": "unit.U002.name",
+      "descriptionKey": "unit.U002.description",
+      "cardType": "UNIT",
+      "race": "人族",
+      "politicalFaction": "朔垣军府",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 2,
+      "copyLimit": 4,
+      "unitId": "U002",
+      "tags": [
+        "unit",
+        "striker"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U003",
+      "nameKey": "unit.U003.name",
+      "descriptionKey": "unit.U003.description",
+      "cardType": "UNIT",
+      "race": "人族",
+      "politicalFaction": "朔垣军府",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 3,
+      "unitId": "U003",
+      "tags": [
+        "unit",
+        "healer"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U004",
+      "nameKey": "unit.U004.name",
+      "descriptionKey": "unit.U004.description",
+      "cardType": "UNIT",
+      "race": "羽民",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 3,
+      "copyLimit": 4,
+      "unitId": "U004",
+      "tags": [
+        "unit",
+        "ranged"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U005",
+      "nameKey": "unit.U005.name",
+      "descriptionKey": "unit.U005.description",
+      "cardType": "UNIT",
+      "race": "羽民",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 2,
+      "copyLimit": 3,
+      "unitId": "U005",
+      "tags": [
+        "unit",
+        "fast"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U006",
+      "nameKey": "unit.U006.name",
+      "descriptionKey": "unit.U006.description",
+      "cardType": "UNIT",
+      "race": "羽民",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 2,
+      "prepare": 1,
+      "copyLimit": 2,
+      "unitId": "U006",
+      "tags": [
+        "unit",
+        "fast"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U007",
+      "nameKey": "unit.U007.name",
+      "descriptionKey": "unit.U007.description",
+      "cardType": "UNIT",
+      "race": "异兽",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 2,
+      "copyLimit": 3,
+      "unitId": "U007",
+      "tags": [
+        "unit",
+        "fast"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U008",
+      "nameKey": "unit.U008.name",
+      "descriptionKey": "unit.U008.description",
+      "cardType": "UNIT",
+      "race": "异兽",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 5,
+      "copyLimit": 1,
+      "unitId": "U008",
+      "tags": [
+        "unit",
+        "anchor"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U009",
+      "nameKey": "unit.U009.name",
+      "descriptionKey": "unit.U009.description",
+      "cardType": "UNIT",
+      "race": "冥裔",
+      "politicalFaction": "归墟会",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 3,
+      "copyLimit": 3,
+      "unitId": "U009",
+      "tags": [
+        "unit",
+        "striker"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U010",
+      "nameKey": "unit.U010.name",
+      "descriptionKey": "unit.U010.description",
+      "cardType": "UNIT",
+      "race": "冥裔",
+      "politicalFaction": "归墟会",
+      "profession": "NONE",
+      "rarity": 2,
+      "prepare": 3,
+      "copyLimit": 3,
+      "unitId": "U010",
+      "tags": [
+        "unit",
+        "ranged"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U011",
+      "nameKey": "unit.U011.name",
+      "descriptionKey": "unit.U011.description",
+      "cardType": "UNIT",
+      "race": "山灵",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 2,
+      "prepare": 3,
+      "copyLimit": 2,
+      "unitId": "U011",
+      "tags": [
+        "unit",
+        "striker"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U012",
+      "nameKey": "unit.U012.name",
+      "descriptionKey": "unit.U012.description",
+      "cardType": "UNIT",
+      "race": "山灵",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 2,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U012",
+      "tags": [
+        "unit",
+        "ranged"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U013",
+      "nameKey": "unit.U013.name",
+      "descriptionKey": "unit.U013.description",
+      "cardType": "UNIT",
+      "race": "人族",
+      "politicalFaction": "朔垣军府",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 3,
+      "unitId": "U013",
+      "tags": [
+        "unit",
+        "support"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U014",
+      "nameKey": "unit.U014.name",
+      "descriptionKey": "unit.U014.description",
+      "cardType": "UNIT",
+      "race": "羽民",
+      "politicalFaction": "无籍行营",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U014",
+      "tags": [
+        "unit",
+        "control"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U015",
+      "nameKey": "unit.U015.name",
+      "descriptionKey": "unit.U015.description",
+      "cardType": "UNIT",
+      "race": "鳞民",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 3,
+      "copyLimit": 3,
+      "unitId": "U015",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U016",
+      "nameKey": "unit.U016.name",
+      "descriptionKey": "unit.U016.description",
+      "cardType": "UNIT",
+      "race": "鳞民",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 2,
+      "copyLimit": 3,
+      "unitId": "U016",
+      "tags": [
+        "unit",
+        "striker"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U017",
+      "nameKey": "unit.U017.name",
+      "descriptionKey": "unit.U017.description",
+      "cardType": "UNIT",
+      "race": "鳞民",
+      "politicalFaction": "无籍行营",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U017",
+      "tags": [
+        "unit",
+        "healer"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U018",
+      "nameKey": "unit.U018.name",
+      "descriptionKey": "unit.U018.description",
+      "cardType": "UNIT",
+      "race": "鳞民",
+      "politicalFaction": "归墟会",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U018",
+      "tags": [
+        "unit",
+        "control"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U019",
+      "nameKey": "unit.U019.name",
+      "descriptionKey": "unit.U019.description",
+      "cardType": "UNIT",
+      "race": "山灵",
+      "politicalFaction": "朔垣军府",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U019",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U020",
+      "nameKey": "unit.U020.name",
+      "descriptionKey": "unit.U020.description",
+      "cardType": "UNIT",
+      "race": "山灵",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 6,
+      "copyLimit": 1,
+      "unitId": "U020",
+      "tags": [
+        "unit",
+        "anchor"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U021",
+      "nameKey": "unit.U021.name",
+      "descriptionKey": "unit.U021.description",
+      "cardType": "UNIT",
+      "race": "冥裔",
+      "politicalFaction": "归墟会",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 4,
+      "copyLimit": 2,
+      "unitId": "U021",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U022",
+      "nameKey": "unit.U022.name",
+      "descriptionKey": "unit.U022.description",
+      "cardType": "UNIT",
+      "race": "冥裔",
+      "politicalFaction": "天序神庭",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 5,
+      "copyLimit": 1,
+      "unitId": "U022",
+      "tags": [
+        "unit",
+        "support"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U023",
+      "nameKey": "unit.U023.name",
+      "descriptionKey": "unit.U023.description",
+      "cardType": "UNIT",
+      "race": "巧民",
+      "politicalFaction": "离山仙盟",
+      "profession": "NONE",
+      "rarity": 2,
+      "prepare": 2,
+      "copyLimit": 3,
+      "unitId": "U023",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U024",
+      "nameKey": "unit.U024.name",
+      "descriptionKey": "unit.U024.description",
+      "cardType": "UNIT",
+      "race": "巧民",
+      "politicalFaction": "离山仙盟",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 3,
+      "copyLimit": 2,
+      "unitId": "U024",
+      "tags": [
+        "unit",
+        "ranged"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U025",
+      "nameKey": "unit.U025.name",
+      "descriptionKey": "unit.U025.description",
+      "cardType": "UNIT",
+      "race": "巧民",
+      "politicalFaction": "河中诸国",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 3,
+      "copyLimit": 2,
+      "unitId": "U025",
+      "tags": [
+        "unit",
+        "summoner"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U026",
+      "nameKey": "unit.U026.name",
+      "descriptionKey": "unit.U026.description",
+      "cardType": "UNIT",
+      "race": "巧民",
+      "politicalFaction": "离山仙盟",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 5,
+      "copyLimit": 1,
+      "unitId": "U026",
+      "tags": [
+        "unit",
+        "anchor"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U027",
+      "nameKey": "unit.U027.name",
+      "descriptionKey": "unit.U027.description",
+      "cardType": "UNIT",
+      "race": "异兽",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 3,
+      "prepare": 3,
+      "copyLimit": 2,
+      "unitId": "U027",
+      "tags": [
+        "unit",
+        "fast"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "U028",
+      "nameKey": "unit.U028.name",
+      "descriptionKey": "unit.U028.description",
+      "cardType": "UNIT",
+      "race": "异兽",
+      "politicalFaction": "山海诸庭",
+      "profession": "NONE",
+      "rarity": 4,
+      "prepare": 5,
+      "copyLimit": 1,
+      "unitId": "U028",
+      "tags": [
+        "unit",
+        "guard"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S001",
+      "nameKey": "skill.S001.name",
+      "descriptionKey": "skill.S001.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S001",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S002",
+      "nameKey": "skill.S002.name",
+      "descriptionKey": "skill.S002.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S002",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S003",
+      "nameKey": "skill.S003.name",
+      "descriptionKey": "skill.S003.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S003",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S004",
+      "nameKey": "skill.S004.name",
+      "descriptionKey": "skill.S004.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S004",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S005",
+      "nameKey": "skill.S005.name",
+      "descriptionKey": "skill.S005.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S005",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S006",
+      "nameKey": "skill.S006.name",
+      "descriptionKey": "skill.S006.description",
+      "cardType": "SKILL",
+      "race": "NONE",
+      "politicalFaction": "NONE",
+      "profession": "NONE",
+      "rarity": 1,
+      "prepare": 1,
+      "copyLimit": 1,
+      "skillId": "S006",
+      "tags": [
+        "skill"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    }
   ]
 }

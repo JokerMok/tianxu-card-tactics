@@ -160,7 +160,7 @@ export function assertConfigTables(value: unknown): asserts value is ConfigTable
   // The runtime manifest stores resource paths; the loader validates and loads those
   // tables. Keep the legacy fixture shape below for the cross-table contract tests.
   if (typeof tables.units === 'string') {
-    for (const tableName of ['units', 'cards', 'skills', 'effects', 'statuses']) {
+    for (const tableName of ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks']) {
       const tablePath = configRequired(tables, tableName, 'config.tables');
       if (tablePath !== `config/${tableName}`) {
         throw new ConfigLoadError(`config.tables.${tableName}`, `只允许加载 config/${tableName}`);

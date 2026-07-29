@@ -35,9 +35,12 @@ const archetypes = new Set([
 assert.equal(manifest.tables.units, 'config/units');
 assert.equal(manifest.tables.cards, 'config/cards');
 assert.deepEqual(units.map((unit) => unit.id), ids, 'units must contain U001-U028 in order');
-assert.deepEqual(cards.map((card) => card.id), ids, 'cards must contain U001-U028 in order');
+const unitCards = cards.filter((card) => card.cardType === 'UNIT');
+const skillCards = cards.filter((card) => card.cardType === 'SKILL');
+assert.deepEqual(unitCards.map((card) => card.id), ids, 'unit cards must contain U001-U028 in order');
+assert.deepEqual(skillCards.map((card) => card.id), ['S001','S002','S003','S004','S005','S006'], 'skill cards must be stable');
 assert.equal(new Set(units.map((unit) => unit.id)).size, 28, 'unit IDs must be unique');
-assert.equal(new Set(cards.map((card) => card.id)).size, 28, 'card IDs must be unique');
+assert.equal(new Set(cards.map((card) => card.id)).size, 34, 'card IDs must be unique');
 
 for (const unit of units) {
   for (const [field, min, max] of [['maxHp', 1, 99], ['attack', 0, 30], ['armor', 0, 20], ['spellResist', 0, 20], ['move', 0, 4], ['range', 1, 12]]) {
@@ -73,7 +76,7 @@ for (const id of ids.slice(12)) {
 }
 
 const unitById = new Map(units.map((unit) => [unit.id, unit]));
-for (const card of cards) {
+for (const card of unitCards) {
   const unit = unitById.get(card.unitId);
   assert.ok(unit, `${card.id} unit reference`);
   assert.equal(card.cardType, 'UNIT');
@@ -86,6 +89,11 @@ for (const card of cards) {
   assert.equal(card.version, 1);
   assert.equal(card.enabled, true);
   assert.equal(card.evidenceLevel, 'C');
+}
+for (const card of skillCards) {
+  assert.equal(card.skillId, card.id);
+  assert.equal(card.race, 'NONE');
+  assert.equal(card.politicalFaction, 'NONE');
 }
 
 const designDoc = fs.readFileSync(path.join(projectRoot, '文档/数值与阵营配置-v1.0.md'), 'utf8');

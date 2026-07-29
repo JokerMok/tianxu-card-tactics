@@ -9,7 +9,9 @@
     "cards": "config/cards",
     "skills": "config/skills",
     "effects": "config/effects",
-    "statuses": "config/statuses"
+    "statuses": "config/statuses",
+    "professions": "config/professions",
+    "decks": "config/decks"
   },
   "idPolicy": {
     "scope": "global",

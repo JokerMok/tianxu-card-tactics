@@ -14,6 +14,8 @@ export interface ConfigManifest {
     skills: string;
     effects: string;
     statuses: string;
+    professions: string;
+    decks: string;
   };
   idPolicy: {
     scope: string;
@@ -115,7 +117,7 @@ export function assertConfigManifest(value: unknown, configPath = 'config/manife
   if (!isRecord(tables)) throw new ConfigLoadError(tablesPath, '必须是 object');
   stringField(tables, 'units', tablesPath);
   stringField(tables, 'cards', tablesPath);
-  const expectedTables = ['units', 'cards', 'skills', 'effects', 'statuses'] as const;
+  const expectedTables = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const;
   for (const tableName of expectedTables) {
     const tablePath = stringField(tables, tableName, tablesPath);
     if (tablePath !== `config/${tableName}`) {
@@ -149,7 +151,7 @@ export function loadConfigManifest(): Promise<ConfigManifest> {
       try {
         assertConfigManifest(asset?.json);
         const manifest = asset.json;
-        const tableLoads = (['units', 'cards', 'skills', 'effects', 'statuses'] as const).map((tableName) =>
+        const tableLoads = (['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const).map((tableName) =>
           loadJsonAsset(manifest.tables[tableName]).then((table) => assertTable(table, tableName, manifest.tables[tableName]))
         );
         void Promise.all(tableLoads).then(() => resolve(manifest), reject);
