@@ -14,6 +14,7 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
+    "package.json",
     "scripts/"
   ],
   "excluded_snapshot_paths": [
