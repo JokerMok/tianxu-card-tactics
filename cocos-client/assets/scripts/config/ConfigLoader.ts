@@ -112,6 +112,9 @@ export function assertConfigManifest(value: unknown, configPath = 'config/manife
   if (!isRecord(tables)) throw new ConfigLoadError(tablesPath, '必须是 object');
   stringField(tables, 'units', tablesPath);
   stringField(tables, 'cards', tablesPath);
+  if (tables.units !== 'config/units' || tables.cards !== 'config/cards') {
+    throw new ConfigLoadError(tablesPath, '只允许加载 config/units 与 config/cards');
+  }
 
   const policyPath = `${configPath}.idPolicy`;
   const policy = required(value, 'idPolicy', configPath);
