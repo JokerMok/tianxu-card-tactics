@@ -17,7 +17,7 @@ npm run dev
 - 默认：A 战场优先主布局。
 - `?variant=B`：内部战术仪表评审布局。
 - `?variant=C`：内部沉浸战线评审布局。
-- `prototype` 参数仅显示布局切换器，不改变布局本身；不传 `variant` 时仍使用 A 布局。
+- `prototype` 参数会显示布局切换器并启用 `has-switcher` 样式，改变底部留白、战场宽度和提示位置；不传 `variant` 时仍使用 A 布局。
 
 ## M0-04 冻结边界
 
