@@ -1,12 +1,12 @@
 {
   "id": "T103",
-  "source_task": "M8-05",
+  "source_task": "M8-04",
   "dependencies": [
     "T102"
   ],
   "wave": 103,
   "executor": "cloud",
-  "risk": "high",
+  "risk": "low",
   "status": "pending",
   "verification_commands": [
     "cd web-prototype && npm test",

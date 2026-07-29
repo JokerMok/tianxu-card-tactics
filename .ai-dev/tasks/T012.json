@@ -1,8 +1,8 @@
 {
   "id": "T012",
-  "source_task": "M1-06",
+  "source_task": "M1-05",
   "dependencies": [
-    "T011"
+    "T010"
   ],
   "wave": 12,
   "executor": "local",

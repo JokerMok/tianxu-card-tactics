@@ -1,12 +1,12 @@
 {
   "id": "T099",
-  "source_task": "M8-01",
+  "source_task": "M7-12",
   "dependencies": [
     "T098"
   ],
   "wave": 99,
   "executor": "cloud",
-  "risk": "low",
+  "risk": "medium",
   "status": "pending",
   "verification_commands": [
     "cd web-prototype && npm test",
@@ -14,7 +14,8 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/"
+    "美术素材/",
+    "cocos-client/assets/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

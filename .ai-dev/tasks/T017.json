@@ -1,12 +1,12 @@
 {
   "id": "T017",
-  "source_task": "M2-01",
+  "source_task": "M1-10",
   "dependencies": [
     "T016"
   ],
   "wave": 17,
   "executor": "cloud",
-  "risk": "high",
+  "risk": "medium",
   "status": "pending",
   "verification_commands": [
     "cd web-prototype && npm test",
@@ -14,7 +14,7 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/core/"
+    "cocos-client/assets/scripts/services/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

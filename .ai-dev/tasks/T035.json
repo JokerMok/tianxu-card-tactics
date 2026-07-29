@@ -1,6 +1,6 @@
 {
   "id": "T035",
-  "source_task": "M2-19",
+  "source_task": "M2-18",
   "dependencies": [
     "T034"
   ],
@@ -14,7 +14,7 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/"
+    "web-prototype/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

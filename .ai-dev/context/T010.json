@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "task_id": "T010",
+  "budget_tokens": 8000,
+  "estimated_tokens": 74,
+  "repo_revision": "d6e624339864e5ce386ec7d0ceba7f1d8a066933",
+  "task_file": ".ai-dev/tasks/T010.json",
+  "task_markdown": ".ai-dev/tasks/T010.md",
+  "required_files": [
+    "cocos-client/assets/resources/config/manifest.json"
+  ],
+  "evidence": [
+    {
+      "path": "cocos-client/assets/resources/config/manifest.json",
+      "lines": "1-18",
+      "reason": "任务允许路径",
+      "sha256": "2a2757f04e49b93eb7096cfef6c6fb10a060e9ef65df607d31ea1479a017e40e",
+      "symbols": [],
+      "content": "{\n  \"schemaVersion\": 1,\n  \"id\": \"CONFIG-MANIFEST\",\n  \"evidenceLevel\": \"C\",\n  \"version\": 1,\n  \"enabled\": true,\n  \"idPolicy\": {\n    \"scope\": \"global\",\n    \"format\": \"^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$\",\n    \"stable\": true,\n    \"unique\": true\n  },\n  \"evidenceLevels\": [\n    \"A\",\n    \"B\",\n    \"C\"\n  ]\n}\n",
+      "estimated_tokens": 74,
+      "cache_hit": true
+    }
+  ],
+  "task_references": [],
+  "excluded_candidates": [],
+  "expansion_policy": "先请求指定文件或符号，再扩大到完整文件；不得自行扫描全仓库",
+  "estimation": "约每 4 个字符 1 token，仅用于预算控制",
+  "confidence": "high"
+}

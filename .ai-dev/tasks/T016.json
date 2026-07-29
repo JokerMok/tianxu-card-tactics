@@ -1,11 +1,11 @@
 {
   "id": "T016",
-  "source_task": "M1-10",
+  "source_task": "M1-09",
   "dependencies": [
     "T015"
   ],
   "wave": 16,
-  "executor": "cloud",
+  "executor": "local",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [

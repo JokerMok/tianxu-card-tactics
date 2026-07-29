@@ -1,12 +1,12 @@
 {
   "id": "T049",
-  "source_task": "M4-01",
+  "source_task": "M3-13",
   "dependencies": [
     "T048"
   ],
   "wave": 49,
-  "executor": "local",
-  "risk": "medium",
+  "executor": "cloud",
+  "risk": "high",
   "status": "pending",
   "verification_commands": [
     "cd web-prototype && npm test",
@@ -14,7 +14,7 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/"
+    "cocos-client/assets/scripts/battle/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

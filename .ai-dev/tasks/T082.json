@@ -1,12 +1,12 @@
 {
   "id": "T082",
-  "source_task": "M6-12",
+  "source_task": "M6-11",
   "dependencies": [
     "T081"
   ],
   "wave": 82,
   "executor": "cloud",
-  "risk": "high",
+  "risk": "medium",
   "status": "pending",
   "verification_commands": [
     "cd web-prototype && npm test",

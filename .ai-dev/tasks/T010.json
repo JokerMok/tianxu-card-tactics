@@ -1,20 +1,20 @@
 {
   "id": "T010",
-  "source_task": "M1-04",
-  "dependencies": [
-    "T009"
-  ],
+  "source_task": "M1-04A",
+  "dependencies": ["T009"],
   "wave": 10,
-  "executor": "local",
-  "risk": "medium",
+  "executor": "cloud",
+  "risk": "high",
   "status": "pending",
   "verification_commands": [
+    "cd cocos-client && node assets/resources/config/validate-t010.mjs",
     "cd web-prototype && npm test",
     "cd web-prototype && npm run build",
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/"
+    "文档/数值与阵营配置-v1.0.md",
+    "cocos-client/assets/resources/config/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",
