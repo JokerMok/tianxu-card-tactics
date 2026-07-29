@@ -14,7 +14,8 @@
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/"
+    "cocos-client/assets/resources/",
+    "cocos-client/assets/scripts/config/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",
