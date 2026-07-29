@@ -37,6 +37,10 @@ function requiredRecord(value: Record<string, unknown>, key: string): Record<str
   return child;
 }
 
+function assertKeys(value: Record<string, unknown>, allowed: readonly string[], path: string): void {
+  for (const key of Object.keys(value)) if (!allowed.includes(key)) throw new Error(`unknown ${path}.${key}`);
+}
+
 function stringArray(value: unknown, path: string): string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string' || item.length === 0)) {
     throw new Error(`${path} must be a non-empty string array`);
@@ -52,6 +56,9 @@ export function validateSave(value: unknown): SaveData {
   const deck = requiredRecord(value, 'deck');
   const progress = requiredRecord(value, 'progress');
   const resources = requiredRecord(value, 'resources');
+  assertKeys(deck, ['cardIds'], 'deck');
+  assertKeys(progress, ['unlockedNodes', 'clearedNodes'], 'progress');
+  assertKeys(resources, ['gold', 'essence'], 'resources');
   const gold = resources.gold;
   const essence = resources.essence;
   if (![gold, essence].every((n) => typeof n === 'number' && Number.isSafeInteger(n) && n >= 0)) throw new Error('resources are invalid');

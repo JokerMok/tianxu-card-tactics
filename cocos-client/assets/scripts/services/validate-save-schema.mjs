@@ -8,5 +8,7 @@ assert.equal(recoverSave(primary, null, 'P001').reason, 'primary');
 assert.equal(recoverSave({ schemaVersion: 99 }, primary, 'P001').reason, 'backup');
 assert.equal(recoverSave({ schemaVersion: 99 }, { schemaVersion: 99 }, 'P001', 200).reason, 'default');
 assert.throws(() => validateSave({ ...primary, unknown: true }), /unknown save field/);
+assert.throws(() => validateSave({ ...primary, deck: { cardIds: [], unknown: true } }), /unknown deck/);
+assert.throws(() => validateSave({ ...primary, resources: { gold: 0, essence: 0, unknown: true } }), /unknown resources/);
 assert.throws(() => validateSave({ ...primary, resources: { gold: -1, essence: 0 } }), /resources are invalid/);
 console.log('T014 save schema PASS: default, validation, backup recovery and corruption fallback');
