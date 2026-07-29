@@ -4,6 +4,7 @@ import { createCardState, decrementPreparation, endCardTurn } from './index.ts';
 const deck = Array.from({ length: 30 }, (_, index) => `C${String(index + 1).padStart(3, '0')}`);
 const prepareByCardId = Object.fromEntries(deck.map((id, index) => [id, (index % 4) + 1]));
 const state = createCardState({ seed: 20260712, decks: { player: deck, enemy: deck }, prepareByCardId });
+const initialPlayerHand = state.hands.player;
 
 assert.equal(state.hands.player.length, 5);
 assert.equal(state.hands.enemy.length, 5);
@@ -18,7 +19,10 @@ const refilled = endCardTurn(ready, 'player');
 assert.equal(refilled.hands.player.length, 6);
 assert(refilled.hands.player.slice(0, 5).every((card) => card.remainingPreparation >= 0));
 assert.equal(refilled.nextId, state.nextId + 1);
-assert.deepEqual(state.hands.player, state.hands.player, 'card state updates must be immutable');
+assert.notStrictEqual(ready, state);
+assert.deepEqual(state.hands.player, initialPlayerHand, 'initial card state remains unchanged');
+assert(state.hands.player.some((card) => card.remainingPreparation > 0), 'initial preparation snapshot must not be decremented');
+assert.notStrictEqual(refilled.hands.player, ready.hands.player, 'end-turn must return a new hand snapshot');
 assert.deepEqual(createCardState({ seed: 20260712, decks: { player: deck, enemy: deck }, prepareByCardId }), state);
 assert.notDeepEqual(createCardState({ seed: 20260713, decks: { player: deck, enemy: deck }, prepareByCardId }).decks, state.decks);
 
