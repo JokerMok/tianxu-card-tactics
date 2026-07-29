@@ -1,14 +1,136 @@
 {
-  "schemaVersion": 1, "table": "statuses", "evidenceLevel": "C", "version": 1, "enabled": true,
+  "schemaVersion": 1,
+  "table": "statuses",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
   "statuses": [
-    {"id":"ST001","statusType":"BURN","element":"FIRE","maxStacks":3,"durationRounds":2,"stackPolicy":"REFRESH"},
-    {"id":"ST002","statusType":"FROZEN","element":"WATER","maxStacks":1,"durationRounds":1,"stackPolicy":"REPLACE"},
-    {"id":"ST003","statusType":"ATTACK_UP","element":"WOOD","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"},
-    {"id":"ST004","statusType":"BARRIER","element":"EARTH","maxStacks":1,"durationRounds":0,"stackPolicy":"REPLACE"},
-    {"id":"ST005","statusType":"VULNERABLE","element":"METAL","maxStacks":3,"durationRounds":2,"stackPolicy":"REFRESH"},
-    {"id":"ST006","statusType":"STUNNED","element":"NONE","maxStacks":1,"durationRounds":1,"stackPolicy":"REPLACE"},
-    {"id":"ST007","statusType":"ARMOR_DOWN","element":"METAL","maxStacks":3,"durationRounds":0,"stackPolicy":"MAX"},
-    {"id":"ST008","statusType":"ARMOR_UP","element":"EARTH","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"},
-    {"id":"ST009","statusType":"DAMAGE_REDUCTION","element":"EARTH","maxStacks":3,"durationRounds":2,"stackPolicy":"MAX"}
+    {
+      "id": "ST001",
+      "category": "DEBUFF",
+      "stackRule": "REFRESH",
+      "maxStacks": 3,
+      "tickTiming": "ROUND_END",
+      "effectIds": [
+        "E002",
+        "E018"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST002",
+      "category": "CONTROL",
+      "stackRule": "REPLACE",
+      "maxStacks": 1,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E004"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST003",
+      "category": "BUFF",
+      "stackRule": "ADD_VALUE",
+      "maxStacks": 3,
+      "tickTiming": "ROUND_START",
+      "effectIds": [
+        "E007"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST004",
+      "category": "BUFF",
+      "stackRule": "REPLACE",
+      "maxStacks": 1,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E009"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST005",
+      "category": "DEBUFF",
+      "stackRule": "REFRESH",
+      "maxStacks": 3,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E013"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST006",
+      "category": "CONTROL",
+      "stackRule": "REPLACE",
+      "maxStacks": 1,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E014"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST007",
+      "category": "DEBUFF",
+      "stackRule": "ADD_VALUE",
+      "maxStacks": 3,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E016"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST008",
+      "category": "BUFF",
+      "stackRule": "ADD_VALUE",
+      "maxStacks": 3,
+      "tickTiming": "ROUND_START",
+      "effectIds": [
+        "E017"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "ST009",
+      "category": "BUFF",
+      "stackRule": "ADD_VALUE",
+      "maxStacks": 3,
+      "tickTiming": "ACTION_START",
+      "effectIds": [
+        "E019"
+      ],
+      "removable": true,
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    }
   ]
 }

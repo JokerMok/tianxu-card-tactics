@@ -1,21 +1,255 @@
 {
-  "schemaVersion": 1, "table": "skills", "evidenceLevel": "C", "version": 1, "enabled": true,
+  "schemaVersion": 1,
+  "table": "skills",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
   "skills": [
-    {"id":"S001","nameKey":"skill.S001.name","descriptionKey":"skill.S001.description","targetType":"ENEMY_UNIT","rangeShape":"SINGLE","rangeA":3,"rangeB":0,"effectIds":["E001","E002"]},
-    {"id":"S002","nameKey":"skill.S002.name","descriptionKey":"skill.S002.description","targetType":"ENEMY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E003","E004"]},
-    {"id":"S003","nameKey":"skill.S003.name","descriptionKey":"skill.S003.description","targetType":"ENEMY_AREA","rangeShape":"RECT","rangeA":2,"rangeB":2,"effectIds":["E005","E006"]},
-    {"id":"S004","nameKey":"skill.S004.name","descriptionKey":"skill.S004.description","targetType":"ALLY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E007"]},
-    {"id":"S005","nameKey":"skill.S005.name","descriptionKey":"skill.S005.description","targetType":"ALLY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E008"]},
-    {"id":"S006","nameKey":"skill.S006.name","descriptionKey":"skill.S006.description","targetType":"ALLY_UNIT","rangeShape":"SINGLE","rangeA":2,"rangeB":0,"effectIds":["E009"]},
-    {"id":"S007","nameKey":"skill.S007.name","descriptionKey":"skill.S007.description","targetType":"ALLY_UNIT","rangeShape":"SINGLE","rangeA":2,"rangeB":0,"effectIds":["E010"]},
-    {"id":"S008","nameKey":"skill.S008.name","descriptionKey":"skill.S008.description","targetType":"ALLY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E010","E011"]},
-    {"id":"S009","nameKey":"skill.S009.name","descriptionKey":"skill.S009.description","targetType":"PREPARE_BAR","rangeShape":"GLOBAL","rangeA":0,"rangeB":0,"effectIds":["E012"]},
-    {"id":"S010","nameKey":"skill.S010.name","descriptionKey":"skill.S010.description","targetType":"ENEMY_UNIT","rangeShape":"SINGLE","rangeA":4,"rangeB":0,"effectIds":["E013"]},
-    {"id":"S011","nameKey":"skill.S011.name","descriptionKey":"skill.S011.description","targetType":"ENEMY_AREA","rangeShape":"RECT","rangeA":2,"rangeB":2,"effectIds":["E014"]},
-    {"id":"S012","nameKey":"skill.S012.name","descriptionKey":"skill.S012.description","targetType":"ALLY_UNIT","rangeShape":"SINGLE","rangeA":3,"rangeB":0,"effectIds":["E015"]},
-    {"id":"S013","nameKey":"skill.S013.name","descriptionKey":"skill.S013.description","targetType":"ENEMY_UNIT","rangeShape":"SINGLE","rangeA":3,"rangeB":0,"effectIds":["E016","E001"]},
-    {"id":"S014","nameKey":"skill.S014.name","descriptionKey":"skill.S014.description","targetType":"ALLY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E017"]},
-    {"id":"S015","nameKey":"skill.S015.name","descriptionKey":"skill.S015.description","targetType":"ALLY_UNIT","rangeShape":"SINGLE","rangeA":2,"rangeB":0,"effectIds":["E018","E010"]},
-    {"id":"S016","nameKey":"skill.S016.name","descriptionKey":"skill.S016.description","targetType":"ALLY_LANE","rangeShape":"LANE","rangeA":1,"rangeB":0,"effectIds":["E019"]}
+    {
+      "id": "S001",
+      "nameKey": "skill.S001.name",
+      "descriptionKey": "skill.S001.description",
+      "targetType": "ENEMY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 3,
+      "rangeB": 0,
+      "effectIds": [
+        "E001",
+        "E002"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S002",
+      "nameKey": "skill.S002.name",
+      "descriptionKey": "skill.S002.description",
+      "targetType": "ENEMY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E003",
+        "E004"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S003",
+      "nameKey": "skill.S003.name",
+      "descriptionKey": "skill.S003.description",
+      "targetType": "ENEMY_AREA",
+      "rangeShape": "RECT",
+      "rangeA": 2,
+      "rangeB": 2,
+      "effectIds": [
+        "E005",
+        "E006"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S004",
+      "nameKey": "skill.S004.name",
+      "descriptionKey": "skill.S004.description",
+      "targetType": "ALLY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E007"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S005",
+      "nameKey": "skill.S005.name",
+      "descriptionKey": "skill.S005.description",
+      "targetType": "ALLY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E008"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S006",
+      "nameKey": "skill.S006.name",
+      "descriptionKey": "skill.S006.description",
+      "targetType": "ALLY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 2,
+      "rangeB": 0,
+      "effectIds": [
+        "E009"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S007",
+      "nameKey": "skill.S007.name",
+      "descriptionKey": "skill.S007.description",
+      "targetType": "ALLY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 2,
+      "rangeB": 0,
+      "effectIds": [
+        "E010"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S008",
+      "nameKey": "skill.S008.name",
+      "descriptionKey": "skill.S008.description",
+      "targetType": "ALLY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E010",
+        "E011"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S009",
+      "nameKey": "skill.S009.name",
+      "descriptionKey": "skill.S009.description",
+      "targetType": "PREPARE_BAR",
+      "rangeShape": "GLOBAL",
+      "rangeA": 0,
+      "rangeB": 0,
+      "effectIds": [
+        "E012"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S010",
+      "nameKey": "skill.S010.name",
+      "descriptionKey": "skill.S010.description",
+      "targetType": "ENEMY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 4,
+      "rangeB": 0,
+      "effectIds": [
+        "E013"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S011",
+      "nameKey": "skill.S011.name",
+      "descriptionKey": "skill.S011.description",
+      "targetType": "ENEMY_AREA",
+      "rangeShape": "RECT",
+      "rangeA": 2,
+      "rangeB": 2,
+      "effectIds": [
+        "E014"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S012",
+      "nameKey": "skill.S012.name",
+      "descriptionKey": "skill.S012.description",
+      "targetType": "ALLY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 3,
+      "rangeB": 0,
+      "effectIds": [
+        "E015"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S013",
+      "nameKey": "skill.S013.name",
+      "descriptionKey": "skill.S013.description",
+      "targetType": "ENEMY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 3,
+      "rangeB": 0,
+      "effectIds": [
+        "E016",
+        "E001"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S014",
+      "nameKey": "skill.S014.name",
+      "descriptionKey": "skill.S014.description",
+      "targetType": "ALLY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E017"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S015",
+      "nameKey": "skill.S015.name",
+      "descriptionKey": "skill.S015.description",
+      "targetType": "ALLY_UNIT",
+      "rangeShape": "SINGLE",
+      "rangeA": 2,
+      "rangeB": 0,
+      "effectIds": [
+        "E018",
+        "E010"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    },
+    {
+      "id": "S016",
+      "nameKey": "skill.S016.name",
+      "descriptionKey": "skill.S016.description",
+      "targetType": "ALLY_LANE",
+      "rangeShape": "LANE",
+      "rangeA": 1,
+      "rangeB": 0,
+      "effectIds": [
+        "E019"
+      ],
+      "evidenceLevel": "C",
+      "version": 1,
+      "enabled": true
+    }
   ]
 }
