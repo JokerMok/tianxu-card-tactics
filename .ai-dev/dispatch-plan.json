@@ -20170,6 +20170,7 @@
             "T001"
           ],
           "allowed_paths": [
+            "package.json",
             "scripts/"
           ],
           "context_ref": ".ai-dev/context/T002.json",
