@@ -119,18 +119,25 @@ export class BattleA0Bootstrap extends Component {
   private metrics!: A0Metrics;
   private gameShell!: GameShell;
   private startupBlocked = false;
+  private startupToken = 0;
 
   onLoad(): void {
-    void this.start();
+    void this.start(++this.startupToken);
   }
 
-  private async start(): Promise<void> {
+  private isStartupActive(token: number): boolean {
+    return token === this.startupToken && this.node.isValid;
+  }
+
+  private async start(token: number): Promise<void> {
     try {
       await loadConfigManifest();
     } catch (error) {
+      if (!this.isStartupActive(token)) return;
       this.blockStartup(error);
       return;
     }
+    if (!this.isStartupActive(token)) return;
     view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
     this.node.getComponent(UITransform)!.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
     this.node.setPosition(DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2);
@@ -164,6 +171,7 @@ export class BattleA0Bootstrap extends Component {
   }
 
   onDestroy(): void {
+    this.startupToken += 1;
     const runtime = globalThis as Record<string, unknown>;
     delete runtime.__A0_METRICS__;
     delete runtime.__A0_STARTUP_ERROR__;
