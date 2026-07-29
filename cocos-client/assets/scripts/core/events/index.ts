@@ -13,11 +13,12 @@ export interface DequeueResult {
 }
 
 export function createEventQueue(nextEventId = 1): EventQueue {
-  if (!Number.isSafeInteger(nextEventId) || nextEventId < 1) throw new Error('nextEventId is invalid');
+  if (!Number.isSafeInteger(nextEventId) || nextEventId < 1 || nextEventId >= Number.MAX_SAFE_INTEGER) throw new Error('nextEventId is invalid');
   return { nextEventId, events: [] };
 }
 
 export function enqueue(queue: EventQueue, input: EventInput): EventQueue {
+  if (queue.nextEventId >= Number.MAX_SAFE_INTEGER) throw new Error('event id exhausted');
   const event: BattleEvent = { ...input, eventId: queue.nextEventId };
   return { nextEventId: queue.nextEventId + 1, events: [...queue.events, event] };
 }

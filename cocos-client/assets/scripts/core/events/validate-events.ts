@@ -24,5 +24,7 @@ assert.equal(dequeue(drained.queue).event, undefined);
 const appended = enqueue(drained.queue, event('ROUND_END', 'enemy'));
 assert.equal(appended.events[0].eventId, 7, 'event ids remain monotonic after draining');
 assert.throws(() => createEventQueue(0), /invalid/);
+assert.throws(() => createEventQueue(Number.MAX_SAFE_INTEGER), /invalid/);
+assert.throws(() => enqueue({ nextEventId: Number.MAX_SAFE_INTEGER, events: [] }, event('OVERFLOW', 'player')), /exhausted/);
 
 console.log('T025 events PASS: stable battle event ordering, monotonic IDs, immutable queue operations');
