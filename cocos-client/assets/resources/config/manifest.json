@@ -4,6 +4,10 @@
   "evidenceLevel": "C",
   "version": 1,
   "enabled": true,
+  "tables": {
+    "units": "config/units",
+    "cards": "config/cards"
+  },
   "idPolicy": {
     "scope": "global",
     "format": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$",
