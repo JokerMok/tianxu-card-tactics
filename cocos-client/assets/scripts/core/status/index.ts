@@ -37,9 +37,12 @@ export function applyStatus(unit: Unit, input: StatusInput, policy: StatusPolicy
   const stacks = input.stacks ?? 1;
   if (!Number.isSafeInteger(stacks) || stacks <= 0) throw new Error('status stacks are invalid');
   const maxStacks = policy.maxStacks ?? Number.MAX_SAFE_INTEGER;
+  if (!Number.isSafeInteger(maxStacks) || maxStacks <= 0) throw new Error('status maxStacks are invalid');
+  if (input.value !== undefined && (!Number.isSafeInteger(input.value) || input.value < 0)) throw new Error('status value is invalid');
+  if (input.remainingRounds !== undefined && (!Number.isSafeInteger(input.remainingRounds) || input.remainingRounds < 0)) throw new Error('status duration is invalid');
   const existingIndex = unit.statuses.findIndex((status) => status.kind === input.kind);
   if (existingIndex < 0) {
-    return { unit: statusUnit(unit, [...unit.statuses, { ...input, stacks }]), applied: true };
+    return { unit: statusUnit(unit, [...unit.statuses, { ...input, stacks: Math.min(maxStacks, stacks) }]), applied: true };
   }
   const existing = unit.statuses[existingIndex];
   const rule = policy.stackRule ?? 'REPLACE';
@@ -74,7 +77,7 @@ export function consumeBarrier(unit: Unit, amount: number): { readonly unit: Uni
   let absorbed = 0;
   const statuses = unit.statuses.map((status) => {
     if (status.kind !== 'BARRIER' || remaining === 0) return status;
-    const shield = status.value ?? status.stacks;
+    const shield = Math.max(0, status.value ?? status.stacks);
     const used = Math.min(shield, remaining);
     remaining -= used;
     absorbed += used;
