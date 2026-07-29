@@ -1,0 +1,7 @@
+{
+  "name": "tianxu-development",
+  "private": true,
+  "scripts": {
+    "verify": "node scripts/verify-all.mjs"
+  }
+}
