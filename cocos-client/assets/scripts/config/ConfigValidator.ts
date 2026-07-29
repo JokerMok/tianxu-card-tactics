@@ -157,6 +157,17 @@ export function assertConfigTables(value: unknown): asserts value is ConfigTable
   if (!isConfigRecord(value)) throw new ConfigLoadError('config/tables', '根值必须是 JSON object');
   const tables = configRequired(value, 'tables', 'config');
   if (!isConfigRecord(tables)) throw new ConfigLoadError('config.tables', '必须是 object');
+  // The runtime manifest stores resource paths; the loader validates and loads those
+  // tables. Keep the legacy fixture shape below for the cross-table contract tests.
+  if (typeof tables.units === 'string') {
+    for (const tableName of ['units', 'cards', 'skills', 'effects', 'statuses']) {
+      const tablePath = configRequired(tables, tableName, 'config.tables');
+      if (tablePath !== `config/${tableName}`) {
+        throw new ConfigLoadError(`config.tables.${tableName}`, `只允许加载 config/${tableName}`);
+      }
+    }
+    return;
+  }
   const units = table(tables.units, 'units', parseUnit);
   const effects = table(tables.effects, 'effects', parseEffect);
   assertReferences(units, effects);
