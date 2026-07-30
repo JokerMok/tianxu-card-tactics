@@ -4,7 +4,7 @@
   "dependencies": [
     "T071"
   ],
-  "wave": 72,
+  "wave": 73,
   "executor": "local",
   "risk": "medium",
   "status": "pending",

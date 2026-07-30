@@ -2,7 +2,7 @@
 
 ## 依据与架构
 
-以项目现状与模块化开发计划-v2.0.md 为任务来源，覆盖 M0–M8 110 个父任务。正式运行时为 Cocos Creator 3.8.8；核心规则放 cocos-client/assets/scripts/core/，配置放 cocos-client/assets/resources/config/，战斗表现放 cocos-client/assets/scripts/battle/，元游戏与服务放 cocos-client/assets/scripts/meta/ 和 services/；React 只保留规则参考、黄金测试和体验对照。
+以项目现状与模块化开发计划-v2.0.md 为任务来源，覆盖 M0–M8 111 个父任务。正式运行时为 Cocos Creator 3.8.8；核心规则放 cocos-client/assets/scripts/core/，配置放 cocos-client/assets/resources/config/，战斗表现放 cocos-client/assets/scripts/battle/，元游戏与服务放 cocos-client/assets/scripts/meta/ 和 services/；React 只保留规则参考、黄金测试和体验对照。
 
 ## 阶段门
 
@@ -12,13 +12,13 @@ M0 要求 Git 干净、根级验证、状态台账和架构方案；M1 要求配
 
 ## 任务调度
 
-.ai-dev/tasks/ 已建立 T001–T111：T001–T009 对应原 M0-01–M0-09，新增 T010 为 M1-04A 数值与政治阵营设计前置，原 M1-04 及后续任务顺延一个 ID。机器调度默认按源计划顺序串行，避免共享 cocos-client/、scripts/ 和资源目录的并行写入；后续只有经 context-budget、scope_guard 证明无共享写入路径，才可拆 Wave 并行。核心、跨模块、数值、经济、账号、支付、安全和最终验收使用 cloud；边界清晰的文档、测试补充和配置迁移可使用 local，但须用户明确同意。
+.ai-dev/tasks/ 已建立 T001–T112：T001–T009 对应原 M0-01–M0-09，新增 T010 为 M1-04A 数值与政治阵营设计前置，新增 T112 为 M2-17A Cocos Golden Runner 前置，原 M1-04 及后续任务顺延一个 ID。机器调度默认按源计划顺序串行，避免共享 cocos-client/、scripts/ 和资源目录的并行写入；后续只有经 context-budget、scope_guard 证明无共享写入路径，才可拆 Wave 并行。核心、跨模块、数值、经济、账号、支付、安全和最终验收使用 cloud；边界清晰的文档、测试补充和配置迁移可使用 local，但须用户明确同意。
 
 当前只允许批准后执行 T001/M0-01。未批准前不得初始化 Git、创建 worktree、调用模型或修改业务代码。每个任务必须基线检查、上下文包、独立 worktree、失败测试、最小实现、回归、范围检查和独立审查。
 
 ## 迁移与回滚
 
-React→Cocos 先保留对照，M2 黄金测试后停止其正式实现地位；存档先建 Schema 再迁移，失败保留备份；规则冲突先写 ADR 并重新批准；本地任务失败一次后升级 cloud，cloud 任务失败一次后停止报告；不删除测试、不强推、不部署、不用 git reset --hard。
+React→Cocos 先保留对照，先建立可在 Node/CI 执行的 Cocos Golden Runner，再进行 M2 黄金测试；M2 黄金测试后停止 React 正式实现地位。存档先建 Schema 再迁移，失败保留备份；规则冲突先写 ADR 并重新批准；本地任务失败一次后升级 cloud，cloud 任务失败一次后停止报告；不删除测试、不强推、不部署、不用 git reset --hard。
 
 ## 全局命令
 
