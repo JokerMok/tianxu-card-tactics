@@ -1,0 +1,13 @@
+{
+  "protocol": "tianxu.cocos-golden-runner/v1",
+  "seed": 42,
+  "commands": [
+    { "type": "BATTLE_START", "payload": { "activeSide": "player" } },
+    { "type": "ROUND_START", "payload": { "round": 1 } },
+    { "type": "UNIT_SPAWNED", "payload": { "id": "player-1", "side": "player", "lane": 0, "cell": 1 } },
+    { "type": "UNIT_SPAWNED", "payload": { "id": "enemy-1", "side": "enemy", "lane": 0, "cell": 4 } },
+    { "type": "ATTACK", "payload": { "sourceId": "player-1", "targetId": "enemy-1", "value": 3 } },
+    { "type": "HERO_DAMAGED", "payload": { "side": "enemy", "value": 3 } },
+    { "type": "BATTLE_END", "payload": { "status": "won" } }
+  ]
+}

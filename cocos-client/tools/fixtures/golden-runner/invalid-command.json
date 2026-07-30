@@ -1,0 +1,7 @@
+{
+  "protocol": "tianxu.cocos-golden-runner/v1",
+  "seed": 42,
+  "commands": [
+    { "type": "TELEPORT_HACK", "payload": {} }
+  ]
+}
