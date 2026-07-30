@@ -1,0 +1,29 @@
+{
+  "id": "T113",
+  "source_task": "M2-17B",
+  "dependencies": [
+    "T112"
+  ],
+  "wave": 36,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:battle-runner",
+    "cd cocos-client && npm run test:golden-runner",
+    "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts",
+    "cd cocos-client && npm run validate:a0",
+    "cd web-prototype && npm test"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/runner/",
+    "cocos-client/tools/",
+    "cocos-client/package.json"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

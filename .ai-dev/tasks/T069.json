@@ -4,7 +4,7 @@
   "dependencies": [
     "T068"
   ],
-  "wave": 70,
+  "wave": 71,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
