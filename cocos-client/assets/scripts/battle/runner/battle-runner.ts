@@ -82,7 +82,7 @@ const STATE_REHYDRATION_FIELDS = new Set([
 ]);
 const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'MOVE_UNIT', 'ATTACK', 'END_TURN']);
 const SIDES: readonly Side[] = ['player', 'enemy'];
-const HERO_MAX_HP = 20;
+const HERO_MAX_HP = 30;
 const MAX_ROUNDS = 80;
 
 class RunnerInputError extends Error {
@@ -96,6 +96,14 @@ class RunnerInputError extends Error {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isSafeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value);
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 function readJson<T>(configRoot: string, name: string): T {
@@ -151,14 +159,14 @@ function parseAction(value: unknown, index: number): HighLevelAction {
   }
   if (value.type === 'DEPLOY_UNIT') {
     exactKeys(value, ['type', 'cardId', 'side', 'lane', 'cell'], label, 'INVALID_COMMAND');
-    if (typeof value.cardId !== 'string' || typeof value.side !== 'string' || !Number.isSafeInteger(value.lane) || !Number.isSafeInteger(value.cell)) {
+    if (typeof value.cardId !== 'string' || typeof value.side !== 'string' || !isSafeInteger(value.lane) || !isSafeInteger(value.cell)) {
       throw new RunnerInputError('INVALID_COMMAND', `${label} DEPLOY_UNIT requires cardId, side, integer lane and integer cell`);
     }
     return value as unknown as HighLevelAction;
   }
   if (value.type === 'MOVE_UNIT') {
     exactKeys(value, value.steps === undefined ? ['type', 'unitId'] : ['type', 'unitId', 'steps'], label, 'INVALID_COMMAND');
-    if (typeof value.unitId !== 'string' || (value.steps !== undefined && !Number.isSafeInteger(value.steps))) {
+    if (typeof value.unitId !== 'string' || (value.steps !== undefined && !isSafeInteger(value.steps))) {
       throw new RunnerInputError('INVALID_COMMAND', `${label} MOVE_UNIT requires unitId and optional integer steps`);
     }
     return value as unknown as HighLevelAction;
@@ -174,9 +182,12 @@ function parseInput(value: unknown): BattleRunnerInput {
   if (rootForbidden) throw new RunnerInputError('STATE_REHYDRATION_FORBIDDEN', `input.${rootForbidden} is forbidden; runner state is seed-derived`);
   exactKeys(value, ['protocol', 'seed', 'actions'], 'input', 'INVALID_INPUT');
   if (value.protocol !== BATTLE_RUNNER_PROTOCOL) throw new RunnerInputError('INVALID_INPUT', `input.protocol must be ${BATTLE_RUNNER_PROTOCOL}`);
-  if (!Number.isSafeInteger(value.seed)) throw new RunnerInputError('INVALID_INPUT', 'input.seed must be a safe integer');
-  if (!Array.isArray(value.actions)) throw new RunnerInputError('INVALID_INPUT', 'input.actions must be an array');
-  return { protocol: value.protocol, seed: value.seed, actions: value.actions.map(parseAction) };
+  const seed = value.seed;
+  if (!isSafeInteger(seed)) throw new RunnerInputError('INVALID_INPUT', 'input.seed must be a safe integer');
+  const rawActions = value.actions;
+  if (!isUnknownArray(rawActions)) throw new RunnerInputError('INVALID_INPUT', 'input.actions must be an array');
+  const actions: HighLevelAction[] = rawActions.map((action, index) => parseAction(action, index));
+  return { protocol: BATTLE_RUNNER_PROTOCOL, seed, actions };
 }
 
 function unitConfig(cardId: string): { readonly card: CardConfig; readonly unit: UnitConfig } {

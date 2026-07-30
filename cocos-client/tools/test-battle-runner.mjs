@@ -70,8 +70,8 @@ assert.equal(typeof output.finalHash, 'string');
 const empty = runValue(input(42, []));
 assert.equal(empty.status, 0);
 assert.equal(empty.output.finalState.round, 0);
-assert.equal(empty.output.finalState.heroHp.player, 20);
-assert.equal(empty.output.finalState.heroHp.enemy, 20);
+assert.equal(empty.output.finalState.heroHp.player, 30);
+assert.equal(empty.output.finalState.heroHp.enemy, 30);
 assert.equal(empty.output.finalState.units.length, 0);
 assert.equal(empty.output.outcome.status, 'playing');
 assert(empty.output.rngCursor > 0, 'seed-derived card state must advance rng');
@@ -90,7 +90,7 @@ const heroDeath = runValue(input(223, [
   { type: 'BATTLE_START' },
   { type: 'DEPLOY_UNIT', cardId: 'U002', side: 'player', lane: 0, cell: 0 },
   { type: 'MOVE_UNIT', unitId: 'unit-player-1', steps: 11 },
-  ...Array.from({ length: 7 }, () => ({ type: 'ATTACK', attackerId: 'unit-player-1' })),
+  ...Array.from({ length: 10 }, () => ({ type: 'ATTACK', attackerId: 'unit-player-1' })),
 ]));
 assert.equal(heroDeath.status, 0);
 assert.equal(heroDeath.output.finalState.heroHp.enemy, 0);
