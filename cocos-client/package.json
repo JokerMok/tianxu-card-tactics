@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "test:golden-runner": "node tools/test-golden-runner.mjs",
     "validate:a0": "node tools/validate-a0.mjs",
     "validate:config-loader": "node tools/validate-config-loader.mjs",
     "validate:config-cross-table": "node tools/validate-config-cross-table.mjs",
