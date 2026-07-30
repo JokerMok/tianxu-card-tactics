@@ -1,0 +1,17 @@
+{
+  "protocol": "tianxu.cocos-battle-runner/v1",
+  "seed": 223,
+  "actions": [
+    { "type": "BATTLE_START" },
+    { "type": "DEPLOY_UNIT", "cardId": "U002", "side": "player", "lane": 0, "cell": 0 },
+    { "type": "MOVE_UNIT", "unitId": "unit-player-1", "steps": 2 },
+    { "type": "END_TURN" },
+    { "type": "DEPLOY_UNIT", "cardId": "U002", "side": "enemy", "lane": 0, "cell": 11 },
+    { "type": "MOVE_UNIT", "unitId": "unit-enemy-2", "steps": 8 },
+    { "type": "END_TURN" },
+    { "type": "ATTACK", "attackerId": "unit-player-1" },
+    { "type": "END_TURN" },
+    { "type": "MOVE_UNIT", "unitId": "unit-enemy-2", "steps": 1 },
+    { "type": "END_TURN" }
+  ]
+}
