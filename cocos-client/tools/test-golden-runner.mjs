@@ -14,6 +14,10 @@ assert.doesNotMatch(runnerSource, /web-prototype|React/i);
 
 function runFixture(name) {
   const input = fs.readFileSync(path.join(fixtureRoot, name), 'utf8');
+  return runInput(input);
+}
+
+function runInput(input) {
   const result = spawnSync(process.execPath, ['--experimental-strip-types', runnerPath], {
     input,
     encoding: 'utf8',
@@ -40,6 +44,25 @@ assert.notEqual(invalid.status, 0);
 assert.equal(invalid.output.status, 'error');
 assert.equal(invalid.output.error.code, 'INVALID_COMMAND');
 
+const boundary = runFixture('boundary-round-80.json');
+assert.equal(boundary.status, 0);
+assert.equal(boundary.output.status, 'ok');
+assert.equal(boundary.output.finalState.round, 80);
+assert.equal(boundary.output.finalState.status, 'lost');
+assert.equal(boundary.output.finalState.units.length, 1);
+assert.equal(boundary.output.finalState.heroHp.player, 0);
+assert.equal(boundary.output.rngCursor, boundary.output.commandCount);
+assert.notEqual(boundary.output.finalHash, normal.output.finalHash);
+assert.equal(
+  boundary.output.keyEvents.find(({ type }) => type === 'ROUND_START').payload.round,
+  80,
+);
+assert.equal(
+  boundary.output.keyEvents.find(({ type }) => type === 'BATTLE_END').payload.status,
+  'lost',
+);
+assert.match(boundary.output.finalHash, /^[0-9a-f]{8}$/);
+
 const repeatA = runFixture('normal-combat.json');
 const repeatB = runFixture('normal-combat.json');
 assert.equal(repeatA.bytes, repeatB.bytes);
@@ -62,5 +85,36 @@ const changedStream = spawnSync(process.execPath, ['--experimental-strip-types',
 });
 assert.notEqual(JSON.parse(changedSeed.stdout).finalHash, normal.output.finalHash);
 assert.notEqual(JSON.parse(changedStream.stdout).finalHash, normal.output.finalHash);
+
+function assertRejected(label, input, code) {
+  const result = runInput(input);
+  assert.notEqual(result.status, 0, `${label} must exit non-zero`);
+  assert.equal(result.output.status, 'error', `${label} must return error JSON`);
+  assert.equal(result.output.error.code, code, `${label} must use ${code}`);
+}
+
+assertRejected('invalid JSON', '{"protocol":', 'INVALID_JSON');
+assertRejected(
+  'non-integer seed',
+  JSON.stringify({ ...normalInput, seed: 42.5 }),
+  'INVALID_INPUT',
+);
+assertRejected(
+  'unsafe seed',
+  JSON.stringify({ ...normalInput, seed: Number.MAX_SAFE_INTEGER + 1 }),
+  'INVALID_INPUT',
+);
+assertRejected(
+  'non-array commands',
+  JSON.stringify({ ...normalInput, commands: {} }),
+  'INVALID_INPUT',
+);
+for (const [label, payload] of [['array payload', []], ['null payload', null], ['scalar payload', 7]]) {
+  assertRejected(
+    label,
+    JSON.stringify({ ...normalInput, commands: [{ type: 'BATTLE_START', payload }] }),
+    'INVALID_COMMAND',
+  );
+}
 
 console.log('Golden runner fixture harness: PASS');

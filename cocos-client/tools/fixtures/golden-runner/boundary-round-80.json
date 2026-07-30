@@ -1,0 +1,11 @@
+{
+  "protocol": "tianxu.cocos-golden-runner/v1",
+  "seed": 99,
+  "commands": [
+    { "type": "BATTLE_START", "payload": { "activeSide": "enemy" } },
+    { "type": "ROUND_START", "payload": { "round": 80 } },
+    { "type": "UNIT_SPAWNED", "payload": { "id": "last-unit", "side": "enemy", "lane": 1, "cell": 5 } },
+    { "type": "HERO_DAMAGED", "payload": { "side": "player", "value": 999 } },
+    { "type": "BATTLE_END", "payload": { "status": "lost" } }
+  ]
+}
