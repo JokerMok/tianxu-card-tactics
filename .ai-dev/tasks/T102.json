@@ -4,7 +4,7 @@
   "dependencies": [
     "T101"
   ],
-  "wave": 105,
+  "wave": 106,
   "executor": "cloud",
   "risk": "low",
   "status": "pending",
