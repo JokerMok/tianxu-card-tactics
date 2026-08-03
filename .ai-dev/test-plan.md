@@ -10,6 +10,7 @@
 - TEST-R2B / REQ-R2B：真实 Cocos Battle Runner 的高层指令执行；覆盖由 seed 独立创建状态、配置驱动部署、移动阻挡、索敌攻击、回合上限、胜负结算、非法状态回灌拒绝和跨进程确定性。
 - TEST-R2C / REQ-R2C：跨引擎对拍契约；覆盖共同 fixture 版本、同一 seed 与高层动作字节、开局/准备值/自动行动/回合上限语义映射、100 个配置驱动动作流、空输入、英雄死亡、非法回灌和同输入确定性；必须证明 React 与 Cocos 分别执行，不能把一侧输出作为另一侧输入。
 - TEST-R2C-R1 / REQ-R2C-R1：针对 T114 失败项覆盖跨引擎单位 ID 与动作引用、100 seeds、round80 单次 `BATTLE_END`、v2 非法指令错误版本、fixture 全量校验和原始 `finalState`/事件语义比较；不得以 `outcome`、哈希或另一侧输出补齐状态字段，且 React 正式默认战斗测试必须回归通过。
+- TEST-R2C-R2 / REQ-R2C-R2：针对 T115 失败项覆盖 fixture 的显式 card/unit/event mapping 实际消费、双方原始 `finalState` 契约字段、协议事件语义映射、100 seeds 的部署/移动/阻挡/显式攻击/END_TURN 自动行动与胜负结算；必须证明 React 与 Cocos 独立生成动作和状态，禁止裁剪投影、单侧补字段、哈希替代和仅生命周期对拍，并回归 T113 的 v1/v2、Golden、replay、A0 与 React 默认战斗。
 - TEST-R3 / REQ-R3：真实 Cocos 入战/回流、BattleState 与节点一致、部署、手牌、暂停、投降、异常退出、重复结算、1280×720/1920×1080/横屏安全区。
 - TEST-R4 / REQ-R4：12 节点、四类目标、首通/重复奖励、三段副本、双难度、挑战塔、Boss、援军、未解锁/精力不足/断线重进/幂等。
 - TEST-R5 / REQ-R5：组件化 UI、单位五状态、主将六状态、六层场景、特效音频、缺资源和错误锚点；24 单位性能门。
