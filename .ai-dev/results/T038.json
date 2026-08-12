@@ -1,0 +1,29 @@
+{
+  "task_id": "T038",
+  "executor": "cloud",
+  "implementer_id": "019ff65d-15e6-72c3-8f19-c802622e0fa7",
+  "reviewer_id": "019ff665-16a1-76c1-96a6-58b6b7920ed8",
+  "base_sha": "0f776ad",
+  "head_sha": "330037653122d73722d3b6e7ee490668f4d89ffa",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/view/battle-state-view.test.mjs", "exit_code": 0},
+    {"command": "node cocos-client/assets/scripts/battle/view/view-contract.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:parity-contract", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T038 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查首次发现 sync 半更新和默认 Cocos factory 未投影阵营/生命/状态；实现 agent 改为 create/apply/commit 三阶段事务并加入异常回滚，默认 factory 写入完整冻结状态和元数据。修复后独立审查 PASS。",
+  "scope_note": "React node_modules 与 dist 仅临时用于验收，已移除；未留下生成物或上下文缓存。"
+}
