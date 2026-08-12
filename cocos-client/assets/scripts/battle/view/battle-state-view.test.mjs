@@ -81,6 +81,38 @@ function makeNodeFactory() {
   };
 }
 
+function makeTransactionalFactory({ failCreateId, failApplyId } = {}) {
+  const root = { children: [] };
+  const created = [];
+  const destroyed = [];
+  return {
+    root,
+    created,
+    destroyed,
+    createUnitNode(unit, parent) {
+      if (unit.id === failCreateId) throw new Error(`create failed: ${unit.id}`);
+      const node = {
+        unitId: unit.id,
+        parent,
+        state: undefined,
+        apply(next) {
+          if (next.id === failApplyId) throw new Error(`apply failed: ${next.id}`);
+          this.state = next;
+        },
+        destroy() {
+          this.destroyed = true;
+          destroyed.push(this);
+          const index = parent.children.indexOf(this);
+          if (index >= 0) parent.children.splice(index, 1);
+        },
+      };
+      parent.children.push(node);
+      created.push(node);
+      return node;
+    },
+  };
+}
+
 const factory = makeNodeFactory();
 const view = new BattleStateView({ root: factory.root, factory });
 const first = makeState([
@@ -143,6 +175,50 @@ assert.throws(() => {
 assert.throws(() => view.sync({ ...third, units: [...third.units, unknown] }), /duplicate unit id/);
 assert.equal(factory.root.children.length, 1);
 
+const createFailureFactory = makeTransactionalFactory({ failCreateId: 'create-fail-2' });
+const createFailureView = new BattleStateView({ root: createFailureFactory.root, factory: createFailureFactory });
+createFailureView.sync(makeState([
+  makeUnit({ id: 'create-old-1' }),
+  makeUnit({ id: 'create-old-2', side: 'enemy' }),
+]));
+const createFailureNodes = [...createFailureView.nodes];
+const createFailureStates = createFailureNodes.map((node) => node.state);
+assert.throws(() => createFailureView.sync(makeState([
+  makeUnit({ id: 'create-old-1', hp: 1 }),
+  makeUnit({ id: 'create-old-2', side: 'enemy', cell: 8 }),
+  makeUnit({ id: 'create-temp-1' }),
+  makeUnit({ id: 'create-fail-2' }),
+])), /create failed: create-fail-2/);
+assert.deepEqual(createFailureView.nodes, createFailureNodes);
+assert.deepEqual(createFailureView.nodes.map((node) => node.state), createFailureStates);
+assert.equal(createFailureView.unitCount, 2);
+assert.deepEqual(createFailureView.nodes.map((node) => node.state.id), ['create-old-1', 'create-old-2']);
+assert.equal(createFailureFactory.destroyed.length, 1);
+assert.equal(createFailureFactory.destroyed[0].unitId, 'create-temp-1');
+assert.equal(createFailureFactory.root.children.includes(createFailureFactory.destroyed[0]), false);
+
+const applyFailureFactory = makeTransactionalFactory({ failApplyId: 'apply-fail-new' });
+const applyFailureView = new BattleStateView({ root: applyFailureFactory.root, factory: applyFailureFactory });
+applyFailureView.sync(makeState([
+  makeUnit({ id: 'apply-old-1', hp: 9 }),
+  makeUnit({ id: 'apply-old-2', side: 'enemy', cell: 9 }),
+]));
+const applyFailureNodes = [...applyFailureView.nodes];
+const applyFailureStates = applyFailureNodes.map((node) => node.state);
+assert.throws(() => applyFailureView.sync(makeState([
+  makeUnit({ id: 'apply-old-1', hp: 2, lane: 1, cell: 5 }),
+  makeUnit({ id: 'apply-old-2', side: 'enemy', cell: 10 }),
+  makeUnit({ id: 'apply-fail-new' }),
+])), /apply failed: apply-fail-new/);
+assert.deepEqual(applyFailureView.nodes, applyFailureNodes);
+assert.deepEqual(applyFailureView.nodes.map((node) => node.state), applyFailureStates);
+assert.equal(applyFailureView.unitCount, 2);
+assert.deepEqual(applyFailureView.nodes.map((node) => node.state.id), ['apply-old-1', 'apply-old-2']);
+assert.equal(applyFailureNodes[0].state.hp, 9);
+assert.equal(applyFailureNodes[0].state.lane, 0);
+assert.equal(applyFailureFactory.destroyed.length, 1);
+assert.equal(applyFailureFactory.destroyed[0].unitId, 'apply-fail-new');
+
 const cocosRoot = { children: [] };
 const cocosNodes = [];
 const applied = [];
@@ -173,5 +249,44 @@ assert.deepEqual(cocosNodes[0].position, { x: 60, y: -20, z: 0 });
 assert.equal(cocosNodes[0].active, true);
 assert.equal(applied.length, 1);
 assert.equal(cocosView.nodes[0].state.hp, 5);
+
+const defaultCocosRoot = { children: [] };
+const defaultCocosFactory = createCocosBattleNodeFactory({
+  parent: defaultCocosRoot,
+  createNode(name) {
+    return {
+      name,
+      active: false,
+      parent: null,
+      position: null,
+      setParent(parent) { this.parent = parent; parent.children.push(this); },
+      setPosition(x, y, z) { this.position = { x, y, z }; },
+      destroy() { this.destroyed = true; },
+    };
+  },
+});
+const defaultCocosView = new BattleStateView({ root: defaultCocosRoot, factory: defaultCocosFactory });
+const defaultCocosState = makeState([makeUnit({
+  id: 'default-cocos-unit',
+  side: 'enemy',
+  lane: 1,
+  cell: 7,
+  hp: 4,
+  maxHp: 12,
+  statuses: [{ id: 'stun-1', kind: 'stun', stacks: 1, remainingRounds: 2 }],
+})]);
+defaultCocosView.sync(defaultCocosState);
+const defaultCocosNode = defaultCocosRoot.children[0];
+assert.equal(defaultCocosNode.battleUnitId, 'default-cocos-unit');
+assert.equal(defaultCocosNode.battleSide, 'enemy');
+assert.equal(defaultCocosNode.battleLane, 1);
+assert.equal(defaultCocosNode.battleCell, 7);
+assert.equal(defaultCocosNode.battleHp, 4);
+assert.equal(defaultCocosNode.battleMaxHp, 12);
+assert.deepEqual(defaultCocosNode.battleStatuses, defaultCocosState.units[0].statuses);
+assert.equal(Object.isFrozen(defaultCocosNode.battleUnitState), true);
+assert.equal(Object.isFrozen(defaultCocosNode.battleStatuses), true);
+assert.equal(defaultCocosNode.battleUnitState.side, defaultCocosState.units[0].side);
+assert.equal(defaultCocosNode.battleUnitState.hp, defaultCocosState.units[0].hp);
 
 console.log('BattleState view binding contract: PASS');

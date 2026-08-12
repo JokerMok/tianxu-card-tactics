@@ -88,8 +88,8 @@ function assertUnitIds(units: readonly Unit[]): void {
 export class BattleStateView<NodeHandle = unknown> {
   private readonly rootValue: unknown;
   private readonly factory: BattleViewNodeFactory<NodeHandle>;
-  private readonly registry = new Map<string, BattleViewNode<NodeHandle>>();
-  private readonly states = new Map<string, BattleUnitViewState>();
+  private registry = new Map<string, BattleViewNode<NodeHandle>>();
+  private states = new Map<string, BattleUnitViewState>();
   private order: string[] = [];
 
   constructor(options: BattleStateViewOptions<NodeHandle>) {
@@ -124,43 +124,80 @@ export class BattleStateView<NodeHandle = unknown> {
 
     const nextStates = snapshot.units.map(freezeUnit);
     const nextIds = new Set(nextStates.map((unit) => unit.id));
+    const stagedRegistry = new Map<string, BattleViewNode<NodeHandle>>();
+    const stagedStates = new Map<string, BattleUnitViewState>();
+    const stagedNewNodes: BattleViewNode<NodeHandle>[] = [];
+    const stagedUpdates: Array<{
+      readonly node: BattleViewNode<NodeHandle>;
+      readonly previous: BattleUnitViewState;
+      readonly next: BattleUnitViewState;
+    }> = [];
     let created = 0;
     let updated = 0;
     let unchanged = 0;
 
-    for (const nextState of nextStates) {
-      const previous = this.states.get(nextState.id);
-      const node = this.registry.get(nextState.id);
-      if (!node || !previous) {
-        const nextNode = this.factory.createUnitNode(nextState, this.rootValue);
-        if (!nextNode || typeof nextNode.apply !== 'function' || typeof nextNode.destroy !== 'function') {
-          throw new Error(`unit node factory returned an invalid node: ${nextState.id}`);
+    // Phase 1: create every new node without touching the committed registry or state maps.
+    try {
+      for (const nextState of nextStates) {
+        const previous = this.states.get(nextState.id);
+        const node = this.registry.get(nextState.id);
+        if (!node || !previous) {
+          const nextNode = this.factory.createUnitNode(nextState, this.rootValue);
+          if (!nextNode || typeof nextNode.apply !== 'function' || typeof nextNode.destroy !== 'function') {
+            nextNode?.destroy?.();
+            throw new Error(`unit node factory returned an invalid node: ${nextState.id}`);
+          }
+          stagedRegistry.set(nextState.id, nextNode);
+          stagedStates.set(nextState.id, nextState);
+          stagedNewNodes.push(nextNode);
+          created += 1;
+        } else {
+          stagedRegistry.set(nextState.id, node);
+          stagedStates.set(nextState.id, nextState);
+          if (sameUnit(previous, nextState)) unchanged += 1;
+          else {
+            stagedUpdates.push({ node, previous, next: nextState });
+            updated += 1;
+          }
         }
-        nextNode.apply(nextState);
-        this.registry.set(nextState.id, nextNode);
-        this.states.set(nextState.id, nextState);
-        created += 1;
-      } else if (sameUnit(previous, nextState)) {
-        unchanged += 1;
-      } else {
-        node.apply(nextState);
-        this.states.set(nextState.id, nextState);
-        updated += 1;
       }
+    } catch (error) {
+      for (const node of stagedNewNodes) safelyDestroy(node);
+      throw error;
     }
 
-    let removed = 0;
-    for (const [unitId, node] of this.registry) {
-      if (nextIds.has(unitId)) continue;
-      node.destroy();
-      this.registry.delete(unitId);
-      this.states.delete(unitId);
-      removed += 1;
+    // Phase 2: apply state. Existing nodes are recorded before apply so even a partially
+    // applied node is included in the rollback attempt.
+    const appliedExisting: Array<{ readonly node: BattleViewNode<NodeHandle>; readonly previous: BattleUnitViewState }> = [];
+    try {
+      for (const update of stagedUpdates) {
+        appliedExisting.push({ node: update.node, previous: update.previous });
+        update.node.apply(update.next);
+      }
+      for (const nextState of nextStates) {
+        if (!stagedNewNodes.includes(stagedRegistry.get(nextState.id)!)) continue;
+        stagedRegistry.get(nextState.id)!.apply(nextState);
+      }
+    } catch (error) {
+      for (let index = appliedExisting.length - 1; index >= 0; index -= 1) {
+        const applied = appliedExisting[index];
+        try { applied.node.apply(applied.previous); } catch { /* preserve the original failure */ }
+      }
+      for (const node of stagedNewNodes) safelyDestroy(node);
+      throw error;
     }
 
+    // Commit only after all creation and application work succeeds. Removed nodes are
+    // destroyed after the new maps/order become the committed view.
+    const removedNodes = [...this.registry.entries()]
+      .filter(([unitId]) => !nextIds.has(unitId))
+      .map(([, node]) => node);
+    this.registry = stagedRegistry;
+    this.states = stagedStates;
     this.order = nextStates.map((unit) => unit.id);
+    for (const node of removedNodes) safelyDestroy(node);
 
-    return Object.freeze({ created, updated, unchanged, removed, unitCount: this.registry.size });
+    return Object.freeze({ created, updated, unchanged, removed: removedNodes.length, unitCount: this.registry.size });
   }
 
   clear(): void {
@@ -173,9 +210,21 @@ export class BattleStateView<NodeHandle = unknown> {
 
 export type BattleView = BattleStateView;
 
+function safelyDestroy<NodeHandle>(node: BattleViewNode<NodeHandle>): void {
+  try { node.destroy(); } catch { /* cleanup must not replace the factory/apply failure */ }
+}
+
 export interface CocosNodeLike {
   name?: string;
   active?: boolean;
+  battleUnitState?: BattleUnitViewState;
+  battleUnitId?: string;
+  battleSide?: BattleUnitViewState['side'];
+  battleLane?: number;
+  battleCell?: number;
+  battleHp?: number;
+  battleMaxHp?: number;
+  battleStatuses?: BattleUnitViewState['statuses'];
   setParent?(parent: unknown): void;
   setPosition?(x: number, y: number, z?: number): void;
   destroy?(): void;
@@ -210,14 +259,22 @@ export function createCocosBattleNodeFactory<Node extends CocosNodeLike = CocosN
     createUnitNode(initialState, parent): BattleViewNode<Node> {
       const node = options.createNode(`BattleUnit-${initialState.id}`);
       node.setParent?.(parent ?? options.parent);
-      let currentState = initialState;
+      let currentState = freezeUnit(initialState);
       const apply = (state: BattleUnitViewState): void => {
-        currentState = state;
-        node.name = `BattleUnit-${state.id}`;
+        currentState = freezeUnit(state);
+        node.battleUnitState = currentState;
+        node.battleUnitId = currentState.id;
+        node.battleSide = currentState.side;
+        node.battleLane = currentState.lane;
+        node.battleCell = currentState.cell;
+        node.battleHp = currentState.hp;
+        node.battleMaxHp = currentState.maxHp;
+        node.battleStatuses = currentState.statuses;
+        node.name = `BattleUnit-${currentState.id}`;
         node.active = true;
-        const position = getPosition(state);
+        const position = getPosition(currentState);
         node.setPosition?.(position.x, position.y, position.z ?? 0);
-        options.applyState?.(node, state);
+        options.applyState?.(node, currentState);
       };
       return {
         node,
