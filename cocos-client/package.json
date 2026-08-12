@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test:battle-runner": "node tools/test-battle-runner.mjs",
+    "test:neutral-balance": "node --experimental-strip-types tools/test-neutral-balance.mjs",
     "test:parity-contract": "node tools/test-parity-contract.mjs",
     "test:battle-runner:types": "node tools/test-battle-runner-types.mjs",
     "test:golden-runner": "node tools/test-golden-runner.mjs",

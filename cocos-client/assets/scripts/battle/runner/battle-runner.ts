@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createBoardState, deployUnit, isSummonCell } from '../../core/board/index.ts';
+import { createBoardState, deployUnit, getLegalDeploymentCells, isSummonCell } from '../../core/board/index.ts';
 import { actionOrder, createAttackAction, type AttackTarget } from '../../core/combat/index.ts';
 import { damageUnit, removeDead } from '../../core/combat/damage.ts';
 import { createCardState, type CardState } from '../../core/cards/index.ts';
@@ -145,6 +145,7 @@ const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'MOVE_UNIT', 'ATTAC
 const SIDES: readonly Side[] = ['player', 'enemy'];
 const HERO_MAX_HP = 30;
 const MAX_ROUNDS = 80;
+const NEUTRAL_RUNTIME_STATES = new WeakSet<object>();
 const PEER_CARD_ID_KEY = ['r', 'e', 'a', 'c', 't', 'CardId'].join('');
 const PEER_EVENT_TYPE_KEY = ['r', 'e', 'a', 'c', 't', 'Type'].join('');
 
@@ -167,6 +168,14 @@ function isSafeInteger(value: unknown): value is number {
 
 function isUnknownArray(value: unknown): value is readonly unknown[] {
   return Array.isArray(value);
+}
+
+function freezeNeutralValue<T>(value: T): T {
+  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value as Record<string, unknown>)) freezeNeutralValue(child);
+    Object.freeze(value);
+  }
+  return value;
 }
 
 function readJson<T>(configRoot: string, name: string): T {
@@ -429,6 +438,13 @@ function initialState(
 }
 
 function update(state: BattleState, patch: Partial<BattleState>): BattleState {
+  if (NEUTRAL_RUNTIME_STATES.has(state)) {
+    if (Object.keys(patch).length === 0) return state;
+    const next = { ...state, ...patch, revision: state.revision + 1 };
+    freezeNeutralValue(next);
+    NEUTRAL_RUNTIME_STATES.add(next);
+    return next;
+  }
   return updateBattleState(state, patch);
 }
 
@@ -652,6 +668,95 @@ function settleParity(state: BattleState): BattleState {
     winner: outcome.winner,
     reason: outcome.reason,
   });
+}
+
+export interface NeutralBattleOutput {
+  readonly seed: number;
+  readonly actionCount: number;
+  readonly finalState: BattleState;
+  readonly outcome: OutcomeResult;
+  readonly rngCursor: number;
+  readonly finalHash: string;
+}
+
+function neutralReadyUnit(state: BattleState): CardConfig | undefined {
+  const cardIds = state.hands[state.activeSide]
+    .filter((card) => card.remainingPreparation === 0)
+    .map((card) => card.cardId)
+    .sort();
+  return cardIds
+    .map((cardId) => AUTHORITY.cards.find((card) => card.id === cardId))
+    .find((card) => card?.cardType === 'UNIT');
+}
+
+function neutralDeploymentCell(state: BattleState): { readonly lane: number; readonly cell: number } | undefined {
+  return getLegalDeploymentCells(createBoardState(state.units), state.activeSide)[0];
+}
+
+function neutralOutcome(state: BattleState): OutcomeResult {
+  const endEvent = [...state.events].reverse().find((eventItem) => eventItem.type === 'BATTLE_END');
+  if (!endEvent || state.status === 'playing') throw new Error('neutral battle did not settle');
+  const winner = endEvent.payload.winner;
+  const reason = endEvent.payload.reason;
+  if ((winner !== 'player' && winner !== 'enemy') || typeof reason !== 'string') {
+    throw new Error('neutral battle has an invalid settlement event');
+  }
+  return {
+    status: state.status,
+    winner,
+    reason: reason as OutcomeResult['reason'],
+    round: endEvent.round,
+    rng: { rngState: state.rngState, rngCursor: state.rngCursor },
+    objectiveIds: [],
+    settled: true,
+  };
+}
+
+/**
+ * Runs the same seed-derived parity turn loop as the Cocos battle runner.
+ * The policy is intentionally identical for both sides; only the authoritative
+ * runner state decides whether a deployment, movement, attack, or settlement occurs.
+ */
+export function runNeutralBattle(seed: number): NeutralBattleOutput {
+  if (!Number.isSafeInteger(seed)) throw new Error('neutral battle seed must be a safe integer');
+  let state = initialState(seed, undefined, true);
+  NEUTRAL_RUNTIME_STATES.add(state);
+  state = decrementParityPreparation(state, state.activeSide);
+  state = emit(state, 'BATTLE_START', state.activeSide, { seed: state.seed });
+  state = emit(state, 'TURN_START', state.activeSide, { turn: state.turn });
+  const actions: HighLevelAction[] = [{ type: 'BATTLE_START' }];
+
+  for (let turn = 0; turn < MAX_ROUNDS * 2 + 4 && state.status === 'playing'; turn += 1) {
+    const card = neutralReadyUnit(state);
+    const cell = card ? neutralDeploymentCell(state) : undefined;
+    if (card && cell) {
+      const deployment: HighLevelAction = {
+        type: 'DEPLOY_UNIT',
+        cardId: card.id,
+        side: state.activeSide,
+        lane: cell.lane,
+        cell: cell.cell,
+      };
+      actions.push(deployment);
+      state = applyAction(state, deployment, undefined, true);
+      if (state.status === 'playing') state = settleParity(state);
+    }
+    if (state.status !== 'playing') break;
+    const endTurn: HighLevelAction = { type: 'END_TURN' };
+    actions.push(endTurn);
+    state = applyAction(state, endTurn, undefined, true);
+  }
+
+  const outcome = neutralOutcome(state);
+  const finalHash = hash(stable({ seed, actions, finalState: state, events: state.events, outcome }));
+  return {
+    seed,
+    actionCount: actions.length,
+    finalState: state,
+    outcome,
+    rngCursor: state.rngCursor,
+    finalHash,
+  };
 }
 
 function projectParityLifecycleEvents(state: BattleState, fixture: ParityFixture): BattleEvent[] {
