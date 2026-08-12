@@ -10,6 +10,7 @@ import { moveUnit } from '../../core/movement/index.ts';
 import { resolveOutcome, type OutcomeResult } from '../../core/outcome/index.ts';
 import { chooseSeeded, type RngState } from '../../core/rng/index.ts';
 import { createBattleState, updateBattleState, type BattleEvent, type BattleState, type Side, type Unit } from '../../core/types/index.ts';
+import type { BattlePlayCardAction, BattleTarget } from '../action-contract.ts';
 
 export const BATTLE_RUNNER_PROTOCOL = 'tianxu.cocos-battle-runner/v1';
 export const BATTLE_RUNNER = 'cocos-battle';
@@ -25,6 +26,7 @@ interface BattleRunnerInput {
 export type HighLevelAction =
   | { readonly type: 'BATTLE_START' }
   | { readonly type: 'DEPLOY_UNIT'; readonly cardId: string; readonly side: Side; readonly lane: number; readonly cell: number }
+  | BattlePlayCardAction
   | { readonly type: 'MOVE_UNIT'; readonly unitId: string; readonly steps?: number }
   | { readonly type: 'ATTACK'; readonly attackerId: string }
   | { readonly type: 'END_TURN' };
@@ -113,9 +115,19 @@ interface CardConfig {
   readonly cardType: string;
   readonly prepare: number;
   readonly unitId?: string;
+  readonly skillId?: string;
   readonly nameKey?: string;
   readonly tags?: readonly string[];
   readonly copyLimit?: number;
+  readonly enabled?: boolean;
+}
+
+interface SkillConfig {
+  readonly id: string;
+  readonly targetType: string;
+  readonly rangeShape: string;
+  readonly rangeA: number;
+  readonly rangeB: number;
   readonly enabled?: boolean;
 }
 
@@ -132,6 +144,7 @@ interface UnitConfig {
 
 interface AuthorityConfig {
   readonly cards: readonly CardConfig[];
+  readonly skills: readonly SkillConfig[];
   readonly units: readonly UnitConfig[];
   readonly deck: readonly string[];
   readonly prepareByCardId: Readonly<Record<string, number>>;
@@ -141,7 +154,7 @@ const STATE_REHYDRATION_FIELDS = new Set([
   'finalState', 'events', 'heroHp', 'heroMaxHp', 'units', 'decks', 'hands', 'graveyards',
   'rngCursor', 'rngState', 'outcome', 'status', 'playedCards', 'nextId', 'nextEventId',
 ]);
-const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'MOVE_UNIT', 'ATTACK', 'END_TURN']);
+const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'PLAY_CARD', 'MOVE_UNIT', 'ATTACK', 'END_TURN']);
 const SIDES: readonly Side[] = ['player', 'enemy'];
 const HERO_MAX_HP = 30;
 const MAX_ROUNDS = 80;
@@ -185,6 +198,7 @@ function readJson<T>(configRoot: string, name: string): T {
 function loadAuthority(): AuthorityConfig {
   const configRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../resources/config');
   const cardsTable = readJson<{ cards: readonly CardConfig[] }>(configRoot, 'cards.json');
+  const skillsTable = readJson<{ skills: readonly SkillConfig[] }>(configRoot, 'skills.json');
   const unitsTable = readJson<{ units: readonly UnitConfig[] }>(configRoot, 'units.json');
   const decksTable = readJson<{ decks: readonly { id: string; cardEntries: readonly { cardId: string; count: number }[] }[] }>(configRoot, 'decks.json');
   const deckConfig = decksTable.decks.find((deck) => deck.id === 'D001') ?? decksTable.decks[0];
@@ -201,6 +215,7 @@ function loadAuthority(): AuthorityConfig {
   }
   return {
     cards,
+    skills: skillsTable.skills.filter((skill) => skill.enabled !== false),
     units,
     deck,
     prepareByCardId: Object.fromEntries(cards.map((card) => [card.id, card.prepare])),
@@ -225,6 +240,36 @@ function exactKeys(
   }
 }
 
+function parseTarget(value: unknown, label: string): BattleTarget {
+  if (!isRecord(value) || typeof value.kind !== 'string') {
+    throw new RunnerInputError('INVALID_COMMAND', `${label} must be a target object`);
+  }
+  if (value.kind === 'global') {
+    exactKeys(value, ['kind'], label, 'INVALID_COMMAND');
+    return { kind: 'global' };
+  }
+  if (value.kind === 'lane') {
+    exactKeys(value, ['kind', 'lane'], label, 'INVALID_COMMAND');
+    if (!isSafeInteger(value.lane)) throw new RunnerInputError('INVALID_COMMAND', `${label}.lane must be an integer`);
+    return { kind: 'lane', lane: value.lane };
+  }
+  if (value.kind === 'cell') {
+    exactKeys(value, ['kind', 'lane', 'cell'], label, 'INVALID_COMMAND');
+    if (!isSafeInteger(value.lane) || !isSafeInteger(value.cell)) {
+      throw new RunnerInputError('INVALID_COMMAND', `${label}.cell requires integer lane and cell`);
+    }
+    return { kind: 'cell', lane: value.lane, cell: value.cell };
+  }
+  if (value.kind === 'unit') {
+    exactKeys(value, ['kind', 'unitId'], label, 'INVALID_COMMAND');
+    if (typeof value.unitId !== 'string' || value.unitId.length === 0) {
+      throw new RunnerInputError('INVALID_COMMAND', `${label}.unitId must be a non-empty string`);
+    }
+    return { kind: 'unit', unitId: value.unitId };
+  }
+  throw new RunnerInputError('INVALID_COMMAND', `${label}.kind is not a supported battle target`);
+}
+
 function parseAction(value: unknown, index: number): HighLevelAction {
   if (!isRecord(value)) throw new RunnerInputError('INVALID_COMMAND', `input.actions[${index}] must be an object`);
   if (typeof value.type !== 'string' || !ACTION_TYPES.has(value.type)) {
@@ -241,6 +286,13 @@ function parseAction(value: unknown, index: number): HighLevelAction {
       throw new RunnerInputError('INVALID_COMMAND', `${label} DEPLOY_UNIT requires cardId, side, integer lane and integer cell`);
     }
     return value as unknown as HighLevelAction;
+  }
+  if (value.type === 'PLAY_CARD') {
+    exactKeys(value, ['type', 'cardId', 'side', 'target'], label, 'INVALID_COMMAND');
+    if (typeof value.cardId !== 'string' || typeof value.side !== 'string') {
+      throw new RunnerInputError('INVALID_COMMAND', `${label} PLAY_CARD requires cardId and side`);
+    }
+    return { type: 'PLAY_CARD', cardId: value.cardId, side: value.side as Side, target: parseTarget(value.target, `${label}.target`) };
   }
   if (value.type === 'MOVE_UNIT') {
     exactKeys(value, value.steps === undefined ? ['type', 'unitId'] : ['type', 'unitId', 'steps'], label, 'INVALID_COMMAND');
@@ -401,6 +453,30 @@ function unitConfig(cardId: string): { readonly card: CardConfig; readonly unit:
   return { card, unit };
 }
 
+interface SkillTargetProfile {
+  readonly kind: 'lane' | 'unit' | 'global';
+  readonly side?: Side;
+}
+
+function skillConfig(cardId: string): { readonly card: CardConfig; readonly skill: SkillConfig; readonly target: SkillTargetProfile } {
+  const card = AUTHORITY.cards.find((candidate) => candidate.id === cardId);
+  if (!card || card.cardType !== 'SKILL' || !card.skillId) {
+    throw new RunnerInputError('INVALID_COMMAND', `cardId is not an enabled skill card: ${cardId}`);
+  }
+  const skill = AUTHORITY.skills.find((candidate) => candidate.id === card.skillId);
+  if (!skill) throw new RunnerInputError('INVALID_COMMAND', `skill config is missing for cardId: ${cardId}`);
+  // The action carries no sourceUnitId. The input adapter is therefore the
+  // only range boundary for skill targets; it applies sourceUnitId/range when
+  // the UI definition provides them. Do not infer a source from board state.
+  if (skill.targetType === 'ENEMY_UNIT') return { card, skill, target: { kind: 'unit', side: 'enemy' } };
+  if (skill.targetType === 'ALLY_UNIT') return { card, skill, target: { kind: 'unit', side: 'player' } };
+  if (skill.targetType === 'ENEMY_LANE' || skill.targetType === 'ALLY_LANE') {
+    return { card, skill, target: { kind: 'lane' } };
+  }
+  if (skill.targetType === 'PREPARE_BAR') return { card, skill, target: { kind: 'global' } };
+  throw new RunnerInputError('INVALID_COMMAND', `skill target type is not supported by PLAY_CARD: ${skill.targetType}`);
+}
+
 function initialState(
   seed: number,
   decks: Readonly<Record<Side, readonly string[]>> = { player: AUTHORITY.deck, enemy: AUTHORITY.deck },
@@ -462,6 +538,7 @@ function ensureStarted(state: BattleState): void {
 function startBattle(state: BattleState): BattleState {
   if (state.round !== 0) throw new RunnerInputError('INVALID_COMMAND', 'BATTLE_START may only be issued once');
   let next = update(state, { round: 1, turn: 1, activeSide: state.openingInitiative });
+  next = decrementPreparation(next, next.activeSide);
   next = emit(next, 'BATTLE_START', next.activeSide, { seed: next.seed });
   next = emit(next, 'ROUND_START', next.activeSide, { round: next.round });
   return emit(next, 'TURN_START', next.activeSide, { turn: next.turn });
@@ -515,6 +592,48 @@ function deploy(
   });
   next = emit(next, 'CARD_PLAYED', action.side, { cardId: action.cardId });
   return emit(next, 'UNIT_SPAWNED', action.side, { unitId, cardId: action.cardId, lane: action.lane, cell: action.cell });
+}
+
+/**
+ * Accepts the input-layer skill target contract without pretending to resolve
+ * the skill. Skill effects are not part of this runner yet; this event is the
+ * executable boundary for a validated target submission and leaves the card
+ * in hand until a later effect resolver consumes it.
+ */
+function submitCardTarget(state: BattleState, action: Extract<HighLevelAction, { type: 'PLAY_CARD' }>): BattleState {
+  ensureStarted(state);
+  if (action.side !== 'player' && action.side !== 'enemy') {
+    throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD side is invalid: ${action.side}`);
+  }
+  if (action.side !== state.activeSide) {
+    throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD side must be active side: ${state.activeSide}`);
+  }
+  const { target: profile } = skillConfig(action.cardId);
+  const handIndex = state.hands[action.side].findIndex((candidate) => candidate.cardId === action.cardId);
+  if (handIndex < 0) throw new RunnerInputError('INVALID_COMMAND', `cardId is not in ${action.side} hand: ${action.cardId}`);
+  if (state.hands[action.side][handIndex].remainingPreparation !== 0) {
+    throw new RunnerInputError('INVALID_COMMAND', `cardId is not ready: ${action.cardId}`);
+  }
+  const target = action.target;
+  if (target.kind !== profile.kind) {
+    throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD target kind must be ${profile.kind}`);
+  }
+  if (target.kind === 'lane') {
+    if (target.lane < 0 || target.lane >= state.laneCount) {
+      throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD target lane is outside the board');
+    }
+  } else if (target.kind === 'unit') {
+    const unit = state.units.find((candidate) => candidate.id === target.unitId && candidate.hp > 0);
+    if (!unit) throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD target unit does not exist: ${target.unitId}`);
+    const expectedSide = profile.side === 'enemy' ? (action.side === 'player' ? 'enemy' : 'player') : action.side;
+    if (unit.side !== expectedSide) throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD target unit has the wrong side');
+  } else if (!state.hands[action.side].some((candidate, index) => index !== handIndex && candidate.remainingPreparation > 0)) {
+    throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD global target has no prepared card');
+  }
+  return emit(state, 'CARD_TARGET_SUBMITTED', action.side, {
+    cardId: action.cardId,
+    target,
+  });
 }
 
 function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE_UNIT' }>, parity = false): BattleState {
@@ -615,7 +734,7 @@ function prepareParityCards(state: BattleState, side: Side): BattleState {
   });
 }
 
-function decrementParityPreparation(state: BattleState, side: Side): BattleState {
+function decrementPreparation(state: BattleState, side: Side): BattleState {
   return update(state, {
     hands: {
       ...state.hands,
@@ -721,7 +840,7 @@ export function runNeutralBattle(seed: number): NeutralBattleOutput {
   if (!Number.isSafeInteger(seed)) throw new Error('neutral battle seed must be a safe integer');
   let state = initialState(seed, undefined, true);
   NEUTRAL_RUNTIME_STATES.add(state);
-  state = decrementParityPreparation(state, state.activeSide);
+  state = decrementPreparation(state, state.activeSide);
   state = emit(state, 'BATTLE_START', state.activeSide, { seed: state.seed });
   state = emit(state, 'TURN_START', state.activeSide, { turn: state.turn });
   const actions: HighLevelAction[] = [{ type: 'BATTLE_START' }];
@@ -783,7 +902,7 @@ function endTurnParity(state: BattleState): BattleState {
   if (roundCompleted && next.round >= next.maxRounds) return settleParity(next);
   const nextRound = roundCompleted ? next.round + 1 : next.round;
   next = update(next, { activeSide: nextSide, round: nextRound, turn: next.turn + 1 });
-  next = decrementParityPreparation(next, nextSide);
+  next = decrementPreparation(next, nextSide);
   return emit(next, 'TURN_START', nextSide, { turn: next.turn });
 }
 
@@ -793,6 +912,7 @@ function endTurn(state: BattleState): BattleState {
   const nextSide: Side = state.activeSide === 'player' ? 'enemy' : 'player';
   const nextRound = state.activeSide === 'enemy' ? state.round + 1 : state.round;
   next = update(next, { activeSide: nextSide, round: nextRound, turn: state.turn + 1 });
+  next = decrementPreparation(next, nextSide);
   if (nextRound >= next.maxRounds) return emit(next, 'ROUND_START', nextSide, { round: nextRound });
   if (nextRound !== state.round) next = emit(next, 'ROUND_START', nextSide, { round: nextRound });
   return emit(next, 'TURN_START', nextSide, { turn: next.turn });
@@ -801,6 +921,7 @@ function endTurn(state: BattleState): BattleState {
 function applyAction(state: BattleState, action: HighLevelAction, canonicalUnitId?: string, parity = false): BattleState {
   if (action.type === 'BATTLE_START') return startBattle(state);
   if (action.type === 'DEPLOY_UNIT') return deploy(state, action, canonicalUnitId, parity);
+  if (action.type === 'PLAY_CARD') return submitCardTarget(state, action);
   if (action.type === 'MOVE_UNIT') return move(state, action, parity);
   if (action.type === 'ATTACK') return attack(state, action, parity);
   if (parity) return endTurnParity(state);
@@ -869,7 +990,7 @@ export function runBattleRunnerV2(input: unknown): ParityBattleRunnerOutput {
     enemy: parsed.fixture.decks.enemy.map((ref) => cardByRef.get(ref)!.cocosCardId),
   } as const;
   let state = initialState(parsed.seed, decks, true);
-  state = decrementParityPreparation(state, state.activeSide);
+  state = decrementPreparation(state, state.activeSide);
   state = emit(state, 'BATTLE_START', state.activeSide, { seed: state.seed });
   state = emit(state, 'TURN_START', state.activeSide, { turn: state.turn });
   for (const action of parsed.fixture.actions) {

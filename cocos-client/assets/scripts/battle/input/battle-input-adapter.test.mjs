@@ -180,6 +180,30 @@ function makeHarness(state = makeState(), nodeFactory, side = 'player') {
   assert.deepEqual(submitted, []);
 }
 
+// A rejected or failed commit keeps the staged choice for retry or correction.
+for (const [dispatch, expectedCode] of [
+  [() => ({ ok: false }), 'COMMIT_REJECTED'],
+  [() => { throw new Error('engine unavailable'); }, 'COMMIT_FAILED'],
+]) {
+  const state = makeState();
+  const session = {
+    get snapshot() { return { state }; },
+    dispatch,
+  };
+  const adapter = new BattleInputAdapter({
+    session,
+    side: 'player',
+    resolveCard(cardId) { return definitions[cardId]; },
+  });
+  assert.equal(adapter.selectCard('u-card').ok, true);
+  assert.equal(adapter.selectCell(0, 0).ok, true);
+  const beforeConfirm = adapter.selection;
+  const result = adapter.confirm();
+  assert.equal(result.ok, false);
+  assert.equal(result.code, expectedCode);
+  assert.deepEqual(adapter.selection, beforeConfirm);
+}
+
 // Touch/Node-like bridges do not depend on Node.js or browser globals.
 {
   const listeners = new Map();

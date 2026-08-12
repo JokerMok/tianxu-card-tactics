@@ -1,14 +1,11 @@
 import type { BattleState, CardInstance, Side } from '../../core/types/index.ts';
+import type { BattleTarget } from '../action-contract.ts';
 
 export type BattleInputCardKind = 'unit' | 'skill';
 export type BattleInputTargetType = 'cell' | 'lane' | 'unit' | 'global';
 export type BattleInputSkillTargetType = 'lane' | 'enemy-unit' | 'ally-unit' | 'global';
 
-export type BattleInputTarget =
-  | { readonly kind: 'cell'; readonly lane: number; readonly cell: number }
-  | { readonly kind: 'lane'; readonly lane: number }
-  | { readonly kind: 'unit'; readonly unitId: string }
-  | { readonly kind: 'global' };
+export type BattleInputTarget = BattleTarget;
 
 export interface BattleInputCardDefinition {
   readonly kind: BattleInputCardKind;
@@ -381,7 +378,7 @@ export class BattleInputAdapter {
     if (typeof dispatch !== 'function') return failure('COMMIT_FAILED', reasonFor('COMMIT_FAILED'));
     let output: unknown;
     try {
-      output = dispatch(frozenAction);
+      output = dispatch.call(this.sessionValue, frozenAction);
     } catch {
       return failure('COMMIT_FAILED', reasonFor('COMMIT_FAILED'));
     }
