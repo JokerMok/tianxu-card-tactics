@@ -1,27 +1,42 @@
-import {
-  BATTLE_RUNNER_PROTOCOL,
-  runBattleRunner,
-  type BattleRunnerOutput,
-  type HighLevelAction,
-} from './runner/battle-runner.ts';
 import type { BattleEvent, BattleState } from '../../core/types/index.ts';
 
 export type BattleSessionLifecycle = 'idle' | 'active' | 'paused' | 'ended';
 
+export type BattleSessionAction =
+  | { readonly type: 'BATTLE_START' }
+  | { readonly type: 'DEPLOY_UNIT'; readonly cardId: string; readonly side: 'player' | 'enemy'; readonly lane: number; readonly cell: number }
+  | { readonly type: 'MOVE_UNIT'; readonly unitId: string; readonly steps?: number }
+  | { readonly type: 'ATTACK'; readonly attackerId: string }
+  | { readonly type: 'END_TURN' };
+
+export type HighLevelAction = BattleSessionAction;
+
+export interface BattleSessionEngineOutput {
+  readonly finalState: BattleState;
+  readonly events: readonly BattleEvent[];
+  readonly finalHash: string;
+}
+
+export interface BattleSessionEngine {
+  run(seed: number, actions: readonly BattleSessionAction[]): BattleSessionEngineOutput;
+}
+
 export interface BattleSessionOptions {
   readonly seed: number;
+  readonly engine: BattleSessionEngine;
 }
+
 export interface BattleSessionSnapshot {
   readonly lifecycle: BattleSessionLifecycle;
   readonly seed: number;
-  readonly actions: readonly HighLevelAction[];
+  readonly actions: readonly BattleSessionAction[];
   readonly state: BattleState;
   readonly events: readonly BattleEvent[];
   readonly eventsConsumed: number;
   readonly finalHash: string;
 }
 
-export type BattleSessionErrorCode = 'INVALID_LIFECYCLE' | 'INVALID_COMMAND';
+export type BattleSessionErrorCode = 'INVALID_LIFECYCLE' | 'INVALID_COMMAND' | 'INVALID_ENGINE';
 
 export class BattleSessionError extends Error {
   readonly code: BattleSessionErrorCode;
@@ -33,37 +48,65 @@ export class BattleSessionError extends Error {
   }
 }
 
-function freezeAction(action: HighLevelAction): HighLevelAction {
+function freezeValue<T>(value: T): T {
+  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value as Record<string, unknown>)) freezeValue(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+
+function freezeAction(action: BattleSessionAction): BattleSessionAction {
   return Object.freeze({ ...action });
 }
 
-function freezeActions(actions: readonly HighLevelAction[]): readonly HighLevelAction[] {
+function freezeActions(actions: readonly BattleSessionAction[]): readonly BattleSessionAction[] {
   return Object.freeze(actions.map(freezeAction));
 }
 
-function input(seed: number, actions: readonly HighLevelAction[]): {
-  readonly protocol: typeof BATTLE_RUNNER_PROTOCOL;
-  readonly seed: number;
-  readonly actions: readonly HighLevelAction[];
-} {
-  return { protocol: BATTLE_RUNNER_PROTOCOL, seed, actions };
+function freezeEngineOutput(output: BattleSessionEngineOutput): BattleSessionEngineOutput {
+  if (
+    output === null
+    || typeof output !== 'object'
+    || output.finalState === null
+    || typeof output.finalState !== 'object'
+    || !Array.isArray(output.events)
+    || typeof output.finalHash !== 'string'
+  ) {
+    throw new BattleSessionError('INVALID_ENGINE', 'battle session engine returned an invalid output');
+  }
+  return Object.freeze({
+    finalState: freezeValue(output.finalState),
+    events: freezeValue([...output.events]),
+    finalHash: output.finalHash,
+  });
 }
 
 /**
- * Owns the lifecycle around the deterministic Cocos battle runner.
+ * Owns battle session lifecycle and delegates deterministic state transitions to an injected engine.
  * Rendering and input policy stay outside this controller.
  */
 export class BattleSessionController {
   private readonly seedValue: number;
+  private readonly engine: BattleSessionEngine;
   private lifecycleValue: BattleSessionLifecycle = 'idle';
-  private actionsValue: readonly HighLevelAction[] = Object.freeze([]);
-  private output: BattleRunnerOutput;
+  private actionsValue: readonly BattleSessionAction[] = Object.freeze([]);
+  private output: BattleSessionEngineOutput;
   private eventsConsumedValue = 0;
   private snapshotValue: BattleSessionSnapshot;
 
-  constructor(options: BattleSessionOptions | number) {
-    this.seedValue = typeof options === 'number' ? options : options.seed;
-    this.output = runBattleRunner(input(this.seedValue, this.actionsValue));
+  constructor(options: BattleSessionOptions);
+  constructor(seed: number, engine: BattleSessionEngine);
+  constructor(optionsOrSeed: BattleSessionOptions | number, positionalEngine?: BattleSessionEngine) {
+    const options = typeof optionsOrSeed === 'number'
+      ? { seed: optionsOrSeed, engine: positionalEngine }
+      : optionsOrSeed;
+    if (!options.engine || typeof options.engine.run !== 'function') {
+      throw new BattleSessionError('INVALID_ENGINE', 'a battle session engine is required');
+    }
+    this.seedValue = options.seed;
+    this.engine = options.engine;
+    this.output = freezeEngineOutput(this.engine.run(this.seedValue, this.actionsValue));
     this.snapshotValue = this.createSnapshot();
   }
 
@@ -87,7 +130,7 @@ export class BattleSessionController {
     return this.snapshotValue;
   }
 
-  dispatch(action: HighLevelAction): BattleSessionSnapshot {
+  dispatch(action: BattleSessionAction): BattleSessionSnapshot {
     this.requireLifecycle('active', 'dispatch');
     if (action.type === 'BATTLE_START') {
       throw new BattleSessionError('INVALID_COMMAND', 'BATTLE_START must be issued by start()');
@@ -129,10 +172,10 @@ export class BattleSessionController {
     return this.snapshotValue;
   }
 
-  private execute(action: HighLevelAction): void {
-    const nextActions = [...this.actionsValue, freezeAction(action)];
-    const nextOutput = runBattleRunner(input(this.seedValue, nextActions));
-    this.actionsValue = freezeActions(nextActions);
+  private execute(action: BattleSessionAction): void {
+    const nextActions = freezeActions([...this.actionsValue, action]);
+    const nextOutput = freezeEngineOutput(this.engine.run(this.seedValue, nextActions));
+    this.actionsValue = nextActions;
     this.output = nextOutput;
   }
 

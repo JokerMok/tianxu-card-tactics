@@ -1,8 +1,26 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { runBattleRunner, BATTLE_RUNNER_PROTOCOL } from './runner/battle-runner.ts';
 import { BattleSessionController } from './session-controller.ts';
 
-const session = new BattleSessionController({ seed: 42 });
+const controllerSource = fs.readFileSync(new URL('./session-controller.ts', import.meta.url), 'utf8');
+assert.doesNotMatch(controllerSource, /\bnode:/, 'session controller must be runtime-neutral');
+assert.doesNotMatch(controllerSource, /runner\/battle-runner\.ts/, 'session controller must not import the Node runner');
+
+const engine = {
+  run(seed, actions) {
+    assert.equal(Object.isFrozen(actions), true, 'engine actions must be immutable');
+    assert.equal(actions.every((action) => Object.isFrozen(action)), true, 'engine action entries must be immutable');
+    const output = runBattleRunner({ protocol: BATTLE_RUNNER_PROTOCOL, seed, actions });
+    return {
+      finalState: output.finalState,
+      events: output.events,
+      finalHash: output.finalHash,
+    };
+  },
+};
+
+const session = new BattleSessionController({ seed: 42, engine });
 assert.equal(session.lifecycle, 'idle');
 assert.equal(session.snapshot.state.round, 0);
 assert.deepEqual(session.consumeEvents(), []);
