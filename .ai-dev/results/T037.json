@@ -1,0 +1,27 @@
+{
+  "task_id": "T037",
+  "executor": "cloud",
+  "implementer_id": "019ff64c-159a-7500-999a-78d185ac45a3",
+  "reviewer_id": "019ff651-e77b-7d23-84ad-d39b6e62bfcd",
+  "base_sha": "373cb3bf21044e1a9e63879db0bea514f869337a",
+  "head_sha": "6ffe6583d4f886bf0ceec8721aeaa642b32fd573",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:parity-contract", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T037 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查首次发现 controller 运行时导入 Node-only battle-runner；实现 agent 改为注入式 BattleSessionEngine，将 Node runner 限定在测试 adapter，并增加无 node:/runner 依赖静态断言。修复后独立审查 PASS。",
+  "scope_note": "React node_modules 与 dist 仅临时用于验收，已移除；未留下生成物或上下文缓存。"
+}
