@@ -1,0 +1,27 @@
+{
+  "task_id": "T036",
+  "executor": "cloud",
+  "implementer_id": "019ff617-dec5-7e01-9e62-8355ff642adf",
+  "reviewer_id": "019ff629-9eb5-7a23-973c-f0d004415d4c",
+  "base_sha": "34fc7ad13b1fe08b834cfe9078350dab05212014",
+  "head_sha": "9592095872a222a9b4c2f9c0ee41dc4c56cfa7e4",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && npm run test:neutral-balance", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:parity-contract", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T036 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查首次发现中立模拟快路径绕过递归冻结；协调器将其修复为结构共享并递归冻结新增节点，补充了不可变性断言。修复后独立审查 PASS，平衡统计与全部回归结果保持一致。",
+  "scope_note": "React node_modules 与 dist 仅临时用于验收，已移除；上下文缓存与生成物均未留在工作树。"
+}
