@@ -1,10 +1,14 @@
 import type { BattleEvent, BattleState } from '../../core/types/index.ts';
+import type { BattlePlayCardAction } from './action-contract.ts';
+
+export type { BattlePlayCardAction, BattleTarget } from './action-contract.ts';
 
 export type BattleSessionLifecycle = 'idle' | 'active' | 'paused' | 'ended';
 
 export type BattleSessionAction =
   | { readonly type: 'BATTLE_START' }
   | { readonly type: 'DEPLOY_UNIT'; readonly cardId: string; readonly side: 'player' | 'enemy'; readonly lane: number; readonly cell: number }
+  | BattlePlayCardAction
   | { readonly type: 'MOVE_UNIT'; readonly unitId: string; readonly steps?: number }
   | { readonly type: 'ATTACK'; readonly attackerId: string }
   | { readonly type: 'END_TURN' };
