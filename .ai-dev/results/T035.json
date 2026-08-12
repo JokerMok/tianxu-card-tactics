@@ -1,0 +1,22 @@
+{
+  "task_id": "T035",
+  "executor": "local",
+  "implementer_id": "coordinator-t035-takeover",
+  "reviewer_id": "019ff60f-9427-77a2-bcae-5bebee086cbf",
+  "base_sha": "84093e8",
+  "head_sha": "36b0bbec3c21c723b6b91d7c16fea80d5e21e910",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd web-prototype && npm test -- --run tests/parity/golden.test.ts", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T035 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "Two cloud implementation attempts timed out without changes. The coordinator took over in the existing isolated T035 worktree, adding only the golden corpus/test layer; an independent reviewer then passed the implementation and verification evidence with no P0/P1/P2 findings.",
+  "scope_note": "Generated node_modules/dist and context cache were removed before the final scope check."
+}
