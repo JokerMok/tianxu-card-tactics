@@ -94,7 +94,12 @@ function stateEventType(type: string): UnitActionState | undefined {
 function resolveUnitId(event: BattleEvent, type: ActionEventType): UnitIdResolution {
   const payload = readPayload(event);
   if (type === 'ATTACK') {
-    return { valid: true, unitId: readString(payload.attackerId) ?? readString(event.sourceId) };
+    return {
+      valid: true,
+      unitId: readString(payload.attackerId)
+        ?? readString(event.sourceId)
+        ?? readString(payload.sourceId),
+    };
   }
   if (type === 'DAMAGE') {
     const targetKind = payload.targetKind;

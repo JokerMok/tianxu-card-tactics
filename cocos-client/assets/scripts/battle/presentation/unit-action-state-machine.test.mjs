@@ -97,6 +97,18 @@ const sequence = [
   });
 }
 
+// Core ATTACK events carry the attacker in payload.sourceId; that standard shape maps to Attack.
+{
+  const machine = new UnitActionStateMachine();
+  machine.dispatch(event(1, 'UNIT_SPAWNED', { unitId: 'u1', cardId: 'U001' }));
+  const result = machine.dispatch(event(2, 'ATTACK', { sourceId: 'u1', targetId: 'u2' }));
+  assert.equal(result.accepted, true);
+  assert.equal(result.code, 'APPLIED');
+  assert.equal(result.unitId, 'u1');
+  assert.equal(result.state, 'Attack');
+  assert.equal(stateOf(machine), 'Attack');
+}
+
 // Duplicate events, out-of-order events, and duplicate spawns do not mutate state.
 {
   const machine = new UnitActionStateMachine();
