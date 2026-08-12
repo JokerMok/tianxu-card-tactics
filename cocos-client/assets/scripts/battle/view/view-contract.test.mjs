@@ -17,4 +17,9 @@ for (const file of runtimeFiles) {
 const controllerSource = fs.readFileSync(path.join(root, 'assets/scripts/battle/session-controller.ts'), 'utf8');
 assert.doesNotMatch(controllerSource, /view\//, 'session controller must not own view binding');
 
+const handSource = fs.readFileSync(path.join(viewRoot, 'battle-hand-view.ts'), 'utf8');
+assert.doesNotMatch(handSource, /(?:from|require\()\s*['"]node:/, 'battle hand view must not use Node-only dependencies');
+assert.doesNotMatch(handSource, /runner\/|session-controller|web-prototype|\bReact\b/, 'battle hand view must remain a view adapter');
+assert.doesNotMatch(handSource, /import\s+(?!type\b)[\s\S]*?from ['"]\.\.\/\.\.\/core\//, 'battle hand view must not place view logic in core');
+
 console.log('BattleState view static contract: PASS');
