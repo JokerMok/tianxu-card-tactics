@@ -3,7 +3,7 @@ import type { BattleTarget } from '../action-contract.ts';
 
 export type BattleInputCardKind = 'unit' | 'skill';
 export type BattleInputTargetType = 'cell' | 'lane' | 'unit' | 'global';
-export type BattleInputSkillTargetType = 'lane' | 'enemy-unit' | 'ally-unit' | 'global';
+export type BattleInputSkillTargetType = 'lane' | 'enemy-lane' | 'ally-lane' | 'enemy-unit' | 'ally-unit' | 'global';
 
 export type BattleInputTarget = BattleTarget;
 
@@ -190,7 +190,9 @@ function isOccupied(state: BattleState, lane: number, cell: number): boolean {
 
 function targetTypeFor(definition: BattleInputCardDefinition): BattleInputTargetType {
   if (definition.kind === 'unit') return 'cell';
-  return definition.targetType === 'enemy-unit' || definition.targetType === 'ally-unit' ? 'unit' : definition.targetType ?? 'global';
+  if (definition.targetType === 'enemy-unit' || definition.targetType === 'ally-unit') return 'unit';
+  if (definition.targetType === 'lane' || definition.targetType === 'enemy-lane' || definition.targetType === 'ally-lane') return 'lane';
+  return definition.targetType ?? 'global';
 }
 
 function targetAllowedByRange(
@@ -458,9 +460,11 @@ export class BattleInputAdapter {
           cell: this.sideValue === PLAYER ? offset : state.cellsPerLane - 1 - offset,
         })))
         .filter((target) => !isOccupied(state, target.lane, target.cell));
-    } else if (definition.targetType === 'lane') {
+    } else if (definition.targetType === 'lane' || definition.targetType === 'enemy-lane' || definition.targetType === 'ally-lane') {
+      // The legacy "lane" definition remains the enemy-lane mapping.
+      const targetSide = definition.targetType === 'ally-lane' ? this.sideValue : OTHER_SIDE[this.sideValue];
       targets = Array.from({ length: state.laneCount }, (_, lane) => ({ kind: 'lane' as const, lane }))
-        .filter((target) => state.units.some((unit) => isLivingUnit(unit) && unit.side === OTHER_SIDE[this.sideValue] && unit.lane === target.lane));
+        .filter((target) => state.units.some((unit) => isLivingUnit(unit) && unit.side === targetSide && unit.lane === target.lane));
     } else if (definition.targetType === 'enemy-unit' || definition.targetType === 'ally-unit') {
       const targetSide = definition.targetType === 'enemy-unit' ? OTHER_SIDE[this.sideValue] : this.sideValue;
       targets = state.units

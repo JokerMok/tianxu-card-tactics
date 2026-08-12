@@ -7,14 +7,31 @@ import { BattleInputAdapter } from './input/battle-input-adapter.ts';
 const skillConfigs = JSON.parse(
   fs.readFileSync(new URL('../../resources/config/skills.json', import.meta.url), 'utf8'),
 ).skills;
+const cardConfigs = JSON.parse(
+  fs.readFileSync(new URL('../../resources/config/cards.json', import.meta.url), 'utf8'),
+).cards;
 
 function inputSkillTargetType(cardId) {
-  const targetType = skillConfigs.find((skill) => skill.id === cardId)?.targetType;
+  const skillId = cardConfigs.find((card) => card.id === cardId)?.skillId;
+  const targetType = skillConfigs.find((skill) => skill.id === skillId)?.targetType;
   if (targetType === 'ENEMY_UNIT') return 'enemy-unit';
   if (targetType === 'ALLY_UNIT') return 'ally-unit';
-  if (targetType === 'ENEMY_LANE' || targetType === 'ALLY_LANE') return 'lane';
+  if (targetType === 'ENEMY_LANE') return 'enemy-lane';
+  if (targetType === 'ALLY_LANE') return 'ally-lane';
   if (targetType === 'PREPARE_BAR') return 'global';
   return undefined;
+}
+
+// T040 deliberately exercises the preparation transition needed by a real
+// skill submission. The changed v1 state is still deterministic for the same
+// seed and action list; this locks both facts without asserting a skill effect.
+{
+  const input = { protocol: BATTLE_RUNNER_PROTOCOL, seed: 42, actions: [{ type: 'BATTLE_START' }] };
+  const first = runBattleRunner(input);
+  const repeat = runBattleRunner(input);
+  assert.equal(first.finalHash, '2d397e91');
+  assert.equal(first.finalHash, repeat.finalHash);
+  assert.equal(first.finalState.hands[first.finalState.activeSide].some((card) => inputSkillTargetType(card.cardId) === 'ally-lane' && card.remainingPreparation === 0), true);
 }
 
 function resolveInputCard(cardId) {
@@ -64,11 +81,11 @@ function makeController(seed) {
   assert(playerUnit && enemyUnit);
   controller.dispatch({ type: 'DEPLOY_UNIT', cardId: playerUnit.cardId, side: 'player', lane: 0, cell: 0 });
   controller.dispatch({ type: 'END_TURN' });
-  controller.dispatch({ type: 'DEPLOY_UNIT', cardId: enemyUnit.cardId, side: 'enemy', lane: 0, cell: 11 });
+  controller.dispatch({ type: 'DEPLOY_UNIT', cardId: enemyUnit.cardId, side: 'enemy', lane: 1, cell: 11 });
   controller.dispatch({ type: 'END_TURN' });
-  const skill = controller.snapshot.state.hands.player.find((item) => inputSkillTargetType(item.cardId) === 'lane');
+  const skill = controller.snapshot.state.hands.player.find((item) => inputSkillTargetType(item.cardId) === 'ally-lane');
   const allySkill = controller.snapshot.state.hands.player.find((item) => inputSkillTargetType(item.cardId) === 'ally-unit');
-  assert(skill, 'the seed must expose a ready lane skill card in the active hand');
+  assert(skill, 'the seed must expose a ready ally-lane skill card in the active hand');
   assert(allySkill, 'the seed must expose a ready ally-unit skill card in the active hand');
   const enemy = controller.snapshot.state.units.find((unit) => unit.side === 'enemy');
   const ally = controller.snapshot.state.units.find((unit) => unit.side === 'player');
@@ -77,6 +94,7 @@ function makeController(seed) {
   const adapter = new BattleInputAdapter({ session: controller, side: 'player', resolveCard: resolveInputCard });
   assert.equal(adapter.selectCard(skill.instanceId).ok, true);
   assert.deepEqual(adapter.preview.candidates, [{ kind: 'lane', lane: 0 }]);
+  assert.equal(adapter.preview.candidates.some((target) => target.lane === 1), false);
   assert.equal(adapter.selectLane(0).ok, true);
   const committed = adapter.confirm();
   assert.equal(committed.ok, true);
@@ -98,15 +116,13 @@ function makeController(seed) {
     (error) => error?.code === 'INVALID_COMMAND' && /wrong side/.test(error.message),
   );
 
-  // D001 has no ENEMY_UNIT or PREPARE_BAR skill card, so those successful
-  // paths are intentionally not claimed here. Their target shapes still pass
-  // the real PLAY_CARD parser before semantic validation rejects this lane card.
-  for (const target of [{ kind: 'unit', unitId: enemy.id }, { kind: 'global' }]) {
-    assert.throws(
-      () => controller.dispatch({ type: 'PLAY_CARD', cardId: skill.cardId, side: 'player', target }),
-      (error) => error?.code === 'INVALID_COMMAND' && !/unsupported high-level action/.test(error.message),
-    );
-  }
+  // D001 has no ENEMY_LANE, ENEMY_UNIT, or PREPARE_BAR card. The real
+  // ALLY_LANE card must reject an enemy-only lane even though the lane shape
+  // itself is valid; this is the runner's relationship guard.
+  assert.throws(
+    () => controller.dispatch({ type: 'PLAY_CARD', cardId: skill.cardId, side: 'player', target: { kind: 'lane', lane: 1 } }),
+    (error) => error?.code === 'INVALID_COMMAND' && /no living ally unit/.test(error.message),
+  );
 }
 
 // A malformed target is rejected by the runner's command parser, not reported

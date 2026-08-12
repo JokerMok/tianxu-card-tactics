@@ -156,6 +156,7 @@ const STATE_REHYDRATION_FIELDS = new Set([
 ]);
 const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'PLAY_CARD', 'MOVE_UNIT', 'ATTACK', 'END_TURN']);
 const SIDES: readonly Side[] = ['player', 'enemy'];
+const OTHER_SIDE: Readonly<Record<Side, Side>> = Object.freeze({ player: 'enemy', enemy: 'player' });
 const HERO_MAX_HP = 30;
 const MAX_ROUNDS = 80;
 const NEUTRAL_RUNTIME_STATES = new WeakSet<object>();
@@ -455,7 +456,7 @@ function unitConfig(cardId: string): { readonly card: CardConfig; readonly unit:
 
 interface SkillTargetProfile {
   readonly kind: 'lane' | 'unit' | 'global';
-  readonly side?: Side;
+  readonly side?: 'enemy' | 'ally';
 }
 
 function skillConfig(cardId: string): { readonly card: CardConfig; readonly skill: SkillConfig; readonly target: SkillTargetProfile } {
@@ -469,10 +470,9 @@ function skillConfig(cardId: string): { readonly card: CardConfig; readonly skil
   // only range boundary for skill targets; it applies sourceUnitId/range when
   // the UI definition provides them. Do not infer a source from board state.
   if (skill.targetType === 'ENEMY_UNIT') return { card, skill, target: { kind: 'unit', side: 'enemy' } };
-  if (skill.targetType === 'ALLY_UNIT') return { card, skill, target: { kind: 'unit', side: 'player' } };
-  if (skill.targetType === 'ENEMY_LANE' || skill.targetType === 'ALLY_LANE') {
-    return { card, skill, target: { kind: 'lane' } };
-  }
+  if (skill.targetType === 'ALLY_UNIT') return { card, skill, target: { kind: 'unit', side: 'ally' } };
+  if (skill.targetType === 'ENEMY_LANE') return { card, skill, target: { kind: 'lane', side: 'enemy' } };
+  if (skill.targetType === 'ALLY_LANE') return { card, skill, target: { kind: 'lane', side: 'ally' } };
   if (skill.targetType === 'PREPARE_BAR') return { card, skill, target: { kind: 'global' } };
   throw new RunnerInputError('INVALID_COMMAND', `skill target type is not supported by PLAY_CARD: ${skill.targetType}`);
 }
@@ -538,6 +538,11 @@ function ensureStarted(state: BattleState): void {
 function startBattle(state: BattleState): BattleState {
   if (state.round !== 0) throw new RunnerInputError('INVALID_COMMAND', 'BATTLE_START may only be issued once');
   let next = update(state, { round: 1, turn: 1, activeSide: state.openingInitiative });
+  // T040 closes the real input loop at this lifecycle boundary: cards drawn
+  // with a preparation value of one become ready on their first active turn.
+  // The previous v1 path omitted this existing card-lifecycle transition, so
+  // a real PLAY_CARD could never pass its ready check. This is deterministic
+  // preparation bookkeeping, not skill-effect resolution.
   next = decrementPreparation(next, next.activeSide);
   next = emit(next, 'BATTLE_START', next.activeSide, { seed: next.seed });
   next = emit(next, 'ROUND_START', next.activeSide, { round: next.round });
@@ -622,10 +627,18 @@ function submitCardTarget(state: BattleState, action: Extract<HighLevelAction, {
     if (target.lane < 0 || target.lane >= state.laneCount) {
       throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD target lane is outside the board');
     }
+    const expectedSide = profile.side === 'enemy' ? OTHER_SIDE[action.side] : action.side;
+    const hasLivingTarget = state.units.some((unit) => unit.hp > 0 && unit.side === expectedSide && unit.lane === target.lane);
+    if (!hasLivingTarget) {
+      throw new RunnerInputError(
+        'INVALID_COMMAND',
+        `PLAY_CARD target lane has no living ${profile.side === 'enemy' ? 'enemy' : 'ally'} unit`,
+      );
+    }
   } else if (target.kind === 'unit') {
     const unit = state.units.find((candidate) => candidate.id === target.unitId && candidate.hp > 0);
     if (!unit) throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD target unit does not exist: ${target.unitId}`);
-    const expectedSide = profile.side === 'enemy' ? (action.side === 'player' ? 'enemy' : 'player') : action.side;
+    const expectedSide = profile.side === 'enemy' ? OTHER_SIDE[action.side] : action.side;
     if (unit.side !== expectedSide) throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD target unit has the wrong side');
   } else if (!state.hands[action.side].some((candidate, index) => index !== handIndex && candidate.remainingPreparation > 0)) {
     throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD global target has no prepared card');
@@ -912,6 +925,8 @@ function endTurn(state: BattleState): BattleState {
   const nextSide: Side = state.activeSide === 'player' ? 'enemy' : 'player';
   const nextRound = state.activeSide === 'enemy' ? state.round + 1 : state.round;
   next = update(next, { activeSide: nextSide, round: nextRound, turn: state.turn + 1 });
+  // Keep v1 preparation state seed-derived and reproducible as each side's
+  // turn begins; PLAY_CARD still only records a validated target submission.
   next = decrementPreparation(next, nextSide);
   if (nextRound >= next.maxRounds) return emit(next, 'ROUND_START', nextSide, { round: nextRound });
   if (nextRound !== state.round) next = emit(next, 'ROUND_START', nextSide, { round: nextRound });

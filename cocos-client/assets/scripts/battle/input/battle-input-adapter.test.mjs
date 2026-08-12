@@ -58,7 +58,7 @@ function makeState(overrides = {}) {
     heroMaxHp: { player: 30, enemy: 30 },
     decks: { player: [], enemy: [] },
     hands: {
-      player: [card('u-card', 'U001'), card('lane-card', 'S-LANE'), card('enemy-card', 'S-ENEMY'), card('ally-card', 'S-ALLY')],
+      player: [card('u-card', 'U001'), card('lane-card', 'S-LANE'), card('enemy-lane-card', 'S-ENEMY-LANE'), card('ally-lane-card', 'S-ALLY-LANE'), card('enemy-card', 'S-ENEMY'), card('ally-card', 'S-ALLY')],
       enemy: [],
     },
     graveyards: { player: [], enemy: [] },
@@ -74,6 +74,8 @@ function makeState(overrides = {}) {
 const definitions = {
   U001: { kind: 'unit' },
   'S-LANE': { kind: 'skill', targetType: 'lane' },
+  'S-ENEMY-LANE': { kind: 'skill', targetType: 'enemy-lane' },
+  'S-ALLY-LANE': { kind: 'skill', targetType: 'ally-lane' },
   'S-ENEMY': { kind: 'skill', targetType: 'enemy-unit' },
   'S-ALLY': { kind: 'skill', targetType: 'ally-unit' },
 };
@@ -167,6 +169,23 @@ function makeHarness(state = makeState(), nodeFactory, side = 'player') {
   const ally = makeHarness(makeState({ units: [unit('enemy-1', 'enemy', 0, 11), unit('ally-1', 'player', 1, 1, 5, 10)] })).adapter;
   assert.equal(ally.selectCard('ally-card').ok, true);
   assert.deepEqual(ally.preview.candidates, [{ kind: 'unit', unitId: 'ally-1' }]);
+}
+
+// Lane target relationships are distinct at the input boundary while the
+// dispatched target keeps the shared { kind: 'lane', lane } shape.
+{
+  const state = makeState({ units: [unit('enemy-1', 'enemy', 0, 11), unit('ally-1', 'player', 1, 1)] });
+  const { adapter } = makeHarness(state);
+  assert.equal(adapter.selectCard('enemy-lane-card').ok, true);
+  assert.deepEqual(adapter.preview.candidates, [{ kind: 'lane', lane: 0 }]);
+  assert.equal(adapter.selectLane(1).code, 'TARGET_NOT_AVAILABLE');
+  assert.equal(adapter.selection.target, null);
+  assert.equal(adapter.cancel().ok, true);
+
+  assert.equal(adapter.selectCard('ally-lane-card').ok, true);
+  assert.deepEqual(adapter.preview.candidates, [{ kind: 'lane', lane: 1 }]);
+  assert.equal(adapter.selectLane(1).ok, true);
+  assert.deepEqual(adapter.selection.target, { kind: 'lane', lane: 1 });
 }
 
 // Select, preview, and cancel never dispatch; cancel is idempotent.
