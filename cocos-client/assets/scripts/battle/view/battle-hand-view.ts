@@ -106,6 +106,11 @@ function readBoolean(value: unknown, label: string): boolean | undefined {
   return value;
 }
 
+function readRequiredBoolean(value: unknown, callbackName: string): boolean {
+  if (typeof value !== 'boolean') throw new Error(`${callbackName} must return a boolean`);
+  return value;
+}
+
 /** Purely projects one immutable core card into render state. */
 export function projectBattleCardState(
   card: CardInstance,
@@ -117,15 +122,15 @@ export function projectBattleCardState(
   const selectedCardId = projection.selectedCardId;
   const selected = readBoolean(custom.selected, 'card selected')
     ?? (projection.isCardSelected
-      ? readBoolean(projection.isCardSelected(card, snapshot), 'card selected')!
+      ? readRequiredBoolean(projection.isCardSelected(card, snapshot), 'isCardSelected')
       : selectedCardId !== undefined && selectedCardId !== null && selectedCardId === card.instanceId);
   const available = readBoolean(custom.available, 'card available')
     ?? (projection.isCardAvailable
-      ? readBoolean(projection.isCardAvailable(card, snapshot), 'card available')!
+      ? readRequiredBoolean(projection.isCardAvailable(card, snapshot), 'isCardAvailable')
       : card.remainingPreparation === 0);
   const disabled = readBoolean(custom.disabled, 'card disabled')
     ?? (projection.isCardDisabled
-      ? readBoolean(projection.isCardDisabled(card, snapshot), 'card disabled')!
+      ? readRequiredBoolean(projection.isCardDisabled(card, snapshot), 'isCardDisabled')
       : !available);
   return freezeCardState({
     instanceId: card.instanceId,

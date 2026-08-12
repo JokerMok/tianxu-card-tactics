@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createBattleState } from '../../core/types/index.ts';
-import { BattleHandView, createCocosBattleHandNodeFactory } from './battle-hand-view.ts';
+import { BattleHandView, createCocosBattleHandNodeFactory, projectBattleCardState } from './battle-hand-view.ts';
 
 function makeCard(instanceId, cardId = 'U001', remainingPreparation = 0) {
   return { instanceId, cardId, remainingPreparation };
@@ -93,6 +93,29 @@ assert.equal(factory.root.children.length, 2);
 assert.equal(factory.root.children.find((node) => node.state.instanceId === 'card-1').state.selected, false);
 assert.equal(factory.root.children.find((node) => node.state.instanceId === 'card-3').state.selected, true);
 assert.equal(factory.destroyed.length, 1);
+
+const committedNodes = [...view.nodes];
+const committedStates = committedNodes.map((node) => node.state);
+const callbackNames = ['isCardSelected', 'isCardAvailable', 'isCardDisabled'];
+for (const callbackName of callbackNames) {
+  for (const invalidValue of [undefined, null, 'invalid']) {
+    const projection = { [callbackName]: () => invalidValue };
+    assert.throws(
+      () => view.sync(second, projection),
+      new RegExp(`${callbackName} must return a boolean`),
+    );
+    assert.deepEqual(view.nodes, committedNodes);
+    assert.deepEqual(view.nodes.map((node) => node.state), committedStates);
+    assert.deepEqual(factory.root.children.map((node) => node.state), committedStates);
+  }
+}
+
+const partialDefaults = projectBattleCardState(second.hands.player[0], second, {
+  getCardState: () => ({ selected: undefined, available: undefined, disabled: undefined }),
+});
+assert.equal(partialDefaults.selected, false);
+assert.equal(partialDefaults.available, false);
+assert.equal(partialDefaults.disabled, true);
 
 const beforeInvalid = [...view.nodes];
 assert.throws(() => view.sync(makeState([
