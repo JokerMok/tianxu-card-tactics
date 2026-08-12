@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "cards": [
+    { "fixtureCardId": "c-U001", "reactCardId": "U001", "cocosCardId": "U001", "cocosUnitId": "U001" },
+    { "fixtureCardId": "c-U002", "reactCardId": "U002", "cocosCardId": "U002", "cocosUnitId": "U002" },
+    { "fixtureCardId": "c-U003", "reactCardId": "U003", "cocosCardId": "U003", "cocosUnitId": "U003" },
+    { "fixtureCardId": "c-U004", "reactCardId": "U004", "cocosCardId": "U004", "cocosUnitId": "U004" },
+    { "fixtureCardId": "c-U005", "reactCardId": "U005", "cocosCardId": "U005", "cocosUnitId": "U005" },
+    { "fixtureCardId": "c-U006", "reactCardId": "U006", "cocosCardId": "U006", "cocosUnitId": "U006" },
+    { "fixtureCardId": "c-U007", "reactCardId": "U007", "cocosCardId": "U007", "cocosUnitId": "U007" },
+    { "fixtureCardId": "c-U008", "reactCardId": "U008", "cocosCardId": "U008", "cocosUnitId": "U008" },
+    { "fixtureCardId": "c-U011", "reactCardId": "U011", "cocosCardId": "U011", "cocosUnitId": "U011" },
+    { "fixtureCardId": "c-U012", "reactCardId": "U012", "cocosCardId": "U012", "cocosUnitId": "U012" },
+    { "fixtureCardId": "c-S001", "reactCardId": "S001", "cocosCardId": "U013", "cocosUnitId": "U013" },
+    { "fixtureCardId": "c-S002", "reactCardId": "S002", "cocosCardId": "U022", "cocosUnitId": "U022" },
+    { "fixtureCardId": "c-S003", "reactCardId": "S003", "cocosCardId": "U014", "cocosUnitId": "U014" }
+  ],
+  "units": [
+    { "fixtureUnitId": "p1", "canonicalUnitId": "unit-player-1" },
+    { "fixtureUnitId": "p2", "canonicalUnitId": "unit-player-2" },
+    { "fixtureUnitId": "e1", "canonicalUnitId": "unit-enemy-1" },
+    { "fixtureUnitId": "e2", "canonicalUnitId": "unit-enemy-2" }
+  ],
+  "events": [
+    { "fixtureType": "BATTLE_START", "reactType": "BATTLE_START", "cocosType": "BATTLE_START", "fields": ["type", "round", "turn"] },
+    { "fixtureType": "TURN_START", "reactType": "TURN_START", "cocosType": "TURN_START", "fields": ["type", "side", "round", "turn"] },
+    { "fixtureType": "TURN_END", "reactType": "TURN_END", "cocosType": "TURN_END", "fields": ["type", "side", "round", "turn"] },
+    { "fixtureType": "ROUND_START", "reactType": "ROUND_START", "cocosType": "ROUND_START", "fields": ["type", "round", "turn"] },
+    { "fixtureType": "UNIT_MOVED", "reactType": "UNIT_MOVED", "cocosType": "UNIT_MOVED", "fields": ["type", "side", "round", "turn", "sourceId"] },
+    { "fixtureType": "ATTACK", "reactType": "ATTACK", "cocosType": "ATTACK", "fields": ["type", "side", "round", "turn", "sourceId", "targetId"] },
+    { "fixtureType": "DAMAGE", "reactType": "DAMAGE", "cocosType": "DAMAGE", "fields": ["type", "side", "round", "turn", "sourceId", "targetId", "value"] },
+    { "fixtureType": "BATTLE_END", "reactType": "BATTLE_END", "cocosType": "BATTLE_END", "fields": ["type", "side", "round", "turn"] }
+  ],
+  "decks": {
+    "player": ["c-U001", "c-U001", "c-U001", "c-U001", "c-U002", "c-U002", "c-U002", "c-U002", "c-U003", "c-U003", "c-U003", "c-U004", "c-U004", "c-U004", "c-U004", "c-U005", "c-U005", "c-U005", "c-U006", "c-U006", "c-U007", "c-U007", "c-U008", "c-U011", "c-U011", "c-U012", "c-U012", "c-S001", "c-S002", "c-S003"],
+    "enemy": ["c-U001", "c-U001", "c-U001", "c-U001", "c-U002", "c-U002", "c-U002", "c-U002", "c-U003", "c-U003", "c-U003", "c-U004", "c-U004", "c-U004", "c-U004", "c-U005", "c-U005", "c-U005", "c-U006", "c-U006", "c-U007", "c-U007", "c-U008", "c-U011", "c-U011", "c-U012", "c-U012", "c-S001", "c-S002", "c-S003"]
+  },
+  "actions": [],
+  "ignoredEventTypes": ["CARD_PLAYED", "UNIT_SPAWNED", "CARD_READY", "PREPARE_CHANGED", "UNIT_DIED", "ACTION_REJECTED", "HERO_DAMAGED", "STATUS_APPLIED", "HEAL", "ACTION_SKIPPED"],
+  "compare": {
+    "stateFields": ["seed", "round", "turn", "maxRounds", "laneCount", "cellsPerLane", "summonDepth", "openingInitiative", "activeSide", "heroHp", "heroMaxHp", "decks", "hands", "graveyards", "units", "status", "rngCursor"],
+    "eventFields": ["type", "side", "round", "turn", "sourceId", "targetId", "value", "quantity"],
+    "omittedFields": ["revision", "rngState", "nextId", "nextEventId", "messages"]
+  }
+}
