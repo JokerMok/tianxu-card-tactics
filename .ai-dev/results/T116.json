@@ -1,0 +1,28 @@
+{
+  "task_id": "T116",
+  "executor": "cloud",
+  "implementer_id": "019fc6a8-2f60-7283-92f9-843c59fb9586",
+  "reviewer_id": "019ff5eb-167b-7ee3-8c20-d1c7dcaa28b8",
+  "base_sha": "ff7d7d3",
+  "head_sha": "9bdd6bcf392df4f848916f7e36e0146c60bcfdbc",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && npm run test:parity-contract", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test -- --run tests/parity", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "runner source static cross-engine scan", "exit_code": 0},
+    {"command": "scope_guard check --task-id T116 --attempt 2", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "Independent review initially found hands shape/preparation, silent event drops, coverage, event granularity and hero attack sequence gaps. The coordinator repaired them locally after cloud implementation attempts; independent re-review passed with no P0/P1/P2 findings.",
+  "scope_note": "Temporary dependency symlink, build output and context cache were removed from the worktree before the final scope check."
+}

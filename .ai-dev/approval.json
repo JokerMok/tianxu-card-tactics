@@ -3,14 +3,14 @@
   "skill_version": 1,
   "status": "approved",
   "approved_by": "user",
-  "approved_at": "2026-08-03T07:58:51.208471+00:00",
+  "approved_at": "2026-08-12T12:46:31.417055+00:00",
   "git_common_dir": "46956bf479c7e2b06a38af9949dbc327df581d48688ff11048a2e0d79b2c0214",
-  "base_sha": "9607013325d19b24f27717a7e583ae4fb625695e",
+  "base_sha": "5dc49f0249307714409e5e05812db6b1410dc8ee",
   "target_branch": "coordination/game-development",
   "artifacts": {
     "prd.md": "4186f0cf01f43174d2994ec542f63c643ccc4d8e63bb83c558e2726828028a2d",
     "test-plan.md": "0136de8f247e030fa837af943a86beea19351d97e64314799e5b06276c0b614f",
-    "development-plan.md": "d0d96bd23a58631662840ac3d27173fac97c2ac4c418fe4bf1118c98c8b77e45",
+    "development-plan.md": "1cb89457c1f928c833f0e89f4b4673fef1446089fcb733a702119b3742ca6acd",
     "tasks/T001.md": "3ee7330604631f0c260593c5ea412adf8cb94e9ca17e17acfbb18a5b2a39c2e1",
     "tasks/T002.md": "30846a2ae918012a1024ea360295445ac2eccc30b97911dcfd38f007008bcfcc",
     "tasks/T003.md": "781569cc3af71ff474fb3747885a3618ed1f28b6ce3ac7c526ccc3c5c512658d",
@@ -242,6 +242,6 @@
     "tasks/T113.json": "83a9aa1582ba8582a0abd4b5b2383cd2732e164921ddf6b5a6230d37ef5aafc4",
     "tasks/T114.json": "dc812485b1d80c872c582749941bbb6e2b646966295a95cb9442570d5ab96430",
     "tasks/T115.json": "28756e31cb4b89ff95f72114e7b91d18104cb0678220ba915b46bd09eb962f5f",
-    "tasks/T116.json": "e43a9b0c693d5a80ff42ae85cfad8897533dea8c27e37d34fb5498b7c4ef8520"
+    "tasks/T116.json": "6cd689a2183cc3005fa947daae8b800619f6385950e476bd4f167cdefc8c36f9"
   }
 }
