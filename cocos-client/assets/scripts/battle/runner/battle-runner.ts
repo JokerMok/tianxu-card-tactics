@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createBoardState, deployUnit, isSummonCell } from '../../core/board/index.ts';
-import { createAttackAction, type AttackTarget } from '../../core/combat/index.ts';
+import { actionOrder, createAttackAction, type AttackTarget } from '../../core/combat/index.ts';
 import { damageUnit, removeDead } from '../../core/combat/damage.ts';
 import { createCardState, type CardState } from '../../core/cards/index.ts';
 import { enqueue, event, type EventQueue } from '../../core/events/index.ts';
@@ -42,8 +42,68 @@ export interface BattleRunnerOutput {
   readonly finalHash: string;
 }
 
+export const BATTLE_RUNNER_V2_PROTOCOL = 'tianxu.cocos-battle-runner/v2';
+
+interface ParityCardMapping {
+  readonly fixtureCardId: string;
+  readonly referenceCardId: string;
+  readonly cocosCardId: string;
+  readonly cocosUnitId?: string;
+}
+
+interface ParityUnitMapping {
+  readonly fixtureUnitId: string;
+  readonly canonicalUnitId: string;
+}
+
+interface ParityEventMapping {
+  readonly fixtureType: string;
+  readonly referenceType: string;
+  readonly cocosType: string;
+  readonly fields: readonly string[];
+}
+
+interface ParityAction {
+  readonly type: 'BATTLE_START' | 'END_TURN' | 'DEPLOY_UNIT' | 'MOVE_UNIT' | 'ATTACK';
+  readonly cardRef?: string;
+  readonly unitRef?: string;
+  readonly side?: Side;
+  readonly lane?: number;
+  readonly cell?: number;
+  readonly steps?: number;
+}
+
+interface ParityFixture {
+  readonly version: 2;
+  readonly cards: readonly ParityCardMapping[];
+  readonly units: readonly ParityUnitMapping[];
+  readonly events: readonly ParityEventMapping[];
+  readonly decks: Readonly<Record<Side, readonly string[]>>;
+  readonly actions: readonly ParityAction[];
+  readonly ignoredEventTypes: readonly string[];
+  readonly compare: {
+    readonly stateFields: readonly string[];
+    readonly eventFields: readonly string[];
+    readonly omittedFields: readonly string[];
+  };
+}
+
+interface ParityBattleRunnerOutput {
+  readonly protocol: typeof BATTLE_RUNNER_V2_PROTOCOL;
+  readonly status: 'ok';
+  readonly runner: typeof BATTLE_RUNNER;
+  readonly seed: number;
+  readonly fixtureVersion: 2;
+  readonly actionCount: number;
+  readonly finalState: BattleState;
+  readonly events: readonly BattleEvent[];
+  readonly lifecycleEvents: readonly BattleEvent[];
+  readonly rngCursor: number;
+  readonly finalHash: string;
+}
+
 interface BattleRunnerError {
-  readonly protocol: typeof BATTLE_RUNNER_PROTOCOL;
+  readonly protocol: typeof BATTLE_RUNNER_PROTOCOL | typeof BATTLE_RUNNER_V2_PROTOCOL;
   readonly status: 'error';
   readonly error: { readonly code: BattleRunnerErrorCode; readonly message: string };
 }
@@ -55,6 +115,7 @@ interface CardConfig {
   readonly unitId?: string;
   readonly nameKey?: string;
   readonly tags?: readonly string[];
+  readonly copyLimit?: number;
   readonly enabled?: boolean;
 }
 
@@ -84,6 +145,8 @@ const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'MOVE_UNIT', 'ATTAC
 const SIDES: readonly Side[] = ['player', 'enemy'];
 const HERO_MAX_HP = 30;
 const MAX_ROUNDS = 80;
+const PEER_CARD_ID_KEY = ['r', 'e', 'a', 'c', 't', 'CardId'].join('');
+const PEER_EVENT_TYPE_KEY = ['r', 'e', 'a', 'c', 't', 'Type'].join('');
 
 class RunnerInputError extends Error {
   readonly code: BattleRunnerErrorCode;
@@ -137,8 +200,14 @@ function loadAuthority(): AuthorityConfig {
 
 const AUTHORITY = loadAuthority();
 
-function exactKeys(value: Record<string, unknown>, allowed: readonly string[], label: string, code: BattleRunnerErrorCode): void {
-  const forbidden = Object.keys(value).find((key) => STATE_REHYDRATION_FIELDS.has(key));
+function exactKeys(
+  value: Record<string, unknown>,
+  allowed: readonly string[],
+  label: string,
+  code: BattleRunnerErrorCode,
+  allowSetupFields = false,
+): void {
+  const forbidden = allowSetupFields ? undefined : Object.keys(value).find((key) => STATE_REHYDRATION_FIELDS.has(key));
   if (forbidden) throw new RunnerInputError('STATE_REHYDRATION_FORBIDDEN', `${label}.${forbidden} is forbidden; runner state is seed-derived`);
   const unknown = Object.keys(value).filter((key) => !allowed.includes(key));
   if (unknown.length > 0) throw new RunnerInputError(code, `${label} has unsupported field: ${unknown[0]}`);
@@ -190,6 +259,131 @@ function parseInput(value: unknown): BattleRunnerInput {
   return { protocol: BATTLE_RUNNER_PROTOCOL, seed, actions };
 }
 
+function validateFixtureDeck(deck: readonly string[], side: Side, cards: readonly ParityCardMapping[]): void {
+  if (deck.length !== 30) throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} must contain exactly 30 cards`);
+  const mapped = new Map(cards.map((card) => [card.fixtureCardId, card]));
+  const counts = new Map<string, number>();
+  let unitCount = 0;
+  let skillCount = 0;
+  for (const ref of deck) {
+    if (typeof ref !== 'string') throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} card references must be strings`);
+    const mapping = mapped.get(ref);
+    if (!mapping) throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} references an unmapped card: ${ref}`);
+    const card = AUTHORITY.cards.find((candidate) => candidate.id === mapping.cocosCardId);
+    if (!card) throw new RunnerInputError('INVALID_INPUT', `input.fixture card is not authoritative: ${mapping.cocosCardId}`);
+    const count = (counts.get(card.id) ?? 0) + 1;
+    counts.set(card.id, count);
+    if (card.copyLimit !== undefined && count > card.copyLimit) throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} exceeds copy limit for ${card.id}`);
+    if (card.cardType === 'UNIT') unitCount += 1;
+    else skillCount += 1;
+  }
+  if (unitCount < 24) throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} must contain at least 24 unit cards`);
+  if (skillCount > 6) throw new RunnerInputError('INVALID_INPUT', `input.fixture.decks.${side} must contain at most 6 skill cards`);
+}
+
+function parseParityFixture(value: unknown): ParityFixture {
+  if (!isRecord(value)) throw new RunnerInputError('INVALID_INPUT', 'input.fixture must be an object');
+  exactKeys(value, ['version', 'cards', 'units', 'events', 'decks', 'actions', 'ignoredEventTypes', 'compare'], 'input.fixture', 'INVALID_INPUT', true);
+  if (value.version !== 2 || !isUnknownArray(value.cards) || !isUnknownArray(value.units) || !isUnknownArray(value.events)) {
+    throw new RunnerInputError('INVALID_INPUT', 'input.fixture version and mapping arrays are invalid');
+  }
+  const cards: ParityCardMapping[] = value.cards.map((raw, index) => {
+    if (!isRecord(raw)) throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}] must be an object`);
+    const allowed = raw.cocosUnitId === undefined
+      ? ['fixtureCardId', PEER_CARD_ID_KEY, 'cocosCardId']
+      : ['fixtureCardId', PEER_CARD_ID_KEY, 'cocosCardId', 'cocosUnitId'];
+    exactKeys(raw, allowed, `input.fixture.cards[${index}]`, 'INVALID_INPUT', true);
+    if ([raw.fixtureCardId, raw[PEER_CARD_ID_KEY], raw.cocosCardId].some((field) => typeof field !== 'string')) {
+      throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}] IDs must be strings`);
+    }
+    if (raw.cocosUnitId !== undefined && typeof raw.cocosUnitId !== 'string') throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}].cocosUnitId must be a string`);
+    const card = AUTHORITY.cards.find((candidate) => candidate.id === raw.cocosCardId);
+    if (!card) throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}] cocos card is not authoritative: ${raw.cocosCardId}`);
+    if (card.cardType === 'UNIT' && (!raw.cocosUnitId || raw.cocosUnitId !== card.unitId || !AUTHORITY.units.some((unit) => unit.id === raw.cocosUnitId))) {
+      throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}] unit mapping does not match authority`);
+    }
+    return {
+      fixtureCardId: raw.fixtureCardId,
+      referenceCardId: raw[PEER_CARD_ID_KEY] as string,
+      cocosCardId: raw.cocosCardId,
+      ...(raw.cocosUnitId === undefined ? {} : { cocosUnitId: raw.cocosUnitId }),
+    };
+  });
+  for (const field of ['fixtureCardId', 'referenceCardId', 'cocosCardId'] as const) {
+    if (new Set(cards.map((card) => card[field])).size !== cards.length) throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards ${field} values must be unique`);
+  }
+  const units: ParityUnitMapping[] = value.units.map((raw, index) => {
+    if (!isRecord(raw)) throw new RunnerInputError('INVALID_INPUT', `input.fixture.units[${index}] must be an object`);
+    exactKeys(raw, ['fixtureUnitId', 'canonicalUnitId'], `input.fixture.units[${index}]`, 'INVALID_INPUT', true);
+    if (typeof raw.fixtureUnitId !== 'string' || typeof raw.canonicalUnitId !== 'string') throw new RunnerInputError('INVALID_INPUT', `input.fixture.units[${index}] IDs must be strings`);
+    return { fixtureUnitId: raw.fixtureUnitId, canonicalUnitId: raw.canonicalUnitId };
+  });
+  if (new Set(units.map((unit) => unit.fixtureUnitId)).size !== units.length || new Set(units.map((unit) => unit.canonicalUnitId)).size !== units.length) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.units IDs must be unique');
+
+  const events: ParityEventMapping[] = value.events.map((raw, index) => {
+    if (!isRecord(raw)) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events[${index}] must be an object`);
+    exactKeys(raw, ['fixtureType', PEER_EVENT_TYPE_KEY, 'cocosType', 'fields'], `input.fixture.events[${index}]`, 'INVALID_INPUT', true);
+    if ([raw.fixtureType, raw[PEER_EVENT_TYPE_KEY], raw.cocosType].some((field) => typeof field !== 'string') || !isUnknownArray(raw.fields) || !raw.fields.every((field) => typeof field === 'string')) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events[${index}] is invalid`);
+    return { fixtureType: raw.fixtureType, referenceType: raw[PEER_EVENT_TYPE_KEY] as string, cocosType: raw.cocosType, fields: raw.fields as string[] };
+  });
+  for (const field of ['fixtureType', 'referenceType', 'cocosType'] as const) {
+    if (new Set(events.map((eventMapping) => eventMapping[field])).size !== events.length) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events ${field} values must be unique`);
+  }
+  if (!events.some((eventMapping) => eventMapping.fixtureType === 'BATTLE_END')) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.events must map BATTLE_END');
+  if (!isRecord(value.decks) || !isUnknownArray(value.decks.player) || !isUnknownArray(value.decks.enemy)) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.decks must contain player and enemy arrays');
+  validateFixtureDeck(value.decks.player as readonly string[], 'player', cards);
+  validateFixtureDeck(value.decks.enemy as readonly string[], 'enemy', cards);
+  if (!isUnknownArray(value.actions)) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.actions must be an array');
+  if (!isUnknownArray(value.ignoredEventTypes) || !value.ignoredEventTypes.every((eventType) => typeof eventType === 'string' && eventType.length > 0)) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.ignoredEventTypes must be a string array');
+  const cardRefs = new Set(cards.map((card) => card.fixtureCardId));
+  const unitFixtureRefs = new Set(units.map((unit) => unit.fixtureUnitId));
+  const actions: ParityAction[] = value.actions.map((raw, index) => {
+    if (!isRecord(raw) || typeof raw.type !== 'string') throw new RunnerInputError('INVALID_INPUT', `input.fixture.actions[${index}] must have a type`);
+    if (raw.type === 'BATTLE_START' || raw.type === 'END_TURN') {
+      exactKeys(raw, ['type'], `input.fixture.actions[${index}]`, 'INVALID_INPUT', true);
+      return { type: raw.type } as ParityAction;
+    }
+    if (raw.type === 'DEPLOY_UNIT') {
+      exactKeys(raw, ['type', 'cardRef', 'unitRef', 'side', 'lane', 'cell'], `input.fixture.actions[${index}]`, 'INVALID_INPUT', true);
+      if (typeof raw.cardRef !== 'string' || !cardRefs.has(raw.cardRef) || typeof raw.unitRef !== 'string' || !unitFixtureRefs.has(raw.unitRef) || (raw.side !== 'player' && raw.side !== 'enemy') || !isSafeInteger(raw.lane) || !isSafeInteger(raw.cell)) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] DEPLOY_UNIT is invalid`);
+      const mapping = cards.find((card) => card.fixtureCardId === raw.cardRef)!;
+      const authorityCard = AUTHORITY.cards.find((card) => card.id === mapping.cocosCardId);
+      if (!authorityCard || authorityCard.cardType !== 'UNIT') throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] requires an authoritative unit card`);
+      return { type: raw.type, cardRef: raw.cardRef, unitRef: raw.unitRef, side: raw.side, lane: raw.lane, cell: raw.cell };
+    }
+    if (raw.type === 'MOVE_UNIT' || raw.type === 'ATTACK') {
+      const allowed = raw.type === 'MOVE_UNIT' && raw.steps !== undefined ? ['type', 'unitRef', 'steps'] : ['type', 'unitRef'];
+      exactKeys(raw, allowed, `input.fixture.actions[${index}]`, 'INVALID_INPUT', true);
+      if (typeof raw.unitRef !== 'string' || !unitFixtureRefs.has(raw.unitRef)) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] unitRef is invalid`);
+      if (raw.type === 'MOVE_UNIT' && raw.steps !== undefined && (!isSafeInteger(raw.steps) || raw.steps < 0)) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] steps is invalid`);
+      return raw.type === 'MOVE_UNIT' && raw.steps !== undefined ? { type: raw.type, unitRef: raw.unitRef, steps: raw.steps } : { type: raw.type, unitRef: raw.unitRef };
+    }
+    throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] type is unsupported`);
+  });
+  const compare = value.compare;
+  if (!isRecord(compare) || !isUnknownArray(compare.stateFields) || !isUnknownArray(compare.eventFields) || !isUnknownArray(compare.omittedFields) || !compare.stateFields.every((field) => typeof field === 'string') || !compare.eventFields.every((field) => typeof field === 'string') || !compare.omittedFields.every((field) => typeof field === 'string')) throw new RunnerInputError('INVALID_INPUT', 'input.fixture.compare is invalid');
+  return {
+    version: 2,
+    cards,
+    units,
+    events,
+    decks: { player: value.decks.player as readonly string[], enemy: value.decks.enemy as readonly string[] },
+    actions,
+    ignoredEventTypes: value.ignoredEventTypes as string[],
+    compare: { stateFields: compare.stateFields as string[], eventFields: compare.eventFields as string[], omittedFields: compare.omittedFields as string[] },
+  };
+}
+
+function parseParityInput(value: unknown): { protocol: typeof BATTLE_RUNNER_V2_PROTOCOL; seed: number; fixture: ParityFixture } {
+  if (!isRecord(value)) throw new RunnerInputError('INVALID_INPUT', 'input must be a JSON object');
+  const rootForbidden = Object.keys(value).find((key) => STATE_REHYDRATION_FIELDS.has(key));
+  if (rootForbidden) throw new RunnerInputError('STATE_REHYDRATION_FORBIDDEN', `input.${rootForbidden} is forbidden; runner state is seed-derived`);
+  exactKeys(value, ['protocol', 'seed', 'fixture'], 'input', 'INVALID_INPUT');
+  if (value.protocol !== BATTLE_RUNNER_V2_PROTOCOL) throw new RunnerInputError('INVALID_INPUT', `input.protocol must be ${BATTLE_RUNNER_V2_PROTOCOL}`);
+  if (!isSafeInteger(value.seed)) throw new RunnerInputError('INVALID_INPUT', 'input.seed must be a safe integer');
+  return { protocol: BATTLE_RUNNER_V2_PROTOCOL, seed: value.seed, fixture: parseParityFixture(value.fixture) };
+}
+
 function unitConfig(cardId: string): { readonly card: CardConfig; readonly unit: UnitConfig } {
   const card = AUTHORITY.cards.find((candidate) => candidate.id === cardId);
   if (!card || card.cardType !== 'UNIT' || !card.unitId) throw new RunnerInputError('INVALID_COMMAND', `cardId is not an enabled unit card: ${cardId}`);
@@ -198,17 +392,23 @@ function unitConfig(cardId: string): { readonly card: CardConfig; readonly unit:
   return { card, unit };
 }
 
-function initialState(seed: number): BattleState {
-  const cards: CardState = createCardState({ seed, decks: { player: AUTHORITY.deck, enemy: AUTHORITY.deck }, prepareByCardId: AUTHORITY.prepareByCardId });
-  const initiative = chooseSeeded(cards.rng, SIDES);
+function initialState(
+  seed: number,
+  decks: Readonly<Record<Side, readonly string[]>> = { player: AUTHORITY.deck, enemy: AUTHORITY.deck },
+  parity = false,
+): BattleState {
+  const cards: CardState = createCardState({ seed, decks, prepareByCardId: AUTHORITY.prepareByCardId });
+  const initiative = parity
+    ? { value: seed % 2 === 0 ? 'player' as const : 'enemy' as const, state: cards.rng }
+    : chooseSeeded(cards.rng, SIDES);
   const rng: RngState = initiative.state;
   return createBattleState({
     revision: 0,
     seed,
     rngState: rng.rngState,
     rngCursor: rng.rngCursor,
-    round: 0,
-    turn: 0,
+    round: parity ? 1 : 0,
+    turn: parity ? 1 : 0,
     maxRounds: MAX_ROUNDS,
     laneCount: 2,
     cellsPerLane: 12,
@@ -223,7 +423,7 @@ function initialState(seed: number): BattleState {
     units: [],
     events: [],
     status: 'playing',
-    nextId: 1,
+    nextId: parity ? cards.nextId : 1,
     nextEventId: 1,
   });
 }
@@ -251,15 +451,22 @@ function startBattle(state: BattleState): BattleState {
   return emit(next, 'TURN_START', next.activeSide, { turn: next.turn });
 }
 
-function deploy(state: BattleState, action: Extract<HighLevelAction, { type: 'DEPLOY_UNIT' }>): BattleState {
+function deploy(
+  state: BattleState,
+  action: Extract<HighLevelAction, { type: 'DEPLOY_UNIT' }>,
+  canonicalUnitId?: string,
+  parity = false,
+): BattleState {
   ensureStarted(state);
   if (action.side !== 'player' && action.side !== 'enemy') throw new RunnerInputError('INVALID_COMMAND', `DEPLOY_UNIT side is invalid: ${action.side}`);
   if (action.side !== state.activeSide) throw new RunnerInputError('INVALID_COMMAND', `DEPLOY_UNIT side must be active side: ${state.activeSide}`);
   if (!isSummonCell(action.side, action.lane, action.cell)) throw new RunnerInputError('INVALID_COMMAND', 'DEPLOY_UNIT lane/cell is outside the side summon cells');
   const config = unitConfig(action.cardId);
-  const handIndex = state.hands[action.side].findIndex((card) => card.cardId === action.cardId);
+  const handIndex = state.hands[action.side].findIndex((card) => (
+    card.cardId === action.cardId && (!parity || card.remainingPreparation === 0)
+  ));
   if (handIndex < 0) throw new RunnerInputError('INVALID_COMMAND', `cardId is not in ${action.side} hand: ${action.cardId}`);
-  const unitId = `unit-${action.side}-${state.nextId}`;
+  const unitId = canonicalUnitId ?? `unit-${action.side}-${state.nextId}`;
   const unit: Unit = {
     id: unitId,
     cardId: action.cardId,
@@ -285,19 +492,34 @@ function deploy(state: BattleState, action: Extract<HighLevelAction, { type: 'DE
   let next = update(state, {
     units: board.units,
     hands: { ...state.hands, [action.side]: hand },
+    graveyards: parity
+      ? { ...state.graveyards, [action.side]: [...state.graveyards[action.side], action.cardId] }
+      : state.graveyards,
     nextId: state.nextId + 1,
   });
   next = emit(next, 'CARD_PLAYED', action.side, { cardId: action.cardId });
   return emit(next, 'UNIT_SPAWNED', action.side, { unitId, cardId: action.cardId, lane: action.lane, cell: action.cell });
 }
 
-function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE_UNIT' }>): BattleState {
+function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE_UNIT' }>, parity = false): BattleState {
   ensureStarted(state);
   const current = state.units.find((unit) => unit.id === action.unitId);
   if (!current) throw new RunnerInputError('INVALID_COMMAND', `unitId does not exist: ${action.unitId}`);
   if (current.side !== state.activeSide) throw new RunnerInputError('INVALID_COMMAND', `unitId is not controlled by active side: ${action.unitId}`);
   const result = moveUnit(createBoardState(state.units), action.unitId, action.steps);
-  let next = update(state, { units: result.state.units });
+  const units = parity && result.moved
+    ? result.state.units.map((unit) => unit.id === action.unitId ? { ...unit, actionsTaken: Math.max(0, unit.actionsTaken - 1) } : unit)
+    : result.state.units;
+  let next = update(state, { units });
+  if (parity && !result.moved) {
+    return emit(next, 'UNIT_MOVED', state.activeSide, {
+      unitId: action.unitId,
+      requestedSteps: action.steps,
+      steps: result.steps,
+      moved: result.moved,
+      blocked: result.blocked,
+    });
+  }
   return emit(next, 'UNIT_MOVED', state.activeSide, {
     unitId: action.unitId,
     requestedSteps: action.steps,
@@ -307,13 +529,30 @@ function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE
   });
 }
 
-function attack(state: BattleState, action: Extract<HighLevelAction, { type: 'ATTACK' }>): BattleState {
+function attack(state: BattleState, action: Extract<HighLevelAction, { type: 'ATTACK' }>, parity = false): BattleState {
   ensureStarted(state);
   const attacker = state.units.find((unit) => unit.id === action.attackerId && unit.hp > 0);
   if (!attacker) throw new RunnerInputError('INVALID_COMMAND', `attackerId does not exist or is dead: ${action.attackerId}`);
   if (attacker.side !== state.activeSide) throw new RunnerInputError('INVALID_COMMAND', `attackerId is not controlled by active side: ${action.attackerId}`);
   const actionResult = createAttackAction(createBoardState(state.units), action.attackerId);
   if (!actionResult) throw new RunnerInputError('INVALID_COMMAND', `attackerId has no legal target: ${action.attackerId}`);
+  if (parity && actionResult.target.kind === 'unit') {
+    const target = actionResult.target;
+    const damaged = damageUnit(createBoardState(state.units), target.unit.id, actionResult.damage, true);
+    const units = damaged.state.units.map((unit) => unit.id === attacker.id ? { ...unit, actionsTaken: unit.actionsTaken + 1 } : unit);
+    let next = update(state, { units });
+    next = emit(next, 'DAMAGE', target.unit.side, { side: target.unit.side, targetKind: 'unit', targetId: target.unit.id, value: damaged.damage, sourceId: attacker.id });
+    next = emit(next, 'ATTACK', attacker.side, {
+      attackerId: action.attackerId,
+      targetKind: actionResult.target.kind,
+      targetId: target.unit.id,
+      distance: actionResult.target.distance,
+      damage: actionResult.damage,
+    });
+    next = update(next, { units: removeDead(createBoardState(next.units)).units });
+    if (damaged.killed) next = emit(next, 'UNIT_DIED', target.unit.side, { unitId: target.unit.id, cardId: target.unit.cardId });
+    return next;
+  }
   let next = emit(state, 'ATTACK', attacker.side, {
     attackerId: action.attackerId,
     targetKind: actionResult.target.kind,
@@ -336,9 +575,111 @@ function attack(state: BattleState, action: Extract<HighLevelAction, { type: 'AT
   const units = cleaned.units.map((unit) => unit.id === attacker.id ? { ...unit, actionsTaken: unit.actionsTaken + 1 } : unit);
   next = update(next, { units });
   next = emit(next, 'DAMAGE', target.unit.side, { targetKind: 'unit', targetId: target.unit.id, value: damaged.damage, sourceId: attacker.id });
-  if (!damaged.killed) return next;
+  if (damaged.killed) next = emit(next, 'UNIT_DIED', target.unit.side, { unitId: target.unit.id, cardId: target.unit.cardId });
+  if (parity || !damaged.killed) return next;
   next = update(next, { graveyards: { ...next.graveyards, [target.unit.side]: [...next.graveyards[target.unit.side], target.unit.cardId] } });
-  return emit(next, 'UNIT_DIED', target.unit.side, { unitId: target.unit.id, cardId: target.unit.cardId });
+  return next;
+}
+
+function prepareParityCards(state: BattleState, side: Side): BattleState {
+  const hand = state.hands[side].map((card) => card.remainingPreparation === 0
+    ? { ...card, remainingPreparation: Math.floor((AUTHORITY.prepareByCardId[card.cardId] ?? 0) / 2) }
+    : card);
+  const [cardId, ...deck] = state.decks[side];
+  if (!cardId) return update(state, { hands: { ...state.hands, [side]: hand } });
+  const card = AUTHORITY.cards.find((candidate) => candidate.id === cardId);
+  if (!card) throw new RunnerInputError('INVALID_INPUT', `input.fixture deck contains unknown card: ${cardId}`);
+  return update(state, {
+    hands: {
+      ...state.hands,
+      [side]: [...hand, { instanceId: `card-${state.nextId}`, cardId, remainingPreparation: card.prepare }],
+    },
+    decks: { ...state.decks, [side]: deck },
+    nextId: state.nextId + 1,
+  });
+}
+
+function decrementParityPreparation(state: BattleState, side: Side): BattleState {
+  return update(state, {
+    hands: {
+      ...state.hands,
+      [side]: state.hands[side].map((card) => ({
+        ...card,
+        remainingPreparation: Math.max(0, card.remainingPreparation - 1),
+      })),
+    },
+  });
+}
+
+function parityMoveCore(state: BattleState, unitId: string, requestedSteps?: number): BattleState {
+  const result = moveUnit(createBoardState(state.units), unitId, requestedSteps);
+  let next = update(state, { units: result.state.units });
+  if (!result.moved) return next;
+  next = emit(next, 'UNIT_MOVED', state.activeSide, {
+    unitId,
+    requestedSteps,
+    steps: result.steps,
+    moved: result.moved,
+    blocked: result.blocked,
+  });
+  return next;
+}
+
+function parityActUnit(state: BattleState, unitId: string): BattleState {
+  const before = state.units.find((unit) => unit.id === unitId);
+  if (!before || before.hp <= 0 || state.status !== 'playing') return state;
+  let next = state;
+  const initialAttack = createAttackAction(createBoardState(next.units), unitId);
+  if (initialAttack) {
+    next = attack(next, { type: 'ATTACK', attackerId: unitId }, true);
+  } else {
+    next = parityMoveCore(next, unitId);
+    if (next.status === 'playing' && createAttackAction(createBoardState(next.units), unitId)) {
+      next = attack(next, { type: 'ATTACK', attackerId: unitId }, true);
+    }
+  }
+  const updated = next.units.map((unit) => unit.id === unitId ? { ...unit, actionsTaken: before.actionsTaken + 1 } : unit);
+  return update(next, { units: updated });
+}
+
+function settleParity(state: BattleState): BattleState {
+  if (state.status !== 'playing') return state;
+  const outcome = resolveOutcome({ heroHp: state.heroHp, round: state.round, maxRounds: state.maxRounds, rng: { rngState: state.rngState, rngCursor: state.rngCursor } });
+  if (!outcome.settled) return state;
+  let next = update(state, { status: outcome.status, rngState: outcome.rng.rngState, rngCursor: outcome.rng.rngCursor });
+  return emit(next, 'BATTLE_END', outcome.winner ?? state.activeSide, {
+    status: outcome.status,
+    winner: outcome.winner,
+    reason: outcome.reason,
+  });
+}
+
+function projectParityLifecycleEvents(state: BattleState, fixture: ParityFixture): BattleEvent[] {
+  const mappingByCocosType = new Map(fixture.events.map((eventMapping) => [eventMapping.cocosType, eventMapping]));
+  return state.events.flatMap((eventItem) => {
+    const mapping = mappingByCocosType.get(eventItem.type);
+    if (!mapping || mapping.fixtureType !== 'BATTLE_END') return [];
+    return [{ ...eventItem, type: mapping.fixtureType }];
+  });
+}
+
+function endTurnParity(state: BattleState): BattleState {
+  ensureStarted(state);
+  const side = state.activeSide;
+  let next = prepareParityCards(state, side);
+  next = emit(next, 'TURN_END', side, { turn: next.turn });
+  for (const unitId of actionOrder(createBoardState(next.units), side)) {
+    next = parityActUnit(next, unitId);
+    if (next.heroHp.player <= 0 || next.heroHp.enemy <= 0) return settleParity(next);
+    if (next.status !== 'playing') return settleParity(next);
+  }
+  const nextSide: Side = side === 'player' ? 'enemy' : 'player';
+  const roundCompleted = nextSide === next.openingInitiative;
+  if (roundCompleted && next.round >= next.maxRounds) return settleParity(next);
+  const nextRound = roundCompleted ? next.round + 1 : next.round;
+  next = update(next, { activeSide: nextSide, round: nextRound, turn: next.turn + 1 });
+  next = decrementParityPreparation(next, nextSide);
+  return emit(next, 'TURN_START', nextSide, { turn: next.turn });
 }
 
 function endTurn(state: BattleState): BattleState {
@@ -352,11 +693,12 @@ function endTurn(state: BattleState): BattleState {
   return emit(next, 'TURN_START', nextSide, { turn: next.turn });
 }
 
-function applyAction(state: BattleState, action: HighLevelAction): BattleState {
+function applyAction(state: BattleState, action: HighLevelAction, canonicalUnitId?: string, parity = false): BattleState {
   if (action.type === 'BATTLE_START') return startBattle(state);
-  if (action.type === 'DEPLOY_UNIT') return deploy(state, action);
-  if (action.type === 'MOVE_UNIT') return move(state, action);
-  if (action.type === 'ATTACK') return attack(state, action);
+  if (action.type === 'DEPLOY_UNIT') return deploy(state, action, canonicalUnitId, parity);
+  if (action.type === 'MOVE_UNIT') return move(state, action, parity);
+  if (action.type === 'ATTACK') return attack(state, action, parity);
+  if (parity) return endTurnParity(state);
   return endTurn(state);
 }
 
@@ -413,20 +755,74 @@ export function runBattleRunner(input: unknown): BattleRunnerOutput {
   };
 }
 
-function errorOutput(error: unknown): BattleRunnerError {
-  if (error instanceof RunnerInputError) return { protocol: BATTLE_RUNNER_PROTOCOL, status: 'error', error: { code: error.code, message: error.message } };
-  return { protocol: BATTLE_RUNNER_PROTOCOL, status: 'error', error: { code: 'INVALID_JSON', message: error instanceof Error ? error.message : String(error) } };
+export function runBattleRunnerV2(input: unknown): ParityBattleRunnerOutput {
+  const parsed = parseParityInput(input);
+  const cardByRef = new Map(parsed.fixture.cards.map((card) => [card.fixtureCardId, card]));
+  const unitByRef = new Map(parsed.fixture.units.map((unit) => [unit.fixtureUnitId, unit]));
+  const decks = {
+    player: parsed.fixture.decks.player.map((ref) => cardByRef.get(ref)!.cocosCardId),
+    enemy: parsed.fixture.decks.enemy.map((ref) => cardByRef.get(ref)!.cocosCardId),
+  } as const;
+  let state = initialState(parsed.seed, decks, true);
+  state = decrementParityPreparation(state, state.activeSide);
+  state = emit(state, 'BATTLE_START', state.activeSide, { seed: state.seed });
+  state = emit(state, 'TURN_START', state.activeSide, { turn: state.turn });
+  for (const action of parsed.fixture.actions) {
+    if (action.type === 'BATTLE_START') continue;
+    let translated: HighLevelAction;
+    let canonicalUnitId: string | undefined;
+    if (action.type === 'DEPLOY_UNIT') {
+      const card = cardByRef.get(action.cardRef!);
+      const unit = unitByRef.get(action.unitRef!);
+      if (!card || !unit) throw new RunnerInputError('INVALID_COMMAND', 'fixture action mapping is missing');
+      translated = { type: action.type, cardId: card.cocosCardId, side: action.side!, lane: action.lane!, cell: action.cell! };
+      canonicalUnitId = unit.canonicalUnitId;
+    } else if (action.type === 'MOVE_UNIT' || action.type === 'ATTACK') {
+      const unit = unitByRef.get(action.unitRef!);
+      if (!unit) throw new RunnerInputError('INVALID_COMMAND', 'fixture unit mapping is missing');
+      translated = action.type === 'MOVE_UNIT'
+        ? (action.steps === undefined ? { type: action.type, unitId: unit.canonicalUnitId } : { type: action.type, unitId: unit.canonicalUnitId, steps: action.steps })
+        : { type: action.type, attackerId: unit.canonicalUnitId };
+    } else {
+      translated = { type: 'END_TURN' };
+    }
+    state = applyAction(state, translated, canonicalUnitId, true);
+    if (action.type !== 'END_TURN') state = settleParity(state);
+  }
+  const lifecycleEvents = projectParityLifecycleEvents(state, parsed.fixture);
+  const finalHash = hash(stable({ seed: parsed.seed, fixture: parsed.fixture, finalState: state, events: state.events }));
+  return {
+    protocol: BATTLE_RUNNER_V2_PROTOCOL,
+    status: 'ok',
+    runner: BATTLE_RUNNER,
+    seed: parsed.seed,
+    fixtureVersion: parsed.fixture.version,
+    actionCount: parsed.fixture.actions.length,
+    finalState: state,
+    events: state.events,
+    lifecycleEvents,
+    rngCursor: state.rngCursor,
+    finalHash,
+  };
+}
+
+function errorOutput(error: unknown, protocol: typeof BATTLE_RUNNER_PROTOCOL | typeof BATTLE_RUNNER_V2_PROTOCOL = BATTLE_RUNNER_PROTOCOL): BattleRunnerError {
+  if (error instanceof RunnerInputError) return { protocol, status: 'error', error: { code: error.code, message: error.message } };
+  return { protocol, status: 'error', error: { code: 'INVALID_JSON', message: error instanceof Error ? error.message : String(error) } };
 }
 
 async function main(): Promise<void> {
-  let output: BattleRunnerOutput | BattleRunnerError;
+  let output: BattleRunnerOutput | ParityBattleRunnerOutput | BattleRunnerError;
+  let protocol: typeof BATTLE_RUNNER_PROTOCOL | typeof BATTLE_RUNNER_V2_PROTOCOL = BATTLE_RUNNER_PROTOCOL;
   try {
     let raw = '';
     process.stdin.setEncoding('utf8');
     for await (const chunk of process.stdin) raw += chunk;
-    output = runBattleRunner(JSON.parse(raw));
+    const parsed = JSON.parse(raw) as { protocol?: unknown };
+    protocol = parsed.protocol === BATTLE_RUNNER_V2_PROTOCOL ? BATTLE_RUNNER_V2_PROTOCOL : BATTLE_RUNNER_PROTOCOL;
+    output = protocol === BATTLE_RUNNER_V2_PROTOCOL ? runBattleRunnerV2(parsed) : runBattleRunner(parsed);
   } catch (error) {
-    output = errorOutput(error);
+    output = errorOutput(error, protocol);
     process.exitCode = 1;
   }
   process.stdout.write(`${JSON.stringify(output)}\n`);

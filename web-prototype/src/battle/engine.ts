@@ -1,5 +1,12 @@
 import { getCard } from '../data/cards';
-import { ENEMY_DECK, PLAYER_DECK, validateDecks } from '../data/decks';
+import {
+  ENEMY_DECK,
+  ENEMY_PROFESSION,
+  PLAYER_DECK,
+  PLAYER_PROFESSION,
+  validateDeck,
+  validateDecks,
+} from '../data/decks';
 import { chooseSeeded, nextRandom, shuffleInPlace } from './rng';
 import type {
   BattleEvent,
@@ -18,6 +25,14 @@ const SUMMON_DEPTH = 3;
 
 export interface AdvanceRoundOptions {
   enemyAi?: boolean;
+}
+
+export interface BattleSetup {
+  decks?: {
+    player: readonly string[];
+    enemy: readonly string[];
+  };
+  openingInitiative?: Side;
 }
 
 function cloneState(state: BattleState): BattleState {
@@ -55,9 +70,16 @@ function drawOpeningHand(state: BattleState, side: Side): void {
   }
 }
 
-export function createBattle(seed = 20260712): BattleState {
-  validateDecks();
+export function createBattle(seed = 20260712, setup: BattleSetup = {}): BattleState {
+  if (setup.decks) {
+    validateDeck([...setup.decks.player], PLAYER_PROFESSION, '玩家牌组');
+    validateDeck([...setup.decks.enemy], ENEMY_PROFESSION, '敌方牌组');
+  } else {
+    validateDecks();
+  }
   const normalizedSeed = seed || 1;
+  const decks = setup.decks ?? { player: PLAYER_DECK, enemy: ENEMY_DECK };
+  const openingInitiative = setup.openingInitiative ?? (normalizedSeed % 2 === 0 ? 'player' : 'enemy');
   const state: BattleState = {
     seed: normalizedSeed,
     rngState: normalizedSeed,
@@ -68,11 +90,11 @@ export function createBattle(seed = 20260712): BattleState {
     laneCount: LANE_COUNT,
     cellsPerLane: BOARD_CELLS,
     summonDepth: SUMMON_DEPTH,
-    openingInitiative: normalizedSeed % 2 === 0 ? 'player' : 'enemy',
-    activeSide: normalizedSeed % 2 === 0 ? 'player' : 'enemy',
+    openingInitiative,
+    activeSide: openingInitiative,
     heroHp: { player: 30, enemy: 30 },
     heroMaxHp: { player: 30, enemy: 30 },
-    decks: { player: [...PLAYER_DECK], enemy: [...ENEMY_DECK] },
+    decks: { player: [...decks.player], enemy: [...decks.enemy] },
     hands: { player: [], enemy: [] },
     graveyards: { player: [], enemy: [] },
     units: [],
@@ -386,6 +408,60 @@ export function playCard(
   return { state, played: true };
 }
 
+export function moveUnitForParity(original: BattleState, unitId: string, steps?: number): BattleState {
+  const state = cloneState(original);
+  if (state.status !== 'playing') return reject(state, '战斗已经结束').state;
+  const unit = state.units.find((candidate) => candidate.id === unitId && candidate.hp > 0);
+  if (!unit) return reject(state, `单位不存在: ${unitId}`).state;
+  if (unit.side !== state.activeSide) return reject(state, `当前不是该阵营的行动回合: ${unitId}`).state;
+  const beforeCell = unit.cell;
+  moveUnit(state, unit, steps, false);
+  addEvent(state, {
+    type: 'UNIT_MOVED',
+    message: unit.cell === beforeCell ? `${unit.name}移动受阻` : `${unit.name}推进至 ${unit.cell + 1} 格`,
+    side: unit.side,
+    sourceId: unit.id,
+  });
+  if (unit.cell !== beforeCell) unit.actionsTaken += 1;
+  return state;
+}
+
+export function attackUnitForParity(original: BattleState, attackerId: string): BattleState {
+  const state = cloneState(original);
+  if (state.status !== 'playing') return reject(state, '战斗已经结束').state;
+  const attacker = state.units.find((candidate) => candidate.id === attackerId && candidate.hp > 0);
+  if (!attacker) return reject(state, `单位不存在: ${attackerId}`).state;
+  if (attacker.side !== state.activeSide) return reject(state, `当前不是该阵营的行动回合: ${attackerId}`).state;
+  const target = findTarget(state, attacker);
+  if (target) {
+    attackUnit(state, attacker, target);
+  } else if (heroDistance(attacker) <= attacker.range) {
+    const targetSide = otherSide(attacker.side);
+    const damage = Math.max(1, attacker.attack);
+    addEvent(state, {
+      type: 'ATTACK',
+      message: `${attacker.name}攻击${targetSide === 'player' ? '我方' : '敌方'}英雄`,
+      side: attacker.side,
+      sourceId: attacker.id,
+      targetId: targetSide,
+    });
+    state.heroHp[targetSide] = Math.max(0, state.heroHp[targetSide] - damage);
+    addEvent(state, {
+      type: 'DAMAGE',
+      message: `${targetSide === 'player' ? '我方' : '敌方'}英雄受到 ${damage} 点伤害`,
+      side: targetSide,
+      sourceId: attacker.id,
+      targetId: targetSide,
+      value: damage,
+    });
+    checkOutcome(state);
+  } else {
+    return reject(state, `单位没有合法目标: ${attackerId}`).state;
+  }
+  attacker.actionsTaken += 1;
+  return state;
+}
+
 function decrementPreparation(state: BattleState, side: Side): void {
   for (const card of state.hands[side]) {
     const before = card.remaining;
@@ -490,20 +566,22 @@ function tryAttack(state: BattleState, unit: Unit): boolean {
   return false;
 }
 
-function moveUnit(state: BattleState, unit: Unit): void {
+function moveUnit(state: BattleState, unit: Unit, requestedSteps?: number, emitEvents = true): void {
   const direction = unit.side === 'player' ? 1 : -1;
-  const distance = unit.move + (unit.actionsTaken === 0 ? unit.firstMoveBonus : 0);
+  const distance = requestedSteps ?? unit.move + (unit.actionsTaken === 0 ? unit.firstMoveBonus : 0);
   for (let step = 0; step < distance; step += 1) {
     const nextCell = unit.cell + direction;
     if (nextCell < 0 || nextCell >= BOARD_CELLS) break;
     if (isCellOccupied(state, unit.lane, nextCell)) break;
     unit.cell = nextCell;
-    addEvent(state, {
-      type: 'UNIT_MOVED',
-      message: `${unit.name}推进至 ${unit.cell + 1} 格`,
-      side: unit.side,
-      sourceId: unit.id,
-    });
+    if (emitEvents) {
+      addEvent(state, {
+        type: 'UNIT_MOVED',
+        message: `${unit.name}推进至 ${unit.cell + 1} 格`,
+        side: unit.side,
+        sourceId: unit.id,
+      });
+    }
   }
 }
 
