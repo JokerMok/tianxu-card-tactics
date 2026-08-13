@@ -1,0 +1,30 @@
+{
+  "id": "T117",
+  "source_task": "M3-07-R1",
+  "dependencies": [
+    "T042"
+  ],
+  "wave": 48,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "node --experimental-strip-types cocos-client/assets/scripts/battle/effects/battle-feedback-projector.test.mjs",
+    "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.test.mjs",
+    "cd cocos-client && npm run test:battle-runner",
+    "cd cocos-client && npm run validate:a0",
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "git diff --check"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/effects/",
+    "cocos-client/assets/scripts/battle/presentation/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}
