@@ -4,10 +4,10 @@
   "dependencies": [
     "T042"
   ],
-  "wave": 48,
+  "wave": 999,
   "executor": "cloud",
   "risk": "high",
-  "status": "pending",
+  "status": "blocked",
   "verification_commands": [
     "node --experimental-strip-types cocos-client/assets/scripts/battle/effects/battle-feedback-projector.test.mjs",
     "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.test.mjs",
