@@ -3,9 +3,9 @@
   "skill_version": 1,
   "status": "approved",
   "approved_by": "user",
-  "approved_at": "2026-08-13T05:55:04.218300+00:00",
+  "approved_at": "2026-08-17T14:10:49.778664+00:00",
   "git_common_dir": "46956bf479c7e2b06a38af9949dbc327df581d48688ff11048a2e0d79b2c0214",
-  "base_sha": "602a3263906fb1fb16ea333f2aa4977d3aaedb57",
+  "base_sha": "da1e1264e003a2ad673522528e1cd543a7ac212c",
   "target_branch": "coordination/game-development",
   "artifacts": {
     "prd.md": "d479573c26662928f90e13c547bdc7dbc1ad191eeb3308fcdb4f3c248163a256",
@@ -128,7 +128,7 @@
     "tasks/T115.md": "dccf4691b2dc902c316388c47ac98264242d9af3adc5a64a08cff9dced5ed371",
     "tasks/T116.md": "9d2e573992e78665b6cfd704fff9fc0076953bd0dfbbff6162f4227c3dbfc88e",
     "tasks/T117.md": "b5b779af5a425200b86a63ab183cfda3763587bf8181489ab8892d96bcd14801",
-    "tasks/T118.md": "7887ca645b13b59cadd4480ba6a8ac5daa2bd766035a643429559a0ff5f685bc",
+    "tasks/T118.md": "23d4bc99d478efec5915c4356d68ddd43c481e46c2d61c68ddd2bdd5e0a0c612",
     "tasks/T001.json": "c845f4bc870bb73abcc516c35cf9c61da6949e1a8112ee84c764d2f1dd84a75d",
     "tasks/T002.json": "599e09a3186436aa9ae48708cbc1c9da37f38be3e751dfd8bc95e6f99f9edb44",
     "tasks/T003.json": "7270c2bb9661fee6ce5683af62471613876f8a44162702823377188fe31ee4b1",
@@ -246,6 +246,6 @@
     "tasks/T115.json": "28756e31cb4b89ff95f72114e7b91d18104cb0678220ba915b46bd09eb962f5f",
     "tasks/T116.json": "6cd689a2183cc3005fa947daae8b800619f6385950e476bd4f167cdefc8c36f9",
     "tasks/T117.json": "6ae900ae2a9dda96cd13d6a829e2d0402d4698e1396e513a603e12e044049774",
-    "tasks/T118.json": "986fa512cca3d652274a860f74ac280c48e615501210b5d8998f5e7c1911a896"
+    "tasks/T118.json": "c613b991834c481cd0bd9fb891eb63ae88963070bcf13136c73980233f69aab5"
   }
 }
