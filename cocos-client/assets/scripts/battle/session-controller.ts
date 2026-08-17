@@ -31,6 +31,7 @@ export interface BattleSessionOptions {
 }
 
 export interface BattleSessionSnapshot {
+  readonly revision: number;
   readonly lifecycle: BattleSessionLifecycle;
   readonly seed: number;
   readonly actions: readonly BattleSessionAction[];
@@ -61,6 +62,9 @@ function freezeValue<T>(value: T): T {
 }
 
 function freezeAction(action: BattleSessionAction): BattleSessionAction {
+  if (action.type === 'PLAY_CARD') {
+    return Object.freeze({ ...action, target: Object.freeze({ ...action.target }) });
+  }
   return Object.freeze({ ...action });
 }
 
@@ -97,6 +101,7 @@ export class BattleSessionController {
   private actionsValue: readonly BattleSessionAction[] = Object.freeze([]);
   private output: BattleSessionEngineOutput;
   private eventsConsumedValue = 0;
+  private revisionValue = 0;
   private snapshotValue: BattleSessionSnapshot;
 
   constructor(options: BattleSessionOptions);
@@ -122,6 +127,10 @@ export class BattleSessionController {
     return this.output.finalState;
   }
 
+  get revision(): number {
+    return this.revisionValue;
+  }
+
   get snapshot(): BattleSessionSnapshot {
     return this.snapshotValue;
   }
@@ -130,7 +139,7 @@ export class BattleSessionController {
     this.requireLifecycle('idle', 'start');
     this.execute({ type: 'BATTLE_START' });
     this.lifecycleValue = 'active';
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return this.snapshotValue;
   }
 
@@ -141,28 +150,40 @@ export class BattleSessionController {
     }
     this.execute(action);
     if (this.output.finalState.status !== 'playing') this.lifecycleValue = 'ended';
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return this.snapshotValue;
+  }
+
+  /** Tests a command against the deterministic engine without committing it. */
+  isActionLegal(action: BattleSessionAction): boolean {
+    try {
+      if (this.lifecycleValue !== 'active' || action.type === 'BATTLE_START') return false;
+      const nextActions = freezeActions([...this.actionsValue, action]);
+      freezeEngineOutput(this.engine.run(this.seedValue, nextActions));
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   consumeEvents(): readonly BattleEvent[] {
     const events = this.output.events.slice(this.eventsConsumedValue);
     this.eventsConsumedValue = this.output.events.length;
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return Object.freeze(events);
   }
 
   pause(): BattleSessionSnapshot {
     this.requireLifecycle('active', 'pause');
     this.lifecycleValue = 'paused';
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return this.snapshotValue;
   }
 
   resume(): BattleSessionSnapshot {
     this.requireLifecycle('paused', 'resume');
     this.lifecycleValue = 'active';
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return this.snapshotValue;
   }
 
@@ -172,7 +193,7 @@ export class BattleSessionController {
       throw new BattleSessionError('INVALID_LIFECYCLE', `cannot end a ${this.lifecycleValue} session`);
     }
     this.lifecycleValue = 'ended';
-    this.refreshSnapshot();
+    this.advanceSnapshot();
     return this.snapshotValue;
   }
 
@@ -194,6 +215,7 @@ export class BattleSessionController {
 
   private createSnapshot(): BattleSessionSnapshot {
     return Object.freeze({
+      revision: this.revisionValue,
       lifecycle: this.lifecycleValue,
       seed: this.seedValue,
       actions: this.actionsValue,
@@ -206,5 +228,10 @@ export class BattleSessionController {
 
   private refreshSnapshot(): void {
     this.snapshotValue = this.createSnapshot();
+  }
+
+  private advanceSnapshot(): void {
+    this.revisionValue += 1;
+    this.refreshSnapshot();
   }
 }
