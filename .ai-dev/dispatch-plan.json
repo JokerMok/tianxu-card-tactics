@@ -1134,6 +1134,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T008",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T009",
       "right": "T010",
       "path_left": "cocos-client/",
@@ -1871,6 +1878,13 @@
     {
       "left": "T009",
       "right": "T119",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T009",
+      "right": "T120",
       "path_left": "cocos-client/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -8778,6 +8792,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T036",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T037",
       "right": "T038",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -9065,6 +9086,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T037",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T038",
       "right": "T039",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -9345,6 +9373,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T038",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T039",
       "right": "T040",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -9618,6 +9653,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T039",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T040",
       "right": "T041",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -9884,6 +9926,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T040",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T041",
       "right": "T042",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -10143,6 +10192,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T041",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T042",
       "right": "T043",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -10395,6 +10451,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T042",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T043",
       "right": "T044",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -10640,6 +10703,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T043",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T044",
       "right": "T045",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -10878,6 +10948,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T044",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T045",
       "right": "T046",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -11109,6 +11186,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T045",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T046",
       "right": "T047",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -11333,6 +11417,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T046",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T047",
       "right": "T048",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -11545,6 +11636,13 @@
     {
       "left": "T047",
       "right": "T119",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T047",
+      "right": "T120",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -12026,6 +12124,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T048",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T049",
       "right": "T067",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -12224,6 +12329,13 @@
     {
       "left": "T049",
       "right": "T119",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T049",
+      "right": "T120",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -16296,6 +16408,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T067",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T068",
       "right": "T069",
       "path_left": "cocos-client/assets/scripts/core/",
@@ -17038,6 +17157,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T071",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T072",
       "right": "T074",
       "path_left": "cocos-client/assets/resources/",
@@ -17710,6 +17836,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T074",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T075",
       "right": "T076",
       "path_left": "cocos-client/assets/scripts/services/",
@@ -18571,6 +18704,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T078",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T079",
       "right": "T080",
       "path_left": "cocos-client/",
@@ -18837,6 +18977,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T079",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T080",
       "right": "T081",
       "path_left": "cocos-client/assets/scripts/services/",
@@ -19257,6 +19404,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T081",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T082",
       "right": "T083",
       "path_left": "cocos-client/assets/scripts/services/",
@@ -19789,6 +19943,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T084",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T085",
       "right": "T086",
       "path_left": "cocos-client/assets/scripts/services/",
@@ -20253,6 +20414,13 @@
     {
       "left": "T087",
       "right": "T119",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T087",
+      "right": "T120",
       "path_left": "cocos-client/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -20468,6 +20636,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T089",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T090",
       "right": "T091",
       "path_left": "cocos-client/assets/scripts/services/",
@@ -20762,6 +20937,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T091",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T092",
       "right": "T093",
       "path_left": "cocos-client/",
@@ -20944,6 +21126,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T092",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T093",
       "right": "T094",
       "path_left": "cocos-client/",
@@ -21119,6 +21308,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T093",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T094",
       "right": "T095",
       "path_left": "美术素材/",
@@ -21287,6 +21483,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T094",
+      "right": "T120",
+      "path_left": "cocos-client/assets/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T095",
       "right": "T096",
       "path_left": "美术素材/",
@@ -21448,6 +21651,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T095",
+      "right": "T120",
+      "path_left": "cocos-client/assets/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T096",
       "right": "T097",
       "path_left": "cocos-client/assets/",
@@ -21602,6 +21812,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T096",
+      "right": "T120",
+      "path_left": "cocos-client/assets/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T097",
       "right": "T098",
       "path_left": "cocos-client/assets/scripts/battle/",
@@ -21688,6 +21905,13 @@
     {
       "left": "T097",
       "right": "T119",
+      "path_left": "cocos-client/assets/scripts/battle/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T097",
+      "right": "T120",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -21833,6 +22057,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T098",
+      "right": "T120",
+      "path_left": "cocos-client/assets/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T099",
       "right": "T100",
       "path_left": "cocos-client/assets/",
@@ -21966,6 +22197,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T099",
+      "right": "T120",
+      "path_left": "cocos-client/assets/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T100",
       "right": "T101",
       "path_left": "cocos-client/assets/resources/",
@@ -22176,6 +22414,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T103",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T104",
       "right": "T105",
       "path_left": "cocos-client/",
@@ -22269,6 +22514,13 @@
     {
       "left": "T104",
       "right": "T119",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T104",
+      "right": "T120",
       "path_left": "cocos-client/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -22407,6 +22659,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T111",
+      "right": "T120",
+      "path_left": "cocos-client/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T112",
       "right": "T113",
       "path_left": "cocos-client/assets/scripts/battle/runner/",
@@ -22442,6 +22701,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T112",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/runner/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T113",
       "right": "T114",
       "path_left": "cocos-client/assets/scripts/battle/runner/",
@@ -22470,6 +22736,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T113",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/runner/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T114",
       "right": "T115",
       "path_left": "cocos-client/assets/scripts/battle/runner/",
@@ -22491,6 +22764,13 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T114",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/runner/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T115",
       "right": "T116",
       "path_left": "cocos-client/assets/scripts/battle/runner/",
@@ -22505,8 +22785,22 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T115",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/runner/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T116",
       "right": "T119",
+      "path_left": "cocos-client/assets/scripts/battle/runner/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T116",
+      "right": "T120",
       "path_left": "cocos-client/assets/scripts/battle/runner/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
@@ -22526,9 +22820,30 @@
       "reason": "shared_write_path"
     },
     {
+      "left": "T117",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/effects/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T118",
       "right": "T119",
       "path_left": "cocos-client/assets/scripts/battle/effects/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T118",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/effects/",
+      "path_right": "cocos-client/assets/scripts/battle/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T119",
+      "right": "T120",
+      "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/assets/scripts/battle/",
       "reason": "shared_write_path"
     }
@@ -22550,11 +22865,12 @@
     "T044",
     "T114",
     "T115",
-    "T117"
+    "T117",
+    "T119"
   ],
   "planned": [
     "T001",
-    "T119",
+    "T120",
     "T002",
     "T045",
     "T003",
@@ -22663,7 +22979,7 @@
       "wave": 1,
       "tasks": [
         "T001",
-        "T119"
+        "T120"
       ],
       "dispatches": [
         {
@@ -22679,7 +22995,7 @@
           "serialized_after": []
         },
         {
-          "task_id": "T119",
+          "task_id": "T120",
           "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "high",
@@ -22689,7 +23005,7 @@
           "allowed_paths": [
             "cocos-client/assets/scripts/battle/"
           ],
-          "context_ref": ".ai-dev/context/T119.json",
+          "context_ref": ".ai-dev/context/T120.json",
           "serialized_after": []
         }
       ]
@@ -22722,7 +23038,7 @@
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
-            "T119"
+            "T120"
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/battle/"
