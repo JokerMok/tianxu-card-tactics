@@ -3,14 +3,14 @@
   "skill_version": 1,
   "status": "approved",
   "approved_by": "user",
-  "approved_at": "2026-08-17T17:12:54.503973+00:00",
+  "approved_at": "2026-08-17T17:32:18.258946+00:00",
   "git_common_dir": "46956bf479c7e2b06a38af9949dbc327df581d48688ff11048a2e0d79b2c0214",
-  "base_sha": "aee06f9490a17bb8543710dee137a416bf091c92",
+  "base_sha": "650ef212a68052a7e31fb1019bc86dcb4babb709",
   "target_branch": "coordination/game-development",
   "artifacts": {
     "prd.md": "d479573c26662928f90e13c547bdc7dbc1ad191eeb3308fcdb4f3c248163a256",
     "test-plan.md": "42e36d8f2514dda65995b81c49103f3f32a3e795501001cb722af9c6a1b2a6b2",
-    "development-plan.md": "8ea4e452668450db3dfba6a893b57e9a63488917b9f99f64477eb066618bc9e5",
+    "development-plan.md": "af52c12324c1d914d78eaec64f61637020e2321730995806b0d3b7b52f5efc58",
     "tasks/T001.md": "3ee7330604631f0c260593c5ea412adf8cb94e9ca17e17acfbb18a5b2a39c2e1",
     "tasks/T002.md": "30846a2ae918012a1024ea360295445ac2eccc30b97911dcfd38f007008bcfcc",
     "tasks/T003.md": "781569cc3af71ff474fb3747885a3618ed1f28b6ce3ac7c526ccc3c5c512658d",
@@ -131,7 +131,7 @@
     "tasks/T118.md": "23d4bc99d478efec5915c4356d68ddd43c481e46c2d61c68ddd2bdd5e0a0c612",
     "tasks/T119.md": "7f24d0e9ad278455a95a473c2926bd191fd02130ceae7eeed64be4cf0a9cc179",
     "tasks/T120.md": "114170edcdf4cf42495a382c2b2bbe79b8853e10a4fd583bfb012082dc88f795",
-    "tasks/T121.md": "05f1685261d60a3be3e572a2c0eeaadd2502337395e82f23fedc5a12985b427c",
+    "tasks/T121.md": "7f3e8c4e9a8205b54ea8dd329803abedfa52091b4b1383125a5abb00d40d3b9c",
     "tasks/T001.json": "c845f4bc870bb73abcc516c35cf9c61da6949e1a8112ee84c764d2f1dd84a75d",
     "tasks/T002.json": "599e09a3186436aa9ae48708cbc1c9da37f38be3e751dfd8bc95e6f99f9edb44",
     "tasks/T003.json": "7270c2bb9661fee6ce5683af62471613876f8a44162702823377188fe31ee4b1",
@@ -252,6 +252,6 @@
     "tasks/T118.json": "2f40d0433fb4b473587d10b1dea85723bc0acd78a89e09ad0f0d9a83414830ae",
     "tasks/T119.json": "6e6be630b55b367017b3184354f9ef91bceba1bad053db8e91f275a43ab14422",
     "tasks/T120.json": "5f796b09188f529f4d4e09db4bf38fad37aa5bb1563c0f56ea6fab8f029ccc6d",
-    "tasks/T121.json": "e86051c627a9508a61f4af117a0acced089865052deb773116c440be7e88ab15"
+    "tasks/T121.json": "16c7c983b1589e9aa824f4e074707f368f8fee1a009e988aadf33bd5d700424b"
   }
 }

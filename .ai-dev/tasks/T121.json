@@ -5,7 +5,7 @@
   "wave": 52,
   "executor": "cloud",
   "risk": "high",
-  "status": "pending",
+  "status": "completed",
   "verification_commands": [
     "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs",
     "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs",
