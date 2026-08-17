@@ -135,7 +135,13 @@ export class BattleExitController {
     this.publish();
     try {
       if (this.portValue === null) throw new Error('battle exit settlement port is unavailable');
-      this.portValue.settle(Object.freeze({ reason }));
+      const settlement = this.portValue.settle(Object.freeze({ reason }));
+      if (
+        settlement !== null
+        && typeof settlement === 'object'
+        && Object.prototype.hasOwnProperty.call(settlement, 'accepted')
+        && (settlement as { readonly accepted?: unknown }).accepted !== true
+      ) throw new Error('battle exit settlement was rejected');
       this.stateValue = 'terminal';
       this.publish();
       return this.result(true, 'SETTLED');
