@@ -107,6 +107,45 @@ function heroSnapshot(projector, side) {
   assert.equal(unitMissingId.code, 'INVALID_EVENT');
 }
 
+// Cross-kind identities are contradictions and must not mutate projection state.
+{
+  const fb = projector();
+  const before = fb.snapshot;
+  const heroWithUnit = fb.dispatch(event(1, 'DAMAGE', {
+    targetKind: 'hero', targetId: 'player', unitId: 'unit-1', value: 2,
+  }));
+  assert.equal(heroWithUnit.code, 'INVALID_EVENT');
+  assert.strictEqual(heroWithUnit.snapshot, before);
+
+  const unitWithHero = fb.dispatch(event(2, 'DAMAGE', {
+    targetKind: 'unit', targetId: 'unit-1', heroId: 'player', value: 2,
+  }));
+  assert.equal(unitWithHero.code, 'INVALID_EVENT');
+  assert.strictEqual(unitWithHero.snapshot, before);
+
+  const damagedHeroWithUnit = fb.dispatch(event(3, 'HERO_DAMAGED', {
+    targetKind: 'hero', targetId: 'player', unitId: 'unit-1', value: 2,
+  }));
+  assert.equal(damagedHeroWithUnit.code, 'INVALID_EVENT');
+  assert.strictEqual(damagedHeroWithUnit.snapshot, before);
+
+  const unitDeathWithHero = fb.dispatch(event(4, 'UNIT_DIED', { unitId: 'unit-1', heroId: 'player' }));
+  assert.equal(unitDeathWithHero.code, 'INVALID_EVENT');
+  assert.strictEqual(unitDeathWithHero.snapshot, before);
+
+  const unitDeathWithConflictingTarget = fb.dispatch(event(5, 'UNIT_DIED', {
+    unitId: 'unit-1', targetId: 'unit-2',
+  }));
+  assert.equal(unitDeathWithConflictingTarget.code, 'INVALID_EVENT');
+  assert.strictEqual(unitDeathWithConflictingTarget.snapshot, before);
+
+  const unitDeathWithInvalidKind = fb.dispatch(event(6, 'UNIT_DIED', {
+    targetKind: 'bogus', unitId: 'unit-1', side: 'player',
+  }));
+  assert.equal(unitDeathWithInvalidKind.code, 'INVALID_EVENT');
+  assert.strictEqual(unitDeathWithInvalidKind.snapshot, before);
+}
+
 // HERO_DAMAGED only accepts explicit hero identity and must be hero-kind target.
 {
   const fb = projector();
@@ -200,7 +239,14 @@ function heroSnapshot(projector, side) {
   assert.equal(unitShield.snapshot.units[0].id, 'unit-1');
   assert.equal(unitShield.snapshot.units[0].shield, 5);
 
-  const shieldWithoutValue = fb.dispatch(event(3, 'STATUS_APPLIED', {
+  const beforeConflictingShield = fb.snapshot;
+  const conflictingShieldSide = fb.dispatch(event(3, 'STATUS_APPLIED', {
+    targetKind: 'unit', targetId: 'unit-1', side: 'enemy', kind: 'SHIELD', amount: 1,
+  }));
+  assert.equal(conflictingShieldSide.code, 'INVALID_EVENT');
+  assert.strictEqual(conflictingShieldSide.snapshot, beforeConflictingShield);
+
+  const shieldWithoutValue = fb.dispatch(event(4, 'STATUS_APPLIED', {
     targetKind: 'unit',
     targetId: 'unit-2',
     kind: 'SHIELD',
@@ -212,15 +258,38 @@ function heroSnapshot(projector, side) {
 
 {
   const fb = projector();
-  const dead = fb.dispatch(event(1, 'UNIT_DIED', { targetKind: 'unit', targetId: 'unit-1' }));
+  const liveDamage = fb.dispatch(event(1, 'DAMAGE', {
+    targetKind: 'unit', targetId: 'unit-1', side: 'player', value: 3,
+  }));
+  assert.equal(liveDamage.accepted, true);
+  assert.equal(liveDamage.snapshot.units[0].hp, null);
+  assert.equal(liveDamage.snapshot.units[0].dead, false);
+
+  const rollback = projector();
+  assert.equal(rollback.dispatch(event(1, 'DAMAGE', {
+    targetKind: 'unit', targetId: 'unit-rollback', value: 1, currentHp: 5,
+  })).accepted, true);
+  const beforeRejectedDamage = rollback.snapshot;
+  const rejectedDamage = rollback.dispatch(event(2, 'DAMAGE', {
+    targetKind: 'unit', targetId: 'unit-rollback', side: 'player', value: 1, currentHp: 99,
+  }));
+  assert.equal(rejectedDamage.code, 'INVALID_EVENT');
+  assert.strictEqual(rejectedDamage.snapshot, beforeRejectedDamage);
+  const validAfterRejection = rollback.dispatch(event(3, 'DAMAGE', {
+    targetKind: 'unit', targetId: 'unit-rollback', value: 1, currentHp: 4,
+  }));
+  assert.equal(validAfterRejection.accepted, true);
+  assert.equal(validAfterRejection.snapshot.units[0].side, null);
+
+  const dead = fb.dispatch(event(2, 'UNIT_DIED', { unitId: 'unit-1', side: 'player' }));
   assert.equal(dead.accepted, true);
   assert.equal(dead.snapshot.units[0].dead, true);
 
-  const heal = fb.dispatch(event(2, 'HEAL', { targetKind: 'hero', targetId: 'enemy', value: 5 }));
+  const heal = fb.dispatch(event(3, 'HEAL', { targetKind: 'hero', targetId: 'enemy', value: 5 }));
   assert.equal(heal.accepted, true);
   assert.equal(heal.snapshot.heroes.enemy.hp, 30);
 
-  const unitHealMissingTarget = fb.dispatch(event(3, 'HEAL', { targetKind: 'unit', value: 2 }));
+  const unitHealMissingTarget = fb.dispatch(event(4, 'HEAL', { targetKind: 'unit', value: 2 }));
   assert.equal(unitHealMissingTarget.accepted, false);
   assert.equal(unitHealMissingTarget.code, 'INVALID_EVENT');
 }
@@ -240,6 +309,11 @@ function heroSnapshot(projector, side) {
   assert.equal(drawWithoutWinner.snapshot.battleStatus, 'draw');
   assert.equal(drawWithoutWinner.snapshot.winner, null);
 
+  const drawWithNullWinner = projector().dispatch(event(1, 'BATTLE_END', { status: 'draw', winner: null, reason: 'ROUND_LIMIT' }));
+  assert.equal(drawWithNullWinner.accepted, true);
+  const drawWithUndefinedWinner = projector().dispatch(event(1, 'BATTLE_END', { status: 'draw', winner: undefined, reason: 'ROUND_LIMIT' }));
+  assert.equal(drawWithUndefinedWinner.accepted, true);
+
   const lost = projector();
   const lose = lost.dispatch(event(1, 'BATTLE_END', { status: 'lost', winner: 'enemy', reason: 'HERO_DEFEATED' }));
   assert.equal(lose.accepted, true);
@@ -250,6 +324,7 @@ function heroSnapshot(projector, side) {
   assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'won', winner: 'enemy', reason: 'HERO_DEFEATED' })).accepted, false);
   assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'draw', winner: 'player', reason: 'ROUND_LIMIT' })).accepted, false);
   assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'lost', reason: 'ROUND_LIMIT' })).accepted, false);
+  assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'won', winner: null, reason: 'ROUND_LIMIT' })).accepted, false);
   assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'won', winner: 'player' })).accepted, false);
   assert.equal(wrongWinner.dispatch(event(1, 'BATTLE_END', { status: 'won', winner: 'player', reason: '' })).accepted, false);
 

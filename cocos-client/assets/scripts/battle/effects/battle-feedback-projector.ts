@@ -86,17 +86,21 @@ export class BattleFeedbackProjector {
 
   private target(event: BattleEvent, payload: Record<string, unknown>, type: EventKind, heroOnly: boolean): { kind: TargetKind; id: string } | null {
     const kind = this.field(event, payload, ['targetKind'], (value): value is TargetKind => KINDS.has(value as TargetKind));
-    if (!kind?.present) {
+    if (kind === null) return null;
+    if (!kind.present) {
       if (type === 'UNIT_DIED') {
-        const fallback = this.field(event, payload, ['unitId'], text);
-        if (!fallback?.present) return null;
+        const unitId = this.field(event, payload, ['unitId'], text);
+        const fallback = this.field(event, payload, ['targetId', 'unitId'], text);
+        const hero = this.field(event, payload, ['heroId'], text);
+        if (!unitId?.present || !fallback?.present || hero === null || hero.present) return null;
         return { kind: 'unit', id: fallback.value! };
       }
       return null;
     }
     if (heroOnly && kind.value !== 'hero') return null;
     const identity = this.field(event, payload, kind.value === 'hero' ? ['targetId', 'heroId'] : ['targetId', 'unitId'], text);
-    if (!identity?.present || (kind.value === 'hero' && !this.heroSide(identity.value!))) return null;
+    const conflictingIdentity = this.field(event, payload, kind.value === 'hero' ? ['unitId'] : ['heroId'], text);
+    if (!identity?.present || conflictingIdentity === null || conflictingIdentity.present || (kind.value === 'hero' && !this.heroSide(identity.value!))) return null;
     return { kind: kind.value!, id: identity.value! };
   }
 
@@ -115,12 +119,20 @@ export class BattleFeedbackProjector {
     const known = this.units.get(targetId);
     if (known?.side && side && known.side !== side) return this.result(false, 'INVALID_EVENT', event.eventId);
     const state = known ?? { id: targetId, side: side ?? null, hp: null, maxHp: null, dead: false, shield: 0, statuses: [] };
-    const hp = state.hp === null ? (heal ? amount : 0) : (heal ? Math.min(state.maxHp ?? state.hp, state.hp + amount) : Math.max(0, state.hp - amount));
     const hint = this.field(event, payload, ['currentHp', 'remainingHp', 'hp'], nonNegative);
-    if (!hint || (hint.present && hint.value !== hp)) return this.result(false, 'INVALID_EVENT', event.eventId);
+    if (!hint) return this.result(false, 'INVALID_EVENT', event.eventId);
+    let hp = state.hp;
+    if (state.hp !== null) {
+      hp = heal
+        ? (state.maxHp === null ? state.hp + amount : Math.min(state.maxHp, state.hp + amount))
+        : Math.max(0, state.hp - amount);
+      if (hint.present && hint.value !== hp) return this.result(false, 'INVALID_EVENT', event.eventId);
+    } else if (hint.present) {
+      hp = hint.value!;
+    }
     if (!known) { this.units.set(targetId, state); this.unitOrder.push(targetId); }
     if (!state.side && side) state.side = side;
-    state.hp = hp; if (state.maxHp === null && hp > 0) state.maxHp = hp; if (hp === 0) state.dead = true;
+    state.hp = hp;
     return this.commit(event);
   }
 
@@ -136,6 +148,8 @@ export class BattleFeedbackProjector {
         hero.shield += amount.value!;
         return this.commit(event);
       }
+      const known = this.units.get(target.id);
+      if (known?.side && side && known.side !== side) return this.result(false, 'INVALID_EVENT', event.eventId);
       const unitState = this.unit(target.id, side);
       if (!unitState) return this.result(false, 'INVALID_EVENT', event.eventId);
       unitState.shield += amount.value!;
@@ -179,7 +193,7 @@ export class BattleFeedbackProjector {
   private end(event: BattleEvent, payload: Record<string, unknown>): BattleFeedbackTransitionResult {
     const status = this.field(event, payload, ['status'], (value): value is 'won' | 'lost' | 'draw' => value === 'won' || value === 'lost' || value === 'draw');
     const reason = this.field(event, payload, ['reason'], text);
-    const winner = this.field(event, payload, ['winner'], (value): value is Side => SIDES.has(value as Side));
+    const winner = this.readWinner(event, payload);
     const side = this.field(event, payload, ['side'], (value): value is Side => SIDES.has(value as Side));
     if (!status?.present || !reason?.present || !winner || !side) return this.result(false, 'INVALID_EVENT', event.eventId);
     const expected = status.value === 'won' ? 'player' : status.value === 'lost' ? 'enemy' : undefined;
@@ -200,6 +214,17 @@ export class BattleFeedbackProjector {
     if (values.length === 0) return { present: false };
     if (!values.every((value) => check(value)) || !values.every((value) => Object.is(value, values[0]))) return null;
     return { present: true, value: values[0] as T };
+  }
+
+  private readWinner(event: BattleEvent, payload: Record<string, unknown>): Field<Side> {
+    const top = event as unknown as Record<string, unknown>;
+    const values: unknown[] = [];
+    if (Object.prototype.hasOwnProperty.call(payload, 'winner')) values.push(payload.winner);
+    if (Object.prototype.hasOwnProperty.call(top, 'winner')) values.push(top.winner);
+    if (values.length === 0) return { present: false };
+    const normalized = values.map((value) => value === null || value === undefined ? null : value);
+    if (!normalized.every((value) => value === null || SIDES.has(value as Side)) || !normalized.every((value) => Object.is(value, normalized[0]))) return null;
+    return normalized[0] === null ? { present: false } : { present: true, value: normalized[0] as Side };
   }
 
   private heroSide(identity: string): Side | null {
