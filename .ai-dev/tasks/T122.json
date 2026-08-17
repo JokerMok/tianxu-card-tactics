@@ -5,7 +5,7 @@
   "wave": 55,
   "executor": "cloud",
   "risk": "high",
-  "status": "pending",
+  "status": "completed",
   "verification_commands": [
     "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-result-transaction.test.mjs",
     "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-exit-controller.test.mjs",
