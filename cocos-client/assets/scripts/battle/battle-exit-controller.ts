@@ -1,6 +1,7 @@
 export const BATTLE_EXIT_STATES = Object.freeze({
   ACTIVE: 'active',
   CONFIRMING: 'confirming',
+  SETTLING: 'settling',
   TERMINAL: 'terminal',
   FAILED: 'failed',
 } as const);
@@ -130,11 +131,13 @@ export class BattleExitController {
     if (this.settledValue) return this.result(false, 'IGNORED');
     this.settledValue = true;
     this.reasonValue = reason;
-    this.stateValue = 'terminal';
+    this.stateValue = 'settling';
     this.publish();
     try {
       if (this.portValue === null) throw new Error('battle exit settlement port is unavailable');
       this.portValue.settle(Object.freeze({ reason }));
+      this.stateValue = 'terminal';
+      this.publish();
       return this.result(true, 'SETTLED');
     } catch {
       this.stateValue = 'failed';

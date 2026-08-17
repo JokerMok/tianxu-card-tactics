@@ -100,17 +100,26 @@ function controller(port) {
   assert.equal(exits.snapshot.reason, 'surrender');
 }
 
-// A failing port is contained, terminal, and is never retried through any entry point.
+// A failing port exposes no successful snapshot during its callback and is never retried.
 {
   let calls = 0;
-  const exits = controller({
+  let cancelResult;
+  let callbackSnapshot;
+  let exits;
+  exits = controller({
     settle() {
       calls += 1;
+      cancelResult = exits.cancel();
+      callbackSnapshot = exits.snapshot;
       throw new Error('exit failed');
     },
   });
   exits.requestSurrender();
   assert.doesNotThrow(() => exits.confirm());
+  assert.equal(cancelResult.accepted, false, 'cancel must not reopen a latched settlement');
+  assert.deepEqual(callbackSnapshot, {
+    state: 'settling', terminal: false, failed: false, settled: false, reason: 'surrender',
+  }, 'the settlement callback must not observe a successful terminal snapshot');
   assert.equal(exits.snapshot.state, 'failed');
   assert.equal(exits.snapshot.terminal, true);
   assert.equal(exits.snapshot.failed, true);
