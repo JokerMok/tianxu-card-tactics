@@ -1,0 +1,26 @@
+{
+  "id": "T121",
+  "source_task": "M3-08-R5",
+  "dependencies": ["T118"],
+  "wave": 52,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs",
+    "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs",
+    "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs",
+    "cd cocos-client && npm run test:battle-runner",
+    "cd cocos-client && npm run validate:a0",
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "git diff --check"
+  ],
+  "allowed_paths": ["cocos-client/assets/scripts/battle/"],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}
