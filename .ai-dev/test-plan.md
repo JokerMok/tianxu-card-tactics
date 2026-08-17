@@ -12,6 +12,8 @@
 - TEST-R2C-R1 / REQ-R2C-R1：针对 T114 失败项覆盖跨引擎单位 ID 与动作引用、100 seeds、round80 单次 `BATTLE_END`、v2 非法指令错误版本、fixture 全量校验和原始 `finalState`/事件语义比较；不得以 `outcome`、哈希或另一侧输出补齐状态字段，且 React 正式默认战斗测试必须回归通过。
 - TEST-R2C-R2 / REQ-R2C-R2：针对 T115 失败项覆盖 fixture 的显式 card/unit/event mapping 实际消费、双方原始 `finalState` 契约字段、协议事件语义映射、100 seeds 的部署/移动/阻挡/显式攻击/END_TURN 自动行动与胜负结算；必须证明 React 与 Cocos 独立生成动作和状态，禁止裁剪投影、单侧补字段、哈希替代和仅生命周期对拍，并回归 T113 的 v1/v2、Golden、replay、A0 与 React 默认战斗。
 - TEST-R3 / REQ-R3：真实 Cocos 入战/回流、BattleState 与节点一致、部署、手牌、暂停、投降、异常退出、重复结算、1280×720/1920×1080/横屏安全区。
+- TEST-R3-H1 / REQ-R3：Harness v2 外部命令只可由安全复制后的普通数据解析。透明或变值 Proxy 必须因 structuredClone 预检失败而拒绝；accessor、非枚举键、Symbol 键、额外键与克隆/描述符不一致均拒绝；拒绝时会话快照引用、状态哈希与生命周期保持不变。解析期间重入命令也必须拒绝；不得把“行为透明 Proxy 不可可靠识别”写为已拒绝。
+- TEST-R3-P1 / REQ-R3：正式 Cocos Web Desktop 由真实 Cocos Creator 构建后在有头硬件加速 Chromium 运行；24 单位压力模式下 `REQUIRE_ABSOLUTE_PERF=1` 的 verify:web 必须断言 FPS ≥55、P95 帧时间 ≤22ms，并保留采样 JSON。无头或相对性能结果不得替代此门禁。
 - TEST-R3-F1 / REQ-R3-F1：反馈投影覆盖伤害、治疗、状态、护盾、死亡与结算；验证目标种类和目标身份的显式性、事件与 payload 冲突、英雄事件身份缺失、非法数值、重复/乱序/结算后事件均被拒绝，且被拒绝时反馈快照保持同一引用；不得读取或改写 `BattleState`，不得从 `side` 推导目标身份。
 - TEST-R3-F2 / REQ-R3-F2：对反馈投影与主将表现机分别验证终局真值表：`won/player`、`lost/enemy` 与 `draw/无 winner` 接受；`won/enemy`、`lost/player`、`draw/有 winner`、缺少 reason、事件层与 payload 冲突均拒绝且反馈快照保持同一引用。`side` 合法但与胜负无关时不得改变结果；所有分支须由自动化反例测试覆盖。
 - TEST-R4 / REQ-R4：12 节点、四类目标、首通/重复奖励、三段副本、双难度、挑战塔、Boss、援军、未解锁/精力不足/断线重进/幂等。
