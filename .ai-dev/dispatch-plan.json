@@ -2899,6 +2899,13 @@
     },
     {
       "left": "T014",
+      "right": "T046",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T014",
       "right": "T048",
       "path_left": "cocos-client/assets/scripts/services/",
       "path_right": "cocos-client/",
@@ -3228,6 +3235,13 @@
     },
     {
       "left": "T015",
+      "right": "T046",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T015",
       "right": "T048",
       "path_left": "cocos-client/assets/scripts/services/",
       "path_right": "cocos-client/",
@@ -3550,6 +3564,13 @@
     },
     {
       "left": "T016",
+      "right": "T046",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T016",
       "right": "T048",
       "path_left": "cocos-client/assets/scripts/services/",
       "path_right": "cocos-client/",
@@ -3861,6 +3882,13 @@
       "right": "T036",
       "path_left": "cocos-client/assets/scripts/services/",
       "path_right": "cocos-client/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T017",
+      "right": "T046",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
       "reason": "shared_write_path"
     },
     {
@@ -11299,6 +11327,69 @@
     },
     {
       "left": "T046",
+      "right": "T051",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T055",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T056",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T057",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T058",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T059",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T062",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T064",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T066",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
       "right": "T067",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
@@ -11313,9 +11404,37 @@
     },
     {
       "left": "T046",
+      "right": "T073",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
       "right": "T074",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T075",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T076",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T077",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
       "reason": "shared_write_path"
     },
     {
@@ -11334,6 +11453,13 @@
     },
     {
       "left": "T046",
+      "right": "T080",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
       "right": "T081",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
@@ -11341,9 +11467,37 @@
     },
     {
       "left": "T046",
+      "right": "T082",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T083",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
       "right": "T084",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T085",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T086",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
       "reason": "shared_write_path"
     },
     {
@@ -11358,6 +11512,13 @@
       "right": "T089",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T090",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
       "reason": "shared_write_path"
     },
     {
@@ -11435,6 +11596,34 @@
       "right": "T104",
       "path_left": "cocos-client/assets/scripts/battle/",
       "path_right": "cocos-client/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T105",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T107",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T108",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T046",
+      "right": "T109",
+      "path_left": "cocos-client/assets/scripts/services/",
+      "path_right": "cocos-client/assets/scripts/services/",
       "reason": "shared_write_path"
     },
     {
@@ -23326,7 +23515,8 @@
             "T045"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/battle/"
+            "cocos-client/assets/scripts/battle/",
+            "cocos-client/assets/scripts/services/"
           ],
           "context_ref": ".ai-dev/context/T046.json",
           "serialized_after": []
