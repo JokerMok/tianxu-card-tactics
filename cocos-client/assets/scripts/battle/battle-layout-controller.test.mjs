@@ -56,6 +56,10 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) {
 // Coordinates only map inside the fitted content area; edges, insets, and letterboxing are rejected.
 {
   const controller = layout(...input(2400, 1080, { left: 96, right: 120, top: 24, bottom: 36 }));
+  assert.deepEqual(controller.designToScreen({ x: 0, y: 540 }), { x: 281.33333333333337, y: 534 });
+  assert.deepEqual(controller.screenToDesign({ x: 281.33333333333337, y: 534 }), { x: 0, y: 540 });
+  assert.deepEqual(controller.designToScreen({ x: 0, y: 0 }), { x: 281.33333333333337, y: 24 });
+  assert.deepEqual(controller.screenToDesign({ x: 281.33333333333337, y: 24 }), { x: 0, y: 0 });
   assertPoint(controller.screenToDesign({ x: 281.33333333333337 + 960 * (1020 / 1080), y: 24 + 540 * (1020 / 1080) }), { x: 960, y: 540 });
   assertPoint(controller.screenToDesign({ x: 281.33333333333337 + 1919 * (1020 / 1080), y: 24 + 1079 * (1020 / 1080) }), { x: 1919, y: 1079 });
   assertPoint(controller.designToScreen({ x: 1919, y: 1079 }), { x: 2093.722222222222, y: 1043.0555555555557 });
@@ -84,12 +88,12 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) {
   assertPoint(controller.designToScreen({ x: 1919, y: 1079 }), { x: 1279.3333333333333, y: 719.3333333333333 });
 }
 
-// Hostile inputs are a rejected, non-throwing transition. Values are read once, then detached.
+// Invalid host inputs are rejected without replacing the last valid immutable snapshot.
 {
   const controller = layout(...input(1920, 1080));
-  const before = controller.snapshot;
   const [viewport, safeInsets] = input(1280, 720);
-  assert.notEqual(controller.resize(viewport, safeInsets), null);
+  const before = controller.resize(viewport, safeInsets);
+  assert.notEqual(before, null);
   viewport.width = 4;
   assert.equal(controller.snapshot.viewport.width, 1280);
 
@@ -109,17 +113,19 @@ for (const [width, height] of [[1280, 720], [1920, 1080]]) {
     [undefined, safeInsets],
     [{}, safeInsets],
     ...[input(720, 1280), input(1280, 720, { left: 700, right: 700 })],
+    [{ width: Number.NaN, height: 720 }, safeInsets],
     [accessorViewport, safeInsets],
     [throwingGetter, safeInsets],
     [viewport, accessorInsets],
     [proxy, safeInsets],
   ]) {
-    assert.doesNotThrow(() => controller.resize(viewportValue, insetValue));
-    assert.equal(controller.resize(viewportValue, insetValue), null);
-    assert.equal(controller.snapshot, null);
+    let result;
+    assert.doesNotThrow(() => { result = controller.resize(viewportValue, insetValue); });
+    assert.equal(result, null);
+    assert.strictEqual(controller.snapshot, before);
+    assert.strictEqual(controller.layout, before);
   }
   assert.equal(getterReads, 0, 'accessors must be rejected before their getter runs');
-  assert.notStrictEqual(before, controller.snapshot);
   assert.equal(controller.screenToDesign(null), null);
   assert.equal(controller.designToScreen(new Proxy({}, { get() { throw new Error('no point'); } })), null);
 

@@ -156,8 +156,8 @@ function screenToDesign(content: BattleLayoutRect, scale: number, point: unknown
   const screen = snapshotPoint(point);
   if (
     screen === null
-    || screen.x <= content.x
-    || screen.y <= content.y
+    || screen.x < content.x
+    || screen.y < content.y
     || screen.x >= content.x + content.width
     || screen.y >= content.y + content.height
   ) return null;
@@ -245,10 +245,10 @@ export class BattleLayoutController {
   resize(viewport: unknown, positionalInsets?: unknown): BattleLayoutSnapshot | null {
     try {
       const next = createBattleLayout(viewport, positionalInsets);
+      if (next === null) return null;
       this.layoutValue = next;
       return next;
     } catch {
-      this.layoutValue = null;
       return null;
     }
   }
