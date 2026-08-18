@@ -11,10 +11,11 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const loaderSource = fs.readFileSync(loaderPath, 'utf8');
 const bootstrap = fs.readFileSync(bootstrapPath, 'utf8');
 
+const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'];
 const tableByPath = {
   'config/manifest': config,
   ...Object.fromEntries(
-    ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'].map((tableName) => {
+    tableNames.map((tableName) => {
       const tablePath = config.tables[tableName];
       const tableFile = path.join(root, 'assets/resources', `${tablePath}.json`);
       return [tablePath, JSON.parse(fs.readFileSync(tableFile, 'utf8'))];
@@ -22,14 +23,19 @@ const tableByPath = {
   ),
 };
 
-const mockCcSource = `
-const manifest = ${JSON.stringify(config)};
+const expectedResourceLoadPaths = ['config/manifest', ...tableNames.map((tableName) => config.tables[tableName])];
+let nextModuleId = 0;
+
+async function loadConfigLoader(resourcesByPath = tableByPath, source = loaderSource) {
+  const mockCcSource = `
+const resourceLoadPaths = [];
+const tableByPath = new Map(Object.entries(${JSON.stringify(resourcesByPath)}));
 const mockCc = {
   JsonAsset: class JsonAsset {},
   resources: {
-    load(_path, _assetType, callback) {
-      const tableByPath = new Map(Object.entries(${JSON.stringify(tableByPath)}));
-      const table = tableByPath.get(_path);
+    load(resourcePath, _assetType, callback) {
+      resourceLoadPaths.push(resourcePath);
+      const table = tableByPath.get(resourcePath);
       if (table === undefined) {
         callback(new Error('Missing resource'));
         return;
@@ -38,28 +44,81 @@ const mockCc = {
     },
   },
 };
+export { resourceLoadPaths };
 `;
-const sourceWithMockCc = loaderSource.replace(
-  "import { JsonAsset, resources } from 'cc';",
-  `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`,
-);
-assert.notEqual(sourceWithMockCc, loaderSource, 'the loader must have the expected sole cc import');
-const executableSource = stripTypeScriptTypes(sourceWithMockCc, { mode: 'transform' });
-const loaderModule = await import(`data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}`);
-const { assertConfigManifest, ConfigLoadError, loadConfigManifest } = loaderModule;
-assert.equal(typeof assertConfigManifest, 'function', 'must execute real assertConfigManifest export');
-assert.equal(typeof ConfigLoadError, 'function', 'must execute real ConfigLoadError export');
-assert.deepEqual(assertConfigManifest(config), undefined, 'valid manifest must be accepted');
-assert.deepEqual(await loadConfigManifest(), config, 'real resource loader must return validated config');
+  const sourceWithMockCc = source.replace(
+    "import { JsonAsset, resources } from 'cc';",
+    `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`,
+  );
+  assert.notEqual(sourceWithMockCc, source, 'the loader must have the expected sole cc import');
+  const executableSource = stripTypeScriptTypes(sourceWithMockCc, { mode: 'transform' });
+  return import(
+    `data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}#${nextModuleId++}`,
+  );
+}
 
 function expectConfigError(label, value, expectedPath) {
-assert.throws(() => assertConfigManifest(value), (error) => {
+  assert.throws(() => assertConfigManifest(value), (error) => {
     assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
     assert.equal(error.message.startsWith(`配置加载失败 [${expectedPath}]`), true, `${label} must include the path`);
     return true;
   });
 }
+
+async function expectLoadConfigError(label, resourcesByPath, expectedPath) {
+  const { ConfigLoadError: LoadConfigError, loadConfigManifest: loadConfig } = await loadConfigLoader(resourcesByPath);
+  await assert.rejects(loadConfig(), (error) => {
+    assert(error instanceof LoadConfigError, `${label} must throw ConfigLoadError`);
+    assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
+    assert.equal(error.message.startsWith(`配置加载失败 [${expectedPath}]`), true, `${label} must include the path`);
+    return true;
+  });
+}
+
+const loaderModule = await loadConfigLoader();
+const { assertConfigManifest, ConfigLoadError, loadConfigManifest } = loaderModule;
+assert.equal(typeof assertConfigManifest, 'function', 'must execute real assertConfigManifest export');
+assert.equal(typeof ConfigLoadError, 'function', 'must execute real ConfigLoadError export');
+assert.deepEqual(assertConfigManifest(config), undefined, 'valid manifest must be accepted');
+assert.deepEqual(await loadConfigManifest(), config, 'real resource loader must return validated config');
+assert.deepEqual(
+  loaderModule.resourceLoadPaths,
+  expectedResourceLoadPaths,
+  'successful loading must request the manifest and every declared table exactly once',
+);
+
+const tableLoads = "(['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const).map((tableName) =>";
+const skippedDeckLoaderSource = loaderSource.replace(
+  tableLoads,
+  "(['units', 'cards', 'skills', 'effects', 'statuses', 'professions'] as const).map((tableName) =>",
+);
+assert.notEqual(skippedDeckLoaderSource, loaderSource, 'the skipped-deck regression source must be created');
+const skippedDeckLoader = await loadConfigLoader(tableByPath, skippedDeckLoaderSource);
+await assert.rejects(
+  async () => {
+    await skippedDeckLoader.loadConfigManifest();
+    assert.deepEqual(
+      skippedDeckLoader.resourceLoadPaths,
+      expectedResourceLoadPaths,
+      'skipping decks must fail the complete resource-path assertion',
+    );
+  },
+  (error) => error?.name === 'AssertionError',
+  'the complete resource-path assertion must reject a loader that skips decks',
+);
+
+const missingDeckResource = structuredClone(tableByPath);
+delete missingDeckResource['config/decks'];
+await expectLoadConfigError('missing table resource', missingDeckResource, 'config/decks');
+
+const unknownDeckTableName = structuredClone(tableByPath);
+unknownDeckTableName['config/decks'].table = 'unknown';
+await expectLoadConfigError('unknown table name', unknownDeckTableName, 'config/decks.table');
+
+const invalidDeckPath = structuredClone(tableByPath);
+invalidDeckPath['config/manifest'].tables.decks = 'config/unknown';
+await expectLoadConfigError('invalid table path', invalidDeckPath, 'config/manifest.tables.decks');
 
 const missingField = structuredClone(config);
 delete missingField.idPolicy.format;
