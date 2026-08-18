@@ -1,5 +1,6 @@
 import {
   assertDropPoolConfig,
+  assertDropPoolState,
   resolveDrop,
   type DropPool,
   type DropPoolState,
@@ -94,8 +95,14 @@ export class DropRewardService {
     assertState(initialState);
     assertDropPoolConfig({ pools });
     if (typeof rng !== 'function' || typeof persist !== 'function') throw new Error('drop reward service is invalid');
+    const poolIndex = new Map(pools.map((pool) => [pool.id, pool]));
+    for (const [poolId, progress] of Object.entries(initialState.dropPools)) {
+      const pool = poolIndex.get(poolId);
+      if (pool === undefined) throw new Error(`unknown drop pool progress: ${poolId}`);
+      assertDropPoolState(pool, progress);
+    }
     this.current = copyState(initialState);
-    this.pools = new Map(pools.map((pool) => [pool.id, pool]));
+    this.pools = poolIndex;
     this.rng = rng;
     this.persist = persist;
   }

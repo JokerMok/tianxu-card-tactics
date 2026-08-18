@@ -126,6 +126,23 @@ function assertState(pool: DropPool, state: DropPoolState): void {
   if (!state.firstClearClaimed && (state.claims !== 0 || state.rareMisses !== 0)) {
     throw new Error('drop pool state has repeat progress before first clear');
   }
+  if (!state.firstClearClaimed) return;
+  if (state.firstClearClaimed && state.claims === 0) {
+    throw new Error('drop pool state first clear flag requires at least one claim');
+  }
+
+  const repeatClaims = state.claims - 1;
+  if (pool.pity === undefined && state.rareMisses !== 0) {
+    throw new Error('drop pool state pity misses require a pity rule');
+  }
+  if (state.rareMisses > repeatClaims) {
+    throw new Error('drop pool state rareMisses exceed repeat claims');
+  }
+}
+
+export function assertDropPoolState(pool: DropPool, state: DropPoolState): asserts state is DropPoolState {
+  assertPool(pool, 'drop pool');
+  assertState(pool, state);
 }
 
 function copyReward(reward: DropReward): DropReward {
@@ -137,6 +154,10 @@ function copyReward(reward: DropReward): DropReward {
 }
 
 function nextState(state: DropPoolState, rareMisses: number): DropPoolState {
+  if (state.claims >= Number.MAX_SAFE_INTEGER) throw new Error('drop pool claims would overflow');
+  if (!Number.isSafeInteger(rareMisses) || rareMisses < 0) {
+    throw new Error('drop pool rareMisses would overflow');
+  }
   return Object.freeze({
     claims: state.claims + 1,
     firstClearClaimed: true,
@@ -160,8 +181,7 @@ function weightedReward(pool: DropPool, rng: DropRng): DropReward {
 
 /** Resolves one drop without retaining state; RNG is supplied by the caller. */
 export function resolveDrop(pool: DropPool, state: DropPoolState, rng: DropRng): DropResolution {
-  assertPool(pool, 'drop pool');
-  assertState(pool, state);
+  assertDropPoolState(pool, state);
   if (typeof rng !== 'function') throw new Error('drop RNG must be a function');
   if (state.claims >= pool.maxClaims) return Object.freeze({ code: 'LIMIT_REACHED', nextState: state });
 

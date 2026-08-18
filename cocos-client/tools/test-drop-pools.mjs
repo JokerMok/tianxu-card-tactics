@@ -46,4 +46,29 @@ const limited = resolveDrop(pool, guaranteedRare.nextState, () => {
 assert.equal(limited.code, 'LIMIT_REACHED');
 assert.deepEqual(limited.nextState, guaranteedRare.nextState);
 
+assert.throws(
+  () => resolveDrop(pool, { claims: 0, firstClearClaimed: true, rareMisses: 0 }, () => 0),
+  /first clear/i,
+  'a first-clear flag requires at least one claim',
+);
+
+const poolWithoutPity = { ...pool, pity: undefined };
+assert.throws(
+  () => resolveDrop(poolWithoutPity, { claims: 1, firstClearClaimed: true, rareMisses: 1 }, () => 0),
+  /pity/i,
+  'rare misses require a pool with a pity rule',
+);
+
+assert.throws(
+  () => resolveDrop(pool, { claims: 1, firstClearClaimed: true, rareMisses: 1 }, () => 0),
+  /rareMisses/i,
+  'rare misses cannot exceed the number of repeat claims',
+);
+
+assert.throws(
+  () => resolveDrop(pool, { claims: 1, firstClearClaimed: true, rareMisses: Number.MAX_SAFE_INTEGER }, () => 0),
+  /rareMisses/i,
+  'a rare-miss increment must be rejected before it overflows',
+);
+
 console.log('T208 drop pools PASS: fixed first clear, injected weighted RNG, pity counter and claim limit');
