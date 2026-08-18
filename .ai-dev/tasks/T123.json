@@ -4,10 +4,10 @@
   "dependencies": [
     "T047"
   ],
-  "wave": 57,
+  "wave": 999,
   "executor": "cloud",
   "risk": "high",
-  "status": "pending",
+  "status": "blocked",
   "verification_commands": [
     "cd cocos-client && npm run test:battle-harness-v2",
     "cd cocos-client && npm run test:battle-runner",

@@ -2,12 +2,12 @@
   "id": "T049",
   "source_task": "M3-13",
   "dependencies": [
-    "T123"
+    "T124"
   ],
   "wave": 58,
   "executor": "cloud",
   "risk": "high",
-  "status": "pending",
+  "status": "blocked",
   "verification_commands": [
     "cd web-prototype && npm test",
     "cd web-prototype && npm run build",

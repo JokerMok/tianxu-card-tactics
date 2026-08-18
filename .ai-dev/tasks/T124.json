@@ -1,0 +1,30 @@
+{
+  "id": "T124",
+  "source_task": "M3-12-R3",
+  "dependencies": [
+    "T047"
+  ],
+  "wave": 57,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:battle-harness-v2",
+    "cd cocos-client && npm run test:battle-runner",
+    "cd cocos-client && npm run test:golden-runner",
+    "cd cocos-client && npm run test:battle-runner:types",
+    "cd cocos-client && npm run validate:a0",
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/testsupport/",
+    "cocos-client/package.json"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

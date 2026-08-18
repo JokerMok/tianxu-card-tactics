@@ -2,9 +2,9 @@
   "id": "T098",
   "source_task": "M7-11",
   "dependencies": [
-    "T097"
+    "T125"
   ],
-  "wave": 107,
+  "wave": 108,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
@@ -15,7 +15,7 @@
   ],
   "allowed_paths": [
     "美术素材/",
-    "cocos-client/assets/"
+    "cocos-client/assets/resources/a0/units/"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

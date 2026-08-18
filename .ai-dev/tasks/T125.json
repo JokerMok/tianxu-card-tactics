@@ -1,0 +1,35 @@
+{
+  "id": "T125",
+  "source_task": "M3-13-R2",
+  "dependencies": [
+    "T124",
+    "T094",
+    "T096",
+    "T097"
+  ],
+  "wave": 107,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd web-prototype && npm test",
+    "cd web-prototype && npm run build",
+    "cd cocos-client && npm run validate:a0",
+    "cd cocos-client && node tools/validate-a0-production-assets.mjs",
+    "cd cocos-client && node tools/verify-web.test.mjs",
+    "cd cocos-client && ./tools/build-web.sh",
+    "cd cocos-client && (python3 -m http.server 4180 -d build/web-desktop >/tmp/t125-http.log 2>&1 & t125_server_pid=$!; trap 'kill \"$t125_server_pid\" 2>/dev/null || true' EXIT; sleep 1; kill -0 \"$t125_server_pid\" || exit 1; A0_HEADLESS=false REQUIRE_ABSOLUTE_PERF=1 A0_BASE_URL=http://127.0.0.1:4180 npm run verify:web)"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/",
+    "cocos-client/tools/verify-web.mjs",
+    "cocos-client/tools/verify-web.test.mjs",
+    "cocos-client/test-artifacts/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

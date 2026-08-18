@@ -11,10 +11,17 @@
   "verification_commands": [
     "cd web-prototype && npm test",
     "cd web-prototype && npm run build",
-    "cd cocos-client && npm run validate:a0"
+    "cd cocos-client && npm run validate:a0",
+    "cd cocos-client && node tools/validate-a0-production-assets.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/battle/"
+    "cocos-client/assets/scripts/battle/",
+    "cocos-client/assets/scripts/a0/",
+    "cocos-client/assets/a0-manifest.json",
+    "cocos-client/assets/resources/a0/production-art-contract.json",
+    "cocos-client/assets/resources/a0/production-art-contract.json.meta",
+    "cocos-client/tools/validate-a0.mjs",
+    "cocos-client/tools/validate-a0-production-assets.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",
