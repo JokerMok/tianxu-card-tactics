@@ -11,13 +11,30 @@ const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const loaderSource = fs.readFileSync(loaderPath, 'utf8');
 const bootstrap = fs.readFileSync(bootstrapPath, 'utf8');
 
+const tableByPath = {
+  'config/manifest': config,
+  ...Object.fromEntries(
+    ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'].map((tableName) => {
+      const tablePath = config.tables[tableName];
+      const tableFile = path.join(root, 'assets/resources', `${tablePath}.json`);
+      return [tablePath, JSON.parse(fs.readFileSync(tableFile, 'utf8'))];
+    }),
+  ),
+};
+
 const mockCcSource = `
 const manifest = ${JSON.stringify(config)};
 const mockCc = {
   JsonAsset: class JsonAsset {},
   resources: {
     load(_path, _assetType, callback) {
-      callback(null, { json: manifest });
+      const tableByPath = new Map(Object.entries(${JSON.stringify(tableByPath)}));
+      const table = tableByPath.get(_path);
+      if (table === undefined) {
+        callback(new Error('Missing resource'));
+        return;
+      }
+      callback(null, { json: table });
     },
   },
 };
