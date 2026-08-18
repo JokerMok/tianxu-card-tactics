@@ -22,6 +22,9 @@ const { assertChapterLevelContract, ConfigLoadError } = await import(
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/manifest.json'), 'utf8'));
 const decks = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/decks.json'), 'utf8'));
+const enumCoverageFixture = JSON.parse(
+  fs.readFileSync(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'), 'utf8'),
+);
 const valid = {
   chapterLevels: [{
     id: 'L01',
@@ -59,6 +62,38 @@ assert.doesNotThrow(
   'a second legal environment must pass',
 );
 
+const enumCoverageById = new Map(enumCoverageFixture.chapterLevels.map((level) => [level.id, level]));
+assert.equal(enumCoverageById.get('L05')?.environmentElement, 'FIRE', 'FIRE must be represented by a real chapter fixture');
+assert.equal(
+  enumCoverageById.get('L10')?.objectives[0]?.type,
+  'DESTROY_TARGET',
+  'DESTROY_TARGET must be represented by a real chapter fixture',
+);
+assert.equal(
+  enumCoverageById.get('L12')?.failureConditions[0]?.type,
+  'ROUND_LIMIT_REACHED',
+  'ROUND_LIMIT_REACHED must be represented by a real chapter fixture',
+);
+assert.equal(
+  enumCoverageById.get('L10')?.rewards[0]?.type,
+  'UNLOCK',
+  'UNLOCK must be represented by a real chapter fixture',
+);
+assert.equal(
+  enumCoverageById.get('L12')?.rewards[0]?.type,
+  'CHEST',
+  'CHEST must be represented by a real chapter fixture',
+);
+assert.equal(
+  enumCoverageById.get('L12')?.rewards[1]?.type,
+  'FLAG',
+  'FLAG must be represented by a real chapter fixture',
+);
+assert.doesNotThrow(
+  () => assertChapterLevelContract(enumCoverageFixture, manifest, decks),
+  'the chapter enum coverage fixture must pass the real contract',
+);
+
 function expectFailure(label, mutate, expectedPath) {
   const fixture = structuredClone(valid);
   mutate(fixture);
@@ -85,4 +120,4 @@ expectFailure('non-positive reward quantity', (fixture) => { fixture.chapterLeve
 expectFailure('missing failure condition', (fixture) => { delete fixture.chapterLevels[0].failureConditions; }, 'config/levels.chapterLevels[0].failureConditions');
 expectFailure('invalid destroyed target ID', (fixture) => { fixture.chapterLevels[0].failureConditions[1].targetId = 'U_001'; }, 'config/levels.chapterLevels[0].failureConditions[1].targetId');
 
-console.log('Chapter level contract: valid L01, L12, and WATER PASS; missing field, invalid ID, out-of-chapter ID, unknown enemy deck, invalid prerequisite, invalid environment, invalid objective, invalid objective target ID, non-positive survival rounds, invalid reward ID, invalid reward type, missing or non-positive reward quantity, missing failure condition, invalid destroyed target ID FAIL as expected');
+console.log('Chapter level contract: valid L01, L12, WATER, and enum coverage fixture (DESTROY_TARGET, UNLOCK, CHEST, FLAG, ROUND_LIMIT_REACHED, FIRE) PASS; missing field, invalid ID, out-of-chapter ID, unknown enemy deck, invalid prerequisite, invalid environment, invalid objective, invalid objective target ID, non-positive survival rounds, invalid reward ID, invalid reward type, missing or non-positive reward quantity, missing failure condition, invalid destroyed target ID FAIL as expected');

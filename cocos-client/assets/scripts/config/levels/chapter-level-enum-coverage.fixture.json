@@ -1,0 +1,50 @@
+{
+  "chapterLevels": [
+    {
+      "id": "L05",
+      "prerequisiteLevelId": "L04",
+      "enemyDeckId": "D001",
+      "environmentElement": "FIRE",
+      "objectives": [
+        { "type": "DEFEAT_ENEMY_HERO" }
+      ],
+      "rewards": [
+        { "type": "CARD", "id": "U001", "quantity": 1 }
+      ],
+      "failureConditions": [
+        { "type": "PLAYER_HERO_DEFEATED" }
+      ]
+    },
+    {
+      "id": "L10",
+      "prerequisiteLevelId": "L09",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        { "type": "DESTROY_TARGET", "targetId": "U001" }
+      ],
+      "rewards": [
+        { "type": "UNLOCK", "id": "OUTPOST", "quantity": 1 }
+      ],
+      "failureConditions": [
+        { "type": "PLAYER_HERO_DEFEATED" }
+      ]
+    },
+    {
+      "id": "L12",
+      "prerequisiteLevelId": "L11",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        { "type": "DEFEAT_ENEMY_HERO" }
+      ],
+      "rewards": [
+        { "type": "CHEST", "id": "CHAPTER-CHEST", "quantity": 1 },
+        { "type": "FLAG", "id": "OUTCAST-CAMP", "quantity": 1 }
+      ],
+      "failureConditions": [
+        { "type": "ROUND_LIMIT_REACHED" }
+      ]
+    }
+  ]
+}
