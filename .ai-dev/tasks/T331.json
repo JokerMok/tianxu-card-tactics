@@ -1,0 +1,25 @@
+{
+  "id": "T331",
+  "source_task": "M4-01-level-contract",
+  "dependencies": [
+    "T201"
+  ],
+  "wave": 2,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-chapter-level-contract.mjs",
+    "cd cocos-client && npm run validate:config-cross-table"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/config/levels/",
+    "cocos-client/tools/test-chapter-level-contract.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

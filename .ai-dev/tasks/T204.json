@@ -2,6 +2,7 @@
   "id": "T204",
   "source_task": "M4-01",
   "dependencies": [
+    "T331",
     "T266",
     "T267",
     "T268",
@@ -24,6 +25,13 @@
     "cd cocos-client && npm run validate:config-cross-table"
   ],
   "allowed_paths": [
+    "cocos-client/assets/resources/config/levels/chapter01/index.json",
+    "cocos-client/assets/resources/config/manifest.json",
+    "cocos-client/assets/scripts/config/ConfigLoader.ts",
+    "cocos-client/assets/scripts/config/ConfigValidator.ts",
+    "cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts",
+    "cocos-client/tools/validate-config-loader.mjs",
+    "cocos-client/tools/validate-config-cross-table.mjs",
     "cocos-client/tools/test-chapter01-levels.mjs"
   ],
   "excluded_snapshot_paths": [

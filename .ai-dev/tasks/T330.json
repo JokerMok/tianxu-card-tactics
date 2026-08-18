@@ -1,0 +1,27 @@
+{
+  "id": "T330",
+  "source_task": "M4-09-runtime-integration",
+  "dependencies": [
+    "T202",
+    "T212"
+  ],
+  "wave": 4,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-hero-profession-runtime.mjs",
+    "cd cocos-client && npm run test:battle-runner"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/core/professions/",
+    "cocos-client/assets/scripts/battle/runner/battle-runner.ts",
+    "cocos-client/tools/test-hero-profession-runtime.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "id": "T212",
-  "source_task": "M4-09",
+  "source_task": "M4-09-profile-rules",
   "dependencies": [
     "T201",
     "T202"

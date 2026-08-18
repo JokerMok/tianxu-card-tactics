@@ -1,18 +1,18 @@
 # 横屏战术卡牌原型测试计划
 
-版本：v2.2
+版本：v2.3
 日期：2026-08-18
-审批状态：已批准（2026-08-18）
+审批状态：待用户批准
 
 | ID | 层级 | 验收条件 | 自动化验证 |
 |---|---|---|---|
 | TEST-001 | 基线 | React 测试、构建、Cocos A0 与资源审计均成功。 | `npm run verify` |
-| TEST-002 | 配置 | 清单、七张表、类型错误与错误路径均被真实加载链覆盖。 | `cd cocos-client && npm run validate:config-loader && npm run validate:config-cross-table` |
+| TEST-002 | 配置 | 清单、七张表、章节索引、类型错误与错误路径均被真实加载链覆盖。 | `cd cocos-client && npm run validate:config-loader && npm run validate:config-cross-table && node --experimental-strip-types tools/test-chapter01-levels.mjs` |
 | TEST-003 | 核心对照 | 固定 seed、指令流、状态哈希和关键事件跨 React/Cocos 一致。 | `test:golden-runner`、`test:battle-runner`、`test:parity-contract` |
 | TEST-004 | 核心平衡 | 两批各一万局中立模拟均为 49%–51%，置信区间覆盖 50%。 | `test:neutral-balance` |
 | TEST-005 | 战斗闭环 | 真实会话可选牌、部署、结束回合、托管、暂停、退出并读取状态哈希。 | Harness v2 全流程正反例与场景回归。 |
 | TEST-006 | 战斗事务 | 表现不篡改核心状态；重复输入、异常退出、重复结算和奖励重复均被拒绝。 | 会话、输入、控制、反馈、退出与结算事务测试。 |
-| TEST-007 | 主线 | 十二关配置、解锁、关卡目标、奖励、背包、牌组、职业、任务与剧情可连续游玩。 | 章节加载、存档、奖励与三十分钟稳定性脚本。 |
+| TEST-007 | 主线 | 十二关配置、解锁、关卡目标、奖励、背包、牌组、职业、任务与剧情可连续游玩。 | 共享关卡契约、章节运行时加载、职业状态变更、存档、奖励与三十分钟稳定性脚本。 |
 | TEST-008 | PVE | 副本、塔、Boss、援军与奖励隔离可重放。 | 模式会话、时间边界和奖励隔离回归。 |
 | TEST-009 | 养成 | 卡牌、装备、建筑、声望、商店、日常与经济守恒。 | 原子事务、时间服务与三十日经济模拟。 |
 | TEST-010 | UI/美术 | 横屏触控、安全区、数据驱动 UI、骨骼、场景、特效和音频完整。 | 组件契约、截图基线、资源清单与场景验证。 |
