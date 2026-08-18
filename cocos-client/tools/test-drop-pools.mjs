@@ -53,6 +53,16 @@ assert.throws(
 );
 
 const poolWithoutPity = { ...pool, pity: undefined };
+const noPityFirst = resolveDrop(poolWithoutPity, initial, () => {
+  throw new Error('first clear must not roll RNG');
+});
+const noPityRepeatOne = resolveDrop(poolWithoutPity, noPityFirst.nextState, () => 0);
+const noPityRepeatTwo = resolveDrop(poolWithoutPity, noPityRepeatOne.nextState, () => 0);
+assert.equal(noPityRepeatOne.code, 'GRANTED');
+assert.equal(noPityRepeatTwo.code, 'GRANTED', 'a no-pity pool must allow the second repeat claim');
+assert.equal(noPityRepeatOne.nextState.rareMisses, 0);
+assert.equal(noPityRepeatTwo.nextState.rareMisses, 0);
+
 assert.throws(
   () => resolveDrop(poolWithoutPity, { claims: 1, firstClearClaimed: true, rareMisses: 1 }, () => 0),
   /pity/i,

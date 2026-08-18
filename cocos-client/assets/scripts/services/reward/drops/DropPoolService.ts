@@ -199,10 +199,11 @@ export function resolveDrop(pool: DropPool, state: DropPoolState, rng: DropRng):
     : pool.repeat.find((reward) => reward.id === pool.pity?.rareRewardId);
   const reward = pityReward ?? weightedReward(pool, rng);
   const isRare = pool.pity !== undefined && reward.id === pool.pity.rareRewardId;
+  const nextRareMisses = pool.pity === undefined ? 0 : isRare ? 0 : state.rareMisses + 1;
   return Object.freeze({
     code: 'GRANTED',
     source: pityReward === undefined ? 'WEIGHTED' : 'PITY',
     reward: copyReward(reward),
-    nextState: nextState(state, isRare ? 0 : state.rareMisses + 1),
+    nextState: nextState(state, nextRareMisses),
   });
 }
