@@ -124,6 +124,10 @@ export class BattleSessionHarnessV2 {
     return this.session.snapshot.finalHash;
   }
 
+  readState() {
+    return this.session.snapshot.state;
+  }
+
   private requireInput(): BattleInputAdapter {
     if (this.input === null) throw new Error('battle input requires an active session');
     return this.input;
