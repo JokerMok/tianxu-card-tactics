@@ -1,0 +1,23 @@
+{
+  "id": "T242",
+  "source_task": "M7-01",
+  "dependencies": [
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run audit:image2"
+  ],
+  "allowed_paths": [
+    "documentation/ui/asset-layer-inventory.md"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

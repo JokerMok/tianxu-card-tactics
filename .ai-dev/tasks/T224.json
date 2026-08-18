@@ -1,0 +1,23 @@
+{
+  "id": "T224",
+  "source_task": "M5-09",
+  "dependencies": [
+    "T222"
+  ],
+  "wave": 8,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:boss-reinforcements"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/core/ai/reinforcements/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

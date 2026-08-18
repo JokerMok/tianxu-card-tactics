@@ -1,0 +1,26 @@
+{
+  "id": "T252",
+  "source_task": "M7-11",
+  "dependencies": [
+    "T203",
+    "T248",
+    "T250"
+  ],
+  "wave": 5,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:unit-production-assets",
+    "cd cocos-client && npm run verify:production-performance"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/battle/units/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

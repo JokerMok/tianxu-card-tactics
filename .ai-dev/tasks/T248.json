@@ -1,0 +1,24 @@
+{
+  "id": "T248",
+  "source_task": "M7-07",
+  "dependencies": [
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:unit-skeleton-samples"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/battle/units/U002/",
+    "cocos-client/assets/resources/art/battle/units/U008/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

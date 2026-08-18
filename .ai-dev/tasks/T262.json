@@ -1,0 +1,24 @@
+{
+  "id": "T262",
+  "source_task": "M8-09",
+  "dependencies": [
+    "T259"
+  ],
+  "wave": 15,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:mail-compensation-support"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/services/support/",
+    "backend/support/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

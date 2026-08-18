@@ -1,0 +1,25 @@
+{
+  "id": "T258",
+  "source_task": "M8-05",
+  "dependencies": [
+    "T241",
+    "T252"
+  ],
+  "wave": 14,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:android-landscape-contract"
+  ],
+  "allowed_paths": [
+    "cocos-client/build-templates/android/",
+    "cocos-client/assets/scripts/platform/android/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

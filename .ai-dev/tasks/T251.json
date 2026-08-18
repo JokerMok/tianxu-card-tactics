@@ -1,0 +1,24 @@
+{
+  "id": "T251",
+  "source_task": "M7-10",
+  "dependencies": [
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:battle-effects-audio"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/battle/effects/",
+    "cocos-client/assets/resources/art/battle/audio/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

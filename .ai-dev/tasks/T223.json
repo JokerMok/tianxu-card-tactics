@@ -1,0 +1,23 @@
+{
+  "id": "T223",
+  "source_task": "M5-08",
+  "dependencies": [
+    "T222"
+  ],
+  "wave": 8,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:special-entities"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/core/board/special-entities/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

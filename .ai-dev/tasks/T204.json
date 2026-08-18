@@ -1,0 +1,25 @@
+{
+  "id": "T204",
+  "source_task": "M4-01",
+  "dependencies": [
+    "T201",
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:chapter01-levels",
+    "cd cocos-client && npm run validate:config-cross-table"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/levels/chapter01/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

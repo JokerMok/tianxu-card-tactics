@@ -1,0 +1,24 @@
+{
+  "id": "T260",
+  "source_task": "M8-07",
+  "dependencies": [
+    "T259"
+  ],
+  "wave": 15,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:config-hot-update"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/services/config-update/",
+    "backend/config-update/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "T203",
+  "source_task": "M3-13",
+  "dependencies": [
+    "T202",
+    "T248",
+    "T250",
+    "T251"
+  ],
+  "wave": 4,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run verify:production-performance",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/performance/",
+    "cocos-client/tools/verify-production-performance.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

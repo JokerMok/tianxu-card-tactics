@@ -1,0 +1,34 @@
+{
+  "id": "T265",
+  "source_task": "M8-12",
+  "dependencies": [
+    "T254",
+    "T255",
+    "T256",
+    "T257",
+    "T258",
+    "T259",
+    "T260",
+    "T261",
+    "T262",
+    "T263",
+    "T264"
+  ],
+  "wave": 17,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:release-stability"
+  ],
+  "allowed_paths": [
+    "cocos-client/tools/release/",
+    "documentation/release/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

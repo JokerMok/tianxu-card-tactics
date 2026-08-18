@@ -1,0 +1,25 @@
+{
+  "id": "T261",
+  "source_task": "M8-08",
+  "dependencies": [
+    "T215",
+    "T241"
+  ],
+  "wave": 14,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:analytics-events"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/services/telemetry/",
+    "backend/analytics/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

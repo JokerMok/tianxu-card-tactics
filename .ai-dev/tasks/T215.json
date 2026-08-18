@@ -1,0 +1,34 @@
+{
+  "id": "T215",
+  "source_task": "M4-12",
+  "dependencies": [
+    "T204",
+    "T205",
+    "T206",
+    "T207",
+    "T208",
+    "T209",
+    "T210",
+    "T211",
+    "T212",
+    "T213",
+    "T214"
+  ],
+  "wave": 6,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:r2-stability",
+    "cd cocos-client && npm run validate:a0"
+  ],
+  "allowed_paths": [
+    "cocos-client/tools/test-r2-stability.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

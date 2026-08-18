@@ -1,0 +1,23 @@
+{
+  "id": "T216",
+  "source_task": "M5-01",
+  "dependencies": [
+    "T215"
+  ],
+  "wave": 7,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:dungeon-session"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/pve/dungeon/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

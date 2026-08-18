@@ -1,0 +1,23 @@
+{
+  "id": "T229",
+  "source_task": "M6-04",
+  "dependencies": [
+    "T228"
+  ],
+  "wave": 12,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:card-refining"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/alchemy/refining/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

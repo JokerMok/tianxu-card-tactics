@@ -1,0 +1,23 @@
+{
+  "id": "T227",
+  "source_task": "M6-02",
+  "dependencies": [
+    "T226"
+  ],
+  "wave": 11,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:card-synthesis"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/alchemy/synthesis/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

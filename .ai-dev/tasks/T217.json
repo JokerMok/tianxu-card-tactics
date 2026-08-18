@@ -1,0 +1,23 @@
+{
+  "id": "T217",
+  "source_task": "M5-02",
+  "dependencies": [
+    "T216"
+  ],
+  "wave": 8,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:dungeon-difficulty"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/pve/dungeon/difficulty/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

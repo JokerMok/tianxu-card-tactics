@@ -1,0 +1,23 @@
+{
+  "id": "T219",
+  "source_task": "M5-04",
+  "dependencies": [
+    "T215"
+  ],
+  "wave": 7,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:tower-config"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/pve/tower/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

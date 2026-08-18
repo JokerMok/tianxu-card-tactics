@@ -1,0 +1,25 @@
+{
+  "id": "T246",
+  "source_task": "M7-05",
+  "dependencies": [
+    "T215",
+    "T225",
+    "T244"
+  ],
+  "wave": 10,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:meta-pages-deck-hero-adventure"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

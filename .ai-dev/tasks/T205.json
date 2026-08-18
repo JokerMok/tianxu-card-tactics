@@ -1,0 +1,23 @@
+{
+  "id": "T205",
+  "source_task": "M4-02",
+  "dependencies": [
+    "T204"
+  ],
+  "wave": 4,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:campaign-state"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/campaign/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

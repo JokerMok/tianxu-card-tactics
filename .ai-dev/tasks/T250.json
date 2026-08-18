@@ -1,0 +1,23 @@
+{
+  "id": "T250",
+  "source_task": "M7-09",
+  "dependencies": [
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:scene-e104"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/battle/scenes/E104/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

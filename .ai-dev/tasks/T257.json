@@ -1,0 +1,25 @@
+{
+  "id": "T257",
+  "source_task": "M8-04",
+  "dependencies": [
+    "T241",
+    "T252"
+  ],
+  "wave": 14,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:web-resource-packaging"
+  ],
+  "allowed_paths": [
+    "cocos-client/build-templates/web/",
+    "cocos-client/tools/resource-packaging/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "T244",
+  "source_task": "M7-03",
+  "dependencies": [
+    "T243"
+  ],
+  "wave": 5,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:meta-shell"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/ui/shell/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

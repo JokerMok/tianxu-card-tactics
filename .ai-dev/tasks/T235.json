@@ -1,0 +1,23 @@
+{
+  "id": "T235",
+  "source_task": "M6-10",
+  "dependencies": [
+    "T234"
+  ],
+  "wave": 11,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:tax-research"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/buildings/tax-research/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

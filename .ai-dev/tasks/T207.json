@@ -1,0 +1,24 @@
+{
+  "id": "T207",
+  "source_task": "M4-04",
+  "dependencies": [
+    "T204"
+  ],
+  "wave": 4,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:enemy-strategy-config",
+    "cd cocos-client && npm run validate:config-cross-table"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/enemy/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "T253",
+  "source_task": "M7-12",
+  "dependencies": [],
+  "wave": 1,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "blocked",
+  "verification_commands": [
+    "cd cocos-client && npm run test:commercial-card-templates"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/cards/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ],
+  "external_prerequisites": [
+    "负责人确认美术风格锁定"
+  ]
+}

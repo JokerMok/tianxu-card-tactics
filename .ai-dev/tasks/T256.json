@@ -1,0 +1,23 @@
+{
+  "id": "T256",
+  "source_task": "M8-03",
+  "dependencies": [
+    "T255"
+  ],
+  "wave": 15,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:difficulty-matrix"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/balance/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

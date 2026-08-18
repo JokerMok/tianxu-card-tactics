@@ -1,0 +1,22 @@
+{
+  "id": "T201",
+  "source_task": "M1-02",
+  "dependencies": [],
+  "wave": 1,
+  "executor": "local",
+  "risk": "low",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run validate:config-loader",
+    "cd cocos-client && npm run validate:config-cross-table"
+  ],
+  "allowed_paths": [
+    "cocos-client/tools/validate-config-loader.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

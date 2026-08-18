@@ -1,0 +1,31 @@
+{
+  "id": "T225",
+  "source_task": "M5-10",
+  "dependencies": [
+    "T216",
+    "T217",
+    "T218",
+    "T219",
+    "T220",
+    "T221",
+    "T222",
+    "T223",
+    "T224"
+  ],
+  "wave": 9,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:pve-reward-isolation"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/tests/pve/reward-isolation/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

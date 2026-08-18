@@ -1,0 +1,25 @@
+{
+  "id": "T206",
+  "source_task": "M4-03",
+  "dependencies": [
+    "T204"
+  ],
+  "wave": 4,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && npm run test:chapter-objectives",
+    "cd cocos-client && npm run test:battle-runner"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/core/outcome/objectives/",
+    "cocos-client/assets/scripts/battle/ui/objectives/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}
