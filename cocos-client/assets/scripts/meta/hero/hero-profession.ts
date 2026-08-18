@@ -159,7 +159,9 @@ export function createHeroProfessionRules(authority: HeroProfessionAuthority): H
   function validateHeroProfile(input: unknown): HeroProfessionValidationResult {
     if (!isRecord(input)) return result(['HERO_INPUT_INVALID']);
     const errors: HeroProfessionError[] = [];
-    if (typeof input.name !== 'string' || input.name.trim().length === 0) errors.push('HERO_NAME_REQUIRED');
+    if (input.name !== undefined && (typeof input.name !== 'string' || input.name.trim().length === 0)) {
+      errors.push('HERO_NAME_REQUIRED');
+    }
     if (input.professionId !== undefined
       && (typeof input.professionId !== 'string' || !parsedAuthority.professionsById.has(input.professionId))) {
       errors.push('HERO_PROFESSION_UNKNOWN');

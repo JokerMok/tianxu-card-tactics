@@ -48,9 +48,11 @@ function validDeck(professionId) {
   };
 }
 
+assert.equal(rules.validateHeroProfile({}).valid, true, 'empty hero metadata remains valid');
 assert.equal(rules.validateHeroProfile({ name: '临川' }).valid, true, 'profession remains optional metadata');
 assert.equal(rules.validateHeroProfile({ name: '临川', professionId: 'P001' }).valid, true);
 expectErrors(rules.validateHeroProfile({ name: '   ', professionId: 'P001' }), 'HERO_NAME_REQUIRED');
+expectErrors(rules.validateHeroProfile({ name: 1 }), 'HERO_NAME_REQUIRED');
 expectErrors(rules.validateHeroProfile({ name: '临川', professionId: 'P999' }), 'HERO_PROFESSION_UNKNOWN');
 
 for (const profession of professionsTable.professions) {
