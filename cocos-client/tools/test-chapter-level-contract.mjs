@@ -28,9 +28,16 @@ const valid = {
     prerequisiteLevelId: null,
     enemyDeckId: 'D001',
     environmentElement: 'NONE',
-    objectives: [{ type: 'DEFEAT_ENEMY_HERO' }],
+    objectives: [
+      { type: 'DEFEAT_ENEMY_HERO' },
+      { type: 'PROTECT_TARGET', targetId: 'U001' },
+      { type: 'SURVIVE_ROUNDS', rounds: 3 },
+    ],
     rewards: [{ type: 'CARD', id: 'U001', quantity: 4 }],
-    failureConditions: [{ type: 'PLAYER_HERO_DEFEATED' }],
+    failureConditions: [
+      { type: 'PLAYER_HERO_DEFEATED' },
+      { type: 'TARGET_DESTROYED', targetId: 'U001' },
+    ],
   }],
 };
 
@@ -44,6 +51,12 @@ terminalLevel.chapterLevels[0].prerequisiteLevelId = 'L11';
 assert.doesNotThrow(
   () => assertChapterLevelContract(terminalLevel, manifest, decks),
   'L12 and its chapter-local prerequisite must pass',
+);
+const waterEnvironment = structuredClone(valid);
+waterEnvironment.chapterLevels[0].environmentElement = 'WATER';
+assert.doesNotThrow(
+  () => assertChapterLevelContract(waterEnvironment, manifest, decks),
+  'a second legal environment must pass',
 );
 
 function expectFailure(label, mutate, expectedPath) {
@@ -63,7 +76,13 @@ expectFailure('unknown enemy deck', (fixture) => { fixture.chapterLevels[0].enem
 expectFailure('invalid prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'C01'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
 expectFailure('invalid environment', (fixture) => { fixture.chapterLevels[0].environmentElement = 'WIND'; }, 'config/levels.chapterLevels[0].environmentElement');
 expectFailure('invalid objective', (fixture) => { fixture.chapterLevels[0].objectives[0].type = 'ESCAPE'; }, 'config/levels.chapterLevels[0].objectives[0].type');
+expectFailure('invalid objective target ID', (fixture) => { fixture.chapterLevels[0].objectives[1].targetId = 'U_001'; }, 'config/levels.chapterLevels[0].objectives[1].targetId');
+expectFailure('non-positive survival rounds', (fixture) => { fixture.chapterLevels[0].objectives[2].rounds = 0; }, 'config/levels.chapterLevels[0].objectives[2].rounds');
+expectFailure('invalid reward ID', (fixture) => { fixture.chapterLevels[0].rewards[0].id = 'U_001'; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('invalid reward type', (fixture) => { fixture.chapterLevels[0].rewards[0].type = 'GOLD'; }, 'config/levels.chapterLevels[0].rewards[0].type');
 expectFailure('missing reward quantity', (fixture) => { delete fixture.chapterLevels[0].rewards[0].quantity; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
+expectFailure('non-positive reward quantity', (fixture) => { fixture.chapterLevels[0].rewards[0].quantity = 0; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
 expectFailure('missing failure condition', (fixture) => { delete fixture.chapterLevels[0].failureConditions; }, 'config/levels.chapterLevels[0].failureConditions');
+expectFailure('invalid destroyed target ID', (fixture) => { fixture.chapterLevels[0].failureConditions[1].targetId = 'U_001'; }, 'config/levels.chapterLevels[0].failureConditions[1].targetId');
 
-console.log('Chapter level contract: valid L01 and L12 PASS; missing field, invalid ID, out-of-chapter ID, unknown enemy deck, invalid prerequisite, invalid environment, invalid objective, missing reward quantity, missing failure condition FAIL as expected');
+console.log('Chapter level contract: valid L01, L12, and WATER PASS; missing field, invalid ID, out-of-chapter ID, unknown enemy deck, invalid prerequisite, invalid environment, invalid objective, invalid objective target ID, non-positive survival rounds, invalid reward ID, invalid reward type, missing or non-positive reward quantity, missing failure condition, invalid destroyed target ID FAIL as expected');
