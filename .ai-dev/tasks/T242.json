@@ -9,10 +9,11 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run audit:image2"
+    "cd cocos-client && node --experimental-strip-types ../documentation/ui/asset-layer-inventory.verify.mjs"
   ],
   "allowed_paths": [
-    "documentation/ui/asset-layer-inventory.md"
+    "documentation/ui/asset-layer-inventory.md",
+    "documentation/ui/asset-layer-inventory.verify.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

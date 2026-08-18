@@ -4,15 +4,16 @@
   "dependencies": [
     "T219"
   ],
-  "wave": 8,
+  "wave": 9,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:tower-shop"
+    "cd cocos-client && node --experimental-strip-types tools/test-tower-shop.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/pve/tower/shop/"
+    "cocos-client/assets/scripts/pve/tower/shop/",
+    "cocos-client/tools/test-tower-shop.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

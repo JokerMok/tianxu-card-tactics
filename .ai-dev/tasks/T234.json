@@ -4,15 +4,16 @@
   "dependencies": [
     "T225"
   ],
-  "wave": 10,
+  "wave": 11,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:building-queue"
+    "cd cocos-client && node --experimental-strip-types tools/test-building-queue.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/buildings/"
+    "cocos-client/assets/scripts/meta/buildings/",
+    "cocos-client/tools/test-building-queue.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

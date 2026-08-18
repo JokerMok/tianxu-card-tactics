@@ -1,0 +1,34 @@
+{
+  "id": "T327",
+  "source_task": "M8-12-PERF",
+  "dependencies": [
+    "T254",
+    "T255",
+    "T256",
+    "T257",
+    "T258",
+    "T259",
+    "T260",
+    "T261",
+    "T262",
+    "T263",
+    "T264"
+  ],
+  "wave": 18,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs"
+  ],
+  "allowed_paths": [
+    "cocos-client/tools/release/perf/",
+    "documentation/release/perf/"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

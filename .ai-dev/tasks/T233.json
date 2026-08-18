@@ -9,10 +9,11 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:equipment-crafting"
+    "cd cocos-client && node --experimental-strip-types tools/test-equipment-crafting.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/equipment/crafting/"
+    "cocos-client/assets/scripts/meta/equipment/crafting/",
+    "cocos-client/tools/test-equipment-crafting.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

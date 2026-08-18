@@ -9,10 +9,11 @@
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:scene-e104"
+    "cd cocos-client && node --experimental-strip-types tools/test-scene-e104.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/art/battle/scenes/E104/"
+    "cocos-client/assets/resources/art/battle/scenes/E104/",
+    "cocos-client/tools/test-scene-e104.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

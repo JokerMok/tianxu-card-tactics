@@ -5,16 +5,17 @@
     "T215",
     "T241"
   ],
-  "wave": 14,
+  "wave": 15,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:analytics-events"
+    "cd cocos-client && node --experimental-strip-types tools/test-analytics-events.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/telemetry/",
-    "backend/analytics/"
+    "backend/analytics/",
+    "cocos-client/tools/test-analytics-events.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

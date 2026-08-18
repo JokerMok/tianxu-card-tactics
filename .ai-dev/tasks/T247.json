@@ -2,18 +2,19 @@
   "id": "T247",
   "source_task": "M7-06",
   "dependencies": [
-    "T241",
-    "T244"
+    "T312",
+    "T313",
+    "T314"
   ],
-  "wave": 14,
+  "wave": 16,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:meta-pages-city-tasks-inventory"
+    "cd cocos-client && node --experimental-strip-types tools/test-meta-pages-city-tasks-inventory.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/ui/pages/city-tasks-inventory/"
+    "cocos-client/tools/test-meta-pages-city-tasks-inventory.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

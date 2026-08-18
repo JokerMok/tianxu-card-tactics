@@ -5,16 +5,17 @@
     "T202",
     "T215"
   ],
-  "wave": 7,
+  "wave": 8,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:boss-phases",
+    "cd cocos-client && node --experimental-strip-types tools/test-boss-phases.mjs",
     "cd cocos-client && npm run test:battle-runner"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/core/boss/"
+    "cocos-client/assets/scripts/core/boss/",
+    "cocos-client/tools/test-boss-phases.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

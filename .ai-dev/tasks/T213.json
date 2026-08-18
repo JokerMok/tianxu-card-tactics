@@ -5,15 +5,16 @@
     "T205",
     "T208"
   ],
-  "wave": 5,
+  "wave": 6,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:mainline-tasks"
+    "cd cocos-client && node --experimental-strip-types tools/test-mainline-tasks.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/tasks/mainline/"
+    "cocos-client/assets/scripts/meta/tasks/mainline/",
+    "cocos-client/tools/test-mainline-tasks.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

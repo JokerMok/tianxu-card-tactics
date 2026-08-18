@@ -2,18 +2,28 @@
   "id": "T255",
   "source_task": "M8-02",
   "dependencies": [
-    "T241"
+    "T315",
+    "T316",
+    "T317",
+    "T318",
+    "T319",
+    "T320",
+    "T321",
+    "T322",
+    "T323",
+    "T324",
+    "T325"
   ],
-  "wave": 14,
+  "wave": 16,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:build-archetypes"
+    "cd cocos-client && node --experimental-strip-types tools/test-build-archetypes.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/config/builds/",
-    "cocos-client/assets/scripts/simulation/builds/"
+    "cocos-client/assets/scripts/simulation/builds/",
+    "cocos-client/tools/test-build-archetypes.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

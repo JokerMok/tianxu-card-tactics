@@ -4,15 +4,16 @@
   "dependencies": [
     "T216"
   ],
-  "wave": 8,
+  "wave": 9,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:dungeon-difficulty"
+    "cd cocos-client && node --experimental-strip-types tools/test-dungeon-difficulty.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/pve/dungeon/difficulty/"
+    "cocos-client/assets/scripts/pve/dungeon/difficulty/",
+    "cocos-client/tools/test-dungeon-difficulty.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

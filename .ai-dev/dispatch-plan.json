@@ -7,6 +7,13 @@
   "cycles_or_blocked": [],
   "conflicts": [
     {
+      "left": "T208",
+      "right": "T218",
+      "path_left": "cocos-client/tools/test-reward-service.mjs",
+      "path_right": "cocos-client/tools/test-reward-service.mjs",
+      "reason": "shared_write_path"
+    },
+    {
       "left": "T210",
       "right": "T226",
       "path_left": "cocos-client/assets/scripts/meta/cards/",
@@ -64,20 +71,27 @@
     },
     {
       "left": "T248",
-      "right": "T252",
+      "right": "T279",
       "path_left": "cocos-client/assets/resources/art/battle/units/U002/",
-      "path_right": "cocos-client/assets/resources/art/battle/units/",
+      "path_right": "cocos-client/assets/resources/art/battle/units/U002/",
+      "reason": "shared_write_path"
+    },
+    {
+      "left": "T248",
+      "right": "T285",
+      "path_left": "cocos-client/assets/resources/art/battle/units/U008/",
+      "path_right": "cocos-client/assets/resources/art/battle/units/U008/",
       "reason": "shared_write_path"
     }
   ],
-  "completed": [],
+  "completed": [
+    "T201",
+    "T202"
+  ],
   "blocked": [
     "T253"
   ],
   "planned": [
-    "T201",
-    "T202",
-    "T204",
     "T208",
     "T212",
     "T242",
@@ -85,36 +99,82 @@
     "T249",
     "T250",
     "T251",
+    "T266",
+    "T267",
+    "T268",
+    "T269",
+    "T270",
+    "T271",
+    "T272",
+    "T273",
+    "T274",
+    "T275",
+    "T276",
+    "T277",
     "T203",
+    "T204",
+    "T209",
+    "T210",
+    "T243",
     "T205",
     "T206",
     "T207",
-    "T209",
-    "T210",
-    "T214",
-    "T243",
     "T211",
-    "T213",
+    "T214",
     "T244",
+    "T278",
+    "T279",
+    "T280",
+    "T281",
+    "T282",
+    "T283",
+    "T284",
+    "T285",
+    "T286",
+    "T287",
+    "T288",
+    "T289",
+    "T290",
+    "T291",
+    "T292",
+    "T293",
+    "T294",
+    "T295",
+    "T296",
+    "T297",
+    "T298",
+    "T299",
+    "T300",
+    "T301",
+    "T302",
+    "T303",
+    "T304",
+    "T305",
+    "T213",
     "T252",
     "T215",
     "T216",
     "T219",
     "T222",
-    "T245",
+    "T306",
+    "T307",
+    "T308",
     "T217",
     "T218",
     "T220",
     "T221",
     "T223",
     "T224",
+    "T245",
     "T225",
     "T226",
     "T231",
     "T234",
     "T237",
     "T239",
-    "T246",
+    "T309",
+    "T310",
+    "T311",
     "T227",
     "T228",
     "T230",
@@ -124,98 +184,69 @@
     "T236",
     "T238",
     "T240",
+    "T246",
     "T229",
     "T241",
-    "T247",
     "T254",
-    "T255",
     "T257",
     "T258",
     "T259",
     "T261",
-    "T256",
+    "T312",
+    "T313",
+    "T314",
+    "T315",
+    "T316",
+    "T317",
+    "T318",
+    "T319",
+    "T320",
+    "T321",
+    "T322",
+    "T323",
+    "T324",
+    "T325",
+    "T247",
+    "T255",
     "T260",
     "T262",
     "T264",
+    "T256",
     "T263",
+    "T326",
+    "T327",
+    "T328",
+    "T329",
     "T265"
   ],
   "waves": [
     {
       "wave": 1,
       "tasks": [
-        "T201"
-      ],
-      "dispatches": [
-        {
-          "task_id": "T201",
-          "concurrency_group": "wave-1-group-1",
-          "executor": "local",
-          "risk": "low",
-          "depends_on": [],
-          "allowed_paths": [
-            "cocos-client/tools/validate-config-loader.mjs"
-          ],
-          "context_ref": ".ai-dev/context/T201.json",
-          "serialized_after": []
-        }
-      ]
-    },
-    {
-      "wave": 2,
-      "tasks": [
-        "T202"
-      ],
-      "dispatches": [
-        {
-          "task_id": "T202",
-          "concurrency_group": "wave-2-group-1",
-          "executor": "cloud",
-          "risk": "high",
-          "depends_on": [
-            "T201"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/battle/testsupport/",
-            "cocos-client/tools/test-battle-harness-v2.mjs",
-            "cocos-client/package.json"
-          ],
-          "context_ref": ".ai-dev/context/T202.json",
-          "serialized_after": []
-        }
-      ]
-    },
-    {
-      "wave": 3,
-      "tasks": [
-        "T204",
         "T208",
         "T212",
         "T242",
         "T248",
         "T249",
         "T250",
-        "T251"
+        "T251",
+        "T266",
+        "T267",
+        "T268",
+        "T269",
+        "T270",
+        "T271",
+        "T272",
+        "T273",
+        "T274",
+        "T275",
+        "T276",
+        "T277"
       ],
       "dispatches": [
         {
-          "task_id": "T204",
-          "concurrency_group": "wave-3-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T201",
-            "T202"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/resources/config/levels/chapter01/"
-          ],
-          "context_ref": ".ai-dev/context/T204.json",
-          "serialized_after": []
-        },
-        {
           "task_id": "T208",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -224,14 +255,16 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/services/reward/drops/",
-            "cocos-client/assets/resources/config/drops/"
+            "cocos-client/assets/resources/config/drops/",
+            "cocos-client/tools/test-drop-pools.mjs",
+            "cocos-client/tools/test-reward-service.mjs"
           ],
           "context_ref": ".ai-dev/context/T208.json",
           "serialized_after": []
         },
         {
           "task_id": "T212",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -239,28 +272,30 @@
             "T202"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/hero/"
+            "cocos-client/assets/scripts/meta/hero/",
+            "cocos-client/tools/test-hero-profession.mjs"
           ],
           "context_ref": ".ai-dev/context/T212.json",
           "serialized_after": []
         },
         {
           "task_id": "T242",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T202"
           ],
           "allowed_paths": [
-            "documentation/ui/asset-layer-inventory.md"
+            "documentation/ui/asset-layer-inventory.md",
+            "documentation/ui/asset-layer-inventory.verify.mjs"
           ],
           "context_ref": ".ai-dev/context/T242.json",
           "serialized_after": []
         },
         {
           "task_id": "T248",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -268,14 +303,15 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/resources/art/battle/units/U002/",
-            "cocos-client/assets/resources/art/battle/units/U008/"
+            "cocos-client/assets/resources/art/battle/units/U008/",
+            "cocos-client/tools/test-unit-skeleton-samples.mjs"
           ],
           "context_ref": ".ai-dev/context/T248.json",
           "serialized_after": []
         },
         {
           "task_id": "T249",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -283,28 +319,30 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/resources/art/battle/heroes/C001/",
-            "cocos-client/assets/resources/art/battle/heroes/C009/"
+            "cocos-client/assets/resources/art/battle/heroes/C009/",
+            "cocos-client/tools/test-hero-skeleton-samples.mjs"
           ],
           "context_ref": ".ai-dev/context/T249.json",
           "serialized_after": []
         },
         {
           "task_id": "T250",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
             "T202"
           ],
           "allowed_paths": [
-            "cocos-client/assets/resources/art/battle/scenes/E104/"
+            "cocos-client/assets/resources/art/battle/scenes/E104/",
+            "cocos-client/tools/test-scene-e104.mjs"
           ],
           "context_ref": ".ai-dev/context/T250.json",
           "serialized_after": []
         },
         {
           "task_id": "T251",
-          "concurrency_group": "wave-3-group-1",
+          "concurrency_group": "wave-1-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -312,29 +350,219 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/resources/art/battle/effects/",
-            "cocos-client/assets/resources/art/battle/audio/"
+            "cocos-client/assets/resources/art/battle/audio/",
+            "cocos-client/tools/test-battle-effects-audio.mjs"
           ],
           "context_ref": ".ai-dev/context/T251.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T266",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L01.json",
+            "cocos-client/tools/test-chapter01-l01.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T266.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T267",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L02.json",
+            "cocos-client/tools/test-chapter01-l02.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T267.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T268",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L03.json",
+            "cocos-client/tools/test-chapter01-l03.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T268.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T269",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L04.json",
+            "cocos-client/tools/test-chapter01-l04.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T269.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T270",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L05.json",
+            "cocos-client/tools/test-chapter01-l05.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T270.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T271",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L06.json",
+            "cocos-client/tools/test-chapter01-l06.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T271.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T272",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L07.json",
+            "cocos-client/tools/test-chapter01-l07.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T272.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T273",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L08.json",
+            "cocos-client/tools/test-chapter01-l08.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T273.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T274",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L09.json",
+            "cocos-client/tools/test-chapter01-l09.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T274.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T275",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L10.json",
+            "cocos-client/tools/test-chapter01-l10.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T275.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T276",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L11.json",
+            "cocos-client/tools/test-chapter01-l11.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T276.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T277",
+          "concurrency_group": "wave-1-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T201",
+            "T202"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/levels/chapter01/L12.json",
+            "cocos-client/tools/test-chapter01-l12.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T277.json",
           "serialized_after": []
         }
       ]
     },
     {
-      "wave": 4,
+      "wave": 2,
       "tasks": [
         "T203",
-        "T205",
-        "T206",
-        "T207",
+        "T204",
         "T209",
         "T210",
-        "T214",
         "T243"
       ],
       "dispatches": [
         {
           "task_id": "T203",
-          "concurrency_group": "wave-4-group-1",
+          "concurrency_group": "wave-2-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -351,93 +579,63 @@
           "serialized_after": []
         },
         {
-          "task_id": "T205",
-          "concurrency_group": "wave-4-group-1",
+          "task_id": "T204",
+          "concurrency_group": "wave-2-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
-            "T204"
+            "T266",
+            "T267",
+            "T268",
+            "T269",
+            "T270",
+            "T271",
+            "T272",
+            "T273",
+            "T274",
+            "T275",
+            "T276",
+            "T277"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/campaign/"
+            "cocos-client/tools/test-chapter01-levels.mjs"
           ],
-          "context_ref": ".ai-dev/context/T205.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T206",
-          "concurrency_group": "wave-4-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T204"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/core/outcome/objectives/",
-            "cocos-client/assets/scripts/battle/ui/objectives/"
-          ],
-          "context_ref": ".ai-dev/context/T206.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T207",
-          "concurrency_group": "wave-4-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T204"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/resources/config/enemy/"
-          ],
-          "context_ref": ".ai-dev/context/T207.json",
+          "context_ref": ".ai-dev/context/T204.json",
           "serialized_after": []
         },
         {
           "task_id": "T209",
-          "concurrency_group": "wave-4-group-1",
+          "concurrency_group": "wave-2-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T208"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/profile/"
+            "cocos-client/assets/scripts/meta/profile/",
+            "cocos-client/tools/test-profile-stamina.mjs"
           ],
           "context_ref": ".ai-dev/context/T209.json",
           "serialized_after": []
         },
         {
           "task_id": "T210",
-          "concurrency_group": "wave-4-group-1",
+          "concurrency_group": "wave-2-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T208"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/cards/"
+            "cocos-client/assets/scripts/meta/cards/",
+            "cocos-client/tools/test-card-inventory.mjs"
           ],
           "context_ref": ".ai-dev/context/T210.json",
           "serialized_after": []
         },
         {
-          "task_id": "T214",
-          "concurrency_group": "wave-4-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T204"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/meta/story/"
-          ],
-          "context_ref": ".ai-dev/context/T214.json",
-          "serialized_after": []
-        },
-        {
           "task_id": "T243",
-          "concurrency_group": "wave-4-group-1",
+          "concurrency_group": "wave-2-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -445,7 +643,8 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/ui/",
-            "cocos-client/assets/resources/ui/components/"
+            "cocos-client/assets/resources/ui/components/",
+            "cocos-client/tools/test-ui-components.mjs"
           ],
           "context_ref": ".ai-dev/context/T243.json",
           "serialized_after": []
@@ -453,31 +652,567 @@
       ]
     },
     {
-      "wave": 5,
+      "wave": 3,
       "tasks": [
+        "T205",
+        "T206",
+        "T207",
         "T211",
-        "T213",
+        "T214",
         "T244",
-        "T252"
+        "T278",
+        "T279",
+        "T280",
+        "T281",
+        "T282",
+        "T283",
+        "T284",
+        "T285",
+        "T286",
+        "T287",
+        "T288",
+        "T289",
+        "T290",
+        "T291",
+        "T292",
+        "T293",
+        "T294",
+        "T295",
+        "T296",
+        "T297",
+        "T298",
+        "T299",
+        "T300",
+        "T301",
+        "T302",
+        "T303",
+        "T304",
+        "T305"
       ],
       "dispatches": [
         {
+          "task_id": "T205",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T204"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/campaign/",
+            "cocos-client/tools/test-campaign-state.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T205.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T206",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T204"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/core/outcome/objectives/",
+            "cocos-client/assets/scripts/battle/ui/objectives/",
+            "cocos-client/tools/test-chapter-objectives.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T206.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T207",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T204"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/enemy/",
+            "cocos-client/tools/test-enemy-strategy-config.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T207.json",
+          "serialized_after": []
+        },
+        {
           "task_id": "T211",
-          "concurrency_group": "wave-5-group-1",
+          "concurrency_group": "wave-3-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T210"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/decks/"
+            "cocos-client/assets/scripts/meta/decks/",
+            "cocos-client/tools/test-deck-management.mjs"
           ],
           "context_ref": ".ai-dev/context/T211.json",
           "serialized_after": []
         },
         {
+          "task_id": "T214",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T204"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/story/",
+            "cocos-client/tools/test-chapter01-story.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T214.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T244",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T243"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/shell/",
+            "cocos-client/tools/test-meta-shell.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T244.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T278",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U001/",
+            "cocos-client/tools/test-unit-production-u001.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T278.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T279",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U002/",
+            "cocos-client/tools/test-unit-production-u002.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T279.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T280",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U003/",
+            "cocos-client/tools/test-unit-production-u003.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T280.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T281",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U004/",
+            "cocos-client/tools/test-unit-production-u004.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T281.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T282",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U005/",
+            "cocos-client/tools/test-unit-production-u005.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T282.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T283",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U006/",
+            "cocos-client/tools/test-unit-production-u006.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T283.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T284",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U007/",
+            "cocos-client/tools/test-unit-production-u007.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T284.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T285",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U008/",
+            "cocos-client/tools/test-unit-production-u008.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T285.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T286",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U009/",
+            "cocos-client/tools/test-unit-production-u009.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T286.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T287",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U010/",
+            "cocos-client/tools/test-unit-production-u010.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T287.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T288",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U011/",
+            "cocos-client/tools/test-unit-production-u011.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T288.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T289",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U012/",
+            "cocos-client/tools/test-unit-production-u012.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T289.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T290",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U013/",
+            "cocos-client/tools/test-unit-production-u013.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T290.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T291",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U014/",
+            "cocos-client/tools/test-unit-production-u014.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T291.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T292",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U015/",
+            "cocos-client/tools/test-unit-production-u015.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T292.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T293",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U016/",
+            "cocos-client/tools/test-unit-production-u016.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T293.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T294",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U017/",
+            "cocos-client/tools/test-unit-production-u017.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T294.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T295",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U018/",
+            "cocos-client/tools/test-unit-production-u018.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T295.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T296",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U019/",
+            "cocos-client/tools/test-unit-production-u019.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T296.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T297",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U020/",
+            "cocos-client/tools/test-unit-production-u020.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T297.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T298",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U021/",
+            "cocos-client/tools/test-unit-production-u021.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T298.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T299",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U022/",
+            "cocos-client/tools/test-unit-production-u022.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T299.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T300",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U023/",
+            "cocos-client/tools/test-unit-production-u023.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T300.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T301",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U024/",
+            "cocos-client/tools/test-unit-production-u024.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T301.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T302",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U025/",
+            "cocos-client/tools/test-unit-production-u025.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T302.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T303",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U026/",
+            "cocos-client/tools/test-unit-production-u026.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T303.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T304",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U027/",
+            "cocos-client/tools/test-unit-production-u027.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T304.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T305",
+          "concurrency_group": "wave-3-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T203"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/art/battle/units/U028/",
+            "cocos-client/tools/test-unit-production-u028.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T305.json",
+          "serialized_after": []
+        }
+      ]
+    },
+    {
+      "wave": 4,
+      "tasks": [
+        "T213",
+        "T252"
+      ],
+      "dispatches": [
+        {
           "task_id": "T213",
-          "concurrency_group": "wave-5-group-1",
+          "concurrency_group": "wave-4-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -485,37 +1220,49 @@
             "T208"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/tasks/mainline/"
+            "cocos-client/assets/scripts/meta/tasks/mainline/",
+            "cocos-client/tools/test-mainline-tasks.mjs"
           ],
           "context_ref": ".ai-dev/context/T213.json",
           "serialized_after": []
         },
         {
-          "task_id": "T244",
-          "concurrency_group": "wave-5-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T243"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/meta/ui/shell/"
-          ],
-          "context_ref": ".ai-dev/context/T244.json",
-          "serialized_after": []
-        },
-        {
           "task_id": "T252",
-          "concurrency_group": "wave-5-group-1",
+          "concurrency_group": "wave-4-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
-            "T203",
-            "T248",
-            "T250"
+            "T278",
+            "T279",
+            "T280",
+            "T281",
+            "T282",
+            "T283",
+            "T284",
+            "T285",
+            "T286",
+            "T287",
+            "T288",
+            "T289",
+            "T290",
+            "T291",
+            "T292",
+            "T293",
+            "T294",
+            "T295",
+            "T296",
+            "T297",
+            "T298",
+            "T299",
+            "T300",
+            "T301",
+            "T302",
+            "T303",
+            "T304",
+            "T305"
           ],
           "allowed_paths": [
-            "cocos-client/assets/resources/art/battle/units/"
+            "cocos-client/tools/test-unit-production-assets.mjs"
           ],
           "context_ref": ".ai-dev/context/T252.json",
           "serialized_after": []
@@ -523,14 +1270,14 @@
       ]
     },
     {
-      "wave": 6,
+      "wave": 5,
       "tasks": [
         "T215"
       ],
       "dispatches": [
         {
           "task_id": "T215",
-          "concurrency_group": "wave-6-group-1",
+          "concurrency_group": "wave-5-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -555,45 +1302,49 @@
       ]
     },
     {
-      "wave": 7,
+      "wave": 6,
       "tasks": [
         "T216",
         "T219",
         "T222",
-        "T245"
+        "T306",
+        "T307",
+        "T308"
       ],
       "dispatches": [
         {
           "task_id": "T216",
-          "concurrency_group": "wave-7-group-1",
+          "concurrency_group": "wave-6-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T215"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/pve/dungeon/"
+            "cocos-client/assets/scripts/pve/dungeon/",
+            "cocos-client/tools/test-dungeon-session.mjs"
           ],
           "context_ref": ".ai-dev/context/T216.json",
           "serialized_after": []
         },
         {
           "task_id": "T219",
-          "concurrency_group": "wave-7-group-1",
+          "concurrency_group": "wave-6-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T215"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/pve/tower/"
+            "cocos-client/assets/scripts/pve/tower/",
+            "cocos-client/tools/test-tower-config.mjs"
           ],
           "context_ref": ".ai-dev/context/T219.json",
           "serialized_after": []
         },
         {
           "task_id": "T222",
-          "concurrency_group": "wave-7-group-1",
+          "concurrency_group": "wave-6-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -601,9 +1352,163 @@
             "T215"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/core/boss/"
+            "cocos-client/assets/scripts/core/boss/",
+            "cocos-client/tools/test-boss-phases.mjs"
           ],
           "context_ref": ".ai-dev/context/T222.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T306",
+          "concurrency_group": "wave-6-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T215",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/",
+            "cocos-client/tools/test-meta-page-home.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T306.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T307",
+          "concurrency_group": "wave-6-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T215",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/campaign/",
+            "cocos-client/tools/test-meta-page-campaign.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T307.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T308",
+          "concurrency_group": "wave-6-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T215",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/cards/",
+            "cocos-client/tools/test-meta-page-cards.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T308.json",
+          "serialized_after": []
+        }
+      ]
+    },
+    {
+      "wave": 7,
+      "tasks": [
+        "T217",
+        "T218",
+        "T220",
+        "T221",
+        "T223",
+        "T224",
+        "T245"
+      ],
+      "dispatches": [
+        {
+          "task_id": "T217",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T216"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/pve/dungeon/difficulty/",
+            "cocos-client/tools/test-dungeon-difficulty.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T217.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T218",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T216"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/pve/reveal/",
+            "cocos-client/tools/test-reveal-reward.mjs",
+            "cocos-client/tools/test-reward-service.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T218.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T220",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T219"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/pve/tower/lifecycle/",
+            "cocos-client/tools/test-tower-lifecycle.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T220.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T221",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T219"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/pve/tower/shop/",
+            "cocos-client/tools/test-tower-shop.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T221.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T223",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T222"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/core/board/special-entities/",
+            "cocos-client/tools/test-special-entities.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T223.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T224",
+          "concurrency_group": "wave-7-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T222"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/core/ai/reinforcements/",
+            "cocos-client/tools/test-boss-reinforcements.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T224.json",
           "serialized_after": []
         },
         {
@@ -612,11 +1517,12 @@
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
-            "T215",
-            "T244"
+            "T306",
+            "T307",
+            "T308"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/"
+            "cocos-client/tools/test-meta-pages-home-campaign-cards.mjs"
           ],
           "context_ref": ".ai-dev/context/T245.json",
           "serialized_after": []
@@ -626,109 +1532,12 @@
     {
       "wave": 8,
       "tasks": [
-        "T217",
-        "T218",
-        "T220",
-        "T221",
-        "T223",
-        "T224"
-      ],
-      "dispatches": [
-        {
-          "task_id": "T217",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T216"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/pve/dungeon/difficulty/"
-          ],
-          "context_ref": ".ai-dev/context/T217.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T218",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T216"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/pve/reveal/"
-          ],
-          "context_ref": ".ai-dev/context/T218.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T220",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T219"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/pve/tower/lifecycle/"
-          ],
-          "context_ref": ".ai-dev/context/T220.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T221",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T219"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/pve/tower/shop/"
-          ],
-          "context_ref": ".ai-dev/context/T221.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T223",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "high",
-          "depends_on": [
-            "T222"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/core/board/special-entities/"
-          ],
-          "context_ref": ".ai-dev/context/T223.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T224",
-          "concurrency_group": "wave-8-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T222"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/core/ai/reinforcements/"
-          ],
-          "context_ref": ".ai-dev/context/T224.json",
-          "serialized_after": []
-        }
-      ]
-    },
-    {
-      "wave": 9,
-      "tasks": [
         "T225"
       ],
       "dispatches": [
         {
           "task_id": "T225",
-          "concurrency_group": "wave-9-group-1",
+          "concurrency_group": "wave-8-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -743,7 +1552,8 @@
             "T224"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/tests/pve/reward-isolation/"
+            "cocos-client/assets/scripts/tests/pve/reward-isolation/",
+            "cocos-client/tools/test-pve-reward-isolation.mjs"
           ],
           "context_ref": ".ai-dev/context/T225.json",
           "serialized_after": []
@@ -751,19 +1561,21 @@
       ]
     },
     {
-      "wave": 10,
+      "wave": 9,
       "tasks": [
         "T226",
         "T231",
         "T234",
         "T237",
         "T239",
-        "T246"
+        "T309",
+        "T310",
+        "T311"
       ],
       "dispatches": [
         {
           "task_id": "T226",
-          "concurrency_group": "wave-10-group-1",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -771,14 +1583,15 @@
             "T225"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/cards/quality/"
+            "cocos-client/assets/scripts/meta/cards/quality/",
+            "cocos-client/tools/test-card-quality.mjs"
           ],
           "context_ref": ".ai-dev/context/T226.json",
           "serialized_after": []
         },
         {
           "task_id": "T231",
-          "concurrency_group": "wave-10-group-1",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -786,28 +1599,30 @@
             "T225"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/equipment/"
+            "cocos-client/assets/scripts/meta/equipment/",
+            "cocos-client/tools/test-equipment-inventory.mjs"
           ],
           "context_ref": ".ai-dev/context/T231.json",
           "serialized_after": []
         },
         {
           "task_id": "T234",
-          "concurrency_group": "wave-10-group-1",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T225"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/buildings/"
+            "cocos-client/assets/scripts/meta/buildings/",
+            "cocos-client/tools/test-building-queue.mjs"
           ],
           "context_ref": ".ai-dev/context/T234.json",
           "serialized_after": []
         },
         {
           "task_id": "T237",
-          "concurrency_group": "wave-10-group-1",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -815,28 +1630,30 @@
             "T225"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/reputation/"
+            "cocos-client/assets/scripts/meta/reputation/",
+            "cocos-client/tools/test-reputation.mjs"
           ],
           "context_ref": ".ai-dev/context/T237.json",
           "serialized_after": []
         },
         {
           "task_id": "T239",
-          "concurrency_group": "wave-10-group-1",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T225"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/tasks/daily/"
+            "cocos-client/assets/scripts/meta/tasks/daily/",
+            "cocos-client/tools/test-daily-rewards.mjs"
           ],
           "context_ref": ".ai-dev/context/T239.json",
           "serialized_after": []
         },
         {
-          "task_id": "T246",
-          "concurrency_group": "wave-10-group-1",
+          "task_id": "T309",
+          "concurrency_group": "wave-9-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -845,15 +1662,50 @@
             "T244"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/"
+            "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/deck/",
+            "cocos-client/tools/test-meta-page-deck.mjs"
           ],
-          "context_ref": ".ai-dev/context/T246.json",
+          "context_ref": ".ai-dev/context/T309.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T310",
+          "concurrency_group": "wave-9-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T215",
+            "T225",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/hero/",
+            "cocos-client/tools/test-meta-page-hero.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T310.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T311",
+          "concurrency_group": "wave-9-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T215",
+            "T225",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/adventure/",
+            "cocos-client/tools/test-meta-page-adventure.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T311.json",
           "serialized_after": []
         }
       ]
     },
     {
-      "wave": 11,
+      "wave": 10,
       "tasks": [
         "T227",
         "T228",
@@ -863,153 +1715,180 @@
         "T235",
         "T236",
         "T238",
-        "T240"
+        "T240",
+        "T246"
       ],
       "dispatches": [
         {
           "task_id": "T227",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T226"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/alchemy/synthesis/"
+            "cocos-client/assets/scripts/meta/alchemy/synthesis/",
+            "cocos-client/tools/test-card-synthesis.mjs"
           ],
           "context_ref": ".ai-dev/context/T227.json",
           "serialized_after": []
         },
         {
           "task_id": "T228",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T226"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/alchemy/dismantle/"
+            "cocos-client/assets/scripts/meta/alchemy/dismantle/",
+            "cocos-client/tools/test-card-dismantle.mjs"
           ],
           "context_ref": ".ai-dev/context/T228.json",
           "serialized_after": []
         },
         {
           "task_id": "T230",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T226"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/collection/"
+            "cocos-client/assets/scripts/meta/collection/",
+            "cocos-client/tools/test-card-collection.mjs"
           ],
           "context_ref": ".ai-dev/context/T230.json",
           "serialized_after": []
         },
         {
           "task_id": "T232",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T231"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/equipment/enhancement/"
+            "cocos-client/assets/scripts/meta/equipment/enhancement/",
+            "cocos-client/tools/test-equipment-enhancement.mjs"
           ],
           "context_ref": ".ai-dev/context/T232.json",
           "serialized_after": []
         },
         {
           "task_id": "T233",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T231"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/equipment/crafting/"
+            "cocos-client/assets/scripts/meta/equipment/crafting/",
+            "cocos-client/tools/test-equipment-crafting.mjs"
           ],
           "context_ref": ".ai-dev/context/T233.json",
           "serialized_after": []
         },
         {
           "task_id": "T235",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T234"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/buildings/tax-research/"
+            "cocos-client/assets/scripts/meta/buildings/tax-research/",
+            "cocos-client/tools/test-tax-research.mjs"
           ],
           "context_ref": ".ai-dev/context/T235.json",
           "serialized_after": []
         },
         {
           "task_id": "T236",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T234"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/expedition/"
+            "cocos-client/assets/scripts/meta/expedition/",
+            "cocos-client/tools/test-expedition.mjs"
           ],
           "context_ref": ".ai-dev/context/T236.json",
           "serialized_after": []
         },
         {
           "task_id": "T238",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T237"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/reputation/shop/"
+            "cocos-client/assets/scripts/meta/reputation/shop/",
+            "cocos-client/tools/test-reputation-shop.mjs"
           ],
           "context_ref": ".ai-dev/context/T238.json",
           "serialized_after": []
         },
         {
           "task_id": "T240",
-          "concurrency_group": "wave-11-group-1",
+          "concurrency_group": "wave-10-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T226"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/shop/"
+            "cocos-client/assets/scripts/meta/shop/",
+            "cocos-client/tools/test-card-shop.mjs"
           ],
           "context_ref": ".ai-dev/context/T240.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T246",
+          "concurrency_group": "wave-10-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T309",
+            "T310",
+            "T311"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/test-meta-pages-deck-hero-adventure.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T246.json",
           "serialized_after": []
         }
       ]
     },
     {
-      "wave": 12,
+      "wave": 11,
       "tasks": [
         "T229"
       ],
       "dispatches": [
         {
           "task_id": "T229",
-          "concurrency_group": "wave-12-group-1",
+          "concurrency_group": "wave-11-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
             "T228"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/meta/alchemy/refining/"
+            "cocos-client/assets/scripts/meta/alchemy/refining/",
+            "cocos-client/tools/test-card-refining.mjs"
           ],
           "context_ref": ".ai-dev/context/T229.json",
           "serialized_after": []
@@ -1017,14 +1896,14 @@
       ]
     },
     {
-      "wave": 13,
+      "wave": 12,
       "tasks": [
         "T241"
       ],
       "dispatches": [
         {
           "task_id": "T241",
-          "concurrency_group": "wave-13-group-1",
+          "concurrency_group": "wave-12-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1045,7 +1924,8 @@
             "T240"
           ],
           "allowed_paths": [
-            "cocos-client/assets/scripts/simulation/economy/"
+            "cocos-client/assets/scripts/simulation/economy/",
+            "cocos-client/tools/test-economy-30d.mjs"
           ],
           "context_ref": ".ai-dev/context/T241.json",
           "serialized_after": []
@@ -1053,35 +1933,32 @@
       ]
     },
     {
-      "wave": 14,
+      "wave": 13,
       "tasks": [
-        "T247",
         "T254",
-        "T255",
         "T257",
         "T258",
         "T259",
-        "T261"
+        "T261",
+        "T312",
+        "T313",
+        "T314",
+        "T315",
+        "T316",
+        "T317",
+        "T318",
+        "T319",
+        "T320",
+        "T321",
+        "T322",
+        "T323",
+        "T324",
+        "T325"
       ],
       "dispatches": [
         {
-          "task_id": "T247",
-          "concurrency_group": "wave-14-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T241",
-            "T244"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/meta/ui/pages/city-tasks-inventory/"
-          ],
-          "context_ref": ".ai-dev/context/T247.json",
-          "serialized_after": []
-        },
-        {
           "task_id": "T254",
-          "concurrency_group": "wave-14-group-1",
+          "concurrency_group": "wave-13-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -1089,29 +1966,15 @@
             "T241"
           ],
           "allowed_paths": [
-            "cocos-client/tools/content-templates/"
+            "cocos-client/tools/content-templates/",
+            "cocos-client/tools/test-content-templates.mjs"
           ],
           "context_ref": ".ai-dev/context/T254.json",
           "serialized_after": []
         },
         {
-          "task_id": "T255",
-          "concurrency_group": "wave-14-group-1",
-          "executor": "cloud",
-          "risk": "medium",
-          "depends_on": [
-            "T241"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/resources/config/builds/",
-            "cocos-client/assets/scripts/simulation/builds/"
-          ],
-          "context_ref": ".ai-dev/context/T255.json",
-          "serialized_after": []
-        },
-        {
           "task_id": "T257",
-          "concurrency_group": "wave-14-group-1",
+          "concurrency_group": "wave-13-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1120,14 +1983,15 @@
           ],
           "allowed_paths": [
             "cocos-client/build-templates/web/",
-            "cocos-client/tools/resource-packaging/"
+            "cocos-client/tools/resource-packaging/",
+            "cocos-client/tools/test-web-resource-packaging.mjs"
           ],
           "context_ref": ".ai-dev/context/T257.json",
           "serialized_after": []
         },
         {
           "task_id": "T258",
-          "concurrency_group": "wave-14-group-1",
+          "concurrency_group": "wave-13-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1136,14 +2000,15 @@
           ],
           "allowed_paths": [
             "cocos-client/build-templates/android/",
-            "cocos-client/assets/scripts/platform/android/"
+            "cocos-client/assets/scripts/platform/android/",
+            "cocos-client/tools/test-android-landscape-contract.mjs"
           ],
           "context_ref": ".ai-dev/context/T258.json",
           "serialized_after": []
         },
         {
           "task_id": "T259",
-          "concurrency_group": "wave-14-group-1",
+          "concurrency_group": "wave-13-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1151,14 +2016,15 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/services/account/",
-            "backend/account/"
+            "backend/account/",
+            "cocos-client/tools/test-account-cloud-save.mjs"
           ],
           "context_ref": ".ai-dev/context/T259.json",
           "serialized_after": []
         },
         {
           "task_id": "T261",
-          "concurrency_group": "wave-14-group-1",
+          "concurrency_group": "wave-13-group-1",
           "executor": "cloud",
           "risk": "medium",
           "depends_on": [
@@ -1167,9 +2033,324 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/services/telemetry/",
-            "backend/analytics/"
+            "backend/analytics/",
+            "cocos-client/tools/test-analytics-events.mjs"
           ],
           "context_ref": ".ai-dev/context/T261.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T312",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/city-tasks-inventory/city/",
+            "cocos-client/tools/test-meta-page-city.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T312.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T313",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/city-tasks-inventory/tasks/",
+            "cocos-client/tools/test-meta-page-tasks.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T313.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T314",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241",
+            "T244"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/meta/ui/pages/city-tasks-inventory/inventory/",
+            "cocos-client/tools/test-meta-page-inventory.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T314.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T315",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/P01.json",
+            "cocos-client/tools/test-build-p01.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T315.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T316",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/P02.json",
+            "cocos-client/tools/test-build-p02.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T316.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T317",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/P03.json",
+            "cocos-client/tools/test-build-p03.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T317.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T318",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/P04.json",
+            "cocos-client/tools/test-build-p04.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T318.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T319",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R01.json",
+            "cocos-client/tools/test-build-r01.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T319.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T320",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R02.json",
+            "cocos-client/tools/test-build-r02.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T320.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T321",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R03.json",
+            "cocos-client/tools/test-build-r03.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T321.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T322",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R04.json",
+            "cocos-client/tools/test-build-r04.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T322.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T323",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R05.json",
+            "cocos-client/tools/test-build-r05.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T323.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T324",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R06.json",
+            "cocos-client/tools/test-build-r06.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T324.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T325",
+          "concurrency_group": "wave-13-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T241"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/resources/config/builds/R07.json",
+            "cocos-client/tools/test-build-r07.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T325.json",
+          "serialized_after": []
+        }
+      ]
+    },
+    {
+      "wave": 14,
+      "tasks": [
+        "T247",
+        "T255",
+        "T260",
+        "T262",
+        "T264"
+      ],
+      "dispatches": [
+        {
+          "task_id": "T247",
+          "concurrency_group": "wave-14-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T312",
+            "T313",
+            "T314"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/test-meta-pages-city-tasks-inventory.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T247.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T255",
+          "concurrency_group": "wave-14-group-1",
+          "executor": "cloud",
+          "risk": "medium",
+          "depends_on": [
+            "T315",
+            "T316",
+            "T317",
+            "T318",
+            "T319",
+            "T320",
+            "T321",
+            "T322",
+            "T323",
+            "T324",
+            "T325"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/simulation/builds/",
+            "cocos-client/tools/test-build-archetypes.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T255.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T260",
+          "concurrency_group": "wave-14-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T259"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/services/config-update/",
+            "backend/config-update/",
+            "cocos-client/tools/test-config-hot-update.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T260.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T262",
+          "concurrency_group": "wave-14-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T259"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/services/support/",
+            "backend/support/",
+            "cocos-client/tools/test-mail-compensation-support.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T262.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T264",
+          "concurrency_group": "wave-14-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T259"
+          ],
+          "allowed_paths": [
+            "cocos-client/assets/scripts/services/compliance/",
+            "documentation/legal/",
+            "cocos-client/tools/test-privacy-compliance.mjs"
+          ],
+          "context_ref": ".ai-dev/context/T264.json",
           "serialized_after": []
         }
       ]
@@ -1178,9 +2359,7 @@
       "wave": 15,
       "tasks": [
         "T256",
-        "T260",
-        "T262",
-        "T264"
+        "T263"
       ],
       "dispatches": [
         {
@@ -1192,67 +2371,15 @@
             "T255"
           ],
           "allowed_paths": [
-            "cocos-client/assets/resources/config/balance/"
+            "cocos-client/assets/resources/config/balance/",
+            "cocos-client/tools/test-difficulty-matrix.mjs"
           ],
           "context_ref": ".ai-dev/context/T256.json",
           "serialized_after": []
         },
         {
-          "task_id": "T260",
-          "concurrency_group": "wave-15-group-1",
-          "executor": "cloud",
-          "risk": "high",
-          "depends_on": [
-            "T259"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/services/config-update/",
-            "backend/config-update/"
-          ],
-          "context_ref": ".ai-dev/context/T260.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T262",
-          "concurrency_group": "wave-15-group-1",
-          "executor": "cloud",
-          "risk": "high",
-          "depends_on": [
-            "T259"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/services/support/",
-            "backend/support/"
-          ],
-          "context_ref": ".ai-dev/context/T262.json",
-          "serialized_after": []
-        },
-        {
-          "task_id": "T264",
-          "concurrency_group": "wave-15-group-1",
-          "executor": "cloud",
-          "risk": "high",
-          "depends_on": [
-            "T259"
-          ],
-          "allowed_paths": [
-            "cocos-client/assets/scripts/services/compliance/",
-            "documentation/legal/"
-          ],
-          "context_ref": ".ai-dev/context/T264.json",
-          "serialized_after": []
-        }
-      ]
-    },
-    {
-      "wave": 16,
-      "tasks": [
-        "T263"
-      ],
-      "dispatches": [
-        {
           "task_id": "T263",
-          "concurrency_group": "wave-16-group-1",
+          "concurrency_group": "wave-15-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1261,7 +2388,8 @@
           ],
           "allowed_paths": [
             "cocos-client/assets/scripts/services/commerce/",
-            "backend/commerce/"
+            "backend/commerce/",
+            "cocos-client/tools/test-commerce-payment.mjs"
           ],
           "context_ref": ".ai-dev/context/T263.json",
           "serialized_after": []
@@ -1269,14 +2397,17 @@
       ]
     },
     {
-      "wave": 17,
+      "wave": 16,
       "tasks": [
-        "T265"
+        "T326",
+        "T327",
+        "T328",
+        "T329"
       ],
       "dispatches": [
         {
-          "task_id": "T265",
-          "concurrency_group": "wave-17-group-1",
+          "task_id": "T326",
+          "concurrency_group": "wave-16-group-1",
           "executor": "cloud",
           "risk": "high",
           "depends_on": [
@@ -1293,8 +2424,109 @@
             "T264"
           ],
           "allowed_paths": [
-            "cocos-client/tools/release/",
-            "documentation/release/"
+            "cocos-client/tools/release/stability/",
+            "documentation/release/stability/"
+          ],
+          "context_ref": ".ai-dev/context/T326.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T327",
+          "concurrency_group": "wave-16-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T254",
+            "T255",
+            "T256",
+            "T257",
+            "T258",
+            "T259",
+            "T260",
+            "T261",
+            "T262",
+            "T263",
+            "T264"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/release/perf/",
+            "documentation/release/perf/"
+          ],
+          "context_ref": ".ai-dev/context/T327.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T328",
+          "concurrency_group": "wave-16-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T254",
+            "T255",
+            "T256",
+            "T257",
+            "T258",
+            "T259",
+            "T260",
+            "T261",
+            "T262",
+            "T263",
+            "T264"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/release/security/",
+            "documentation/release/security/"
+          ],
+          "context_ref": ".ai-dev/context/T328.json",
+          "serialized_after": []
+        },
+        {
+          "task_id": "T329",
+          "concurrency_group": "wave-16-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T254",
+            "T255",
+            "T256",
+            "T257",
+            "T258",
+            "T259",
+            "T260",
+            "T261",
+            "T262",
+            "T263",
+            "T264"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/release/recovery/",
+            "documentation/release/recovery/"
+          ],
+          "context_ref": ".ai-dev/context/T329.json",
+          "serialized_after": []
+        }
+      ]
+    },
+    {
+      "wave": 17,
+      "tasks": [
+        "T265"
+      ],
+      "dispatches": [
+        {
+          "task_id": "T265",
+          "concurrency_group": "wave-17-group-1",
+          "executor": "cloud",
+          "risk": "high",
+          "depends_on": [
+            "T326",
+            "T327",
+            "T328",
+            "T329"
+          ],
+          "allowed_paths": [
+            "cocos-client/tools/release/final/",
+            "documentation/release/final/"
           ],
           "context_ref": ".ai-dev/context/T265.json",
           "serialized_after": []

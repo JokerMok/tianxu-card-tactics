@@ -5,15 +5,16 @@
     "T225",
     "T241"
   ],
-  "wave": 14,
+  "wave": 15,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:content-templates"
+    "cd cocos-client && node --experimental-strip-types tools/test-content-templates.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/tools/content-templates/"
+    "cocos-client/tools/content-templates/",
+    "cocos-client/tools/test-content-templates.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

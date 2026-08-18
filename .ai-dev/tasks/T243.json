@@ -9,11 +9,12 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:ui-components"
+    "cd cocos-client && node --experimental-strip-types tools/test-ui-components.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/ui/",
-    "cocos-client/assets/resources/ui/components/"
+    "cocos-client/assets/resources/ui/components/",
+    "cocos-client/tools/test-ui-components.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

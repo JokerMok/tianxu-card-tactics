@@ -1,0 +1,26 @@
+{
+  "id": "T269",
+  "source_task": "M4-01-L04",
+  "dependencies": [
+    "T201",
+    "T202"
+  ],
+  "wave": 3,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-chapter01-l04.mjs",
+    "cd cocos-client && npm run validate:config-cross-table"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/levels/chapter01/L04.json",
+    "cocos-client/tools/test-chapter01-l04.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

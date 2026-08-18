@@ -4,15 +4,16 @@
   "dependencies": [
     "T204"
   ],
-  "wave": 4,
+  "wave": 5,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:chapter01-story"
+    "cd cocos-client && node --experimental-strip-types tools/test-chapter01-story.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/story/"
+    "cocos-client/assets/scripts/meta/story/",
+    "cocos-client/tools/test-chapter01-story.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

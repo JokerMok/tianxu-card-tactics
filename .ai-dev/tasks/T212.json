@@ -10,11 +10,12 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:hero-profession",
+    "cd cocos-client && node --experimental-strip-types tools/test-hero-profession.mjs",
     "cd cocos-client && npm run test:battle-runner"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/hero/"
+    "cocos-client/assets/scripts/meta/hero/",
+    "cocos-client/tools/test-hero-profession.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

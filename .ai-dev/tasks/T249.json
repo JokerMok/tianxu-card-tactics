@@ -9,11 +9,12 @@
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:hero-skeleton-samples"
+    "cd cocos-client && node --experimental-strip-types tools/test-hero-skeleton-samples.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/resources/art/battle/heroes/C001/",
-    "cocos-client/assets/resources/art/battle/heroes/C009/"
+    "cocos-client/assets/resources/art/battle/heroes/C009/",
+    "cocos-client/tools/test-hero-skeleton-samples.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

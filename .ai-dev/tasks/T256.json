@@ -4,15 +4,16 @@
   "dependencies": [
     "T255"
   ],
-  "wave": 15,
+  "wave": 17,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:difficulty-matrix"
+    "cd cocos-client && node --experimental-strip-types tools/test-difficulty-matrix.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/config/balance/"
+    "cocos-client/assets/resources/config/balance/",
+    "cocos-client/tools/test-difficulty-matrix.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

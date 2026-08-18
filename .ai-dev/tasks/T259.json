@@ -4,16 +4,17 @@
   "dependencies": [
     "T241"
   ],
-  "wave": 14,
+  "wave": 15,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:account-cloud-save"
+    "cd cocos-client && node --experimental-strip-types tools/test-account-cloud-save.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/account/",
-    "backend/account/"
+    "backend/account/",
+    "cocos-client/tools/test-account-cloud-save.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

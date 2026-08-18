@@ -7,10 +7,11 @@
   "risk": "high",
   "status": "blocked",
   "verification_commands": [
-    "cd cocos-client && npm run test:commercial-card-templates"
+    "cd cocos-client && node --experimental-strip-types tools/test-commercial-card-templates.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/resources/art/cards/"
+    "cocos-client/assets/resources/art/cards/",
+    "cocos-client/tools/test-commercial-card-templates.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

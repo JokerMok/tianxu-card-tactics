@@ -2,19 +2,19 @@
   "id": "T246",
   "source_task": "M7-05",
   "dependencies": [
-    "T215",
-    "T225",
-    "T244"
+    "T309",
+    "T310",
+    "T311"
   ],
-  "wave": 10,
+  "wave": 12,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:meta-pages-deck-hero-adventure"
+    "cd cocos-client && node --experimental-strip-types tools/test-meta-pages-deck-hero-adventure.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/ui/pages/deck-hero-adventure/"
+    "cocos-client/tools/test-meta-pages-deck-hero-adventure.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

@@ -4,15 +4,16 @@
   "dependencies": [
     "T204"
   ],
-  "wave": 4,
+  "wave": 5,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:campaign-state"
+    "cd cocos-client && node --experimental-strip-types tools/test-campaign-state.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/campaign/"
+    "cocos-client/assets/scripts/meta/campaign/",
+    "cocos-client/tools/test-campaign-state.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

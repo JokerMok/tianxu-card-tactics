@@ -4,15 +4,16 @@
   "dependencies": [
     "T228"
   ],
-  "wave": 12,
+  "wave": 13,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:card-refining"
+    "cd cocos-client && node --experimental-strip-types tools/test-card-refining.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/alchemy/refining/"
+    "cocos-client/assets/scripts/meta/alchemy/refining/",
+    "cocos-client/tools/test-card-refining.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

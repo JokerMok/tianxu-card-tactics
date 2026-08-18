@@ -10,12 +10,14 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:drop-pools",
-    "cd cocos-client && npm run test:reward-service"
+    "cd cocos-client && node --experimental-strip-types tools/test-drop-pools.mjs",
+    "cd cocos-client && node --experimental-strip-types tools/test-reward-service.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/reward/drops/",
-    "cocos-client/assets/resources/config/drops/"
+    "cocos-client/assets/resources/config/drops/",
+    "cocos-client/tools/test-drop-pools.mjs",
+    "cocos-client/tools/test-reward-service.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

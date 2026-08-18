@@ -2,18 +2,19 @@
   "id": "T245",
   "source_task": "M7-04",
   "dependencies": [
-    "T215",
-    "T244"
+    "T306",
+    "T307",
+    "T308"
   ],
-  "wave": 7,
+  "wave": 9,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:meta-pages-home-campaign-cards"
+    "cd cocos-client && node --experimental-strip-types tools/test-meta-pages-home-campaign-cards.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/"
+    "cocos-client/tools/test-meta-pages-home-campaign-cards.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

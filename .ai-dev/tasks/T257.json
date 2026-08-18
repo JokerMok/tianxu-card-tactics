@@ -5,16 +5,17 @@
     "T241",
     "T252"
   ],
-  "wave": 14,
+  "wave": 15,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:web-resource-packaging"
+    "cd cocos-client && node --experimental-strip-types tools/test-web-resource-packaging.mjs"
   ],
   "allowed_paths": [
     "cocos-client/build-templates/web/",
-    "cocos-client/tools/resource-packaging/"
+    "cocos-client/tools/resource-packaging/",
+    "cocos-client/tools/test-web-resource-packaging.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

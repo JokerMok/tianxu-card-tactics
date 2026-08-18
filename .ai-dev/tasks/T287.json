@@ -1,0 +1,24 @@
+{
+  "id": "T287",
+  "source_task": "M7-11-U010",
+  "dependencies": [
+    "T203"
+  ],
+  "wave": 5,
+  "executor": "cloud",
+  "risk": "high",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u010.mjs"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/art/battle/units/U010/",
+    "cocos-client/tools/test-unit-production-u010.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

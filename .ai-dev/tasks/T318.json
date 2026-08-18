@@ -1,0 +1,24 @@
+{
+  "id": "T318",
+  "source_task": "M8-02-P04",
+  "dependencies": [
+    "T241"
+  ],
+  "wave": 15,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-build-p04.mjs"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/builds/P04.json",
+    "cocos-client/tools/test-build-p04.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

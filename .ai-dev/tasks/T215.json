@@ -14,12 +14,12 @@
     "T213",
     "T214"
   ],
-  "wave": 6,
+  "wave": 7,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:r2-stability",
+    "cd cocos-client && node --experimental-strip-types tools/test-r2-stability.mjs",
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [

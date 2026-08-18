@@ -4,15 +4,16 @@
   "dependencies": [
     "T219"
   ],
-  "wave": 8,
+  "wave": 9,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:tower-lifecycle"
+    "cd cocos-client && node --experimental-strip-types tools/test-tower-lifecycle.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/pve/tower/lifecycle/"
+    "cocos-client/assets/scripts/pve/tower/lifecycle/",
+    "cocos-client/tools/test-tower-lifecycle.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

@@ -12,7 +12,7 @@
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run verify:production-performance",
+    "cd cocos-client && node --experimental-strip-types tools/verify-production-performance.mjs",
     "cd cocos-client && npm run validate:a0"
   ],
   "allowed_paths": [

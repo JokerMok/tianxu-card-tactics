@@ -9,11 +9,12 @@
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:battle-effects-audio"
+    "cd cocos-client && node --experimental-strip-types tools/test-battle-effects-audio.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/resources/art/battle/effects/",
-    "cocos-client/assets/resources/art/battle/audio/"
+    "cocos-client/assets/resources/art/battle/audio/",
+    "cocos-client/tools/test-battle-effects-audio.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

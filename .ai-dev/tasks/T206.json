@@ -4,17 +4,18 @@
   "dependencies": [
     "T204"
   ],
-  "wave": 4,
+  "wave": 5,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:chapter-objectives",
+    "cd cocos-client && node --experimental-strip-types tools/test-chapter-objectives.mjs",
     "cd cocos-client && npm run test:battle-runner"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/core/outcome/objectives/",
-    "cocos-client/assets/scripts/battle/ui/objectives/"
+    "cocos-client/assets/scripts/battle/ui/objectives/",
+    "cocos-client/tools/test-chapter-objectives.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

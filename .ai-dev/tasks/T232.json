@@ -4,15 +4,16 @@
   "dependencies": [
     "T231"
   ],
-  "wave": 11,
+  "wave": 12,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:equipment-enhancement"
+    "cd cocos-client && node --experimental-strip-types tools/test-equipment-enhancement.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/equipment/enhancement/"
+    "cocos-client/assets/scripts/meta/equipment/enhancement/",
+    "cocos-client/tools/test-equipment-enhancement.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

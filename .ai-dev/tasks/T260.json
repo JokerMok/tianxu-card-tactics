@@ -4,16 +4,17 @@
   "dependencies": [
     "T259"
   ],
-  "wave": 15,
+  "wave": 16,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:config-hot-update"
+    "cd cocos-client && node --experimental-strip-types tools/test-config-hot-update.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/config-update/",
-    "backend/config-update/"
+    "backend/config-update/",
+    "cocos-client/tools/test-config-hot-update.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

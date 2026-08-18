@@ -5,16 +5,17 @@
     "T241",
     "T252"
   ],
-  "wave": 14,
+  "wave": 15,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:android-landscape-contract"
+    "cd cocos-client && node --experimental-strip-types tools/test-android-landscape-contract.mjs"
   ],
   "allowed_paths": [
     "cocos-client/build-templates/android/",
-    "cocos-client/assets/scripts/platform/android/"
+    "cocos-client/assets/scripts/platform/android/",
+    "cocos-client/tools/test-android-landscape-contract.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

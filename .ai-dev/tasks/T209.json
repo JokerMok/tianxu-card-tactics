@@ -9,10 +9,11 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:profile-stamina"
+    "cd cocos-client && node --experimental-strip-types tools/test-profile-stamina.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/profile/"
+    "cocos-client/assets/scripts/meta/profile/",
+    "cocos-client/tools/test-profile-stamina.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

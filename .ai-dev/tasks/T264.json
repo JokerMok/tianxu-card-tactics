@@ -4,16 +4,17 @@
   "dependencies": [
     "T259"
   ],
-  "wave": 15,
+  "wave": 16,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:privacy-compliance"
+    "cd cocos-client && node --experimental-strip-types tools/test-privacy-compliance.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/compliance/",
-    "documentation/legal/"
+    "documentation/legal/",
+    "cocos-client/tools/test-privacy-compliance.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

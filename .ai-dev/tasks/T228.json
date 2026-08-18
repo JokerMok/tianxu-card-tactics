@@ -4,15 +4,16 @@
   "dependencies": [
     "T226"
   ],
-  "wave": 11,
+  "wave": 12,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:card-dismantle"
+    "cd cocos-client && node --experimental-strip-types tools/test-card-dismantle.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/alchemy/dismantle/"
+    "cocos-client/assets/scripts/meta/alchemy/dismantle/",
+    "cocos-client/tools/test-card-dismantle.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

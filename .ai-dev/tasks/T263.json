@@ -5,16 +5,17 @@
     "T259",
     "T262"
   ],
-  "wave": 16,
+  "wave": 17,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:commerce-payment"
+    "cd cocos-client && node --experimental-strip-types tools/test-commerce-payment.mjs"
   ],
   "allowed_paths": [
     "cocos-client/assets/scripts/services/commerce/",
-    "backend/commerce/"
+    "backend/commerce/",
+    "cocos-client/tools/test-commerce-payment.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

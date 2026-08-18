@@ -12,15 +12,16 @@
     "T223",
     "T224"
   ],
-  "wave": 9,
+  "wave": 10,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:pve-reward-isolation"
+    "cd cocos-client && node --experimental-strip-types tools/test-pve-reward-isolation.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/tests/pve/reward-isolation/"
+    "cocos-client/assets/scripts/tests/pve/reward-isolation/",
+    "cocos-client/tools/test-pve-reward-isolation.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

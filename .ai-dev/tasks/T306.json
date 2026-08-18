@@ -1,0 +1,25 @@
+{
+  "id": "T306",
+  "source_task": "M7-04-HOME",
+  "dependencies": [
+    "T215",
+    "T244"
+  ],
+  "wave": 8,
+  "executor": "cloud",
+  "risk": "medium",
+  "status": "pending",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-meta-page-home.mjs"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/",
+    "cocos-client/tools/test-meta-page-home.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}

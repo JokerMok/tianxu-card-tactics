@@ -5,15 +5,16 @@
     "T212",
     "T225"
   ],
-  "wave": 10,
+  "wave": 11,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:equipment-inventory"
+    "cd cocos-client && node --experimental-strip-types tools/test-equipment-inventory.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/equipment/"
+    "cocos-client/assets/scripts/meta/equipment/",
+    "cocos-client/tools/test-equipment-inventory.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

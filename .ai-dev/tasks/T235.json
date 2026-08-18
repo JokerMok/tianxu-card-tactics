@@ -4,15 +4,16 @@
   "dependencies": [
     "T234"
   ],
-  "wave": 11,
+  "wave": 12,
   "executor": "cloud",
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:tax-research"
+    "cd cocos-client && node --experimental-strip-types tools/test-tax-research.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/buildings/tax-research/"
+    "cocos-client/assets/scripts/meta/buildings/tax-research/",
+    "cocos-client/tools/test-tax-research.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

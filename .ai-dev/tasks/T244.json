@@ -9,10 +9,11 @@
   "risk": "medium",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:meta-shell"
+    "cd cocos-client && node --experimental-strip-types tools/test-meta-shell.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/meta/ui/shell/"
+    "cocos-client/assets/scripts/meta/ui/shell/",
+    "cocos-client/tools/test-meta-shell.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",

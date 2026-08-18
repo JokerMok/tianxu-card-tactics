@@ -18,15 +18,16 @@
     "T239",
     "T240"
   ],
-  "wave": 13,
+  "wave": 14,
   "executor": "cloud",
   "risk": "high",
   "status": "pending",
   "verification_commands": [
-    "cd cocos-client && npm run test:economy-30d"
+    "cd cocos-client && node --experimental-strip-types tools/test-economy-30d.mjs"
   ],
   "allowed_paths": [
-    "cocos-client/assets/scripts/simulation/economy/"
+    "cocos-client/assets/scripts/simulation/economy/",
+    "cocos-client/tools/test-economy-30d.mjs"
   ],
   "excluded_snapshot_paths": [
     "web-prototype/node_modules/",
