@@ -38,7 +38,7 @@ const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
 const units = JSON.parse(fs.readFileSync(unitsPath, 'utf8'));
 const skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
 const enumCoverage = JSON.parse(fs.readFileSync(enumFixturePath, 'utf8'));
-const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const chapterLevelIds = new Set([levelConfig.chapterLevels[0].id, levelConfig.chapterLevels[0].prerequisiteLevelId].filter(Boolean));
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
   chapterLevelIds,
