@@ -41,11 +41,15 @@ const units = readJson(unitsPath);
 const skills = readJson(skillsPath);
 const story = readText(storyPath);
 const sceneDoc = readText(sceneDocPath);
+const enumCoverage = readJson(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
 const unitIds = new Set(units.units.map(({ id }) => id));
+const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const sceneTargetIds = new Set([...sceneDoc.matchAll(/^###\s+(E\d+)\b/gmu)].map((match) => match[1]));
+const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
-  chapterLevelIds: new Set(['L01', 'L02']),
-  targetIds: new Set([...unitIds, 'E102']),
+  chapterLevelIds,
+  targetIds: new Set([...unitIds, ...sceneTargetIds]),
   unitIds,
   skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
   cards: new Map(cards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
@@ -54,9 +58,9 @@ const references = {
     ...(card.unitId ? { unitId: card.unitId } : {}),
     ...(card.skillId ? { skillId: card.skillId } : {}),
   }])),
-  unlockIds: new Set(['OUTPOST']),
-  chestIds: new Set(['CHAPTER-CHEST']),
-  flagIds: new Set(['OUTCAST-CAMP']),
+  unlockIds: rewardIds('UNLOCK'),
+  chestIds: rewardIds('CHEST'),
+  flagIds: rewardIds('FLAG'),
 };
 const deck = decks.decks.find(({ id }) => id === 'D001');
 const deckCardIds = new Set(deck.cardEntries.map(({ cardId }) => cardId));
@@ -86,6 +90,20 @@ assert.equal(cardIds.has('U002'), true, 'the L02 reward must reference the exist
 assert.equal(deckCardIds.has('U001'), true, 'D001 must contain the frontline teaching card U001');
 assert.equal(deckCardIds.has('U004'), true, 'D001 must contain the ranged teaching card U004');
 assert.equal(level.chapterLevels[0].battleRules.forbiddenSceneTargetActions[0].targetId, 'E102');
+function assertL02BattleRules(rules) {
+  assert.deepEqual(rules.enemyDeploymentOrder.map(({ phase }) => phase), [1, 2]);
+  assert.deepEqual(rules.enemyDeploymentOrder.map(({ kind }) => kind), ['BASIC_MELEE', 'RANGED']);
+  for (const entry of rules.enemyDeploymentOrder) {
+    assert.equal(cardIds.has(entry.cardId), true);
+    assert.equal(unitIds.has(entry.unitId), true);
+  }
+  assert.equal(rules.combatPreview.counterMultiplier, 1.25);
+  assert.equal(rules.combatPreview.showDamageBreakdown, true);
+  assert.deepEqual(rules.forbiddenSceneTargetActions, [{ targetId: 'E102', action: 'AREA_FIRE' }]);
+  assert.equal(sceneTargetIds.has(rules.forbiddenSceneTargetActions[0].targetId), true);
+}
+assertL02BattleRules(level.chapterLevels[0].battleRules);
+assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, combatPreview: { counterMultiplier: 1, showDamageBreakdown: true } }));
 assert.match(story, /### 4\.2 1-2 烽台失名/);
 assert.match(story, /敌方先部署轻装役兵，再部署远射单位/);
 assert.match(story, /折锋枪兵军契×4/);
