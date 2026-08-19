@@ -122,26 +122,26 @@ export class DropRewardService {
     if (this.current.processedRewardKeys.includes(businessKey)) return this.result(false, 'DUPLICATE');
     if (this.committing) return this.result(false, 'REENTRANT');
 
-    const pool = this.pools.get(poolId);
-    if (pool === undefined) throw new Error(`unknown drop pool: ${poolId}`);
-    const poolState = this.current.dropPools[poolId];
-    if (poolState === undefined) throw new Error(`missing drop pool progress: ${poolId}`);
-    const resolution = resolveDrop(pool, poolState, this.rng);
-    if (resolution.code === 'LIMIT_REACHED') return this.result(false, 'LIMIT_REACHED');
-
-    const next: DropRewardState = {
-      resources: grantResources(this.current.resources, resolution.reward.rewards),
-      processedRewardKeys: [...this.current.processedRewardKeys, businessKey],
-      dropPools: { ...this.current.dropPools, [poolId]: resolution.nextState },
-    };
     this.committing = true;
     try {
+      const pool = this.pools.get(poolId);
+      if (pool === undefined) throw new Error(`unknown drop pool: ${poolId}`);
+      const poolState = this.current.dropPools[poolId];
+      if (poolState === undefined) throw new Error(`missing drop pool progress: ${poolId}`);
+      const resolution = resolveDrop(pool, poolState, this.rng);
+      if (resolution.code === 'LIMIT_REACHED') return this.result(false, 'LIMIT_REACHED');
+
+      const next: DropRewardState = {
+        resources: grantResources(this.current.resources, resolution.reward.rewards),
+        processedRewardKeys: [...this.current.processedRewardKeys, businessKey],
+        dropPools: { ...this.current.dropPools, [poolId]: resolution.nextState },
+      };
       this.persist(copyState(next));
+      this.current = next;
+      return this.result(true, 'APPLIED');
     } finally {
       this.committing = false;
     }
-    this.current = next;
-    return this.result(true, 'APPLIED');
   }
 
   private result(applied: boolean, code: DropClaimCode): DropClaimResult {

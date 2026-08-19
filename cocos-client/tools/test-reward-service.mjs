@@ -82,6 +82,45 @@ assert.equal(saveAttempts, 2);
 assert.deepEqual(rollback.snapshot().resources, { gold: 100, essence: 0 });
 assert.deepEqual(rollback.snapshot().processedRewardKeys, ['drop:stage:N001:rollback']);
 
+const rngReentrantPool = { ...pool, maxClaims: 2 };
+const rngReentrantState = {
+  resources: { gold: 0, essence: 0 },
+  processedRewardKeys: [],
+  dropPools: {
+    [rngReentrantPool.id]: { claims: 1, firstClearClaimed: true, rareMisses: 0 },
+  },
+};
+let rngReentrantService;
+let rngReentrantResult;
+let rngReentrantCalls = 0;
+const rngReentrantSaved = [];
+rngReentrantService = new DropRewardService(
+  rngReentrantState,
+  [rngReentrantPool],
+  () => {
+    if (rngReentrantCalls === 0) {
+      rngReentrantResult = rngReentrantService.claim('drop:stage:N001:rng-inner', rngReentrantPool.id);
+    }
+    rngReentrantCalls += 1;
+    return 0;
+  },
+  (next) => rngReentrantSaved.push(next),
+);
+const rngOuter = rngReentrantService.claim('drop:stage:N001:rng-outer', rngReentrantPool.id);
+assert.equal(rngOuter.code, 'APPLIED');
+assert.equal(rngReentrantResult.code, 'REENTRANT', 'RNG must not synchronously re-enter reward settlement');
+assert.equal(rngReentrantSaved.length, 1, 'RNG re-entry must not persist a second claim');
+assert.deepEqual(rngReentrantService.snapshot(), {
+  resources: { gold: 10, essence: 0 },
+  processedRewardKeys: ['drop:stage:N001:rng-outer'],
+  dropPools: { [rngReentrantPool.id]: { claims: 2, firstClearClaimed: true, rareMisses: 1 } },
+});
+assert.equal(
+  rngReentrantService.claim('drop:stage:N001:rng-limit', rngReentrantPool.id).code,
+  'LIMIT_REACHED',
+  'the RNG re-entry guard must release after the outer claim',
+);
+
 const reloaded = new DropRewardService(saved.at(-1), config.pools, () => {
   throw new Error('a reloaded duplicate must not roll RNG');
 }, () => {
