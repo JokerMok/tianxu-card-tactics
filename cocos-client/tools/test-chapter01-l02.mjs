@@ -10,6 +10,7 @@ const manifestPath = path.join(configRoot, 'manifest.json');
 const decksPath = path.join(configRoot, 'decks.json');
 const cardsPath = path.join(configRoot, 'cards.json');
 const unitsPath = path.join(configRoot, 'units.json');
+const skillsPath = path.join(configRoot, 'skills.json');
 const storyPath = path.resolve(root, '../首章剧情关卡-v1.1.md');
 const sceneDocPath = path.resolve(root, '../场景战场UI特效生图提示词库-v1.2.md');
 
@@ -37,15 +38,31 @@ const manifest = readJson(manifestPath);
 const decks = readJson(decksPath);
 const cards = readJson(cardsPath);
 const units = readJson(unitsPath);
+const skills = readJson(skillsPath);
 const story = readText(storyPath);
 const sceneDoc = readText(sceneDocPath);
 const cardIds = new Set(cards.cards.map(({ id }) => id));
 const unitIds = new Set(units.units.map(({ id }) => id));
+const references = {
+  chapterLevelIds: new Set(['L01', 'L02']),
+  targetIds: new Set([...unitIds, 'E102']),
+  unitIds,
+  skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
+  cards: new Map(cards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
+    cardType: card.cardType,
+    copyLimit: card.copyLimit,
+    ...(card.unitId ? { unitId: card.unitId } : {}),
+    ...(card.skillId ? { skillId: card.skillId } : {}),
+  }])),
+  unlockIds: new Set(['OUTPOST']),
+  chestIds: new Set(['CHAPTER-CHEST']),
+  flagIds: new Set(['OUTCAST-CAMP']),
+};
 const deck = decks.decks.find(({ id }) => id === 'D001');
 const deckCardIds = new Set(deck.cardEntries.map(({ cardId }) => cardId));
 
 assert.doesNotThrow(
-  () => assertChapterLevelContract(level, manifest, decks),
+  () => assertChapterLevelContract(level, manifest, decks, references),
   'the real L02 file must satisfy the shared chapter-level contract',
 );
 assert.deepEqual(level.chapterLevels, [{
@@ -53,20 +70,22 @@ assert.deepEqual(level.chapterLevels, [{
   prerequisiteLevelId: 'L01',
   enemyDeckId: 'D001',
   environmentElement: 'NONE',
-  objectives: [
-    { type: 'DESTROY_TARGET', targetId: 'U013' },
-    { type: 'PROTECT_TARGET', targetId: 'E102' },
-  ],
+  objectives: [{ type: 'DEFEAT_ENEMY_HERO' }],
   rewards: [{ type: 'CARD', id: 'U002', quantity: 4 }],
-  failureConditions: [
-    { type: 'PLAYER_HERO_DEFEATED' },
-    { type: 'TARGET_DESTROYED', targetId: 'E102' },
-  ],
+  failureConditions: [{ type: 'PLAYER_HERO_DEFEATED' }],
+  battleRules: {
+    enemyDeploymentOrder: [
+      { phase: 1, kind: 'BASIC_MELEE', cardId: 'U001', unitId: 'U001' },
+      { phase: 2, kind: 'RANGED', cardId: 'U004', unitId: 'U004' },
+    ],
+    combatPreview: { counterMultiplier: 1.25, showDamageBreakdown: true },
+    forbiddenSceneTargetActions: [{ targetId: 'E102', action: 'AREA_FIRE' }],
+  },
 }], 'L02 must retain the frozen field values');
 assert.equal(cardIds.has('U002'), true, 'the L02 reward must reference the existing U002 card');
-assert.equal(unitIds.has('U013'), true, 'the L02 command target must reference the existing U013 unit');
 assert.equal(deckCardIds.has('U001'), true, 'D001 must contain the frontline teaching card U001');
 assert.equal(deckCardIds.has('U004'), true, 'D001 must contain the ranged teaching card U004');
+assert.equal(level.chapterLevels[0].battleRules.forbiddenSceneTargetActions[0].targetId, 'E102');
 assert.match(story, /### 4\.2 1-2 烽台失名/);
 assert.match(story, /敌方先部署轻装役兵，再部署远射单位/);
 assert.match(story, /折锋枪兵军契×4/);
@@ -75,7 +94,7 @@ assert.match(sceneDoc, /### E102 烽台失名/);
 function expectFailure(label, mutate, expectedPath) {
   const candidate = structuredClone(level);
   mutate(candidate);
-  assert.throws(() => assertChapterLevelContract(candidate, manifest, decks), (error) => {
+  assert.throws(() => assertChapterLevelContract(candidate, manifest, decks, references), (error) => {
     assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
     return true;
