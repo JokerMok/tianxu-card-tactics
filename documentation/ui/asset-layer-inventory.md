@@ -4,7 +4,7 @@
 
 来源规则：当前没有可复用的独立层文件，`present` 层的 `assetPath` 定位到对应整屏视觉源图，`assetId` 保留为 `null`；`absent` 层不把场景元素冒充角色或资产，`assetPath` 与 `assetId` 均为 `null`。`runtime` 记录平台实际接入情况：Cocos 当前接入九张整屏 PNG，并记录 `.meta` UUID 与源图 SHA-256；React 原型没有对应的九页 Image2 UI 图像资产，路径、资源路径和 ID 均明确为 `null`。
 
-平台盘点：Cocos 的九张运行时图片均位于 `cocos-client/assets/resources/ui/image2`，并由 `GameShell` 以 `ui/image2/*/spriteFrame` 加载；React 当前仅有 `web-prototype/public/assets/commanders/player.webp` 与 `enemy.webp` 两张战斗原型角色图，不属于本清单的九页 UI 资产，不能替代缺失的页面图层。
+平台盘点：Cocos 的九张运行时图片均位于 `cocos-client/assets/resources/ui/image2`，并由 `GameShell` 以 `ui/image2/*/spriteFrame` 加载；React 当前仅有 `web-prototype/public/assets/commanders/player.webp` 与 `enemy.webp` 两张战斗原型角色图，不属于本清单的九页 UI 资产，不能替代缺失的页面图层。React 证据扫描仅覆盖 `web-prototype/src` 源码与 `web-prototype/public` 运行时资产；`web-prototype/artifacts` 下的离线参考截图不属于 React 运行时/源代码证据，不得触发 UI01–UI09 资产误报。
 
 ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DEC、9S、ICO、TXT、STA；验证器解析下列清单并校验全部 63 项。
 

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +10,8 @@ const repositoryRoot = path.resolve(path.dirname(documentPath), '../..');
 const sourceRoot = path.join(repositoryRoot, '美术素材/UI全界面/Image2-v1-1920');
 const gameShellPath = path.join(repositoryRoot, 'cocos-client/assets/scripts/meta/GameShell.ts');
 const reactRoot = path.join(repositoryRoot, 'web-prototype');
+const reactEvidenceDirectories = ['src', 'public'];
+const reactEvidencePrefixes = reactEvidenceDirectories.map((directory) => directory + '/');
 const canvas = { width: 1920, height: 1080 };
 const layers = ['背景', '角色', '装饰', '九宫格', '图标', '文字', '状态'];
 const layerCodes = { '背景': 'BG', '角色': 'CHR', '装饰': 'DEC', '九宫格': '9S', '图标': 'ICO', '文字': 'TXT', '状态': 'STA' };
@@ -73,10 +76,13 @@ async function readPngDimensions(filePath) {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
-async function findReactUiEvidence() {
+function isReactEvidencePath(relativePath) {
+  return reactEvidencePrefixes.some((prefix) => relativePath.startsWith(prefix));
+}
+
+async function findReactUiEvidence(scanRoot = reactRoot) {
   const evidence = [];
-  const roots = [reactRoot];
-  const sourceMarker = /Image2-v1-1920|UI0[1-9]-(?:主城|征战|卡库|编队|主将|历练|营造|任务|行囊)\.png|ui\/image2\/UI0[1-9]/;
+  const sourceMarker = /Image2-v1-1920|UI0[1-9]-(?:主城|征战|卡库|编队|主将|历练|营造|任务|行囊)\.png|ui\/image2\/UI0[1-9](?=$|[\/_-])|UI0[1-9](?:[-_][A-Za-z0-9][A-Za-z0-9_-]*)+\.(?:png|jpe?g|webp|svg)\b|(?:\b(?:const|let|var|function|class)\s+UI0[1-9]\b|\bUI0[1-9]\s*[:=]|\b(?:id|key|screen|screenId|asset|assetId|source|image|route)\s*[:=]\s*[\"'`]?UI0[1-9]\b)/i;
   async function walk(directory) {
     let entries;
     try {
@@ -87,19 +93,20 @@ async function findReactUiEvidence() {
     for (const entry of entries) {
       if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
       const fullPath = path.join(directory, entry.name);
-      const relativePath = path.relative(reactRoot, fullPath).split(path.sep).join('/');
+      const relativePath = path.relative(scanRoot, fullPath).split(path.sep).join('/');
       if (entry.isDirectory()) {
         await walk(fullPath);
         continue;
       }
-      if (/^UI0[1-9](?:[-_.]|$)/i.test(entry.name) || relativePath.includes('Image2-v1-1920')) evidence.push(relativePath);
+      const looksLikeUiAsset = /^UI0[1-9](?:[-_.]|$)/i.test(entry.name) || relativePath.includes('Image2-v1-1920');
+      if (isReactEvidencePath(relativePath) && looksLikeUiAsset) evidence.push(relativePath);
       if (/\.(?:css|html|js|jsx|json|md|ts|tsx)$/.test(entry.name)) {
         const content = await fs.readFile(fullPath, 'utf8');
-        if (sourceMarker.test(content)) evidence.push(relativePath + ' (reference)');
+        if (isReactEvidencePath(relativePath) && sourceMarker.test(content)) evidence.push(relativePath + ' (reference)');
       }
     }
   }
-  for (const root of roots) await walk(root);
+  for (const directory of reactEvidenceDirectories) await walk(path.join(scanRoot, directory));
   return [...new Set(evidence)];
 }
 
@@ -333,6 +340,8 @@ const markdown = await fs.readFile(documentPath, 'utf8');
 const inventory = inventoryFromMarkdown(markdown);
 const gameShellSource = await fs.readFile(gameShellPath, 'utf8');
 const reactUiEvidence = await findReactUiEvidence();
+assert.equal(isReactEvidencePath('src/components/BattleLayout.tsx'), true, 'React source UI references must remain in scan scope');
+assert.equal(isReactEvidencePath('public/assets/UI01-runtime.png'), true, 'React public runtime assets must remain in scan scope');
 await validateInventory(inventory, gameShellSource, reactUiEvidence);
 
 const negativeCases = [
@@ -364,6 +373,26 @@ const negativeCases = [
 ];
 for (const [label, mutate, expectedMessage] of negativeCases) {
   await expectInvalid(label, mutate, expectedMessage, inventory, gameShellSource, reactUiEvidence);
+}
+
+const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'asset-layer-inventory-'));
+try {
+  await fs.mkdir(path.join(fixtureRoot, 'artifacts'), { recursive: true });
+  await fs.mkdir(path.join(fixtureRoot, 'src'), { recursive: true });
+  await fs.mkdir(path.join(fixtureRoot, 'public'), { recursive: true });
+  await fs.writeFile(path.join(fixtureRoot, 'artifacts/UI01-BATTLE-LAYOUT-REFERENCE.png'), 'offline battle reference');
+  await fs.writeFile(path.join(fixtureRoot, 'artifacts/UI01-SURRENDER-CONFIRM.png'), 'offline surrender reference');
+  await fs.writeFile(path.join(fixtureRoot, 'src/App.jsx'), "const battleReference = 'UI01-BATTLE-LAYOUT-REFERENCE.png';\n");
+  await fs.writeFile(path.join(fixtureRoot, 'public/ui-state.js'), "export const screenId = 'UI01';\n");
+  await fs.writeFile(path.join(fixtureRoot, 'src/unrelated.md'), 'UI01 is an ordinary label, not a source reference.\n');
+
+  const fixtureEvidence = await findReactUiEvidence(fixtureRoot);
+  assert.equal(fixtureEvidence.some((entry) => entry.startsWith('artifacts/')), false, 'offline artifacts must not be scanned');
+  assert.equal(fixtureEvidence.includes('src/App.jsx (reference)'), true, 'UI01 filename reference must be captured');
+  assert.equal(fixtureEvidence.includes('public/ui-state.js (reference)'), true, 'UI01 identifier reference must be captured');
+  assert.equal(fixtureEvidence.includes('src/unrelated.md (reference)'), false, 'ordinary UI01 text must not be evidence');
+} finally {
+  await fs.rm(fixtureRoot, { recursive: true, force: true });
 }
 
 const layerCount = inventory.screens.reduce((count, screen) => count + screen.layers.length, 0);
