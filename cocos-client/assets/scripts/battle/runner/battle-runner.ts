@@ -8,6 +8,16 @@ import { createCardState, type CardState } from '../../core/cards/index.ts';
 import { enqueue, event, type EventQueue } from '../../core/events/index.ts';
 import { moveUnit } from '../../core/movement/index.ts';
 import { resolveOutcome, type OutcomeResult } from '../../core/outcome/index.ts';
+import {
+  createProfessionState,
+  professionEffectFor,
+  triggerBattleStart,
+  triggerDamageOverTime,
+  triggerDeploy,
+  triggerSpell,
+  type Profession,
+  type ProfessionState,
+} from '../../core/professions/index.ts';
 import { chooseSeeded, type RngState } from '../../core/rng/index.ts';
 import { createBattleState, updateBattleState, type BattleEvent, type BattleState, type Side, type Unit } from '../../core/types/index.ts';
 import type { BattlePlayCardAction, BattleTarget } from '../action-contract.ts';
@@ -21,6 +31,7 @@ interface BattleRunnerInput {
   readonly protocol: typeof BATTLE_RUNNER_PROTOCOL;
   readonly seed: number;
   readonly actions: readonly HighLevelAction[];
+  readonly professionId?: string;
 }
 
 export type HighLevelAction =
@@ -29,7 +40,26 @@ export type HighLevelAction =
   | BattlePlayCardAction
   | { readonly type: 'MOVE_UNIT'; readonly unitId: string; readonly steps?: number }
   | { readonly type: 'ATTACK'; readonly attackerId: string }
+  | { readonly type: 'APPLY_DOT'; readonly side: Side; readonly targetIds: readonly string[]; readonly amount: number }
   | { readonly type: 'END_TURN' };
+
+interface ProfessionConfig {
+  readonly id: string;
+  readonly skillIds: readonly string[];
+  readonly enabled?: boolean;
+}
+
+interface ProfessionRuntimeState extends ProfessionState {
+  readonly professionId: string;
+  readonly barrierByUnit: Readonly<Record<string, number>>;
+  readonly spellResistanceIgnore: number;
+  readonly dotDamageReduction: number;
+  readonly dotDamageReduced: number;
+  readonly preparationReduction: number;
+  readonly preparationReductionByCard: Readonly<Record<string, number>>;
+}
+
+type RunnerBattleState = BattleState & { readonly professionState?: ProfessionRuntimeState };
 
 export interface BattleRunnerOutput {
   readonly protocol: typeof BATTLE_RUNNER_PROTOCOL;
@@ -37,7 +67,7 @@ export interface BattleRunnerOutput {
   readonly runner: typeof BATTLE_RUNNER;
   readonly seed: number;
   readonly actionCount: number;
-  readonly finalState: BattleState;
+  readonly finalState: RunnerBattleState;
   readonly events: readonly BattleEvent[];
   readonly rngCursor: number;
   readonly outcome: OutcomeResult;
@@ -97,7 +127,7 @@ interface ParityBattleRunnerOutput {
   readonly seed: number;
   readonly fixtureVersion: 2;
   readonly actionCount: number;
-  readonly finalState: BattleState;
+  readonly finalState: RunnerBattleState;
   readonly events: readonly BattleEvent[];
   readonly lifecycleEvents: readonly BattleEvent[];
   readonly rngCursor: number;
@@ -116,6 +146,7 @@ interface CardConfig {
   readonly prepare: number;
   readonly unitId?: string;
   readonly skillId?: string;
+  readonly profession?: string;
   readonly nameKey?: string;
   readonly tags?: readonly string[];
   readonly copyLimit?: number;
@@ -146,15 +177,16 @@ interface AuthorityConfig {
   readonly cards: readonly CardConfig[];
   readonly skills: readonly SkillConfig[];
   readonly units: readonly UnitConfig[];
+  readonly professions: readonly ProfessionConfig[];
   readonly deck: readonly string[];
   readonly prepareByCardId: Readonly<Record<string, number>>;
 }
 
 const STATE_REHYDRATION_FIELDS = new Set([
   'finalState', 'events', 'heroHp', 'heroMaxHp', 'units', 'decks', 'hands', 'graveyards',
-  'rngCursor', 'rngState', 'outcome', 'status', 'playedCards', 'nextId', 'nextEventId',
+  'rngCursor', 'rngState', 'outcome', 'status', 'playedCards', 'nextId', 'nextEventId', 'professionState',
 ]);
-const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'PLAY_CARD', 'MOVE_UNIT', 'ATTACK', 'END_TURN']);
+const ACTION_TYPES = new Set(['BATTLE_START', 'DEPLOY_UNIT', 'PLAY_CARD', 'MOVE_UNIT', 'ATTACK', 'APPLY_DOT', 'END_TURN']);
 const SIDES: readonly Side[] = ['player', 'enemy'];
 const OTHER_SIDE: Readonly<Record<Side, Side>> = Object.freeze({ player: 'enemy', enemy: 'player' });
 const HERO_MAX_HP = 30;
@@ -201,6 +233,7 @@ function loadAuthority(): AuthorityConfig {
   const cardsTable = readJson<{ cards: readonly CardConfig[] }>(configRoot, 'cards.json');
   const skillsTable = readJson<{ skills: readonly SkillConfig[] }>(configRoot, 'skills.json');
   const unitsTable = readJson<{ units: readonly UnitConfig[] }>(configRoot, 'units.json');
+  const professionsTable = readJson<{ professions: readonly ProfessionConfig[] }>(configRoot, 'professions.json');
   const decksTable = readJson<{ decks: readonly { id: string; cardEntries: readonly { cardId: string; count: number }[] }[] }>(configRoot, 'decks.json');
   const deckConfig = decksTable.decks.find((deck) => deck.id === 'D001') ?? decksTable.decks[0];
   if (!deckConfig) throw new Error('authoritative deck D001 is missing');
@@ -208,6 +241,23 @@ function loadAuthority(): AuthorityConfig {
   const units = unitsTable.units.filter((unit) => unit.enabled !== false);
   const cardsById = new Map(cards.map((card) => [card.id, card]));
   const unitsById = new Map(units.map((unit) => [unit.id, unit]));
+  const professions = professionsTable.professions.filter((profession) => profession.enabled !== false);
+  if (professions.length !== 4 || new Set(professions.map((profession) => profession.id)).size !== 4
+    || !['P001', 'P002', 'P003', 'P004'].every((id) => professions.some((profession) => profession.id === id))) {
+    throw new Error('authoritative four professions are missing');
+  }
+  for (const profession of professions) {
+    if (!/^P00[1-4]$/.test(profession.id) || profession.skillIds.length === 0 || new Set(profession.skillIds).size !== profession.skillIds.length) {
+      throw new Error(`authoritative profession is invalid: ${profession.id}`);
+    }
+    for (const skillId of profession.skillIds) {
+      const skillCard = cardsById.get(skillId);
+      const skill = skillsTable.skills.find((candidate) => candidate.id === skillId && candidate.enabled !== false);
+      if (!skillCard || skillCard.cardType !== 'SKILL' || skillCard.skillId !== skillId || !skill) {
+        throw new Error(`authoritative profession skill is invalid: ${profession.id}/${skillId}`);
+      }
+    }
+  }
   const deck = deckConfig.cardEntries.flatMap((entry) => Array.from({ length: entry.count }, () => entry.cardId));
   for (const cardId of deck) {
     const card = cardsById.get(cardId);
@@ -218,6 +268,7 @@ function loadAuthority(): AuthorityConfig {
     cards,
     skills: skillsTable.skills.filter((skill) => skill.enabled !== false),
     units,
+    professions,
     deck,
     prepareByCardId: Object.fromEntries(cards.map((card) => [card.id, card.prepare])),
   };
@@ -302,6 +353,15 @@ function parseAction(value: unknown, index: number): HighLevelAction {
     }
     return value as unknown as HighLevelAction;
   }
+  if (value.type === 'APPLY_DOT') {
+    exactKeys(value, ['type', 'side', 'targetIds', 'amount'], label, 'INVALID_COMMAND');
+    if (typeof value.side !== 'string' || !isUnknownArray(value.targetIds) || value.targetIds.length === 0
+      || !value.targetIds.every((targetId) => typeof targetId === 'string' && targetId.length > 0)
+      || new Set(value.targetIds).size !== value.targetIds.length || !isSafeInteger(value.amount) || value.amount <= 0) {
+      throw new RunnerInputError('INVALID_COMMAND', `${label} APPLY_DOT requires a side, unique targetIds and a positive integer amount`);
+    }
+    return value as unknown as HighLevelAction;
+  }
   exactKeys(value, ['type', 'attackerId'], label, 'INVALID_COMMAND');
   if (typeof value.attackerId !== 'string') throw new RunnerInputError('INVALID_COMMAND', `${label}.attackerId must be a string`);
   return value as unknown as HighLevelAction;
@@ -311,14 +371,25 @@ function parseInput(value: unknown): BattleRunnerInput {
   if (!isRecord(value)) throw new RunnerInputError('INVALID_INPUT', 'input must be a JSON object');
   const rootForbidden = Object.keys(value).find((key) => STATE_REHYDRATION_FIELDS.has(key));
   if (rootForbidden) throw new RunnerInputError('STATE_REHYDRATION_FORBIDDEN', `input.${rootForbidden} is forbidden; runner state is seed-derived`);
-  exactKeys(value, ['protocol', 'seed', 'actions'], 'input', 'INVALID_INPUT');
+  const allowedKeys = !Object.hasOwn(value, 'professionId')
+    ? ['protocol', 'seed', 'actions']
+    : ['protocol', 'seed', 'actions', 'professionId'];
+  exactKeys(value, allowedKeys, 'input', 'INVALID_INPUT');
   if (value.protocol !== BATTLE_RUNNER_PROTOCOL) throw new RunnerInputError('INVALID_INPUT', `input.protocol must be ${BATTLE_RUNNER_PROTOCOL}`);
   const seed = value.seed;
   if (!isSafeInteger(seed)) throw new RunnerInputError('INVALID_INPUT', 'input.seed must be a safe integer');
+  if (value.professionId !== undefined && (typeof value.professionId !== 'string' || !AUTHORITY.professions.some((profession) => profession.id === value.professionId))) {
+    throw new RunnerInputError('INVALID_INPUT', `input.professionId is not an authoritative profession: ${String(value.professionId)}`);
+  }
   const rawActions = value.actions;
   if (!isUnknownArray(rawActions)) throw new RunnerInputError('INVALID_INPUT', 'input.actions must be an array');
   const actions: HighLevelAction[] = rawActions.map((action, index) => parseAction(action, index));
-  return { protocol: BATTLE_RUNNER_PROTOCOL, seed, actions };
+  return {
+    protocol: BATTLE_RUNNER_PROTOCOL,
+    seed,
+    actions,
+    ...(value.professionId === undefined ? {} : { professionId: value.professionId as string }),
+  };
 }
 
 function validateFixtureDeck(deck: readonly string[], side: Side, cards: readonly ParityCardMapping[]): void {
@@ -477,16 +548,99 @@ function skillConfig(cardId: string): { readonly card: CardConfig; readonly skil
   throw new RunnerInputError('INVALID_COMMAND', `skill target type is not supported by PLAY_CARD: ${skill.targetType}`);
 }
 
+const PROFESSION_BY_ID: Readonly<Record<string, Profession>> = Object.freeze({
+  P001: 'COMMANDER',
+  P002: 'ARCANIST',
+  P003: 'COVENANT',
+  P004: 'TACTICIAN',
+});
+
+function professionConfig(professionId: string): { readonly config: ProfessionConfig; readonly profession: Profession } {
+  const profession = PROFESSION_BY_ID[professionId];
+  const config = AUTHORITY.professions.find((candidate) => candidate.id === professionId);
+  if (!profession || !config) throw new RunnerInputError('INVALID_INPUT', `professionId is not authoritative: ${professionId}`);
+  return { config, profession };
+}
+
+function professionDeck(professionId: string): readonly string[] {
+  const { config } = professionConfig(professionId);
+  const skillIds = config.skillIds.map((skillId) => {
+    const card = AUTHORITY.cards.find((candidate) => candidate.id === skillId);
+    const skill = AUTHORITY.skills.find((candidate) => candidate.id === skillId);
+    if (!card || card.cardType !== 'SKILL' || card.skillId !== skillId || !skill) {
+      throw new Error(`profession ${professionId} references a non-authoritative skill: ${skillId}`);
+    }
+    return card.id;
+  });
+  const requiredUnits = 30 - skillIds.length;
+  const unitIds: string[] = [];
+  for (const card of AUTHORITY.cards) {
+    if (card.cardType !== 'UNIT' || card.profession !== undefined && card.profession !== 'NONE') continue;
+    const copyLimit = card.copyLimit ?? 1;
+    const copies = Math.min(copyLimit, requiredUnits - unitIds.length);
+    for (let index = 0; index < copies; index += 1) unitIds.push(card.id);
+    if (unitIds.length === requiredUnits) break;
+  }
+  if (unitIds.length !== requiredUnits) throw new Error(`profession ${professionId} cannot build an authoritative 30-card deck`);
+  return [...unitIds, ...skillIds];
+}
+
+function createRuntimeProfessionState(professionId: string): ProfessionRuntimeState {
+  const { profession } = professionConfig(professionId);
+  const state = createProfessionState(profession);
+  return {
+    ...state,
+    professionId,
+    barrierByUnit: {},
+    spellResistanceIgnore: 0,
+    dotDamageReduction: 0,
+    dotDamageReduced: 0,
+    preparationReduction: 0,
+    preparationReductionByCard: {},
+  };
+}
+
+function coreProfessionState(state: ProfessionRuntimeState): ProfessionState {
+  return {
+    profession: state.profession,
+    logs: state.logs,
+    laneTriggers: state.laneTriggers,
+    roundTriggers: state.roundTriggers,
+    actionTriggers: state.actionTriggers,
+  };
+}
+
+function mergeTraitState(state: ProfessionRuntimeState, result: ReturnType<typeof triggerDeploy>): ProfessionRuntimeState {
+  return {
+    ...state,
+    logs: result.state.logs,
+    laneTriggers: result.state.laneTriggers,
+    roundTriggers: result.state.roundTriggers,
+    actionTriggers: result.state.actionTriggers,
+  };
+}
+
+function effectValue(effectIds: readonly string[], operation: 'APPLY_BARRIER' | 'IGNORE_SPELL_RESIST' | 'REDUCE_DOT_DAMAGE' | 'REDUCE_PREPARATION'): number {
+  const effect = effectIds.map((effectId) => professionEffectFor(effectId)).find((candidate) => candidate.operation === operation);
+  if (!effect) throw new Error(`profession effect operation is missing: ${operation}`);
+  return effect.value;
+}
+
 function initialState(
   seed: number,
   decks: Readonly<Record<Side, readonly string[]>> = { player: AUTHORITY.deck, enemy: AUTHORITY.deck },
   parity = false,
-): BattleState {
-  const cards: CardState = createCardState({ seed, decks, prepareByCardId: AUTHORITY.prepareByCardId });
+  professionId?: string,
+): RunnerBattleState {
+  const runtimeDecks = professionId
+    ? { player: professionDeck(professionId), enemy: decks.enemy }
+    : decks;
+  const cards: CardState = createCardState({ seed, decks: runtimeDecks, prepareByCardId: AUTHORITY.prepareByCardId });
   const initiative = parity
     ? { value: seed % 2 === 0 ? 'player' as const : 'enemy' as const, state: cards.rng }
     : chooseSeeded(cards.rng, SIDES);
   const rng: RngState = initiative.state;
+  const runtimeProfession = professionId ? createRuntimeProfessionState(professionId) : undefined;
   return createBattleState({
     revision: 0,
     seed,
@@ -510,10 +664,11 @@ function initialState(
     status: 'playing',
     nextId: parity ? cards.nextId : 1,
     nextEventId: 1,
-  });
+    ...(runtimeProfession ? { professionState: runtimeProfession } : {}),
+  } as unknown as Parameters<typeof createBattleState>[0]) as RunnerBattleState;
 }
 
-function update(state: BattleState, patch: Partial<BattleState>): BattleState {
+function update(state: RunnerBattleState, patch: Partial<RunnerBattleState>): RunnerBattleState {
   if (NEUTRAL_RUNTIME_STATES.has(state)) {
     if (Object.keys(patch).length === 0) return state;
     const next = { ...state, ...patch, revision: state.revision + 1 };
@@ -521,21 +676,62 @@ function update(state: BattleState, patch: Partial<BattleState>): BattleState {
     NEUTRAL_RUNTIME_STATES.add(next);
     return next;
   }
-  return updateBattleState(state, patch);
+  return updateBattleState(state, patch as Partial<BattleState>) as RunnerBattleState;
 }
 
-function emit(state: BattleState, type: string, side: Side, payload: Readonly<Record<string, unknown>> = {}): BattleState {
+function emit(state: RunnerBattleState, type: string, side: Side, payload: Readonly<Record<string, unknown>> = {}): RunnerBattleState {
   const queue: EventQueue = { nextEventId: state.nextEventId, events: state.events };
   const next = enqueue(queue, { ...event(type, side, payload), round: state.round, turn: state.turn, activeSide: state.activeSide, rngCursor: state.rngCursor });
   return update(state, { events: next.events, nextEventId: next.nextEventId });
 }
 
-function ensureStarted(state: BattleState): void {
+function ensureStarted(state: RunnerBattleState): void {
   if (state.round === 0) throw new RunnerInputError('INVALID_COMMAND', 'battle must start before this action');
   if (state.status !== 'playing') throw new RunnerInputError('INVALID_COMMAND', 'battle has already settled');
 }
 
-function startBattle(state: BattleState): BattleState {
+function applyBattleStartProfession(state: RunnerBattleState): RunnerBattleState {
+  const professionState = state.professionState;
+  if (!professionState) return state;
+  const result = triggerBattleStart(coreProfessionState(professionState), state.hands.player, state.round);
+  if (!result.triggered) return state;
+  const targetId = result.objectIds[0];
+  const target = state.hands.player.find((card) => card.instanceId === targetId);
+  const targetConfig = target && AUTHORITY.cards.find((card) => card.id === target.cardId);
+  if (!target || !targetConfig || targetConfig.cardType !== 'UNIT') {
+    throw new RunnerInputError('INVALID_COMMAND', 'TACTICIAN selected a non-authoritative unit card');
+  }
+  const reduction = effectValue(result.effectIds, 'REDUCE_PREPARATION');
+  const after = Math.max(0, target.remainingPreparation - reduction);
+  const hands = {
+    ...state.hands,
+    player: state.hands.player.map((card) => card.instanceId === target.instanceId
+      ? { ...card, remainingPreparation: after }
+      : card),
+  };
+  const nextProfessionState = mergeTraitState(professionState, result);
+  const next = update(state, {
+    hands,
+    professionState: {
+      ...nextProfessionState,
+      preparationReduction: nextProfessionState.preparationReduction + (target.remainingPreparation - after),
+      preparationReductionByCard: {
+        ...nextProfessionState.preparationReductionByCard,
+        [target.instanceId]: (nextProfessionState.preparationReductionByCard[target.instanceId] ?? 0) + (target.remainingPreparation - after),
+      },
+    },
+  });
+  return emit(next, 'PROFESSION_TRAIT_APPLIED', 'player', {
+    professionId: professionState.professionId,
+    traitId: result.state.logs[result.state.logs.length - 1].traitId,
+    operation: 'REDUCE_PREPARATION',
+    targetId: target.instanceId,
+    before: target.remainingPreparation,
+    after,
+  });
+}
+
+function startBattle(state: RunnerBattleState): RunnerBattleState {
   if (state.round !== 0) throw new RunnerInputError('INVALID_COMMAND', 'BATTLE_START may only be issued once');
   let next = update(state, { round: 1, turn: 1, activeSide: state.openingInitiative });
   // T040 closes the real input loop at this lifecycle boundary: cards drawn
@@ -546,15 +742,92 @@ function startBattle(state: BattleState): BattleState {
   next = decrementPreparation(next, next.activeSide);
   next = emit(next, 'BATTLE_START', next.activeSide, { seed: next.seed });
   next = emit(next, 'ROUND_START', next.activeSide, { round: next.round });
-  return emit(next, 'TURN_START', next.activeSide, { turn: next.turn });
+  next = emit(next, 'TURN_START', next.activeSide, { turn: next.turn });
+  return applyBattleStartProfession(next);
+}
+
+function applyDeployProfession(state: RunnerBattleState, unitId: string, side: Side, lane: number, actionNumber: number): RunnerBattleState {
+  const professionState = state.professionState;
+  if (!professionState) return state;
+  const unit = state.units.find((candidate) => candidate.id === unitId);
+  if (!unit) throw new RunnerInputError('INVALID_COMMAND', `deployed unit does not exist: ${unitId}`);
+  const result = triggerDeploy(coreProfessionState(professionState), {
+    unit,
+    side,
+    lane,
+    round: state.round,
+    action: actionNumber,
+  });
+  if (!result.triggered) return state;
+  const barrier = effectValue(result.effectIds, 'APPLY_BARRIER');
+  const nextProfessionState = mergeTraitState(professionState, result);
+  const updatedUnit: Unit = {
+    ...unit,
+    statuses: [
+      ...unit.statuses,
+      {
+        id: `profession-barrier-${unit.id}`,
+        kind: 'BARRIER',
+        sourceId: 'profession:COMMANDER',
+        stacks: 1,
+        value: barrier,
+      },
+    ],
+  };
+  const next = update(state, {
+    units: state.units.map((candidate) => candidate.id === unit.id ? updatedUnit : candidate),
+    professionState: {
+      ...nextProfessionState,
+      barrierByUnit: {
+        ...nextProfessionState.barrierByUnit,
+        [unit.id]: (nextProfessionState.barrierByUnit[unit.id] ?? 0) + barrier,
+      },
+    },
+  });
+  return emit(next, 'PROFESSION_TRAIT_APPLIED', side, {
+    professionId: professionState.professionId,
+    traitId: result.state.logs[result.state.logs.length - 1].traitId,
+    operation: 'APPLY_BARRIER',
+    targetId: unit.id,
+    value: barrier,
+  });
+}
+
+function applySpellProfession(state: RunnerBattleState, cardInstanceId: string, side: Side, actionNumber: number): RunnerBattleState {
+  const professionState = state.professionState;
+  if (!professionState) return state;
+  const result = triggerSpell(coreProfessionState(professionState), {
+    casterId: cardInstanceId,
+    side,
+    isSpell: true,
+    round: state.round,
+    action: actionNumber,
+  });
+  if (!result.triggered) return state;
+  const bypass = effectValue(result.effectIds, 'IGNORE_SPELL_RESIST');
+  const nextProfessionState = mergeTraitState(professionState, result);
+  const next = update(state, {
+    professionState: {
+      ...nextProfessionState,
+      spellResistanceIgnore: nextProfessionState.spellResistanceIgnore + bypass,
+    },
+  });
+  return emit(next, 'PROFESSION_TRAIT_APPLIED', side, {
+    professionId: professionState.professionId,
+    traitId: result.state.logs[result.state.logs.length - 1].traitId,
+    operation: 'IGNORE_SPELL_RESIST',
+    targetId: cardInstanceId,
+    value: bypass,
+  });
 }
 
 function deploy(
-  state: BattleState,
+  state: RunnerBattleState,
   action: Extract<HighLevelAction, { type: 'DEPLOY_UNIT' }>,
   canonicalUnitId?: string,
   parity = false,
-): BattleState {
+  actionNumber = 1,
+): RunnerBattleState {
   ensureStarted(state);
   if (action.side !== 'player' && action.side !== 'enemy') throw new RunnerInputError('INVALID_COMMAND', `DEPLOY_UNIT side is invalid: ${action.side}`);
   if (action.side !== state.activeSide) throw new RunnerInputError('INVALID_COMMAND', `DEPLOY_UNIT side must be active side: ${state.activeSide}`);
@@ -596,7 +869,8 @@ function deploy(
     nextId: state.nextId + 1,
   });
   next = emit(next, 'CARD_PLAYED', action.side, { cardId: action.cardId });
-  return emit(next, 'UNIT_SPAWNED', action.side, { unitId, cardId: action.cardId, lane: action.lane, cell: action.cell });
+  next = emit(next, 'UNIT_SPAWNED', action.side, { unitId, cardId: action.cardId, lane: action.lane, cell: action.cell });
+  return applyDeployProfession(next, unitId, action.side, action.lane, actionNumber);
 }
 
 /**
@@ -605,7 +879,7 @@ function deploy(
  * executable boundary for a validated target submission and leaves the card
  * in hand until a later effect resolver consumes it.
  */
-function submitCardTarget(state: BattleState, action: Extract<HighLevelAction, { type: 'PLAY_CARD' }>): BattleState {
+function submitCardTarget(state: RunnerBattleState, action: Extract<HighLevelAction, { type: 'PLAY_CARD' }>, actionNumber = 1): RunnerBattleState {
   ensureStarted(state);
   if (action.side !== 'player' && action.side !== 'enemy') {
     throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD side is invalid: ${action.side}`);
@@ -614,6 +888,13 @@ function submitCardTarget(state: BattleState, action: Extract<HighLevelAction, {
     throw new RunnerInputError('INVALID_COMMAND', `PLAY_CARD side must be active side: ${state.activeSide}`);
   }
   const { target: profile } = skillConfig(action.cardId);
+  if (state.professionState && action.side === 'player') {
+    const profession = professionConfig(state.professionState.professionId).config;
+    const card = AUTHORITY.cards.find((candidate) => candidate.id === action.cardId);
+    if (!card || !card.skillId || !profession.skillIds.includes(card.skillId)) {
+      throw new RunnerInputError('INVALID_COMMAND', `cardId is not in the real profession skill pool: ${action.cardId}`);
+    }
+  }
   const handIndex = state.hands[action.side].findIndex((candidate) => candidate.cardId === action.cardId);
   if (handIndex < 0) throw new RunnerInputError('INVALID_COMMAND', `cardId is not in ${action.side} hand: ${action.cardId}`);
   if (state.hands[action.side][handIndex].remainingPreparation !== 0) {
@@ -643,13 +924,85 @@ function submitCardTarget(state: BattleState, action: Extract<HighLevelAction, {
   } else if (!state.hands[action.side].some((candidate, index) => index !== handIndex && candidate.remainingPreparation > 0)) {
     throw new RunnerInputError('INVALID_COMMAND', 'PLAY_CARD global target has no prepared card');
   }
-  return emit(state, 'CARD_TARGET_SUBMITTED', action.side, {
+  let next = emit(state, 'CARD_TARGET_SUBMITTED', action.side, {
     cardId: action.cardId,
     target,
   });
+  const card = next.hands[action.side][handIndex];
+  return applySpellProfession(next, card.instanceId, action.side, actionNumber);
 }
 
-function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE_UNIT' }>, parity = false): BattleState {
+function applyDot(state: RunnerBattleState, action: Extract<HighLevelAction, { type: 'APPLY_DOT' }>, actionNumber = 1): RunnerBattleState {
+  ensureStarted(state);
+  if (action.side !== 'player' && action.side !== 'enemy') {
+    throw new RunnerInputError('INVALID_COMMAND', `APPLY_DOT side is invalid: ${action.side}`);
+  }
+  if (action.side !== state.activeSide) {
+    throw new RunnerInputError('INVALID_COMMAND', `APPLY_DOT side must be active side: ${state.activeSide}`);
+  }
+  if (action.targetIds.length === 0 || new Set(action.targetIds).size !== action.targetIds.length || !Number.isSafeInteger(action.amount) || action.amount <= 0) {
+    throw new RunnerInputError('INVALID_COMMAND', 'APPLY_DOT requires unique targets and a positive amount');
+  }
+  const targetSide = OTHER_SIDE[action.side];
+  const targets = action.targetIds.map((targetId) => state.units.find((unit) => unit.id === targetId));
+  if (targets.some((unit) => !unit || unit.hp <= 0 || unit.side !== targetSide)) {
+    throw new RunnerInputError('INVALID_COMMAND', 'APPLY_DOT target must be a living unit on the opposite side');
+  }
+  const professionState = state.professionState;
+  let reduction = 0;
+  let nextProfessionState = professionState;
+  if (professionState) {
+    const result = triggerDamageOverTime(coreProfessionState(professionState), {
+      targetIds: action.targetIds,
+      targetSide,
+      isDamageOverTime: true,
+      round: state.round,
+      action: actionNumber,
+    });
+    if (result.triggered) {
+      reduction = effectValue(result.effectIds, 'REDUCE_DOT_DAMAGE');
+      const merged = mergeTraitState(professionState, result);
+      nextProfessionState = {
+        ...merged,
+        dotDamageReduction: merged.dotDamageReduction + reduction,
+        dotDamageReduced: merged.dotDamageReduced + Math.min(reduction, action.amount),
+      };
+    }
+  }
+  const actualDamage = Math.max(0, action.amount - reduction);
+  let board = createBoardState(state.units);
+  let totalDamage = 0;
+  for (const targetId of action.targetIds) {
+    if (actualDamage === 0) continue;
+    const damaged = damageUnit(board, targetId, actualDamage, false);
+    board = damaged.state;
+    totalDamage += damaged.damage;
+  }
+  board = removeDead(board);
+  let next = update(state, {
+    units: board.units,
+    ...(nextProfessionState ? { professionState: nextProfessionState } : {}),
+  });
+  next = emit(next, 'DAMAGE_OVER_TIME', targetSide, {
+    targetIds: action.targetIds,
+    amount: action.amount,
+    value: totalDamage,
+    reduction,
+  });
+  if (professionState && nextProfessionState && nextProfessionState.logs.length > professionState.logs.length) {
+    next = emit(next, 'PROFESSION_TRAIT_APPLIED', 'player', {
+      professionId: professionState.professionId,
+      traitId: nextProfessionState.logs[nextProfessionState.logs.length - 1].traitId,
+      operation: 'REDUCE_DOT_DAMAGE',
+      targetIds: action.targetIds,
+      amount: action.amount,
+      value: reduction,
+    });
+  }
+  return next;
+}
+
+function move(state: RunnerBattleState, action: Extract<HighLevelAction, { type: 'MOVE_UNIT' }>, parity = false): RunnerBattleState {
   ensureStarted(state);
   const current = state.units.find((unit) => unit.id === action.unitId);
   if (!current) throw new RunnerInputError('INVALID_COMMAND', `unitId does not exist: ${action.unitId}`);
@@ -677,7 +1030,7 @@ function move(state: BattleState, action: Extract<HighLevelAction, { type: 'MOVE
   });
 }
 
-function attack(state: BattleState, action: Extract<HighLevelAction, { type: 'ATTACK' }>, parity = false): BattleState {
+function attack(state: RunnerBattleState, action: Extract<HighLevelAction, { type: 'ATTACK' }>, parity = false): RunnerBattleState {
   ensureStarted(state);
   const attacker = state.units.find((unit) => unit.id === action.attackerId && unit.hp > 0);
   if (!attacker) throw new RunnerInputError('INVALID_COMMAND', `attackerId does not exist or is dead: ${action.attackerId}`);
@@ -729,7 +1082,7 @@ function attack(state: BattleState, action: Extract<HighLevelAction, { type: 'AT
   return next;
 }
 
-function prepareParityCards(state: BattleState, side: Side): BattleState {
+function prepareParityCards(state: RunnerBattleState, side: Side): RunnerBattleState {
   const hand = state.hands[side].map((card) => card.remainingPreparation === 0
     ? { ...card, remainingPreparation: Math.floor((AUTHORITY.prepareByCardId[card.cardId] ?? 0) / 2) }
     : card);
@@ -747,7 +1100,7 @@ function prepareParityCards(state: BattleState, side: Side): BattleState {
   });
 }
 
-function decrementPreparation(state: BattleState, side: Side): BattleState {
+function decrementPreparation(state: RunnerBattleState, side: Side): RunnerBattleState {
   return update(state, {
     hands: {
       ...state.hands,
@@ -759,7 +1112,7 @@ function decrementPreparation(state: BattleState, side: Side): BattleState {
   });
 }
 
-function parityMoveCore(state: BattleState, unitId: string, requestedSteps?: number): BattleState {
+function parityMoveCore(state: RunnerBattleState, unitId: string, requestedSteps?: number): RunnerBattleState {
   const result = moveUnit(createBoardState(state.units), unitId, requestedSteps);
   let next = update(state, { units: result.state.units });
   if (!result.moved) return next;
@@ -773,7 +1126,7 @@ function parityMoveCore(state: BattleState, unitId: string, requestedSteps?: num
   return next;
 }
 
-function parityActUnit(state: BattleState, unitId: string): BattleState {
+function parityActUnit(state: RunnerBattleState, unitId: string): RunnerBattleState {
   const before = state.units.find((unit) => unit.id === unitId);
   if (!before || before.hp <= 0 || state.status !== 'playing') return state;
   let next = state;
@@ -790,7 +1143,7 @@ function parityActUnit(state: BattleState, unitId: string): BattleState {
   return update(next, { units: updated });
 }
 
-function settleParity(state: BattleState): BattleState {
+function settleParity(state: RunnerBattleState): RunnerBattleState {
   if (state.status !== 'playing') return state;
   const outcome = resolveOutcome({ heroHp: state.heroHp, round: state.round, maxRounds: state.maxRounds, rng: { rngState: state.rngState, rngCursor: state.rngCursor } });
   if (!outcome.settled) return state;
@@ -805,13 +1158,13 @@ function settleParity(state: BattleState): BattleState {
 export interface NeutralBattleOutput {
   readonly seed: number;
   readonly actionCount: number;
-  readonly finalState: BattleState;
+  readonly finalState: RunnerBattleState;
   readonly outcome: OutcomeResult;
   readonly rngCursor: number;
   readonly finalHash: string;
 }
 
-function neutralReadyUnit(state: BattleState): CardConfig | undefined {
+function neutralReadyUnit(state: RunnerBattleState): CardConfig | undefined {
   const cardIds = state.hands[state.activeSide]
     .filter((card) => card.remainingPreparation === 0)
     .map((card) => card.cardId)
@@ -821,11 +1174,11 @@ function neutralReadyUnit(state: BattleState): CardConfig | undefined {
     .find((card) => card?.cardType === 'UNIT');
 }
 
-function neutralDeploymentCell(state: BattleState): { readonly lane: number; readonly cell: number } | undefined {
+function neutralDeploymentCell(state: RunnerBattleState): { readonly lane: number; readonly cell: number } | undefined {
   return getLegalDeploymentCells(createBoardState(state.units), state.activeSide)[0];
 }
 
-function neutralOutcome(state: BattleState): OutcomeResult {
+function neutralOutcome(state: RunnerBattleState): OutcomeResult {
   const endEvent = [...state.events].reverse().find((eventItem) => eventItem.type === 'BATTLE_END');
   if (!endEvent || state.status === 'playing') throw new Error('neutral battle did not settle');
   const winner = endEvent.payload.winner;
@@ -891,7 +1244,7 @@ export function runNeutralBattle(seed: number): NeutralBattleOutput {
   };
 }
 
-function projectParityLifecycleEvents(state: BattleState, fixture: ParityFixture): BattleEvent[] {
+function projectParityLifecycleEvents(state: RunnerBattleState, fixture: ParityFixture): BattleEvent[] {
   const mappingByCocosType = new Map(fixture.events.map((eventMapping) => [eventMapping.cocosType, eventMapping]));
   return state.events.flatMap((eventItem) => {
     const mapping = mappingByCocosType.get(eventItem.type);
@@ -900,7 +1253,7 @@ function projectParityLifecycleEvents(state: BattleState, fixture: ParityFixture
   });
 }
 
-function endTurnParity(state: BattleState): BattleState {
+function endTurnParity(state: RunnerBattleState): RunnerBattleState {
   ensureStarted(state);
   const side = state.activeSide;
   let next = prepareParityCards(state, side);
@@ -919,7 +1272,7 @@ function endTurnParity(state: BattleState): BattleState {
   return emit(next, 'TURN_START', nextSide, { turn: next.turn });
 }
 
-function endTurn(state: BattleState): BattleState {
+function endTurn(state: RunnerBattleState): RunnerBattleState {
   ensureStarted(state);
   let next = emit(state, 'TURN_END', state.activeSide, { turn: state.turn });
   const nextSide: Side = state.activeSide === 'player' ? 'enemy' : 'player';
@@ -933,17 +1286,18 @@ function endTurn(state: BattleState): BattleState {
   return emit(next, 'TURN_START', nextSide, { turn: next.turn });
 }
 
-function applyAction(state: BattleState, action: HighLevelAction, canonicalUnitId?: string, parity = false): BattleState {
+function applyAction(state: RunnerBattleState, action: HighLevelAction, canonicalUnitId?: string, parity = false, actionNumber = 1): RunnerBattleState {
   if (action.type === 'BATTLE_START') return startBattle(state);
-  if (action.type === 'DEPLOY_UNIT') return deploy(state, action, canonicalUnitId, parity);
-  if (action.type === 'PLAY_CARD') return submitCardTarget(state, action);
+  if (action.type === 'DEPLOY_UNIT') return deploy(state, action, canonicalUnitId, parity, actionNumber);
+  if (action.type === 'PLAY_CARD') return submitCardTarget(state, action, actionNumber);
+  if (action.type === 'APPLY_DOT') return applyDot(state, action, actionNumber);
   if (action.type === 'MOVE_UNIT') return move(state, action, parity);
   if (action.type === 'ATTACK') return attack(state, action, parity);
   if (parity) return endTurnParity(state);
   return endTurn(state);
 }
 
-function settle(state: BattleState): { readonly state: BattleState; readonly outcome: OutcomeResult } {
+function settle(state: RunnerBattleState): { readonly state: RunnerBattleState; readonly outcome: OutcomeResult } {
   const outcome = resolveOutcome({ heroHp: state.heroHp, round: state.round, maxRounds: state.maxRounds, rng: { rngState: state.rngState, rngCursor: state.rngCursor } });
   if (!outcome.settled) return { state, outcome };
   let next = update(state, { status: outcome.status, rngState: outcome.rng.rngState, rngCursor: outcome.rng.rngCursor });
@@ -973,10 +1327,10 @@ function hash(value: string): string {
 
 export function runBattleRunner(input: unknown): BattleRunnerOutput {
   const parsed = parseInput(input);
-  let state = initialState(parsed.seed);
+  let state = initialState(parsed.seed, undefined, false, parsed.professionId);
   let outcome = resolveOutcome({ heroHp: state.heroHp, round: state.round, maxRounds: state.maxRounds, rng: { rngState: state.rngState, rngCursor: state.rngCursor } });
-  for (const action of parsed.actions) {
-    state = applyAction(state, action);
+  for (const [index, action] of parsed.actions.entries()) {
+    state = applyAction(state, action, undefined, false, index + 1);
     const settled = settle(state);
     state = settled.state;
     outcome = settled.outcome;
@@ -1008,7 +1362,7 @@ export function runBattleRunnerV2(input: unknown): ParityBattleRunnerOutput {
   state = decrementPreparation(state, state.activeSide);
   state = emit(state, 'BATTLE_START', state.activeSide, { seed: state.seed });
   state = emit(state, 'TURN_START', state.activeSide, { turn: state.turn });
-  for (const action of parsed.fixture.actions) {
+  for (const [index, action] of parsed.fixture.actions.entries()) {
     if (action.type === 'BATTLE_START') continue;
     let translated: HighLevelAction;
     let canonicalUnitId: string | undefined;
@@ -1027,7 +1381,7 @@ export function runBattleRunnerV2(input: unknown): ParityBattleRunnerOutput {
     } else {
       translated = { type: 'END_TURN' };
     }
-    state = applyAction(state, translated, canonicalUnitId, true);
+    state = applyAction(state, translated, canonicalUnitId, true, index + 1);
     if (action.type !== 'END_TURN') state = settleParity(state);
   }
   const lifecycleEvents = projectParityLifecycleEvents(state, parsed.fixture);
