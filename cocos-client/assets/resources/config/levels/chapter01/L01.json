@@ -1,0 +1,33 @@
+{
+  "chapterLevels": [{
+  "id": "L01",
+  "prerequisiteLevelId": null,
+  "enemyDeckId": "D001",
+  "environmentElement": "NONE",
+  "objectives": [
+    {
+      "type": "DEFEAT_ENEMY_HERO"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "CARD",
+      "id": "U001",
+      "quantity": 4
+    }
+  ],
+  "failureConditions": [
+    {
+      "type": "PLAYER_HERO_DEFEATED"
+    }
+  ],
+  "scenarioRules": {
+    "playerHeroHp": 30,
+    "activeLaneCount": 1,
+    "playerSummonSlots": 3,
+    "unlockSecondLaneOnFirstDeployment": true,
+    "openingSkillCardsAllowed": false,
+    "enemyOpeningCardFilter": "UNITS_ONLY"
+  }
+  }]
+}
