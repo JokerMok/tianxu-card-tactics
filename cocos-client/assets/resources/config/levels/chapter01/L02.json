@@ -1,0 +1,49 @@
+{
+  "chapterLevels": [
+    {
+      "id": "L02",
+      "prerequisiteLevelId": "L01",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        { "type": "DEFEAT_ENEMY_HERO" }
+      ],
+      "rewards": [
+        {
+          "type": "CARD",
+          "id": "U002",
+          "quantity": 4
+        }
+      ],
+      "failureConditions": [
+        { "type": "PLAYER_HERO_DEFEATED" }
+      ],
+      "battleRules": {
+        "enemyDeploymentOrder": [
+          {
+            "phase": 1,
+            "kind": "BASIC_MELEE",
+            "cardId": "U001",
+            "unitId": "U001"
+          },
+          {
+            "phase": 2,
+            "kind": "RANGED",
+            "cardId": "U004",
+            "unitId": "U004"
+          }
+        ],
+        "combatPreview": {
+          "counterMultiplier": 1.25,
+          "showDamageBreakdown": true
+        },
+        "forbiddenSceneTargetActions": [
+          {
+            "targetId": "E102",
+            "action": "AREA_FIRE"
+          }
+        ]
+      }
+    }
+  ]
+}
