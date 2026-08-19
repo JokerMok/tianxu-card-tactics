@@ -1,0 +1,34 @@
+{
+  "chapterLevels": [{
+    "id": "L09",
+    "prerequisiteLevelId": "L08",
+    "enemyDeckId": "D001",
+    "environmentElement": "NONE",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [{ "type": "CARD", "id": "U009", "quantity": 2 }],
+    "failureConditions": [{ "type": "PLAYER_HERO_DEFEATED" }],
+    "scenarioRules": {
+      "enemySpiritUnitIds": ["U009", "U010"],
+      "spiritDefenseType": "SPIRIT",
+      "physicalDamageMultiplier": 0.75,
+      "spellDamageMultiplier": 1.25,
+      "reviveRule": {
+        "unitIds": ["U009"],
+        "maxRevives": 1,
+        "reviveHp": 1,
+        "trigger": "DEATH"
+      },
+      "temporarySpellAid": {
+        "sourceCharacterId": "C001",
+        "cardId": "S001",
+        "uses": 1
+      },
+      "purifySkillId": "S015",
+      "alternateSolutions": [
+        "FOCUS_DAMAGE",
+        "PURIFY_REVIVE_MARK",
+        "SUPPRESS_REVIVE_POSITION"
+      ]
+    }
+  }]
+}
