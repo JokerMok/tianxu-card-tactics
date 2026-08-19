@@ -21,10 +21,40 @@ const { assertChapterLevelContract, ConfigLoadError } = await import(
 );
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/manifest.json'), 'utf8'));
+const cards = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/cards.json'), 'utf8'));
+const units = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/units.json'), 'utf8'));
 const decks = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/decks.json'), 'utf8'));
 const enumCoverageFixture = JSON.parse(
   fs.readFileSync(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'), 'utf8'),
 );
+
+// 来源：当前生效《首章剧情关卡-v1.1.md》§3.1/§7；只注册本测试实际覆盖的章节节点及其文档前置。
+const chapterLevelIds = new Set([
+  'L01',
+  ...enumCoverageFixture.chapterLevels.map((level) => level.id),
+  ...enumCoverageFixture.chapterLevels
+    .map((level) => level.prerequisiteLevelId)
+    .filter((id) => id !== null),
+]);
+// 来源：真实 units.json；章节目标使用战场单位 ID，避免用卡牌、牌组或技能 ID冒充目标。
+const targetIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
+// 来源：真实 cards.json；保留 cardType/copyLimit 元数据供奖励契约核对。
+const cardReferences = new Map(
+  cards.cards
+    .filter((card) => card.enabled !== false)
+    .map((card) => [card.id, { cardType: card.cardType, copyLimit: card.copyLimit }]),
+);
+// 来源：当前生效章节奖励注册表（《首章剧情关卡-v1.1.md》§7）及 T331 enum fixture 的稳定 ID 映射。
+const references = {
+  chapterLevelIds,
+  targetIds,
+  cards: cardReferences,
+  unlockIds: new Set(['OUTPOST']),
+  chestIds: new Set(['CHAPTER-CHEST']),
+  flagIds: new Set(['OUTCAST-CAMP']),
+};
+const skillCardId = cards.cards.find((card) => card.cardType === 'SKILL')?.id;
+assert.equal(typeof skillCardId, 'string', 'real cards.json must provide a skill card for the negative case');
 const valid = {
   chapterLevels: [{
     id: 'L01',
@@ -45,20 +75,24 @@ const valid = {
 };
 
 assert.doesNotThrow(
-  () => assertChapterLevelContract(valid, manifest, decks),
+  () => assertChapterLevelContract(valid, manifest, decks, references),
   'valid chapter level contract must pass',
+);
+assert.doesNotThrow(
+  () => assertChapterLevelContract(valid, manifest, decks),
+  'legacy call without references must remain compatible',
 );
 const terminalLevel = structuredClone(valid);
 terminalLevel.chapterLevels[0].id = 'L12';
 terminalLevel.chapterLevels[0].prerequisiteLevelId = 'L11';
 assert.doesNotThrow(
-  () => assertChapterLevelContract(terminalLevel, manifest, decks),
+  () => assertChapterLevelContract(terminalLevel, manifest, decks, references),
   'L12 and its chapter-local prerequisite must pass',
 );
 const waterEnvironment = structuredClone(valid);
 waterEnvironment.chapterLevels[0].environmentElement = 'WATER';
 assert.doesNotThrow(
-  () => assertChapterLevelContract(waterEnvironment, manifest, decks),
+  () => assertChapterLevelContract(waterEnvironment, manifest, decks, references),
   'a second legal environment must pass',
 );
 
@@ -90,14 +124,22 @@ assert.equal(
   'FLAG must be represented by a real chapter fixture',
 );
 assert.doesNotThrow(
-  () => assertChapterLevelContract(enumCoverageFixture, manifest, decks),
+  () => assertChapterLevelContract(enumCoverageFixture, manifest, decks, references),
   'the chapter enum coverage fixture must pass the real contract',
 );
 
 function expectFailure(label, mutate, expectedPath) {
   const fixture = structuredClone(valid);
   mutate(fixture);
-  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks), (error) => {
+  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, references), (error) => {
+    assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
+    assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
+    return true;
+  });
+}
+
+function expectFailureWithReferences(label, fixture, customReferences, expectedPath) {
+  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, customReferences), (error) => {
     assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
     return true;
@@ -109,15 +151,66 @@ expectFailure('invalid ID', (fixture) => { fixture.chapterLevels[0].id = 'L_01';
 expectFailure('out-of-chapter ID', (fixture) => { fixture.chapterLevels[0].id = 'L13'; }, 'config/levels.chapterLevels[0].id');
 expectFailure('unknown enemy deck', (fixture) => { fixture.chapterLevels[0].enemyDeckId = 'D404'; }, 'config/levels.chapterLevels[0].enemyDeckId');
 expectFailure('invalid prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'C01'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
+expectFailure('unknown registered prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'L06'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
+expectFailure('self prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'L01'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
 expectFailure('invalid environment', (fixture) => { fixture.chapterLevels[0].environmentElement = 'WIND'; }, 'config/levels.chapterLevels[0].environmentElement');
 expectFailure('invalid objective', (fixture) => { fixture.chapterLevels[0].objectives[0].type = 'ESCAPE'; }, 'config/levels.chapterLevels[0].objectives[0].type');
 expectFailure('invalid objective target ID', (fixture) => { fixture.chapterLevels[0].objectives[1].targetId = 'U_001'; }, 'config/levels.chapterLevels[0].objectives[1].targetId');
+expectFailure('unknown objective target', (fixture) => { fixture.chapterLevels[0].objectives[1].targetId = 'U999'; }, 'config/levels.chapterLevels[0].objectives[1].targetId');
 expectFailure('non-positive survival rounds', (fixture) => { fixture.chapterLevels[0].objectives[2].rounds = 0; }, 'config/levels.chapterLevels[0].objectives[2].rounds');
 expectFailure('invalid reward ID', (fixture) => { fixture.chapterLevels[0].rewards[0].id = 'U_001'; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('unknown card reward', (fixture) => { fixture.chapterLevels[0].rewards[0].id = 'D001'; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('skill card cannot be a chapter reward', (fixture) => { fixture.chapterLevels[0].rewards[0].id = skillCardId; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('card reward copy limit', (fixture) => { fixture.chapterLevels[0].rewards[0].quantity = 5; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
+expectFailure('reward card type mismatch', (fixture) => { fixture.chapterLevels[0].rewards[0].cardType = 'SKILL'; }, 'config/levels.chapterLevels[0].rewards[0].cardType');
 expectFailure('invalid reward type', (fixture) => { fixture.chapterLevels[0].rewards[0].type = 'GOLD'; }, 'config/levels.chapterLevels[0].rewards[0].type');
 expectFailure('missing reward quantity', (fixture) => { delete fixture.chapterLevels[0].rewards[0].quantity; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
 expectFailure('non-positive reward quantity', (fixture) => { fixture.chapterLevels[0].rewards[0].quantity = 0; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
+expectFailure('deck ID cannot be an unlock reward', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'D001', quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('unit ID cannot be a chest reward', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'CHEST', id: 'U001', quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('skill ID cannot be a flag reward', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'FLAG', id: skillCardId, quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
+expectFailure('reward type registry mismatch', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'CHAPTER-CHEST', quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
+const forgedUnlockReferences = { ...references, unlockIds: new Set(['U001']) };
+const forgedUnlockFixture = structuredClone(valid);
+forgedUnlockFixture.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'U001', quantity: 1 };
+expectFailureWithReferences(
+  'unit ID cannot pass by forging the unlock registry',
+  forgedUnlockFixture,
+  forgedUnlockReferences,
+  'config/levels.chapterLevels[0].rewards[0].id',
+);
 expectFailure('missing failure condition', (fixture) => { delete fixture.chapterLevels[0].failureConditions; }, 'config/levels.chapterLevels[0].failureConditions');
 expectFailure('invalid destroyed target ID', (fixture) => { fixture.chapterLevels[0].failureConditions[1].targetId = 'U_001'; }, 'config/levels.chapterLevels[0].failureConditions[1].targetId');
+expectFailure('unknown destroyed target', (fixture) => { fixture.chapterLevels[0].failureConditions[1].targetId = 'U999'; }, 'config/levels.chapterLevels[0].failureConditions[1].targetId');
 
-console.log('Chapter level contract: valid L01, L12, WATER, and enum coverage fixture (DESTROY_TARGET, UNLOCK, CHEST, FLAG, ROUND_LIMIT_REACHED, FIRE) PASS; missing field, invalid ID, out-of-chapter ID, unknown enemy deck, invalid prerequisite, invalid environment, invalid objective, invalid objective target ID, non-positive survival rounds, invalid reward ID, invalid reward type, missing or non-positive reward quantity, missing failure condition, invalid destroyed target ID FAIL as expected');
+const battleRulesFixture = structuredClone(valid);
+battleRulesFixture.chapterLevels[0].battleRules = {
+  activeLaneCount: 1,
+  summonSlots: 3,
+  openingSkillRestriction: 'NO_SKILLS',
+  enemyCardFilter: 'UNITS_ONLY',
+  controlMode: 'AUTO',
+  mirror: true,
+  fast: true,
+  guard: true,
+  intercept: true,
+  temporaryAid: true,
+};
+assert.doesNotThrow(
+  () => assertChapterLevelContract(battleRulesFixture, manifest, decks, references),
+  'battleRules legal enums, bounds and booleans must pass',
+);
+expectFailure('unknown battle rule', (fixture) => {
+  fixture.chapterLevels[0].battleRules = { activeLaneCount: 1, debugCheat: true };
+}, 'config/levels.chapterLevels[0].battleRules.debugCheat');
+expectFailure('invalid active lane count', (fixture) => {
+  fixture.chapterLevels[0].battleRules = { activeLaneCount: 3 };
+}, 'config/levels.chapterLevels[0].battleRules.activeLaneCount');
+expectFailure('invalid battle control mode', (fixture) => {
+  fixture.chapterLevels[0].battleRules = { controlMode: 'ASSISTED' };
+}, 'config/levels.chapterLevels[0].battleRules.controlMode');
+expectFailure('invalid battle rule boolean', (fixture) => {
+  fixture.chapterLevels[0].battleRules = { temporaryAid: 'yes' };
+}, 'config/levels.chapterLevels[0].battleRules.temporaryAid');
+
+console.log('Chapter level contract: real manifest/cards/units/decks references, chapter prerequisites, target/reward registries, card type/copy limits, enum coverage and battleRules PASS; legacy and original negative cases remain covered');
