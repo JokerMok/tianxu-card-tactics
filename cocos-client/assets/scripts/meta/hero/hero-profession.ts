@@ -84,8 +84,8 @@ function parseCards(rawCards: readonly unknown[]): ReadonlyMap<string, CardDefin
     if (!isRecord(rawCard) || !isEnabled(rawCard)) continue;
     const { id, cardType, profession, skillId, copyLimit } = rawCard;
     if (typeof id !== 'string' || id.length === 0 || (cardType !== 'UNIT' && cardType !== 'SKILL')
-      || typeof profession !== 'string' || !isPositiveInteger(copyLimit) || cards.has(id)
-      || (skillId !== undefined && typeof skillId !== 'string')) {
+      || typeof profession !== 'string' || profession.length === 0 || !isPositiveInteger(copyLimit) || cards.has(id)
+      || (skillId !== undefined && (typeof skillId !== 'string' || skillId.length === 0))) {
       throw new Error('hero profession cards config is invalid');
     }
     cards.set(id, {
@@ -106,24 +106,26 @@ function parseProfessions(rawProfessions: readonly unknown[]): ReadonlyMap<strin
     if (!isRecord(rawProfession) || !isEnabled(rawProfession)) continue;
     const { id, skillIds } = rawProfession;
     if (typeof id !== 'string' || id.length === 0 || !Array.isArray(skillIds)
-      || !skillIds.every((skillId) => typeof skillId === 'string') || professions.has(id)) {
+      || !skillIds.every((skillId) => typeof skillId === 'string' && skillId.length > 0)
+      || new Set(skillIds).size !== skillIds.length || professions.has(id)) {
       throw new Error('hero profession config is invalid');
     }
-    professions.set(id, { id, skillIds });
+    professions.set(id, { id, skillIds: [...skillIds] });
   }
   if (professions.size === 0) throw new Error('hero profession config is empty');
   return professions;
 }
 
 function parseDeckLimits(rawDecks: readonly unknown[]): DeckLimits {
-  const rawDeck = rawDecks.find((candidate) => isRecord(candidate) && candidate.id === 'D001')
-    ?? rawDecks.find(isRecord);
+  const rawDeck = rawDecks.find((candidate) => isRecord(candidate)
+    && candidate.id === 'D001' && isEnabled(candidate));
   if (!rawDeck || !isRecord(rawDeck)
     || !isPositiveInteger(rawDeck.totalCards)
     || !isPositiveInteger(rawDeck.minUnitCards)
     || !isPositiveInteger(rawDeck.maxSkillCards)
     || rawDeck.minUnitCards > rawDeck.totalCards
-    || rawDeck.maxSkillCards > rawDeck.totalCards) {
+    || rawDeck.maxSkillCards > rawDeck.totalCards
+    || rawDeck.minUnitCards + rawDeck.maxSkillCards < rawDeck.totalCards) {
     throw new Error('hero profession deck limits config is invalid');
   }
   return {
@@ -137,9 +139,19 @@ function parseAuthority(authority: HeroProfessionAuthority): RulesAuthority {
   if (!authority || !Array.isArray(authority.cards) || !Array.isArray(authority.decks) || !Array.isArray(authority.professions)) {
     throw new Error('hero profession authority is invalid');
   }
+  const cardsById = parseCards(authority.cards);
+  const professionsById = parseProfessions(authority.professions);
+  for (const profession of professionsById.values()) {
+    for (const skillId of profession.skillIds) {
+      const card = cardsById.get(skillId);
+      if (!card || card.cardType !== 'SKILL' || (card.skillId ?? card.id) !== skillId) {
+        throw new Error('hero profession skill references are invalid');
+      }
+    }
+  }
   return {
-    cardsById: parseCards(authority.cards),
-    professionsById: parseProfessions(authority.professions),
+    cardsById,
+    professionsById,
     limits: parseDeckLimits(authority.decks),
   };
 }
