@@ -1,0 +1,37 @@
+{
+  "chapterLevels": [{
+    "id": "L12",
+    "prerequisiteLevelId": "L11",
+    "enemyDeckId": "D001",
+    "environmentElement": "NONE",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [
+      { "type": "CHEST", "id": "CHAPTER-CHEST", "quantity": 1 },
+      { "type": "FLAG", "id": "OUTCAST-CAMP", "quantity": 1 }
+    ],
+    "failureConditions": [
+      { "type": "PLAYER_HERO_DEFEATED" },
+      { "type": "ROUND_LIMIT_REACHED", "rounds": 80 }
+    ],
+    "scenarioRules": {
+      "sceneId": "E112",
+      "bossCharacterId": "C010",
+      "roundLimit": 80,
+      "pointBookRule": {
+        "enemyActionInterval": 3,
+        "summonUnitId": "U009",
+        "occupiedSlotPolicy": "SKIP",
+        "overwriteUnits": false
+      },
+      "phaseTransition": {
+        "triggerBossHpPercent": 50,
+        "bossEntersBattle": true,
+        "bossRole": "HIGH_HP_ELITE",
+        "nameLockAffects": ["SKILL_CARD"],
+        "unitCardPreparationNormal": true
+      },
+      "victoryPolicy": "DEFEAT_BOSS_AND_KEEP_PLAYER_HERO_ALIVE",
+      "rewardRegistryIds": ["CHAPTER-CHEST", "OUTCAST-CAMP"]
+    }
+  }]
+}
