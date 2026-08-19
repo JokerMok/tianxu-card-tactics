@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 const documentPath = fileURLToPath(new URL('./asset-layer-inventory.md', import.meta.url));
 const repositoryRoot = path.resolve(path.dirname(documentPath), '../..');
 const sourceRoot = path.join(repositoryRoot, '美术素材/UI全界面/Image2-v1-1920');
+const gameShellPath = path.join(repositoryRoot, 'cocos-client/assets/scripts/meta/GameShell.ts');
+const reactRoot = path.join(repositoryRoot, 'web-prototype');
 const canvas = { width: 1920, height: 1080 };
 const layers = ['背景', '角色', '装饰', '九宫格', '图标', '文字', '状态'];
 const layerCodes = { '背景': 'BG', '角色': 'CHR', '装饰': 'DEC', '九宫格': '9S', '图标': 'ICO', '文字': 'TXT', '状态': 'STA' };
@@ -16,7 +18,7 @@ const expectedSources = {
   UI04: 'UI04-编队.png', UI05: 'UI05-主将.png', UI06: 'UI06-历练.png',
   UI07: 'UI07-营造.png', UI08: 'UI08-任务.png', UI09: 'UI09-行囊.png',
 };
-const expectedRuntimeAssets = {
+const expectedCocos = {
   UI01: { assetPath: 'cocos-client/assets/resources/ui/image2/UI01-home.png', resourcePath: 'ui/image2/UI01-home/spriteFrame', assetId: '1479317e-dbec-4396-ba9f-d4784797edf9', sourceSha256: '302460789161231daeed324b22dda5bd61bd0a9aa1a21854208ed81e113eb750' },
   UI02: { assetPath: 'cocos-client/assets/resources/ui/image2/UI02-campaign.png', resourcePath: 'ui/image2/UI02-campaign/spriteFrame', assetId: '8b74bf8c-6961-4dd0-b50f-492e928a3ae6', sourceSha256: 'b73a4af1ac2a917d4a89f7dddd197efb1cc040d4ad4ed2603901ef3aa48dfa0b' },
   UI03: { assetPath: 'cocos-client/assets/resources/ui/image2/UI03-cards.png', resourcePath: 'ui/image2/UI03-cards/spriteFrame', assetId: '49e0cd70-f507-4fa5-a36f-07d4da8a0325', sourceSha256: 'dcdf2ebab28c2a8d1198844b5424854c669ceb5753f0422d2a3e3f5ac64061ef' },
@@ -28,10 +30,26 @@ const expectedRuntimeAssets = {
   UI09: { assetPath: 'cocos-client/assets/resources/ui/image2/UI09-inventory.png', resourcePath: 'ui/image2/UI09-inventory/spriteFrame', assetId: '103fc9ed-1b08-4c98-8ce9-a2fc49150d00', sourceSha256: 'fbb355a9b4aed6c12ef5068c36e2070c05150bbe4d25ce2b869fb0cbc6a37582' },
 };
 const expectedReactObservedAssets = [
-  'web-prototype/public/assets/commanders/player.webp',
-  'web-prototype/public/assets/commanders/enemy.webp',
+  { assetPath: 'web-prototype/public/assets/commanders/player.webp', scope: '战斗原型角色图', screenAsset: false },
+  { assetPath: 'web-prototype/public/assets/commanders/enemy.webp', scope: '战斗原型角色图', screenAsset: false },
 ];
 const visualSourceRoot = '美术素材/UI全界面/Image2-v1-1920';
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const sha256Pattern = /^[0-9a-f]{64}$/i;
+
+function isRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isFiniteNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isSafeRepositoryPath(value) {
+  if (typeof value !== 'string' || value.length === 0 || value !== value.trim() || value.includes('\0') || value.includes('\\')) return false;
+  if (path.posix.isAbsolute(value) || /^[A-Za-z]:/.test(value)) return false;
+  return value.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
+}
 
 function inventoryFromMarkdown(markdown) {
   const start = '<!-- asset-layer-inventory:start -->';
@@ -45,177 +63,195 @@ function inventoryFromMarkdown(markdown) {
   return JSON.parse(match[1]);
 }
 
-function isFiniteNumber(value) {
-  return typeof value === 'number' && Number.isFinite(value);
+async function fileSha256(filePath) {
+  return crypto.createHash('sha256').update(await fs.readFile(filePath)).digest('hex');
 }
 
-function isSafeRelativePath(value) {
-  if (typeof value !== 'string' || value.length === 0 || value !== value.trim()) return false;
-  if (value.includes('\\') || value.includes('\0') || value.startsWith('/') || /^[A-Za-z]:\//.test(value)) return false;
-  return value.split('/').every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
+async function readPngDimensions(filePath) {
+  const bytes = await fs.readFile(filePath);
+  if (bytes.length < 24 || bytes.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') throw new Error('not a PNG');
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
-function isInsideRepository(relativePath) {
-  const resolved = path.resolve(repositoryRoot, relativePath);
-  return resolved === repositoryRoot || resolved.startsWith(repositoryRoot + path.sep);
-}
-
-async function validateFilePath(relativePath, label, errors, { png = false } = {}) {
-  if (!isSafeRelativePath(relativePath) || !isInsideRepository(relativePath)) {
-    errors.push('illegal asset path for ' + label);
-    return;
-  }
-  const absolutePath = path.resolve(repositoryRoot, relativePath);
-  let bytes;
-  try {
-    bytes = await fs.readFile(absolutePath);
-  } catch {
-    errors.push('asset file is unavailable for ' + label);
-    return;
-  }
-  if (png) {
-    const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-    const width = bytes.length >= 24 ? bytes.readUInt32BE(16) : null;
-    const height = bytes.length >= 24 ? bytes.readUInt32BE(20) : null;
-    if (bytes.length < 24 || !bytes.subarray(0, 8).equals(pngSignature) || width !== canvas.width || height !== canvas.height) {
-      errors.push('PNG asset must be 1920x1080 for ' + label);
+async function findReactUiEvidence() {
+  const evidence = [];
+  const roots = [reactRoot];
+  const sourceMarker = /Image2-v1-1920|UI0[1-9]-(?:主城|征战|卡库|编队|主将|历练|营造|任务|行囊)\.png|ui\/image2\/UI0[1-9]/;
+  async function walk(directory) {
+    let entries;
+    try {
+      entries = await fs.readdir(directory, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'build') continue;
+      const fullPath = path.join(directory, entry.name);
+      const relativePath = path.relative(reactRoot, fullPath).split(path.sep).join('/');
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+        continue;
+      }
+      if (/^UI0[1-9](?:[-_.]|$)/i.test(entry.name) || relativePath.includes('Image2-v1-1920')) evidence.push(relativePath);
+      if (/\.(?:css|html|js|jsx|json|md|ts|tsx)$/.test(entry.name)) {
+        const content = await fs.readFile(fullPath, 'utf8');
+        if (sourceMarker.test(content)) evidence.push(relativePath + ' (reference)');
+      }
     }
   }
+  for (const root of roots) await walk(root);
+  return [...new Set(evidence)];
 }
 
-async function validateMatchingFiles(leftPath, rightPath, label, errors) {
-  if (!isSafeRelativePath(leftPath) || !isSafeRelativePath(rightPath) || !isInsideRepository(leftPath) || !isInsideRepository(rightPath)) {
-    errors.push('illegal asset path for ' + label);
+async function validateObservedReactAssets(inventory, errors) {
+  if (!Array.isArray(inventory.reactObservedAssets)) {
+    errors.push('reactObservedAssets must be an array');
     return;
   }
-  try {
-    const [left, right] = await Promise.all([
-      fs.readFile(path.resolve(repositoryRoot, leftPath)),
-      fs.readFile(path.resolve(repositoryRoot, rightPath)),
-    ]);
-    const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
-    if (digest(left) !== digest(right)) errors.push('asset content mismatch for ' + label);
-  } catch {
-    errors.push('asset file is unavailable for ' + label);
+  if (inventory.reactObservedAssets.length !== expectedReactObservedAssets.length) {
+    errors.push('reactObservedAssets count must be ' + expectedReactObservedAssets.length);
+  }
+  const seenPaths = new Set();
+  for (const observed of inventory.reactObservedAssets) {
+    if (!isRecord(observed)) {
+      errors.push('React observed asset record must be an object');
+      continue;
+    }
+    if (seenPaths.has(observed.assetPath)) errors.push('duplicate React observed asset path ' + observed.assetPath);
+    seenPaths.add(observed.assetPath);
+    if (!expectedReactObservedAssets.some((expected) => expected.assetPath === observed.assetPath)) {
+      errors.push('unexpected React observed asset path ' + observed.assetPath);
+    }
+    if (!isSafeRepositoryPath(observed.assetPath)) errors.push('React asset path must be repository-relative: ' + String(observed.assetPath));
+    try {
+      await fs.access(path.join(repositoryRoot, observed.assetPath));
+    } catch {
+      errors.push('observed React asset file is unavailable: ' + String(observed.assetPath));
+    }
+  }
+  for (const expected of expectedReactObservedAssets) {
+    const observed = inventory.reactObservedAssets.find((candidate) => candidate?.assetPath === expected.assetPath);
+    if (!observed) {
+      errors.push('missing observed React asset ' + expected.assetPath);
+      continue;
+    }
+    if (observed.scope !== expected.scope) errors.push('incorrect React asset scope for ' + expected.assetPath);
+    if (observed.screenAsset !== expected.screenAsset) errors.push('React commander asset cannot be a screen asset: ' + expected.assetPath);
   }
 }
 
-async function validateSha256(relativePath, expectedDigest, label, errors) {
-  if (!isSafeRelativePath(relativePath) || !isInsideRepository(relativePath)) {
-    errors.push('illegal asset path for ' + label);
+async function validateCocosRuntime(screen, expectedSource, gameShellSource, usedCocosPaths, usedCocosIds, errors) {
+  const runtime = screen.runtime;
+  if (!isRecord(runtime) || !isRecord(runtime.cocos)) {
+    errors.push('Cocos runtime record is missing for ' + screen.id);
     return;
-  }
-  try {
-    const bytes = await fs.readFile(path.resolve(repositoryRoot, relativePath));
-    const actualDigest = createHash('sha256').update(bytes).digest('hex');
-    if (actualDigest !== expectedDigest) errors.push('source SHA-256 mismatch for ' + label);
-  } catch {
-    errors.push('asset file is unavailable for ' + label);
-  }
-}
-
-async function validateMetaUuid(assetPath, expectedUuid, label, errors) {
-  const metaPath = assetPath + '.meta';
-  if (!isSafeRelativePath(metaPath) || !isInsideRepository(metaPath)) {
-    errors.push('illegal asset path for ' + label);
-    return;
-  }
-  try {
-    const metadata = JSON.parse(await fs.readFile(path.resolve(repositoryRoot, metaPath), 'utf8'));
-    if (metadata.uuid !== expectedUuid) errors.push('.meta UUID mismatch for ' + label);
-  } catch {
-    errors.push('.meta file is unavailable for ' + label);
-  }
-}
-
-function validateRuntime(runtime, screenId, errors) {
-  const expected = expectedRuntimeAssets[screenId];
-  if (!runtime || typeof runtime !== 'object') {
-    errors.push('runtime mapping missing for ' + screenId);
-    return [];
   }
   const cocos = runtime.cocos;
-  const hasCocosAssetPath = typeof cocos?.assetPath === 'string' && cocos.assetPath.length > 0;
-  if (!cocos || cocos.availability !== 'present' || !hasCocosAssetPath) errors.push('Cocos runtime asset missing for ' + screenId);
-  if (hasCocosAssetPath && cocos.assetPath !== expected.assetPath) errors.push('invalid Cocos runtime asset path for ' + screenId);
-  if (hasCocosAssetPath && !isSafeRelativePath(cocos.assetPath)) errors.push('illegal asset path for Cocos runtime ' + screenId);
-  if (cocos?.resourcePath !== expected.resourcePath) errors.push('invalid Cocos resource path for ' + screenId);
-  if (!isSafeRelativePath(cocos?.resourcePath)) errors.push('illegal resource path for Cocos runtime ' + screenId);
-  if (cocos?.assetId !== expected.assetId) errors.push('Cocos asset ID mismatch for ' + screenId);
-  if (cocos?.sourceSha256 !== expected.sourceSha256) errors.push('source SHA-256 declaration mismatch for ' + screenId);
+  const expected = expectedCocos[screen.id];
+  if (cocos.availability !== 'present') errors.push('Cocos runtime must be present for ' + screen.id);
+  const hasCocosAssetPath = typeof cocos.assetPath === 'string' && cocos.assetPath.length > 0;
+  if (!hasCocosAssetPath) {
+    errors.push('Cocos runtime asset missing for ' + screen.id);
+  } else if (!isSafeRepositoryPath(cocos.assetPath)) {
+    errors.push('Cocos assetPath must be a safe repository-relative path for ' + screen.id);
+  } else {
+    if (usedCocosPaths.has(cocos.assetPath)) errors.push('duplicate Cocos runtime asset path ' + cocos.assetPath);
+    usedCocosPaths.add(cocos.assetPath);
+  }
+  if (cocos.assetPath !== expected.assetPath) errors.push('Cocos assetPath mismatch for ' + screen.id);
+  if (cocos.resourcePath !== expected.resourcePath) errors.push('Cocos resourcePath mismatch for ' + screen.id);
+  if (!isSafeRepositoryPath(cocos.resourcePath)) errors.push('Cocos resourcePath must be a safe repository-relative path for ' + screen.id);
+  if (!uuidPattern.test(String(cocos.assetId))) errors.push('Cocos assetId must be a UUID for ' + screen.id);
+  if (usedCocosIds.has(cocos.assetId)) errors.push('duplicate Cocos assetId ' + String(cocos.assetId));
+  usedCocosIds.add(cocos.assetId);
+  if (cocos.assetId !== expected.assetId) errors.push('Cocos assetId mismatch for ' + screen.id);
+  if (!sha256Pattern.test(String(cocos.sourceSha256))) errors.push('Cocos sourceSha256 must be SHA-256 for ' + screen.id);
+  if (cocos.sourceSha256 !== expected.sourceSha256) errors.push('source SHA-256 declaration mismatch for ' + screen.id);
+  if (!gameShellSource.includes("'" + expected.resourcePath + "'")) errors.push('GameShell resource mapping missing for ' + screen.id);
 
-  const react = runtime.react;
-  if (!react || react.availability !== 'absent') errors.push('React UI asset must be absent for ' + screenId);
-  if (react?.assetPath !== null || react?.resourcePath !== null || react?.assetId !== null) errors.push('React UI asset path and ID must be null for ' + screenId);
-  if (typeof react?.verification !== 'string' || react.verification.trim().length === 0) errors.push('React absence evidence missing for ' + screenId);
-  return expected;
+  if (!hasCocosAssetPath || !isSafeRepositoryPath(cocos.assetPath)) return;
+  const cocosAssetFile = path.join(repositoryRoot, cocos.assetPath);
+  try {
+    const [cocosHash, sourceHash, cocosSize, sourceSize, meta] = await Promise.all([
+      fileSha256(cocosAssetFile),
+      fileSha256(path.join(sourceRoot, expectedSource)),
+      readPngDimensions(cocosAssetFile),
+      readPngDimensions(path.join(sourceRoot, expectedSource)),
+      fs.readFile(cocosAssetFile + '.meta', 'utf8').then((value) => JSON.parse(value)),
+    ]);
+    if (cocosHash !== sourceHash) errors.push('Cocos UI image differs from its visual source for ' + screen.id);
+    if (sourceHash !== expected.sourceSha256) errors.push('source SHA-256 mismatch for ' + screen.id);
+    if (cocos.sourceSha256 !== sourceHash) errors.push('Cocos sourceSha256 mismatch for ' + screen.id);
+    for (const [label, size] of [['Cocos', cocosSize], ['source', sourceSize]]) {
+      if (size.width !== canvas.width || size.height !== canvas.height) errors.push(label + ' UI image must be 1920x1080 for ' + screen.id);
+    }
+    if (!isRecord(meta) || meta.uuid !== expected.assetId) errors.push('Cocos .meta UUID mismatch for ' + screen.id);
+  } catch {
+    errors.push('Cocos UI image, source, or .meta file is unavailable for ' + screen.id);
+  }
 }
 
-async function validateInventory(inventory) {
+async function validateReactRuntime(screen, reactUiEvidence, errors) {
+  const runtime = screen.runtime;
+  if (!isRecord(runtime) || !isRecord(runtime.react)) {
+    errors.push('React runtime record is missing for ' + screen.id);
+    return;
+  }
+  const react = runtime.react;
+  if (react.availability !== 'absent') errors.push('React runtime UI asset must be absent for ' + screen.id);
+  for (const field of ['assetPath', 'resourcePath', 'assetId']) {
+    if (react[field] !== null) errors.push('React runtime ' + field + ' must be null for absent ' + screen.id);
+  }
+  if (typeof react.verification !== 'string' || react.verification.trim().length === 0) {
+    errors.push('React missing-asset evidence is required for ' + screen.id);
+  }
+  if (reactUiEvidence.length) {
+    errors.push('React UI asset/reference found while inventory says absent: ' + reactUiEvidence.join(', '));
+  }
+}
+
+async function validateInventory(inventory, gameShellSource, reactUiEvidence) {
   const errors = [];
   if (!inventory || inventory.schemaVersion !== 1) errors.push('schemaVersion must be 1');
   if (!Array.isArray(inventory?.screens)) errors.push('screens must be an array');
   if (errors.length) throw new Error(errors.join('; '));
 
-  if (!Array.isArray(inventory.reactObservedAssets) || inventory.reactObservedAssets.length !== expectedReactObservedAssets.length) {
-    errors.push('React observed asset inventory must contain exactly ' + expectedReactObservedAssets.length + ' files');
-  } else {
-    const observedPaths = new Set();
-    for (const asset of inventory.reactObservedAssets) {
-      if (!asset || typeof asset !== 'object') {
-        errors.push('React observed asset record must be an object');
-        continue;
-      }
-      if (observedPaths.has(asset.assetPath)) errors.push('duplicate React observed asset path ' + asset.assetPath);
-      observedPaths.add(asset.assetPath);
-      if (asset.screenAsset !== false) errors.push('React observed asset must not be classified as a screen asset ' + asset.assetPath);
-      if (typeof asset.scope !== 'string' || asset.scope.trim().length === 0) errors.push('React observed asset scope missing for ' + asset.assetPath);
-      if (!expectedReactObservedAssets.includes(asset.assetPath)) errors.push('unexpected React observed asset path ' + asset.assetPath);
-      await validateFilePath(asset.assetPath, 'React observed asset ' + asset.assetPath, errors);
-    }
-    for (const expectedPath of expectedReactObservedAssets) {
-      if (!observedPaths.has(expectedPath)) errors.push('missing React observed asset ' + expectedPath);
-    }
-  }
-
+  await validateObservedReactAssets(inventory, errors);
   const screenIds = new Set();
   const recordIds = new Set();
+  const usedCocosPaths = new Set();
+  const usedCocosIds = new Set();
   if (inventory.screens.length !== Object.keys(expectedSources).length) errors.push('screen count must be ' + Object.keys(expectedSources).length);
+
   for (const [id, source] of Object.entries(expectedSources)) {
-    const screen = inventory.screens.find((candidate) => candidate.id === id);
+    const screen = inventory.screens.find((candidate) => candidate?.id === id);
     if (!screen) {
       errors.push('missing screen ' + id + ' for source ' + source);
-    } else if (screen.source !== source) {
-      errors.push('missing or incorrect source image for ' + id);
-    } else {
-      try {
-        await fs.access(path.join(sourceRoot, source));
-      } catch {
-        errors.push('source image file is unavailable for ' + id);
-      }
+      continue;
+    }
+    if (screen.source !== source) errors.push('missing or incorrect source image for ' + id);
+    try {
+      const sourceSize = await readPngDimensions(path.join(sourceRoot, source));
+      if (sourceSize.width !== canvas.width || sourceSize.height !== canvas.height) errors.push('source image must be 1920x1080 for ' + id);
+    } catch {
+      errors.push('source image file is unavailable for ' + id);
     }
   }
 
   for (const screen of inventory.screens) {
+    if (!isRecord(screen)) {
+      errors.push('screen must be an object');
+      continue;
+    }
     if (screenIds.has(screen.id)) errors.push('duplicate screen ID ' + screen.id);
     screenIds.add(screen.id);
     if (!Object.hasOwn(expectedSources, screen.id)) {
       errors.push('unknown screen ID ' + screen.id);
       continue;
     }
-    const expectedRuntime = validateRuntime(screen.runtime, screen.id, errors);
-    if (expectedRuntime && isSafeRelativePath(screen.runtime?.cocos?.assetPath)) {
-      await validateFilePath(screen.runtime.cocos.assetPath, 'Cocos runtime ' + screen.id, errors, { png: true });
-      await validateMetaUuid(screen.runtime.cocos.assetPath, expectedRuntime.assetId, 'Cocos runtime ' + screen.id, errors);
-      await validateSha256(screen.runtime.cocos.assetPath, expectedRuntime.sourceSha256, 'Cocos runtime ' + screen.id, errors);
-      await validateMatchingFiles(
-        visualSourceRoot + '/' + expectedSources[screen.id],
-        screen.runtime.cocos.assetPath,
-        'Cocos/source mapping ' + screen.id,
-        errors,
-      );
-    }
     if (typeof screen.name !== 'string' || screen.name.length === 0) errors.push('screen name missing for ' + screen.id);
+    await validateCocosRuntime(screen, expectedSources[screen.id], gameShellSource, usedCocosPaths, usedCocosIds, errors);
+    await validateReactRuntime(screen, reactUiEvidence, errors);
     if (!Array.isArray(screen.layers)) {
       errors.push('layers must be an array for ' + screen.id);
       continue;
@@ -224,6 +260,10 @@ async function validateInventory(inventory) {
     const seenLayers = new Set();
     const seenZ = new Set();
     for (const record of screen.layers) {
+      if (!isRecord(record)) {
+        errors.push('layer record must be an object for ' + screen.id);
+        continue;
+      }
       if (!layers.includes(record.layer)) {
         errors.push('illegal layer ' + String(record.layer) + ' for ' + screen.id);
         continue;
@@ -242,14 +282,19 @@ async function validateInventory(inventory) {
       if (record.availability === 'absent' && (record.asset !== null || record.reusable !== false)) errors.push('absent record treated as an asset for ' + record.id);
 
       if (!(record.assetPath === null || typeof record.assetPath === 'string')) errors.push('assetPath must be a string or null for ' + record.id);
+      if (typeof record.assetPath === 'string' && !isSafeRepositoryPath(record.assetPath)) errors.push('assetPath must be repository-relative for ' + record.id);
       if (!(record.assetId === null || typeof record.assetId === 'string')) errors.push('assetId must be a string or null for ' + record.id);
-      if (record.assetPath !== null && !isSafeRelativePath(record.assetPath)) errors.push('illegal asset path for ' + record.id);
       if (record.availability === 'absent') {
         if (record.assetPath !== null || record.assetId !== null) errors.push('absent record has a structured asset source for ' + record.id);
       } else if (record.assetPath !== visualSourceRoot + '/' + screen.source || record.assetId !== null) {
         errors.push('present record must point to its visual source without a standalone asset ID for ' + record.id);
       } else {
-        await validateFilePath(record.assetPath, 'visual source for ' + record.id, errors, { png: true });
+        try {
+          const size = await readPngDimensions(path.join(repositoryRoot, record.assetPath));
+          if (size.width !== canvas.width || size.height !== canvas.height) errors.push('PNG asset must be 1920x1080 for ' + record.id);
+        } catch {
+          errors.push('asset file is unavailable for ' + record.id);
+        }
       }
 
       for (const field of ['x', 'y', 'width', 'height']) {
@@ -269,16 +314,16 @@ async function validateInventory(inventory) {
     for (const layer of layers) {
       if (!seenLayers.has(layer)) errors.push('missing required layer ' + layer + ' for ' + screen.id);
     }
-    if (seenZ.size !== Math.min(screen.layers.length, layers.length)) errors.push('each layer must have a unique z in ' + screen.id);
+    if (seenZ.size !== layers.length) errors.push('each required layer must have a unique z in ' + screen.id);
   }
   if (errors.length) throw new Error(errors.join('; '));
 }
 
-async function expectInvalid(label, mutate, expectedMessage) {
+async function expectInvalid(label, mutate, expectedMessage, inventory, gameShellSource, reactUiEvidence) {
   const candidate = structuredClone(inventory);
   mutate(candidate);
   await assert.rejects(
-    () => validateInventory(candidate),
+    () => validateInventory(candidate, gameShellSource, reactUiEvidence),
     (error) => error instanceof Error && error.message.includes(expectedMessage),
     label + ' did not fail with ' + expectedMessage,
   );
@@ -286,24 +331,40 @@ async function expectInvalid(label, mutate, expectedMessage) {
 
 const markdown = await fs.readFile(documentPath, 'utf8');
 const inventory = inventoryFromMarkdown(markdown);
-await validateInventory(inventory);
+const gameShellSource = await fs.readFile(gameShellPath, 'utf8');
+const reactUiEvidence = await findReactUiEvidence();
+await validateInventory(inventory, gameShellSource, reactUiEvidence);
 
-await expectInvalid('missing image', (candidate) => { candidate.screens[0].source = 'UI01-不存在.png'; }, 'missing or incorrect source image');
-await expectInvalid('duplicate ID', (candidate) => { candidate.screens[0].layers[1].id = candidate.screens[0].layers[0].id; }, 'duplicate record ID');
-await expectInvalid('illegal layer', (candidate) => { candidate.screens[0].layers[0].layer = '控件'; }, 'illegal layer');
-await expectInvalid('missing state', (candidate) => { candidate.screens[0].layers = candidate.screens[0].layers.filter((record) => record.layer !== '状态'); }, 'missing required layer 状态');
-await expectInvalid('absent treated as asset', (candidate) => { candidate.screens[1].layers.find((record) => record.layer === '角色').asset = '虚构角色立绘'; }, 'absent record treated as an asset');
-await expectInvalid('missing record source', (candidate) => { candidate.screens[0].layers[0].source = null; }, 'record source image missing or incorrect');
-await expectInvalid('missing Cocos runtime asset', (candidate) => { candidate.screens[0].runtime.cocos.assetPath = null; }, 'Cocos runtime asset missing');
-await expectInvalid('wrong Cocos asset ID', (candidate) => { candidate.screens[0].runtime.cocos.assetId = 'not-a-cocos-uuid'; }, 'Cocos asset ID mismatch');
-await expectInvalid('wrong source SHA-256', (candidate) => { candidate.screens[0].runtime.cocos.sourceSha256 = '0'.repeat(64); }, 'source SHA-256 declaration mismatch');
-await expectInvalid('illegal layer asset path', (candidate) => { candidate.screens[0].layers[0].assetPath = '../outside.png'; }, 'illegal asset path');
-await expectInvalid('duplicate React observed asset', (candidate) => { candidate.reactObservedAssets[1].assetPath = candidate.reactObservedAssets[0].assetPath; }, 'duplicate React observed asset path');
-
-await expectInvalid('illegal z', (candidate) => { candidate.screens[0].layers[1].z = 1.5; }, 'z must be an integer');
-await expectInvalid('non-positive size', (candidate) => { candidate.screens[0].layers[0].width = 0; }, 'width must be positive');
-await expectInvalid('out-of-bounds coordinates', (candidate) => { candidate.screens[0].layers[0].x = 1; candidate.screens[0].layers[0].width = 1920; }, 'x + width exceeds 1920');
-await expectInvalid('missing structured source', (candidate) => { candidate.screens[0].layers[0].assetPath = null; }, 'present record must point to its visual source');
+const negativeCases = [
+  ['missing screen', (candidate) => { candidate.screens = candidate.screens.slice(1); }, 'missing screen UI01'],
+  ['missing image', (candidate) => { candidate.screens[0].source = 'UI01-不存在.png'; }, 'missing or incorrect source image'],
+  ['duplicate screen ID', (candidate) => { candidate.screens[1].id = candidate.screens[0].id; }, 'duplicate screen ID'],
+  ['duplicate ID', (candidate) => { candidate.screens[0].layers[1].id = candidate.screens[0].layers[0].id; }, 'duplicate record ID'],
+  ['illegal layer', (candidate) => { candidate.screens[0].layers[0].layer = '控件'; }, 'illegal layer'],
+  ['missing state', (candidate) => { candidate.screens[0].layers = candidate.screens[0].layers.filter((record) => record.layer !== '状态'); }, 'missing required layer 状态'],
+  ['absent treated as asset', (candidate) => { candidate.screens[1].layers.find((record) => record.layer === '角色').asset = '虚构角色立绘'; }, 'absent record treated as an asset'],
+  ['missing record source', (candidate) => { candidate.screens[0].layers[0].source = null; }, 'record source image missing or incorrect'],
+  ['illegal z', (candidate) => { candidate.screens[0].layers[1].z = 1.5; }, 'z must be an integer'],
+  ['non-positive size', (candidate) => { candidate.screens[0].layers[0].width = 0; }, 'width must be positive'],
+  ['out-of-bounds coordinates', (candidate) => { candidate.screens[0].layers[0].x = 1; candidate.screens[0].layers[0].width = 1920; }, 'x + width exceeds 1920'],
+  ['missing structured source', (candidate) => { candidate.screens[0].layers[0].assetPath = null; }, 'present record must point to its visual source'],
+  ['illegal layer path', (candidate) => { candidate.screens[0].layers[0].assetPath = '/tmp/UI01.png'; }, 'assetPath must be repository-relative'],
+  ['traversal layer path', (candidate) => { candidate.screens[0].layers[0].assetPath = '../outside.png'; }, 'assetPath must be repository-relative'],
+  ['duplicate Cocos path', (candidate) => { candidate.screens[1].runtime.cocos.assetPath = candidate.screens[0].runtime.cocos.assetPath; }, 'duplicate Cocos runtime asset path'],
+  ['missing Cocos asset', (candidate) => { candidate.screens[0].runtime.cocos.assetPath = null; }, 'Cocos runtime asset missing'],
+  ['illegal Cocos path', (candidate) => { candidate.screens[0].runtime.cocos.assetPath = '../outside.png'; }, 'Cocos assetPath must be a safe repository-relative path'],
+  ['illegal Cocos resource path', (candidate) => { candidate.screens[0].runtime.cocos.resourcePath = '../outside/spriteFrame'; }, 'Cocos resourcePath must be a safe repository-relative path'],
+  ['missing Cocos ID', (candidate) => { candidate.screens[0].runtime.cocos.assetId = null; }, 'Cocos assetId mismatch'],
+  ['wrong Cocos ID', (candidate) => { candidate.screens[0].runtime.cocos.assetId = 'not-a-cocos-uuid'; }, 'Cocos assetId mismatch'],
+  ['React path on absent asset', (candidate) => { candidate.screens[0].runtime.react.assetPath = 'web-prototype/public/assets/UI01.png'; }, 'React runtime assetPath must be null'],
+  ['React falsely present', (candidate) => { candidate.screens[0].runtime.react.availability = 'present'; }, 'React runtime UI asset must be absent'],
+  ['duplicate React observed asset', (candidate) => { candidate.reactObservedAssets[1].assetPath = candidate.reactObservedAssets[0].assetPath; }, 'duplicate React observed asset path'],
+  ['missing source hash declaration', (candidate) => { candidate.screens[0].runtime.cocos.sourceSha256 = '0'.repeat(64); }, 'source SHA-256 declaration mismatch'],
+  ['Cocos hash mismatch', (candidate) => { candidate.screens[0].runtime.cocos.sourceSha256 = '0'.repeat(64); }, 'Cocos sourceSha256 mismatch'],
+];
+for (const [label, mutate, expectedMessage] of negativeCases) {
+  await expectInvalid(label, mutate, expectedMessage, inventory, gameShellSource, reactUiEvidence);
+}
 
 const layerCount = inventory.screens.reduce((count, screen) => count + screen.layers.length, 0);
-console.log('Asset-layer inventory verification: PASS (' + inventory.screens.length + ' screens, ' + layerCount + ' layers, 16 negative cases rejected)');
+console.log('Asset-layer inventory verification: PASS (' + inventory.screens.length + ' screens, ' + layerCount + ' layers, ' + negativeCases.length + ' negative cases rejected)');
