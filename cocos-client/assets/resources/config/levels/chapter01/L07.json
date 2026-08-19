@@ -1,0 +1,43 @@
+{
+  "chapterLevels": [{
+    "id": "L07",
+    "prerequisiteLevelId": "L06",
+    "enemyDeckId": "D001",
+    "environmentElement": "EARTH",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [
+      { "type": "CARD", "id": "U012", "quantity": 2 },
+      { "type": "CARD", "id": "U011", "quantity": 2 }
+    ],
+    "failureConditions": [{ "type": "PLAYER_HERO_DEFEATED" }],
+    "scenarioRules": {
+      "environmentElement": "EARTH",
+      "enemyHeavyUnitIds": ["U001"],
+      "enemyGiantUnitIds": ["U012"],
+      "impactCounter": {
+        "targetDefenseType": "HEAVY",
+        "requiredOffenseType": "IMPACT",
+        "availableUnitIds": ["U011", "U012"]
+      },
+      "pierceCounter": {
+        "targetDefenseType": "GIANT",
+        "requiredOffenseType": "PIERCE",
+        "availableUnitIds": ["U002"]
+      },
+      "knockbackRule": {
+        "sourceUnitId": "U012",
+        "distance": 1
+      },
+      "temporaryAid": {
+        "characterId": "C003",
+        "mode": "RULE_ALLY",
+        "durationRounds": 2
+      },
+      "alternateSolutions": [
+        "SPELL_BYPASS_ARMOR",
+        "PIERCE_COUNTER",
+        "KNOCKBACK_CONTROL"
+      ]
+    }
+  }]
+}
