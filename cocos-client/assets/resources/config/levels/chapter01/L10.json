@@ -1,0 +1,31 @@
+{
+  "chapterLevels": [{
+    "id": "L10",
+    "prerequisiteLevelId": "L09",
+    "enemyDeckId": "D001",
+    "environmentElement": "NONE",
+    "objectives": [
+      { "type": "DESTROY_TARGET", "targetId": "U001" },
+      { "type": "DESTROY_TARGET", "targetId": "U004" }
+    ],
+    "rewards": [{ "type": "UNLOCK", "id": "OUTPOST", "quantity": 1 }],
+    "failureConditions": [
+      { "type": "PLAYER_HERO_DEFEATED" },
+      { "type": "TARGET_DESTROYED", "targetId": "U001" },
+      { "type": "TARGET_DESTROYED", "targetId": "U004" }
+    ],
+    "scenarioRules": {
+      "sceneId": "E110",
+      "laneCount": 2,
+      "keyTargetIds": ["U001", "U004"],
+      "laneTargetMapping": [
+        { "lane": 1, "targetId": "U001", "role": "SIGNAL_BEACON" },
+        { "lane": 2, "targetId": "U004", "role": "REINFORCEMENT_GATE" }
+      ],
+      "objectivePolicy": "DESTROY_ALL_KEY_TARGETS",
+      "failureTargetPolicy": "ANY_KEY_TARGET_DESTROYED",
+      "heroKillDoesNotEnd": true,
+      "outpostUnlockId": "OUTPOST"
+    }
+  }]
+}
