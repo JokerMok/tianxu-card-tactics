@@ -58,10 +58,22 @@ const noPityFirst = resolveDrop(poolWithoutPity, initial, () => {
 });
 const noPityRepeatOne = resolveDrop(poolWithoutPity, noPityFirst.nextState, () => 0);
 const noPityRepeatTwo = resolveDrop(poolWithoutPity, noPityRepeatOne.nextState, () => 0);
+const noPityRepeatThree = resolveDrop(poolWithoutPity, noPityRepeatTwo.nextState, () => 0);
 assert.equal(noPityRepeatOne.code, 'GRANTED');
 assert.equal(noPityRepeatTwo.code, 'GRANTED', 'a no-pity pool must allow the second repeat claim');
+assert.equal(noPityRepeatThree.code, 'GRANTED', 'a no-pity pool must allow the third repeat claim');
 assert.equal(noPityRepeatOne.nextState.rareMisses, 0);
 assert.equal(noPityRepeatTwo.nextState.rareMisses, 0);
+assert.equal(noPityRepeatThree.nextState.rareMisses, 0);
+assert.equal(noPityRepeatThree.nextState.claims, poolWithoutPity.maxClaims);
+
+const noPityLimited = resolveDrop(poolWithoutPity, noPityRepeatThree.nextState, () => {
+  throw new Error('claim limit must not consume RNG');
+});
+assert.equal(noPityLimited.code, 'LIMIT_REACHED');
+assert.equal(noPityLimited.nextState.rareMisses, 0);
+assert.equal(noPityLimited.nextState.claims, noPityRepeatThree.nextState.claims);
+assert.deepEqual(noPityLimited.nextState, noPityRepeatThree.nextState, 'claim limit must preserve the no-pity state');
 
 assert.throws(
   () => resolveDrop(poolWithoutPity, { claims: 1, firstClearClaimed: true, rareMisses: 1 }, () => 0),
