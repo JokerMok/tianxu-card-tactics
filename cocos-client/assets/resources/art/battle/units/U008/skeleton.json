@@ -88,7 +88,6 @@
       "sourcePose": { "source": "poseSheet", "poseIndex": 1 },
       "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 1 }],
       "tracks": [
-        { "bone": "root", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.4, "value": 20 }, { "time": 0.8, "value": 0 }] },
         { "bone": "frontLeg", "property": "rotate", "frames": [{ "time": 0, "value": -18 }, { "time": 0.4, "value": 18 }, { "time": 0.8, "value": -18 }] },
         { "bone": "rearLeg", "property": "rotate", "frames": [{ "time": 0, "value": 18 }, { "time": 0.4, "value": -18 }, { "time": 0.8, "value": 18 }] }
       ],
