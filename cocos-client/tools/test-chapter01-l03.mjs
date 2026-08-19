@@ -40,7 +40,7 @@ const enumCoverage = JSON.parse(fs.readFileSync(enumFixturePath, 'utf8'));
 const story = fs.readFileSync(storyPath, 'utf8');
 const characterSheet = fs.readFileSync(characterPath, 'utf8');
 const unitIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
-const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const chapterLevelIds = new Set([levelConfig.chapterLevels[0].id, levelConfig.chapterLevels[0].prerequisiteLevelId].filter(Boolean));
 const characterTargetIds = new Set([...characterSheet.matchAll(/\|\s*(C\d+)\s*\|/gu)].map((match) => match[1]));
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
@@ -122,7 +122,14 @@ function assertL03BattleRules(rules) {
   assert.deepEqual(rules.requiredResponses, ['GUARD_BLOCK_FAST', 'INTERCEPT_AFTER_TWO_CELL_MOVE']);
 }
 assertL03BattleRules(level.battleRules);
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, fastUnitIds: ['U999'] }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, guardUnitIds: ['U999'] }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, interceptUnitIds: ['U999'] }));
 assert.throws(() => assertL03BattleRules({ ...level.battleRules, movementTrigger: { distance: 1, responseUnitId: 'U002' } }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, movementTrigger: { distance: 2, responseUnitId: 'U999' } }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, temporaryAid: { targetId: 'C999', mode: 'PROTECT' } }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, temporaryAid: { targetId: 'C002', mode: 'ATTACK' } }));
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, requiredResponses: ['GUARD_BLOCK_FAST'] }));
 
 assert.equal(decks.decks.some((deck) => deck.id === level.enemyDeckId), true, 'L03 must use a real enemy deck');
 assert.equal(cards.cards.some((card) => card.id === 'U004'), true, 'L03 reward U004 must exist in cards.json');
