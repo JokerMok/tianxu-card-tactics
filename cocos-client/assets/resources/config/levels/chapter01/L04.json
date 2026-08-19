@@ -1,0 +1,32 @@
+{
+  "chapterLevels": [
+    {
+      "id": "L04",
+      "prerequisiteLevelId": "L03",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        {
+          "type": "DEFEAT_ENEMY_HERO"
+        }
+      ],
+      "rewards": [
+        {
+          "type": "CARD",
+          "id": "U005",
+          "quantity": 3
+        },
+        {
+          "type": "CARD",
+          "id": "U006",
+          "quantity": 2
+        }
+      ],
+      "failureConditions": [
+        {
+          "type": "PLAYER_HERO_DEFEATED"
+        }
+      ]
+    }
+  ]
+}
