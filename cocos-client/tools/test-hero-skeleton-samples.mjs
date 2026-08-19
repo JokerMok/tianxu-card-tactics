@@ -201,11 +201,11 @@ function validateSource(heroId, skeleton, directory) {
   assert.deepEqual(source.alphaBounds, image.alphaBounds, `${heroId} alpha bounds must be recorded`);
   assert.deepEqual(source.transparentBorder, image.transparentBorder, `${heroId} transparent border must be recorded`);
   assert.equal(source.edgeAlphaPixels, image.edgeAlphaPixels, `${heroId} edge alpha contract must be recorded`);
-  return image;
+  return { image, sourceBytes };
 }
 
 function validateSkeleton(heroId, skeleton, directory) {
-  const image = validateSource(heroId, skeleton, directory);
+  const { image, sourceBytes } = validateSource(heroId, skeleton, directory);
   assert.equal(skeleton.schema, 'battle-hero-skeleton/v1', `${heroId} schema is invalid`);
   assert.equal(skeleton.heroId, heroId, `${heroId} directory and skeleton ID must match`);
   assert.deepEqual(skeleton.placement, {
@@ -235,6 +235,13 @@ function validateSkeleton(heroId, skeleton, directory) {
   const attachment = skeleton.attachments[0];
   assert.equal(attachment.name, 'body', `${heroId} must expose a body attachment`);
   assert.equal(attachment.bone, 'root', `${heroId} body must attach to root`);
+  assert.equal(typeof attachment.file, 'string', `${heroId} body attachment must provide a file`);
+  assert.equal(attachment.file, skeleton.source.file, `${heroId} body attachment must match source.file`);
+  const attachmentFile = resolve(directory, attachment.file);
+  assert.equal(existsSync(attachmentFile), true, `${heroId} body attachment file is missing`);
+  const attachmentBytes = readFileSync(attachmentFile);
+  assert.deepEqual(attachmentBytes, sourceBytes, `${heroId} body attachment must preserve the approved source bytes`);
+  assert.equal(createHash('sha256').update(attachmentBytes).digest('hex'), skeleton.source.sha256, `${heroId} body attachment SHA-256 is stale`);
   assert.deepEqual({ width: attachment.width, height: attachment.height }, { ...EXPECTED[heroId].rawSize }, `${heroId} attachment dimensions must preserve raw size`);
   assert.deepEqual({ rawWidth: attachment.rawWidth, rawHeight: attachment.rawHeight }, { rawWidth: image.width, rawHeight: image.height }, `${heroId} attachment raw size must be recorded`);
   assert.equal(attachment.preserveAspectRatio, true, `${heroId} body must preserve source ratio`);
@@ -287,6 +294,14 @@ const cardSource = structuredClone(samples[0].skeleton);
 cardSource.source.sourceFile = '美术素材/运行时/卡面/core/large/C001-CARD.webp';
 assert.throws(() => validateSkeleton('C001', cardSource, samples[0].directory), /card, chroma, side-slot, raw, or background/);
 
+const wrongAttachmentPath = structuredClone(samples[0].skeleton);
+wrongAttachmentPath.attachments[0].file = '../C009/C009-BATTLE-CUTOUT.png';
+assert.throws(() => validateSkeleton('C001', wrongAttachmentPath, samples[0].directory), /body attachment must match source\.file/);
+
+const missingAttachment = structuredClone(samples[1].skeleton);
+missingAttachment.attachments = [];
+assert.throws(() => validateSkeleton('C009', missingAttachment, samples[1].directory), /must provide a visual attachment/);
+
 const wrongAlphaBoundary = structuredClone(samples[1].skeleton);
 wrongAlphaBoundary.source.alphaBounds.width -= 1;
 assert.throws(() => validateSkeleton('C009', wrongAlphaBoundary, samples[1].directory), /alpha bounds must be recorded/);
@@ -295,4 +310,4 @@ const wrongDirection = structuredClone(samples[1].skeleton);
 wrongDirection.orientations.enemy.scaleY = -1;
 assert.throws(() => validateSkeleton('C009', wrongDirection, samples[1].directory), /deterministic player\/enemy mirroring/);
 
-console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 4 contract counterexamples rejected`);
+console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 6 contract counterexamples rejected`);
