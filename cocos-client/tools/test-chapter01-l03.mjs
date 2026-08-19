@@ -31,6 +31,7 @@ const { assertChapterLevelContract, ConfigLoadError } = await import(
 );
 
 const levelConfig = JSON.parse(fs.readFileSync(levelPath, 'utf8'));
+const previousLevelConfig = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/levels/chapter01/L02.json'), 'utf8'));
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const decks = JSON.parse(fs.readFileSync(decksPath, 'utf8'));
 const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
@@ -40,7 +41,10 @@ const enumCoverage = JSON.parse(fs.readFileSync(enumFixturePath, 'utf8'));
 const story = fs.readFileSync(storyPath, 'utf8');
 const characterSheet = fs.readFileSync(characterPath, 'utf8');
 const unitIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
-const chapterLevelIds = new Set([levelConfig.chapterLevels[0].id, levelConfig.chapterLevels[0].prerequisiteLevelId].filter(Boolean));
+const chapterLevelIds = new Set([
+  ...previousLevelConfig.chapterLevels.map((entry) => entry.id),
+  ...levelConfig.chapterLevels.map((entry) => entry.id),
+]);
 const characterTargetIds = new Set([...characterSheet.matchAll(/\|\s*(C\d+)\s*\|/gu)].map((match) => match[1]));
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
@@ -66,6 +70,7 @@ assert.doesNotThrow(
 
 assert.equal(levelConfig.chapterLevels.length, 1, 'L03 file must contain exactly one level');
 const [level] = levelConfig.chapterLevels;
+assert.equal(previousLevelConfig.chapterLevels[0].id, 'L02', 'L03 prerequisite must exist in the preceding real level file');
 assert.deepEqual(
   {
     id: level.id,
