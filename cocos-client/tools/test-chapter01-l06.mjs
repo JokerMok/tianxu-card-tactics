@@ -58,11 +58,14 @@ function assertScenarioRules(rules) {
   assert.deepEqual(rules.alternateSolutions, ['PURIFY', 'SPREAD_DEPLOYMENT', 'LANE_SWAP', 'FIRE_DAMAGE']);
 }
 assertScenarioRules(level.scenarioRules);
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, rewardPolicy: 'RANDOM_SKILL' }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, environmentElement: 'FIRE' }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, sameElementEffectBonusPercent: 0 }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, fireEffectPenaltyPercent: 0 }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, freezeStatus: 'BURN' }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, purifyAvailable: false }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, preBattleEnvironmentReadRequired: false }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, alternateSolutions: ['PURIFY'] }));
 
 function expectFailure(label, mutate, expectedPath) {
   const candidate = structuredClone(levelConfig);
