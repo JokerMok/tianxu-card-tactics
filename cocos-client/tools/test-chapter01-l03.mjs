@@ -10,6 +10,7 @@ const decksPath = path.join(root, 'assets/resources/config/decks.json');
 const cardsPath = path.join(root, 'assets/resources/config/cards.json');
 const unitsPath = path.join(root, 'assets/resources/config/units.json');
 const skillsPath = path.join(root, 'assets/resources/config/skills.json');
+const enumFixturePath = path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json');
 const storyPath = path.join(root, '..', '首章剧情关卡-v1.1.md');
 const characterPath = path.join(root, '..', '首发角色视觉设定-v1.0.md');
 
@@ -35,12 +36,16 @@ const decks = JSON.parse(fs.readFileSync(decksPath, 'utf8'));
 const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
 const units = JSON.parse(fs.readFileSync(unitsPath, 'utf8'));
 const skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
+const enumCoverage = JSON.parse(fs.readFileSync(enumFixturePath, 'utf8'));
 const story = fs.readFileSync(storyPath, 'utf8');
 const characterSheet = fs.readFileSync(characterPath, 'utf8');
 const unitIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
+const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const characterTargetIds = new Set([...characterSheet.matchAll(/\|\s*(C\d+)\s*\|/gu)].map((match) => match[1]));
+const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
-  chapterLevelIds: new Set(['L02', 'L03']),
-  targetIds: new Set([...unitIds, 'C002']),
+  chapterLevelIds,
+  targetIds: new Set([...unitIds, ...characterTargetIds]),
   unitIds,
   skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
   cards: new Map(cards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
@@ -49,9 +54,9 @@ const references = {
     ...(card.unitId ? { unitId: card.unitId } : {}),
     ...(card.skillId ? { skillId: card.skillId } : {}),
   }])),
-  unlockIds: new Set(['OUTPOST']),
-  chestIds: new Set(['CHAPTER-CHEST']),
-  flagIds: new Set(['OUTCAST-CAMP']),
+  unlockIds: rewardIds('UNLOCK'),
+  chestIds: rewardIds('CHEST'),
+  flagIds: rewardIds('FLAG'),
 };
 
 assert.doesNotThrow(
@@ -105,6 +110,19 @@ assert.deepEqual(level.battleRules, {
   temporaryAid: { targetId: 'C002', mode: 'PROTECT' },
   requiredResponses: ['GUARD_BLOCK_FAST', 'INTERCEPT_AFTER_TWO_CELL_MOVE'],
 }, 'L03 must encode fast/guard/intercept and temporary aid rules');
+function assertL03BattleRules(rules) {
+  assert.deepEqual(rules.fastUnitIds, ['U005']);
+  assert.deepEqual(rules.guardUnitIds, ['U001']);
+  assert.deepEqual(rules.interceptUnitIds, ['U002']);
+  for (const id of [...rules.fastUnitIds, ...rules.guardUnitIds, ...rules.interceptUnitIds]) assert.equal(unitIds.has(id), true);
+  assert.equal(rules.movementTrigger.distance, 2);
+  assert.equal(unitIds.has(rules.movementTrigger.responseUnitId), true);
+  assert.deepEqual(rules.temporaryAid, { targetId: 'C002', mode: 'PROTECT' });
+  assert.equal(characterTargetIds.has(rules.temporaryAid.targetId), true);
+  assert.deepEqual(rules.requiredResponses, ['GUARD_BLOCK_FAST', 'INTERCEPT_AFTER_TWO_CELL_MOVE']);
+}
+assertL03BattleRules(level.battleRules);
+assert.throws(() => assertL03BattleRules({ ...level.battleRules, movementTrigger: { distance: 1, responseUnitId: 'U002' } }));
 
 assert.equal(decks.decks.some((deck) => deck.id === level.enemyDeckId), true, 'L03 must use a real enemy deck');
 assert.equal(cards.cards.some((card) => card.id === 'U004'), true, 'L03 reward U004 must exist in cards.json');
