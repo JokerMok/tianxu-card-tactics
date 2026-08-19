@@ -30,14 +30,31 @@ const level = readJson(levelPath);
 const manifest = readJson(path.join(configRoot, 'manifest.json'));
 const decks = readJson(path.join(configRoot, 'decks.json'));
 const cards = readJson(path.join(configRoot, 'cards.json'));
+const units = readJson(path.join(configRoot, 'units.json'));
+const skills = readJson(path.join(configRoot, 'skills.json'));
 const deckIds = new Set(decks.decks.map(({ id }) => id));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
+const references = {
+  chapterLevelIds: new Set(['L01']),
+  targetIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
+  unitIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
+  skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
+  cards: new Map(cards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
+    cardType: card.cardType,
+    copyLimit: card.copyLimit,
+    ...(card.unitId ? { unitId: card.unitId } : {}),
+    ...(card.skillId ? { skillId: card.skillId } : {}),
+  }])),
+  unlockIds: new Set(['OUTPOST']),
+  chestIds: new Set(['CHAPTER-CHEST']),
+  flagIds: new Set(['OUTCAST-CAMP']),
+};
 const levelContract = { chapterLevels: [level] };
 
 assert.deepEqual(
   Object.keys(level).sort(),
-  ['enemyDeckId', 'environmentElement', 'failureConditions', 'id', 'objectives', 'prerequisiteLevelId', 'rewards'],
-  'L01 must contain the T331 level fields only',
+  ['enemyDeckId', 'environmentElement', 'failureConditions', 'id', 'objectives', 'prerequisiteLevelId', 'rewards', 'scenarioRules'],
+  'L01 must contain the T331 level fields and scenario rules',
 );
 assert.equal(level.id, 'L01', 'L01 ID must be the first chapter level');
 assert.equal(level.prerequisiteLevelId, null, 'L01 must have no prerequisite');
@@ -57,9 +74,17 @@ assert.deepEqual(
   [{ type: 'PLAYER_HERO_DEFEATED' }],
   'L01 must fail when the player hero is defeated',
 );
+assert.deepEqual(level.scenarioRules, {
+  playerHeroHp: 30,
+  activeLaneCount: 1,
+  playerSummonSlots: 3,
+  unlockSecondLaneOnFirstDeployment: true,
+  openingSkillCardsAllowed: false,
+  enemyOpeningCardFilter: 'UNITS_ONLY',
+}, 'L01 must encode the one-lane deployment tutorial rules');
 
 assert.doesNotThrow(
-  () => assertChapterLevelContract(levelContract, manifest, decks, 'config/levels/chapter01/L01'),
+  () => assertChapterLevelContract(levelContract, manifest, decks, references, 'config/levels/chapter01/L01'),
   'real L01 must pass the shared chapter-level contract',
 );
 
@@ -67,7 +92,7 @@ function expectFailure(label, mutate, expectedPath) {
   const invalidLevel = structuredClone(level);
   mutate(invalidLevel);
   assert.throws(
-    () => assertChapterLevelContract({ chapterLevels: [invalidLevel] }, manifest, decks, 'config/levels/chapter01/L01'),
+    () => assertChapterLevelContract({ chapterLevels: [invalidLevel] }, manifest, decks, references, 'config/levels/chapter01/L01'),
     (error) => {
       assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
       assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);

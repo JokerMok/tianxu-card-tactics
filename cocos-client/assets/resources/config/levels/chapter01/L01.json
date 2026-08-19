@@ -19,5 +19,13 @@
     {
       "type": "PLAYER_HERO_DEFEATED"
     }
-  ]
+  ],
+  "scenarioRules": {
+    "playerHeroHp": 30,
+    "activeLaneCount": 1,
+    "playerSummonSlots": 3,
+    "unlockSecondLaneOnFirstDeployment": true,
+    "openingSkillCardsAllowed": false,
+    "enemyOpeningCardFilter": "UNITS_ONLY"
+  }
 }
