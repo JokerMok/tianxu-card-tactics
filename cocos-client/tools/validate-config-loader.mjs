@@ -6,13 +6,16 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const configPath = path.join(root, 'assets/resources/config/manifest.json');
 const loaderPath = path.join(root, 'assets/scripts/config/ConfigLoader.ts');
+const contractPath = path.join(root, 'assets/scripts/config/levels/ChapterLevelContract.ts');
 const bootstrapPath = path.join(root, 'assets/scripts/a0/BattleA0Bootstrap.ts');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const loaderSource = fs.readFileSync(loaderPath, 'utf8');
+const contractSource = fs.readFileSync(contractPath, 'utf8');
 const bootstrap = fs.readFileSync(bootstrapPath, 'utf8');
+const chapterIndex = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/levels/chapter01/index.json'), 'utf8'));
 
 const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'];
-const tableByPath = {
+const resourceByPath = {
   'config/manifest': config,
   ...Object.fromEntries(
     tableNames.map((tableName) => {
@@ -21,12 +24,24 @@ const tableByPath = {
       return [tablePath, JSON.parse(fs.readFileSync(tableFile, 'utf8'))];
     }),
   ),
+  [config.chapters.chapter01]: chapterIndex,
+  ...Object.fromEntries(
+    chapterIndex.levels.map((entry) => [
+      entry.resource,
+      JSON.parse(fs.readFileSync(path.join(root, 'assets/resources', `${entry.resource}.json`), 'utf8')),
+    ]),
+  ),
 };
 
-const expectedResourceLoadPaths = ['config/manifest', ...tableNames.map((tableName) => config.tables[tableName])];
+const expectedResourceLoadPaths = [
+  'config/manifest',
+  ...tableNames.map((tableName) => config.tables[tableName]),
+  config.chapters.chapter01,
+  ...chapterIndex.levels.map((entry) => entry.resource),
+];
 let nextModuleId = 0;
 
-async function loadConfigLoader(resourcesByPath = tableByPath, source = loaderSource) {
+async function loadConfigLoader(resourcesByPath = resourceByPath, source = loaderSource) {
   const mockCcSource = `
 const resourceLoadPaths = [];
 const tableByPath = new Map(Object.entries(${JSON.stringify(resourcesByPath)}));
@@ -46,12 +61,22 @@ const mockCc = {
 };
 export { resourceLoadPaths };
 `;
-  const sourceWithMockCc = source.replace(
+  const sourceWithoutChapterContractImport = source.replace(
+    "import type { ChapterLevelConfig, ChapterLevelReferences } from './levels/ChapterLevelContract';",
+    '',
+  );
+  const sourceWithMockCc = sourceWithoutChapterContractImport.replace(
     "import { JsonAsset, resources } from 'cc';",
     `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`,
   );
-  assert.notEqual(sourceWithMockCc, source, 'the loader must have the expected sole cc import');
-  const executableSource = stripTypeScriptTypes(sourceWithMockCc, { mode: 'transform' });
+  assert.notEqual(sourceWithMockCc, sourceWithoutChapterContractImport, 'the loader must have the expected sole cc import');
+  const executableSource = stripTypeScriptTypes(
+    `${sourceWithMockCc.replace(
+      "const chapterContract = await import('./levels/ChapterLevelContract');",
+      'const chapterContract = { assertChapterLevelContract };',
+    )}\n${contractSource.replace("import { assertConfigManifest, ConfigLoadError, type ConfigManifest } from '../ConfigLoader';", '')}`,
+    { mode: 'transform' },
+  );
   return import(
     `data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}#${nextModuleId++}`,
   );
@@ -88,37 +113,54 @@ assert.deepEqual(
   'successful loading must request the manifest and every declared table exactly once',
 );
 
-const tableLoads = "(['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const).map((tableName) =>";
+const tableNamesDeclaration = "const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const;";
 const skippedDeckLoaderSource = loaderSource.replace(
-  tableLoads,
-  "(['units', 'cards', 'skills', 'effects', 'statuses', 'professions'] as const).map((tableName) =>",
+  tableNamesDeclaration,
+  "const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions'] as const;",
 );
 assert.notEqual(skippedDeckLoaderSource, loaderSource, 'the skipped-deck regression source must be created');
-const skippedDeckLoader = await loadConfigLoader(tableByPath, skippedDeckLoaderSource);
+const skippedDeckLoader = await loadConfigLoader(resourceByPath, skippedDeckLoaderSource);
 await assert.rejects(
-  async () => {
-    await skippedDeckLoader.loadConfigManifest();
-    assert.deepEqual(
-      skippedDeckLoader.resourceLoadPaths,
-      expectedResourceLoadPaths,
-      'skipping decks must fail the complete resource-path assertion',
-    );
-  },
-  (error) => error?.name === 'AssertionError',
-  'the complete resource-path assertion must reject a loader that skips decks',
+  skippedDeckLoader.loadConfigManifest(),
+  (error) => error?.name === 'ConfigLoadError' && error.configPath === 'config/decks',
+  'the chapter loader must reject a loader that skips decks',
 );
 
-const missingDeckResource = structuredClone(tableByPath);
+const missingDeckResource = structuredClone(resourceByPath);
 delete missingDeckResource['config/decks'];
 await expectLoadConfigError('missing table resource', missingDeckResource, 'config/decks');
 
-const unknownDeckTableName = structuredClone(tableByPath);
+const unknownDeckTableName = structuredClone(resourceByPath);
 unknownDeckTableName['config/decks'].table = 'unknown';
 await expectLoadConfigError('unknown table name', unknownDeckTableName, 'config/decks.table');
 
-const invalidDeckPath = structuredClone(tableByPath);
+const invalidDeckPath = structuredClone(resourceByPath);
 invalidDeckPath['config/manifest'].tables.decks = 'config/unknown';
 await expectLoadConfigError('invalid table path', invalidDeckPath, 'config/manifest.tables.decks');
+
+const missingChapterIndex = structuredClone(resourceByPath);
+delete missingChapterIndex[config.chapters.chapter01];
+await expectLoadConfigError('missing chapter index', missingChapterIndex, config.chapters.chapter01);
+
+const missingChapterLevel = structuredClone(resourceByPath);
+delete missingChapterLevel['config/levels/chapter01/L12'];
+await expectLoadConfigError('missing chapter level', missingChapterLevel, 'config/levels/chapter01/L12');
+
+const invalidChapterPrerequisite = structuredClone(resourceByPath);
+invalidChapterPrerequisite['config/levels/chapter01/L08'].chapterLevels[0].prerequisiteLevelId = 'L99';
+await expectLoadConfigError(
+  'invalid chapter prerequisite',
+  invalidChapterPrerequisite,
+  'config/levels/chapter01/L08.chapterLevels[0].prerequisiteLevelId',
+);
+
+const unknownChapterDeck = structuredClone(resourceByPath);
+unknownChapterDeck['config/levels/chapter01/L10'].chapterLevels[0].enemyDeckId = 'D404';
+await expectLoadConfigError(
+  'unknown chapter deck',
+  unknownChapterDeck,
+  'config/levels/chapter01/L10.chapterLevels[0].enemyDeckId',
+);
 
 const missingField = structuredClone(config);
 delete missingField.idPolicy.format;
@@ -146,6 +188,9 @@ assert.match(loaderSource, /export interface ConfigManifest/);
 assert.match(loaderSource, /export function isConfigManifest\(value: unknown\): value is ConfigManifest/);
 assert.match(loaderSource, /export function assertConfigManifest\(/);
 assert.match(loaderSource, /resources\.load\(['"]config\/manifest['"]/);
+assert.match(loaderSource, /loadChapter01Levels\(/);
+assert.match(loaderSource, /chapter01: string/);
+assert.match(loaderSource, /config\/levels\/chapter01\/index/);
 assert.match(loaderSource, /ConfigLoadError/);
 assert.match(bootstrap, /loadConfigManifest\(/);
 assert.match(bootstrap, /startupBlocked/);

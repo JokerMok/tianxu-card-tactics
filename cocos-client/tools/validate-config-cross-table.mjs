@@ -14,7 +14,9 @@ const mockCc = {
 };
 `;
 const executableSource = stripTypeScriptTypes(
-  `${loaderSource.replace("import { JsonAsset, resources } from 'cc';", `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`)}\n${validatorSource.replace("import { ConfigLoadError } from './ConfigLoader';", '')}`,
+  `${loaderSource
+    .replace("import type { ChapterLevelConfig, ChapterLevelReferences } from './levels/ChapterLevelContract';", '')
+    .replace("import { JsonAsset, resources } from 'cc';", `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`)}\n${validatorSource.replace("import { ConfigLoadError } from './ConfigLoader';", '')}`,
   { mode: 'transform' },
 );
 const module = await import(`data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}`);

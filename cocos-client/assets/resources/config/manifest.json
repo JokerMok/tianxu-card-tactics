@@ -13,6 +13,9 @@
     "professions": "config/professions",
     "decks": "config/decks"
   },
+  "chapters": {
+    "chapter01": "config/levels/chapter01/index"
+  },
   "idPolicy": {
     "scope": "global",
     "format": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$",
