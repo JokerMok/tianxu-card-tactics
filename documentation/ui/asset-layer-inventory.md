@@ -2,7 +2,9 @@
 
 范围与依据：本清单以 `美术素材/UI全界面/Image2-v1-1920` 下的九张正式 Image2-v1 视觉稿为唯一视觉依据，统一采用原生 `1920×1080` 坐标系。每个界面按背景、角色、装饰、九宫格、图标、文字、状态各记录一项；坐标是该层在整屏视觉稿中的合理视觉包围盒，z 按背景到状态的渲染顺序排列。
 
-来源规则：当前范围只提供整屏视觉稿，没有可复用的独立 Cocos 资产。因而 `present` 层的 `assetPath` 必须定位到对应整屏视觉源图，`assetId` 保留为 `null`；`absent` 层不把场景元素冒充角色或资产，`assetPath` 与 `assetId` 均为 `null`。
+来源规则：当前没有可复用的独立层文件，`present` 层的 `assetPath` 定位到对应整屏视觉源图，`assetId` 保留为 `null`；`absent` 层不把场景元素冒充角色或资产，`assetPath` 与 `assetId` 均为 `null`。`runtime` 记录平台实际接入情况：Cocos 当前接入九张整屏 PNG，并记录 `.meta` UUID 与源图 SHA-256；React 原型没有对应的九页 Image2 UI 图像资产，路径、资源路径和 ID 均明确为 `null`。
+
+平台盘点：Cocos 的九张运行时图片均位于 `cocos-client/assets/resources/ui/image2`，并由 `GameShell` 以 `ui/image2/*/spriteFrame` 加载；React 当前仅有 `web-prototype/public/assets/commanders/player.webp` 与 `enemy.webp` 两张战斗原型角色图，不属于本清单的九页 UI 资产，不能替代缺失的页面图层。
 
 ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DEC、9S、ICO、TXT、STA；验证器解析下列清单并校验全部 63 项。
 
@@ -10,11 +12,39 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
 ~~~json
 {
   "schemaVersion": 1,
+  "reactObservedAssets": [
+    {
+      "assetPath": "web-prototype/public/assets/commanders/player.webp",
+      "scope": "战斗原型角色图",
+      "screenAsset": false
+    },
+    {
+      "assetPath": "web-prototype/public/assets/commanders/enemy.webp",
+      "scope": "战斗原型角色图",
+      "screenAsset": false
+    }
+  ],
   "screens": [
     {
       "id": "UI01",
       "name": "主城",
       "source": "UI01-主城.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI01-home.png",
+          "resourcePath": "ui/image2/UI01-home/spriteFrame",
+          "assetId": "1479317e-dbec-4396-ba9f-d4784797edf9",
+          "sourceSha256": "302460789161231daeed324b22dda5bd61bd0a9aa1a21854208ed81e113eb750"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的主城 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI01-BG-01",
@@ -134,6 +164,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI02",
       "name": "征战",
       "source": "UI02-征战.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI02-campaign.png",
+          "resourcePath": "ui/image2/UI02-campaign/spriteFrame",
+          "assetId": "8b74bf8c-6961-4dd0-b50f-492e928a3ae6",
+          "sourceSha256": "b73a4af1ac2a917d4a89f7dddd197efb1cc040d4ad4ed2603901ef3aa48dfa0b"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的征战 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI02-BG-01",
@@ -253,6 +299,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI03",
       "name": "卡库",
       "source": "UI03-卡库.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI03-cards.png",
+          "resourcePath": "ui/image2/UI03-cards/spriteFrame",
+          "assetId": "49e0cd70-f507-4fa5-a36f-07d4da8a0325",
+          "sourceSha256": "dcdf2ebab28c2a8d1198844b5424854c669ceb5753f0422d2a3e3f5ac64061ef"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的卡库 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI03-BG-01",
@@ -372,6 +434,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI04",
       "name": "编队",
       "source": "UI04-编队.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI04-deck.png",
+          "resourcePath": "ui/image2/UI04-deck/spriteFrame",
+          "assetId": "12c50cfd-85ad-4f43-87be-5bf0361c913e",
+          "sourceSha256": "0b93ceacfac4e9d8bd982356353f630ade7e28a6e41d4f3522fa46bdc6dbb0aa"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的编队 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI04-BG-01",
@@ -491,6 +569,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI05",
       "name": "主将",
       "source": "UI05-主将.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI05-hero.png",
+          "resourcePath": "ui/image2/UI05-hero/spriteFrame",
+          "assetId": "b6adff5d-ea92-4278-bed9-7ad78f3f7705",
+          "sourceSha256": "f23cc606cfa88d18963bac1afe639b2cd1ffc2751473fb650b13eef504f371ee"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的主将 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI05-BG-01",
@@ -610,6 +704,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI06",
       "name": "历练",
       "source": "UI06-历练.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI06-adventure.png",
+          "resourcePath": "ui/image2/UI06-adventure/spriteFrame",
+          "assetId": "5ca7cb83-f69d-494e-a099-593767af3e0e",
+          "sourceSha256": "491ffc89f2b548e3805c8ea47e0a00cbd36441ffb66d9fdb7b60fb9d238d06cd"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的历练 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI06-BG-01",
@@ -729,6 +839,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI07",
       "name": "营造",
       "source": "UI07-营造.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI07-city.png",
+          "resourcePath": "ui/image2/UI07-city/spriteFrame",
+          "assetId": "0eab0bb0-f9d9-4283-96ad-8cbd6a83d292",
+          "sourceSha256": "4e52b600caff5cfd4abfdf629f84e6c8d829820e1f2ed02766dc4faa72d1a876"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的营造 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI07-BG-01",
@@ -848,6 +974,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI08",
       "name": "任务",
       "source": "UI08-任务.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI08-tasks.png",
+          "resourcePath": "ui/image2/UI08-tasks/spriteFrame",
+          "assetId": "4431439e-fb12-43b4-8c6c-85493fe5e557",
+          "sourceSha256": "d02fdb49cf3d82dc3926186b113fcfcea4fd444a861110f2985e72e73d01cf6c"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的任务 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI08-BG-01",
@@ -967,6 +1109,22 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
       "id": "UI09",
       "name": "行囊",
       "source": "UI09-行囊.png",
+      "runtime": {
+        "cocos": {
+          "availability": "present",
+          "assetPath": "cocos-client/assets/resources/ui/image2/UI09-inventory.png",
+          "resourcePath": "ui/image2/UI09-inventory/spriteFrame",
+          "assetId": "103fc9ed-1b08-4c98-8ce9-a2fc49150d00",
+          "sourceSha256": "fbb355a9b4aed6c12ef5068c36e2070c05150bbe4d25ce2b869fb0cbc6a37582"
+        },
+        "react": {
+          "availability": "absent",
+          "assetPath": null,
+          "resourcePath": null,
+          "assetId": null,
+          "verification": "React 原型没有对应的行囊 Image2 页面图像资产。"
+        }
+      },
       "layers": [
         {
           "id": "UI09-BG-01",
