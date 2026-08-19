@@ -8,6 +8,8 @@ const levelPath = path.join(root, 'assets/resources/config/levels/chapter01/L03.
 const manifestPath = path.join(root, 'assets/resources/config/manifest.json');
 const decksPath = path.join(root, 'assets/resources/config/decks.json');
 const cardsPath = path.join(root, 'assets/resources/config/cards.json');
+const unitsPath = path.join(root, 'assets/resources/config/units.json');
+const skillsPath = path.join(root, 'assets/resources/config/skills.json');
 const storyPath = path.join(root, '..', '首章剧情关卡-v1.1.md');
 const characterPath = path.join(root, '..', '首发角色视觉设定-v1.0.md');
 
@@ -31,11 +33,29 @@ const levelConfig = JSON.parse(fs.readFileSync(levelPath, 'utf8'));
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const decks = JSON.parse(fs.readFileSync(decksPath, 'utf8'));
 const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
+const units = JSON.parse(fs.readFileSync(unitsPath, 'utf8'));
+const skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
 const story = fs.readFileSync(storyPath, 'utf8');
 const characterSheet = fs.readFileSync(characterPath, 'utf8');
+const unitIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
+const references = {
+  chapterLevelIds: new Set(['L02', 'L03']),
+  targetIds: new Set([...unitIds, 'C002']),
+  unitIds,
+  skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
+  cards: new Map(cards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
+    cardType: card.cardType,
+    copyLimit: card.copyLimit,
+    ...(card.unitId ? { unitId: card.unitId } : {}),
+    ...(card.skillId ? { skillId: card.skillId } : {}),
+  }])),
+  unlockIds: new Set(['OUTPOST']),
+  chestIds: new Set(['CHAPTER-CHEST']),
+  flagIds: new Set(['OUTCAST-CAMP']),
+};
 
 assert.doesNotThrow(
-  () => assertChapterLevelContract(levelConfig, manifest, decks, 'config/levels/chapter01/L03.json'),
+  () => assertChapterLevelContract(levelConfig, manifest, decks, references, 'config/levels/chapter01/L03.json'),
   'the real L03 config must pass the shared chapter level contract',
 );
 
@@ -77,6 +97,14 @@ assert.deepEqual(
   ],
   'L03 must fail when the player hero or 翎照 is defeated',
 );
+assert.deepEqual(level.battleRules, {
+  fastUnitIds: ['U005'],
+  guardUnitIds: ['U001'],
+  interceptUnitIds: ['U002'],
+  movementTrigger: { distance: 2, responseUnitId: 'U002' },
+  temporaryAid: { targetId: 'C002', mode: 'PROTECT' },
+  requiredResponses: ['GUARD_BLOCK_FAST', 'INTERCEPT_AFTER_TWO_CELL_MOVE'],
+}, 'L03 must encode fast/guard/intercept and temporary aid rules');
 
 assert.equal(decks.decks.some((deck) => deck.id === level.enemyDeckId), true, 'L03 must use a real enemy deck');
 assert.equal(cards.cards.some((card) => card.id === 'U004'), true, 'L03 reward U004 must exist in cards.json');
@@ -88,7 +116,7 @@ assert.match(characterSheet, /\| C002 \| 翎照 \|/u, 'C002 must be a real docum
 function expectFailure(label, mutate, expectedPath) {
   const fixture = structuredClone(levelConfig);
   mutate(fixture);
-  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, 'config/levels/chapter01/L03.json'), (error) => {
+  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, references, 'config/levels/chapter01/L03.json'), (error) => {
     assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
     return true;
