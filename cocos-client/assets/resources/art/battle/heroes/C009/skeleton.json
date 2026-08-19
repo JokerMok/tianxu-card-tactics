@@ -1,6 +1,9 @@
 {
   "schema": "battle-hero-skeleton/v1",
   "heroId": "C009",
+  "assetStage": "A0-reference",
+  "runtimeMode": "single-cutout-reference-skeleton",
+  "framePolicy": "one-approved-cutout-per-state; transform-only-motion",
   "placement": {
     "role": "commander",
     "fixedOutsideGrid": true,
@@ -43,8 +46,10 @@
   "mountPoints": [
     { "name": "shadow", "bone": "root", "x": 0, "y": 0 },
     { "name": "healthBar", "bone": "root", "x": 0, "y": 1040 },
+    { "name": "hitCenter", "bone": "root", "x": 0, "y": 520 },
     { "name": "commandOrigin", "bone": "root", "x": 0, "y": 680 },
-    { "name": "criticalFx", "bone": "root", "x": 0, "y": 520 }
+    { "name": "criticalFx", "bone": "root", "x": 0, "y": 520 },
+    { "name": "sideSlotCenter", "bone": "root", "x": 0, "y": 512 }
   ],
   "orientations": {
     "player": { "direction": 1, "scaleX": 1, "scaleY": 1 },
@@ -55,32 +60,36 @@
     "Idle": {
       "duration": 1.2,
       "loop": true,
+      "sourceAttachment": "body",
       "tracks": [
         { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.6, "value": 1.2 }, { "time": 1.2, "value": 0 }] }
       ],
       "events": []
     },
     "HitLight": {
-      "duration": 0.3,
+      "duration": 0.22,
       "loop": false,
+      "sourceAttachment": "body",
       "tracks": [
-        { "bone": "root", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.08, "value": -12 }, { "time": 0.3, "value": 0 }] },
-        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.1, "value": -2 }, { "time": 0.3, "value": 0 }] }
+        { "bone": "root", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.06, "value": -12 }, { "time": 0.22, "value": 0 }] },
+        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.08, "value": -2 }, { "time": 0.22, "value": 0 }] }
       ],
-      "events": [{ "name": "hitLight", "time": 0.08 }]
+      "events": [{ "name": "hitLight", "time": 0.06 }]
     },
     "HitHeavy": {
-      "duration": 0.46,
+      "duration": 0.4,
       "loop": false,
+      "sourceAttachment": "body",
       "tracks": [
-        { "bone": "root", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.1, "value": -24 }, { "time": 0.46, "value": 0 }] },
-        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.14, "value": -5 }, { "time": 0.46, "value": 0 }] }
+        { "bone": "root", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.1, "value": -24 }, { "time": 0.4, "value": 0 }] },
+        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.14, "value": -5 }, { "time": 0.4, "value": 0 }] }
       ],
       "events": [{ "name": "hitHeavy", "time": 0.1 }]
     },
     "Command": {
       "duration": 0.72,
       "loop": false,
+      "sourceAttachment": "body",
       "tracks": [
         { "bone": "root", "property": "translateY", "frames": [{ "time": 0, "value": 0 }, { "time": 0.24, "value": 18 }, { "time": 0.72, "value": 0 }] },
         { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.24, "value": -3 }, { "time": 0.72, "value": 0 }] }
@@ -90,6 +99,7 @@
     "Critical": {
       "duration": 0.58,
       "loop": false,
+      "sourceAttachment": "body",
       "tracks": [
         { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.16, "value": 4 }, { "time": 0.58, "value": 0 }] },
         { "bone": "root", "property": "opacity", "frames": [{ "time": 0, "value": 1 }, { "time": 0.16, "value": 0.82 }, { "time": 0.58, "value": 1 }] }
@@ -99,6 +109,7 @@
     "Defeat": {
       "duration": 0.8,
       "loop": false,
+      "sourceAttachment": "body",
       "tracks": [
         { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.42, "value": -18 }, { "time": 0.8, "value": -86 }] },
         { "bone": "root", "property": "opacity", "frames": [{ "time": 0, "value": 1 }, { "time": 0.56, "value": 1 }, { "time": 0.8, "value": 0 }] }

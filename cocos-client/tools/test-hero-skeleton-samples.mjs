@@ -8,7 +8,16 @@ const clientRoot = resolve(process.cwd());
 const projectRoot = resolve(clientRoot, '..');
 const heroRoot = resolve(clientRoot, 'assets/resources/art/battle/heroes');
 const REQUIRED_STATES = ['Idle', 'HitLight', 'HitHeavy', 'Command', 'Critical', 'Defeat'];
+const REQUIRED_MOUNTS = ['shadow', 'healthBar', 'hitCenter', 'commandOrigin', 'criticalFx', 'sideSlotCenter'];
 const TRACK_PROPERTIES = new Set(['translateX', 'translateY', 'rotate', 'opacity']);
+const STATE_REQUIREMENTS = Object.freeze({
+  Idle: Object.freeze({ loop: true, changedProperties: ['rotate'], event: null }),
+  HitLight: Object.freeze({ loop: false, changedProperties: ['translateX', 'rotate'], event: 'hitLight', duration: [0.18, 0.24] }),
+  HitHeavy: Object.freeze({ loop: false, changedProperties: ['translateX', 'rotate'], event: 'hitHeavy', duration: [0.28, 0.42] }),
+  Command: Object.freeze({ loop: false, changedProperties: ['translateY', 'rotate'], event: 'command' }),
+  Critical: Object.freeze({ loop: false, changedProperties: ['rotate', 'opacity'], event: 'critical' }),
+  Defeat: Object.freeze({ loop: false, changedProperties: ['rotate', 'opacity'], event: 'despawn', duration: [0.6, 1] }),
+});
 const EXPECTED = {
   C001: {
     rawSize: { width: 787, height: 1024 },
@@ -24,6 +33,24 @@ const EXPECTED = {
     edgeAlphaPixels: 0,
     sha256: '6de58467ff20f6cf451641d3f7e4590f21ee970171adb0b0d77943c67aafac05',
   },
+};
+const EXPECTED_MOUNTS = {
+  C001: [
+    { name: 'shadow', bone: 'root', x: 0, y: 0 },
+    { name: 'healthBar', bone: 'root', x: 0, y: 1040 },
+    { name: 'hitCenter', bone: 'root', x: 0, y: 520 },
+    { name: 'commandOrigin', bone: 'root', x: 0, y: 680 },
+    { name: 'criticalFx', bone: 'root', x: 0, y: 520 },
+    { name: 'sideSlotCenter', bone: 'root', x: 0, y: 512 },
+  ],
+  C009: [
+    { name: 'shadow', bone: 'root', x: 0, y: 0 },
+    { name: 'healthBar', bone: 'root', x: 0, y: 1040 },
+    { name: 'hitCenter', bone: 'root', x: 0, y: 520 },
+    { name: 'commandOrigin', bone: 'root', x: 0, y: 680 },
+    { name: 'criticalFx', bone: 'root', x: 0, y: 520 },
+    { name: 'sideSlotCenter', bone: 'root', x: 0, y: 512 },
+  ],
 };
 
 function isFiniteNumber(value) {
@@ -151,8 +178,21 @@ function validateFrames(animation, stateName, boneNames) {
       values.add(frame.value);
     }
     if (values.size > 1) changing = true;
+    assert.equal(track.frames[0].time, 0, `${stateName} tracks must start at time zero`);
+    assert.equal(track.frames.at(-1).time, animation.duration, `${stateName} tracks must end at duration`);
   }
   assert.equal(changing, true, `${stateName} must contain visible motion`);
+}
+
+function hasChangingTrack(animation, property) {
+  return animation.tracks.some((track) => track.property === property
+    && new Set(track.frames.map((frame) => frame.value)).size > 1);
+}
+
+function maxAbsoluteTrackValue(animation, property) {
+  return Math.max(...animation.tracks
+    .filter((track) => track.property === property)
+    .flatMap((track) => track.frames.map((frame) => Math.abs(frame.value))), 0);
 }
 
 function validateSource(heroId, skeleton, directory) {
@@ -208,6 +248,9 @@ function validateSkeleton(heroId, skeleton, directory) {
   const { image, sourceBytes } = validateSource(heroId, skeleton, directory);
   assert.equal(skeleton.schema, 'battle-hero-skeleton/v1', `${heroId} schema is invalid`);
   assert.equal(skeleton.heroId, heroId, `${heroId} directory and skeleton ID must match`);
+  assert.equal(skeleton.assetStage, 'A0-reference', `${heroId} asset stage must remain an approved A0 reference`);
+  assert.equal(skeleton.runtimeMode, 'single-cutout-reference-skeleton', `${heroId} runtime mode must identify a real cutout-backed sample`);
+  assert.equal(skeleton.framePolicy, 'one-approved-cutout-per-state; transform-only-motion', `${heroId} must not claim fabricated image frames`);
   assert.deepEqual(skeleton.placement, {
     role: 'commander',
     fixedOutsideGrid: true,
@@ -224,14 +267,17 @@ function validateSkeleton(heroId, skeleton, directory) {
   for (const [index, bone] of skeleton.bones.entries()) {
     assert.match(bone.name ?? '', /^[a-z][a-zA-Z0-9]*$/, `${heroId} bone names must be stable identifiers`);
     assert.equal(boneNames.has(bone.name), false, `${heroId} bone names must be unique`);
-    if (index === 0) assert.equal(bone.name, 'root', `${heroId} hierarchy must begin at root`);
+    if (index === 0) {
+      assert.equal(bone.name, 'root', `${heroId} hierarchy must begin at root`);
+      assert.equal('parent' in bone, false, `${heroId} root must not have a parent`);
+    }
     else assert.equal(boneNames.has(bone.parent), true, `${heroId} bones must reference an earlier parent`);
     assertFinite(bone.x, `${heroId} bone X must be finite`);
     assertFinite(bone.y, `${heroId} bone Y must be finite`);
     boneNames.add(bone.name);
   }
 
-  assert.equal(Array.isArray(skeleton.attachments) && skeleton.attachments.length >= 1, true, `${heroId} must provide a visual attachment`);
+  assert.equal(Array.isArray(skeleton.attachments) && skeleton.attachments.length === 1, true, `${heroId} must provide exactly one approved visual attachment`);
   const attachment = skeleton.attachments[0];
   assert.equal(attachment.name, 'body', `${heroId} must expose a body attachment`);
   assert.equal(attachment.bone, 'root', `${heroId} body must attach to root`);
@@ -247,8 +293,11 @@ function validateSkeleton(heroId, skeleton, directory) {
   assert.equal(attachment.preserveAspectRatio, true, `${heroId} body must preserve source ratio`);
   assert.equal(attachment.backgroundless, true, `${heroId} body must remain backgroundless`);
 
+  assert.deepEqual(skeleton.mountPoints, EXPECTED_MOUNTS[heroId], `${heroId} mount point layout must match the approved sample`);
   const mounts = new Map((skeleton.mountPoints ?? []).map((mount) => [mount.name, mount]));
-  for (const mountName of ['shadow', 'healthBar', 'commandOrigin', 'criticalFx']) {
+  assert.equal(mounts.size, skeleton.mountPoints.length, `${heroId} mount point names must be unique`);
+  assert.deepEqual([...mounts.keys()], REQUIRED_MOUNTS, `${heroId} mount point contract is incomplete or reordered`);
+  for (const mountName of REQUIRED_MOUNTS) {
     const mount = mounts.get(mountName);
     assert.equal(Boolean(mount), true, `${heroId} must declare ${mountName} mount point`);
     assert.equal(boneNames.has(mount?.bone), true, `${heroId} ${mountName} must reference a bone`);
@@ -264,22 +313,35 @@ function validateSkeleton(heroId, skeleton, directory) {
   assert.deepEqual(Object.keys(skeleton.animations), REQUIRED_STATES, `${heroId} animations must match the six-state contract exactly`);
   for (const stateName of REQUIRED_STATES) {
     const animation = skeleton.animations[stateName];
+    const semantics = STATE_REQUIREMENTS[stateName];
     assert.equal(typeof animation === 'object' && animation !== null, true, `${heroId} must define ${stateName}`);
     assert.equal(animation.duration > 0 && animation.duration <= 3, true, `${heroId} ${stateName} duration must be 0–3 seconds`);
     assert.equal(typeof animation.loop, 'boolean', `${heroId} ${stateName} must declare loop behavior`);
+    assert.equal(animation.sourceAttachment, 'body', `${heroId} ${stateName} must use the approved body attachment`);
+    assert.equal(animation.loop, semantics.loop, `${heroId} ${stateName} loop behavior is invalid`);
+    if (semantics.duration) {
+      assert.equal(animation.duration >= semantics.duration[0] && animation.duration <= semantics.duration[1], true, `${heroId} ${stateName} duration is outside its state threshold`);
+    }
     assert.equal(Array.isArray(animation.tracks) && animation.tracks.length > 0, true, `${heroId} ${stateName} must contain tracks`);
     assert.equal(Array.isArray(animation.events), true, `${heroId} ${stateName} must contain events`);
     validateFrames(animation, stateName, boneNames);
     for (const event of animation.events) {
       assert.match(event.name ?? '', /^[a-z][a-zA-Z0-9]*$/, `${heroId} ${stateName} event names must be stable`);
+      assertFinite(event.time, `${heroId} ${stateName} event time must be finite`);
       assert.equal(event.time >= 0 && event.time <= animation.duration, true, `${heroId} ${stateName} event is outside its duration`);
     }
+    for (const property of semantics.changedProperties) {
+      assert.equal(hasChangingTrack(animation, property), true, `${heroId} ${stateName} must animate ${property}`);
+    }
+    if (semantics.event === null) assert.equal(animation.events.length, 0, `${heroId} ${stateName} must not emit an action event`);
+    else assert.equal(animation.events.some((event) => event.name === semantics.event), true, `${heroId} ${stateName} must expose ${semantics.event}`);
   }
-  assert.equal(skeleton.animations.Idle.loop, true, `${heroId} Idle must loop`);
-  for (const stateName of REQUIRED_STATES.slice(1)) assert.equal(skeleton.animations[stateName].loop, false, `${heroId} ${stateName} must not loop`);
-  for (const [stateName, eventName] of [['HitLight', 'hitLight'], ['HitHeavy', 'hitHeavy'], ['Command', 'command'], ['Critical', 'critical'], ['Defeat', 'despawn']]) {
-    assert.equal(skeleton.animations[stateName].events.some((event) => event.name === eventName), true, `${heroId} ${stateName} must expose ${eventName} event`);
-  }
+  assert.equal(skeleton.animations.HitHeavy.duration > skeleton.animations.HitLight.duration, true, `${heroId} heavy hit must last longer than light hit`);
+  assert.equal(maxAbsoluteTrackValue(skeleton.animations.HitHeavy, 'translateX') > maxAbsoluteTrackValue(skeleton.animations.HitLight, 'translateX'), true, `${heroId} heavy hit must recoil farther than light hit`);
+  assert.equal(maxAbsoluteTrackValue(skeleton.animations.HitHeavy, 'rotate') > maxAbsoluteTrackValue(skeleton.animations.HitLight, 'rotate'), true, `${heroId} heavy hit must rotate farther than light hit`);
+  const despawn = skeleton.animations.Defeat.events.find((event) => event.name === 'despawn');
+  assert.equal(despawn.time, skeleton.animations.Defeat.duration, `${heroId} Defeat despawn must occur at the final keyframe`);
+  assert.equal(skeleton.animations.Defeat.tracks.some((track) => track.property === 'opacity' && track.frames.at(-1).value === 0), true, `${heroId} Defeat must end transparent`);
   assert.equal(skeleton.animations.Attack, undefined, `${heroId} must not silently use the unit Attack state contract`);
 }
 
@@ -300,7 +362,7 @@ assert.throws(() => validateSkeleton('C001', wrongAttachmentPath, samples[0].dir
 
 const missingAttachment = structuredClone(samples[1].skeleton);
 missingAttachment.attachments = [];
-assert.throws(() => validateSkeleton('C009', missingAttachment, samples[1].directory), /must provide a visual attachment/);
+assert.throws(() => validateSkeleton('C009', missingAttachment, samples[1].directory), /must provide exactly one approved visual attachment/);
 
 const wrongAlphaBoundary = structuredClone(samples[1].skeleton);
 wrongAlphaBoundary.source.alphaBounds.width -= 1;
@@ -310,4 +372,52 @@ const wrongDirection = structuredClone(samples[1].skeleton);
 wrongDirection.orientations.enemy.scaleY = -1;
 assert.throws(() => validateSkeleton('C009', wrongDirection, samples[1].directory), /deterministic player\/enemy mirroring/);
 
-console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 6 contract counterexamples rejected`);
+const wrongBackgroundFlag = structuredClone(samples[0].skeleton);
+wrongBackgroundFlag.source.backgroundless = false;
+assert.throws(() => validateSkeleton('C001', wrongBackgroundFlag, samples[0].directory), /backgroundless source/);
+
+const wrongAttachmentBackgroundFlag = structuredClone(samples[1].skeleton);
+wrongAttachmentBackgroundFlag.attachments[0].backgroundless = false;
+assert.throws(() => validateSkeleton('C009', wrongAttachmentBackgroundFlag, samples[1].directory), /body must remain backgroundless/);
+
+const wrongMountLayout = structuredClone(samples[0].skeleton);
+wrongMountLayout.mountPoints.pop();
+assert.throws(() => validateSkeleton('C001', wrongMountLayout, samples[0].directory), /mount point layout/);
+
+const duplicateMount = structuredClone(samples[1].skeleton);
+duplicateMount.mountPoints.push({ ...duplicateMount.mountPoints[0] });
+assert.throws(() => validateSkeleton('C009', duplicateMount, samples[1].directory), /mount point layout/);
+
+const wrongStateAttachment = structuredClone(samples[0].skeleton);
+wrongStateAttachment.animations.Command.sourceAttachment = 'placeholder';
+assert.throws(() => validateSkeleton('C001', wrongStateAttachment, samples[0].directory), /approved body attachment/);
+
+const wrongLoop = structuredClone(samples[1].skeleton);
+wrongLoop.animations.HitLight.loop = true;
+assert.throws(() => validateSkeleton('C009', wrongLoop, samples[1].directory), /loop behavior is invalid/);
+
+const wrongTrackStart = structuredClone(samples[0].skeleton);
+wrongTrackStart.animations.Idle.tracks[0].frames[0].time = 0.1;
+assert.throws(() => validateSkeleton('C001', wrongTrackStart, samples[0].directory), /tracks must start at time zero/);
+
+const wrongTrackEnd = structuredClone(samples[1].skeleton);
+wrongTrackEnd.animations.Defeat.tracks[0].frames.at(-1).time = 0.7;
+assert.throws(() => validateSkeleton('C009', wrongTrackEnd, samples[1].directory), /tracks must end at duration/);
+
+const wrongCommandMotion = structuredClone(samples[0].skeleton);
+wrongCommandMotion.animations.Command.tracks[0].frames.forEach((frame) => { frame.value = 0; });
+assert.throws(() => validateSkeleton('C001', wrongCommandMotion, samples[0].directory), /must animate translateY/);
+
+const weakHeavyHit = structuredClone(samples[1].skeleton);
+weakHeavyHit.animations.HitHeavy.tracks.find((track) => track.property === 'translateX').frames[1].value = -8;
+assert.throws(() => validateSkeleton('C009', weakHeavyHit, samples[1].directory), /heavy hit must recoil farther/);
+
+const loopingDefeat = structuredClone(samples[0].skeleton);
+loopingDefeat.animations.Defeat.loop = true;
+assert.throws(() => validateSkeleton('C001', loopingDefeat, samples[0].directory), /loop behavior is invalid/);
+
+const persistentDefeat = structuredClone(samples[1].skeleton);
+persistentDefeat.animations.Defeat.tracks.find((track) => track.property === 'opacity').frames.at(-1).value = 1;
+assert.throws(() => validateSkeleton('C009', persistentDefeat, samples[1].directory), /Defeat must animate opacity|Defeat must end transparent/);
+
+console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 17 contract counterexamples rejected`);
