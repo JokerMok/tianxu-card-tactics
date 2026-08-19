@@ -1,0 +1,43 @@
+{
+  "chapterLevels": [
+    {
+      "id": "L03",
+      "prerequisiteLevelId": "L02",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        {
+          "type": "DEFEAT_ENEMY_HERO"
+        },
+        {
+          "type": "PROTECT_TARGET",
+          "targetId": "C002"
+        }
+      ],
+      "rewards": [
+        {
+          "type": "CARD",
+          "id": "U004",
+          "quantity": 4
+        }
+      ],
+      "failureConditions": [
+        {
+          "type": "PLAYER_HERO_DEFEATED"
+        },
+        {
+          "type": "TARGET_DESTROYED",
+          "targetId": "C002"
+        }
+      ],
+      "battleRules": {
+        "fastUnitIds": ["U005"],
+        "guardUnitIds": ["U001"],
+        "interceptUnitIds": ["U002"],
+        "movementTrigger": { "distance": 2, "responseUnitId": "U002" },
+        "temporaryAid": { "targetId": "C002", "mode": "PROTECT" },
+        "requiredResponses": ["GUARD_BLOCK_FAST", "INTERCEPT_AFTER_TWO_CELL_MOVE"]
+      }
+    }
+  ]
+}
