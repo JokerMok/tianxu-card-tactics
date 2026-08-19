@@ -11,6 +11,7 @@ const decksPath = path.join(root, 'assets/resources/config/decks.json');
 const cardsPath = path.join(root, 'assets/resources/config/cards.json');
 const unitsPath = path.join(root, 'assets/resources/config/units.json');
 const skillsPath = path.join(root, 'assets/resources/config/skills.json');
+const enumFixturePath = path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json');
 const contractPath = path.join(root, 'assets/scripts/config/levels/ChapterLevelContract.ts');
 const loaderPath = path.join(root, 'assets/scripts/config/ConfigLoader.ts');
 
@@ -36,8 +37,11 @@ const decks = JSON.parse(fs.readFileSync(decksPath, 'utf8'));
 const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
 const units = JSON.parse(fs.readFileSync(unitsPath, 'utf8'));
 const skills = JSON.parse(fs.readFileSync(skillsPath, 'utf8'));
+const enumCoverage = JSON.parse(fs.readFileSync(enumFixturePath, 'utf8'));
+const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
-  chapterLevelIds: new Set(['L03', 'L04']),
+  chapterLevelIds,
   targetIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
   unitIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
   skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
@@ -47,9 +51,9 @@ const references = {
     ...(card.unitId ? { unitId: card.unitId } : {}),
     ...(card.skillId ? { skillId: card.skillId } : {}),
   }])),
-  unlockIds: new Set(['OUTPOST']),
-  chestIds: new Set(['CHAPTER-CHEST']),
-  flagIds: new Set(['OUTCAST-CAMP']),
+  unlockIds: rewardIds('UNLOCK'),
+  chestIds: rewardIds('CHEST'),
+  flagIds: rewardIds('FLAG'),
 };
 
 assert.doesNotThrow(
@@ -105,6 +109,21 @@ assert.deepEqual(
   },
   'L04 must carry the R1 neutral mirror scenario rules',
 );
+function assertL04ScenarioRules(rules) {
+  assert.equal(rules.playerHeroHp, 30);
+  assert.equal(rules.enemyHeroHp, 30);
+  assert.equal(rules.laneCount, 2);
+  assert.equal(rules.laneLength, 12);
+  assert.deepEqual(rules.summonZone, { laneCount: 2, depth: 3 });
+  assert.equal(rules.deckSize, 30);
+  assert.deepEqual(rules.controlModes, ['MANUAL', 'AUTO']);
+  assert.equal(rules.canToggleAuto, true);
+  assert.equal(rules.roundLimit, 80);
+  assert.equal(rules.seed, 20260712);
+  assert.equal(rules.specialRules, 'NONE');
+}
+assertL04ScenarioRules(level.scenarioRules);
+assert.throws(() => assertL04ScenarioRules({ ...level.scenarioRules, laneCount: 1 }));
 
 const deck = decks.decks.find(({ id }) => id === level.enemyDeckId);
 assert(deck, 'L04 must reference a real deck record');
