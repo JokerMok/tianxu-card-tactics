@@ -67,8 +67,12 @@ function assertScenarioRules(rules) {
 }
 assertScenarioRules(level.scenarioRules);
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, enemyFireUnitIds: ['U001'] }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, burnStatus: 'FREEZE' }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, waterCounterMultiplier: 1 }));
 assert.throws(() => assertScenarioRules({ ...level.scenarioRules, purifyAid: { characterId: 'C999', uses: 1 } }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, purifyAid: { characterId: 'C001', uses: 0 } }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, allowAlternateResponses: ['HEAL'] }));
+assert.throws(() => assertScenarioRules({ ...level.scenarioRules, preserveControlledBeast: false }));
 
 function expectFailure(label, mutate, expectedPath) {
   const candidate = structuredClone(levelConfig);
