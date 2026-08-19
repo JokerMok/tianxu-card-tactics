@@ -1,0 +1,22 @@
+{
+  "chapterLevels": [{
+    "id": "L05",
+    "prerequisiteLevelId": "L04",
+    "enemyDeckId": "D001",
+    "environmentElement": "FIRE",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [
+      { "type": "CARD", "id": "U007", "quantity": 2 },
+      { "type": "CARD", "id": "U003", "quantity": 3 }
+    ],
+    "failureConditions": [{ "type": "PLAYER_HERO_DEFEATED" }],
+    "scenarioRules": {
+      "enemyFireUnitIds": ["U007"],
+      "burnStatus": "BURN",
+      "waterCounterMultiplier": 1.25,
+      "purifyAid": { "characterId": "C001", "uses": 1 },
+      "allowAlternateResponses": ["HEAL", "GUARD_BLOCK", "EARLY_KILL"],
+      "preserveControlledBeast": true
+    }
+  }]
+}
