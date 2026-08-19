@@ -7,7 +7,7 @@
   "wave": 2,
   "executor": "cloud",
   "risk": "medium",
-  "status": "pending",
+  "status": "completed",
   "verification_commands": [
     "cd cocos-client && node --experimental-strip-types tools/test-chapter-level-contract.mjs",
     "cd cocos-client && npm run validate:config-cross-table"
