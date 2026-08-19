@@ -1,0 +1,44 @@
+{
+  "chapterLevels": [{
+    "id": "L11",
+    "prerequisiteLevelId": "L10",
+    "enemyDeckId": "D001",
+    "environmentElement": "NONE",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [{ "type": "CARD", "id": "S014", "quantity": 1, "cardType": "SKILL" }],
+    "failureConditions": [{ "type": "PLAYER_HERO_DEFEATED" }],
+    "scenarioRules": {
+      "professionSkillPolicy": "CURRENT_PROFESSION_SKILL_III",
+      "professionSkillIdByProfession": {
+        "P001": "S014",
+        "P002": "S003",
+        "P003": "S015",
+        "P004": "S010"
+      },
+      "nameCheckRule": {
+        "enemyActionInterval": 3,
+        "prepareIncrease": 1,
+        "tieBreak": "SEEDED",
+        "seed": 20260712
+      },
+      "professionAdvantageRules": {
+        "P001": {
+          "counterRole": "FAST",
+          "targetUnitIds": ["U005", "U006"]
+        },
+        "P002": {
+          "counterDefenseType": "HEAVY",
+          "targetUnitIds": ["U001", "U013", "U019"]
+        },
+        "P003": {
+          "counterStatuses": ["BURN", "REVIVE"],
+          "targetUnitIds": ["U007", "U009"]
+        },
+        "P004": {
+          "minPrepare": 5,
+          "targetUnitIds": ["U008"]
+        }
+      }
+    }
+  }]
+}
