@@ -88,13 +88,14 @@ function assertPool(value: unknown, label: string): asserts value is DropPool {
 
   const repeatIds = new Set<string>();
   let totalWeight = 0;
-  value.repeat.forEach((reward, index) => {
+  for (let index = 0; index < value.repeat.length; index += 1) {
+    const reward = value.repeat[index];
     assertReward(reward, `${label}.repeat[${index}]`, true);
     if (repeatIds.has(reward.id)) throw new Error(`${label}.repeat[${index}].id is duplicated`);
     repeatIds.add(reward.id);
     totalWeight += reward.weight as number;
     if (!Number.isSafeInteger(totalWeight)) throw new Error(`${label}.repeat total weight is unsafe`);
-  });
+  }
 
   if (value.pity === undefined) return;
   if (!isRecord(value.pity)) throw new Error(`${label}.pity must be an object`);
@@ -110,11 +111,12 @@ export function assertDropPoolConfig(value: unknown): asserts value is DropPoolC
     throw new Error('drop pool config must contain a non-empty pools array');
   }
   const ids = new Set<string>();
-  value.pools.forEach((pool, index) => {
+  for (let index = 0; index < value.pools.length; index += 1) {
+    const pool = value.pools[index];
     assertPool(pool, `pools[${index}]`);
     if (ids.has(pool.id)) throw new Error(`pools[${index}].id is duplicated`);
     ids.add(pool.id);
-  });
+  }
 }
 
 function assertState(pool: DropPool, state: DropPoolState): void {
@@ -171,10 +173,14 @@ function weightedReward(pool: DropPool, rng: DropRng): DropReward {
     throw new Error('drop RNG must return a finite number in [0, 1)');
   }
   const totalWeight = pool.repeat.reduce((total, reward) => total + (reward.weight as number), 0);
-  let threshold = roll * totalWeight;
-  for (const reward of pool.repeat) {
-    threshold -= reward.weight as number;
-    if (threshold < 0) return reward;
+  const threshold = roll * totalWeight;
+  let cumulativeWeight = 0;
+  for (let index = 0; index < pool.repeat.length; index += 1) {
+    const reward = pool.repeat[index];
+    cumulativeWeight += reward.weight as number;
+    // Buckets are [lowerBound, upperBound). The last-entry fallback handles
+    // finite-precision rounding when roll < 1 is multiplied by a large total.
+    if (threshold < cumulativeWeight || index === pool.repeat.length - 1) return reward;
   }
   throw new Error('drop pool weighted selection failed');
 }

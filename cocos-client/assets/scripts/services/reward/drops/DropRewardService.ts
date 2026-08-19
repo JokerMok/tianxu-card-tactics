@@ -15,7 +15,7 @@ export interface DropRewardState {
 }
 
 export type DropRewardPersistence = (next: Readonly<DropRewardState>) => void;
-export type DropClaimCode = 'APPLIED' | 'DUPLICATE' | 'LIMIT_REACHED';
+export type DropClaimCode = 'APPLIED' | 'DUPLICATE' | 'LIMIT_REACHED' | 'REENTRANT';
 
 export interface DropClaimResult {
   readonly applied: boolean;
@@ -90,16 +90,22 @@ export class DropRewardService {
   private readonly pools: ReadonlyMap<string, DropPool>;
   private readonly rng: DropRng;
   private readonly persist: DropRewardPersistence;
+  private committing = false;
 
   constructor(initialState: DropRewardState, pools: readonly DropPool[], rng: DropRng, persist: DropRewardPersistence) {
     assertState(initialState);
     assertDropPoolConfig({ pools });
     if (typeof rng !== 'function' || typeof persist !== 'function') throw new Error('drop reward service is invalid');
     const poolIndex = new Map(pools.map((pool) => [pool.id, pool]));
+    for (const pool of pools) {
+      if (!Object.prototype.hasOwnProperty.call(initialState.dropPools, pool.id)) {
+        throw new Error(`missing drop pool progress: ${pool.id}`);
+      }
+      assertDropPoolState(pool, initialState.dropPools[pool.id]);
+    }
     for (const [poolId, progress] of Object.entries(initialState.dropPools)) {
       const pool = poolIndex.get(poolId);
       if (pool === undefined) throw new Error(`unknown drop pool progress: ${poolId}`);
-      assertDropPoolState(pool, progress);
     }
     this.current = copyState(initialState);
     this.pools = poolIndex;
@@ -114,6 +120,7 @@ export class DropRewardService {
   claim(businessKey: string, poolId: string): DropClaimResult {
     assertBusinessKey(businessKey);
     if (this.current.processedRewardKeys.includes(businessKey)) return this.result(false, 'DUPLICATE');
+    if (this.committing) return this.result(false, 'REENTRANT');
 
     const pool = this.pools.get(poolId);
     if (pool === undefined) throw new Error(`unknown drop pool: ${poolId}`);
@@ -127,7 +134,12 @@ export class DropRewardService {
       processedRewardKeys: [...this.current.processedRewardKeys, businessKey],
       dropPools: { ...this.current.dropPools, [poolId]: resolution.nextState },
     };
-    this.persist(copyState(next));
+    this.committing = true;
+    try {
+      this.persist(copyState(next));
+    } finally {
+      this.committing = false;
+    }
     this.current = next;
     return this.result(true, 'APPLIED');
   }

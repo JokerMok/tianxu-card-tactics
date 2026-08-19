@@ -46,6 +46,12 @@ assert.equal(duplicate.applied, false);
 assert.equal(rolls, 0, 'duplicate key must not roll or grant again');
 assert.equal(saved.length, 1, 'duplicate key must not persist again');
 
+const duplicateSnapshot = duplicate.state;
+duplicateSnapshot.resources.gold = 999999;
+duplicateSnapshot.processedRewardKeys.push('mutated-outside-service');
+assert.deepEqual(service.snapshot().resources, { gold: 100, essence: 0 }, 'result snapshots are defensive copies');
+assert.deepEqual(service.snapshot().processedRewardKeys, ['drop:stage:N001:1']);
+
 assert.equal(service.claim('drop:stage:N001:2', pool.id).code, 'APPLIED');
 assert.equal(service.claim('drop:stage:N001:3', pool.id).code, 'APPLIED');
 assert.equal(service.claim('drop:stage:N001:4', pool.id).code, 'APPLIED');
@@ -75,5 +81,36 @@ assert.equal(rollback.claim('drop:stage:N001:rollback', pool.id).code, 'APPLIED'
 assert.equal(saveAttempts, 2);
 assert.deepEqual(rollback.snapshot().resources, { gold: 100, essence: 0 });
 assert.deepEqual(rollback.snapshot().processedRewardKeys, ['drop:stage:N001:rollback']);
+
+const reloaded = new DropRewardService(saved.at(-1), config.pools, () => {
+  throw new Error('a reloaded duplicate must not roll RNG');
+}, () => {
+  throw new Error('a reloaded duplicate must not persist');
+});
+assert.equal(reloaded.claim('drop:stage:N001:4', pool.id).code, 'DUPLICATE');
+assert.deepEqual(reloaded.snapshot().resources, { gold: 120, essence: 1 });
+
+assert.throws(
+  () => new DropRewardService(initialState(), [{ ...pool, repeat: [] }], () => 0, () => {}),
+  /repeat.*non-empty/i,
+  'the reward service must reject an empty configured pool',
+);
+const missingProgress = initialState();
+missingProgress.dropPools = {};
+assert.throws(
+  () => new DropRewardService(missingProgress, config.pools, () => 0, () => {}),
+  /missing drop pool progress/i,
+  'the reward service must reject state without progress for every configured pool',
+);
+
+let reentrantService;
+let reentrantResult;
+reentrantService = new DropRewardService(initialState(), config.pools, () => 0, () => {
+  reentrantResult = reentrantService.claim('drop:stage:N001:reentrant', pool.id);
+});
+assert.equal(reentrantService.claim('drop:stage:N001:outer', pool.id).code, 'APPLIED');
+assert.equal(reentrantResult.code, 'REENTRANT', 'persistence must not re-enter reward settlement');
+assert.deepEqual(reentrantService.snapshot().resources, { gold: 100, essence: 0 });
+assert.deepEqual(reentrantService.snapshot().processedRewardKeys, ['drop:stage:N001:outer']);
 
 console.log('T208 reward service PASS: idempotency, single-persist atomicity and rollback');

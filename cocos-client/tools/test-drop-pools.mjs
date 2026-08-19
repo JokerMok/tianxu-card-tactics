@@ -26,6 +26,21 @@ assert.equal(weightedRare.reward.id, 'stage-n001-rare-essence');
 assert.deepEqual(weightedRare.reward.rewards, { essence: 1 });
 assert.equal(weightedRare.nextState.rareMisses, 0, 'natural rare draw resets pity');
 
+const boundaryBeforeRare = resolveDrop(pool, first.nextState, () => 0.75 - Number.EPSILON);
+assert.equal(boundaryBeforeRare.reward.id, 'stage-n001-gold', 'the interval before the boundary stays common');
+const boundaryRare = resolveDrop(pool, first.nextState, () => 0.75);
+assert.equal(boundaryRare.reward.id, 'stage-n001-rare-essence', 'the exact boundary belongs to the next interval');
+const upperBoundaryRare = resolveDrop(pool, first.nextState, () => 0.9999999999999999);
+assert.equal(upperBoundaryRare.reward.id, 'stage-n001-rare-essence', 'the upper half-open interval remains selectable');
+
+for (const invalidRoll of [-Number.EPSILON, 1, Number.NaN, Number.POSITIVE_INFINITY]) {
+  assert.throws(
+    () => resolveDrop(pool, first.nextState, () => invalidRoll),
+    /RNG.*\[0, 1\)/,
+    `invalid RNG roll ${String(invalidRoll)} must be rejected`,
+  );
+}
+
 const repeatedOne = resolveDrop(pool, first.nextState, () => 0);
 const repeatedTwo = resolveDrop(pool, repeatedOne.nextState, () => 0);
 assert.equal(repeatedOne.reward.id, 'stage-n001-gold');
@@ -74,6 +89,45 @@ assert.equal(noPityLimited.code, 'LIMIT_REACHED');
 assert.equal(noPityLimited.nextState.rareMisses, 0);
 assert.equal(noPityLimited.nextState.claims, noPityRepeatThree.nextState.claims);
 assert.deepEqual(noPityLimited.nextState, noPityRepeatThree.nextState, 'claim limit must preserve the no-pity state');
+
+const withPool = (changes) => ({ ...config, pools: [{ ...pool, ...changes }] });
+assert.throws(() => assertDropPoolConfig({ ...config, pools: [] }), /non-empty pools/i, 'an empty catalog is invalid');
+assert.throws(() => assertDropPoolConfig(withPool({ repeat: [] })), /repeat.*non-empty/i, 'an empty repeat pool is invalid');
+assert.throws(
+  () => assertDropPoolConfig({ ...config, pools: new Array(1) }),
+  /pools\[0\]/i,
+  'a sparse pool catalog is invalid',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ repeat: new Array(1) })),
+  /repeat\[0\]/i,
+  'a sparse repeat pool is invalid',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ repeat: [{ ...pool.repeat[0], weight: 0 }, pool.repeat[1]] })),
+  /weight.*positive/i,
+  'zero-weight entries are invalid',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ repeat: [{ ...pool.repeat[0], weight: Number.MAX_SAFE_INTEGER }, pool.repeat[1]] })),
+  /total weight is unsafe/i,
+  'an unsafe total weight is invalid',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ repeat: [pool.repeat[0], { ...pool.repeat[0] }] })),
+  /duplicated/i,
+  'repeat reward ids must be unique',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ pity: { ...pool.pity, rareRewardId: 'missing-reward' } })),
+  /must reference/i,
+  'pity must reference a configured reward',
+);
+assert.throws(
+  () => assertDropPoolConfig(withPool({ firstClear: { ...pool.firstClear, rewards: { gold: 0 } } })),
+  /positive/i,
+  'reward amounts must be positive',
+);
 
 assert.throws(
   () => resolveDrop(poolWithoutPity, { claims: 1, firstClearClaimed: true, rareMisses: 1 }, () => 0),
