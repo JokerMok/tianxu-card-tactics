@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 
+import { CampaignStateService } from '../assets/scripts/meta/campaign/index.ts';
 import {
   CHAPTER01_LEVEL_IDS,
   MAINLINE_FEATURE_IDS,
@@ -31,6 +32,17 @@ function freshService(options = {}) {
     initialFeatures: ['campaign', 'tasks'],
     ...options,
   });
+}
+
+function campaignSnapshotAfterClears(count) {
+  const service = new CampaignStateService(campaignDefinition);
+  for (let index = 0; index < count; index += 1) {
+    const levelId = CHAPTER01_LEVEL_IDS[index];
+    service.selectLevel(levelId);
+    service.startLevel();
+    service.completeLevel(3);
+  }
+  return service.snapshot();
 }
 
 const initial = freshService();
@@ -107,6 +119,46 @@ const claimed = service.claim('M4-10-L01', (task, businessKey) => {
 assert.equal(claimed.code, 'APPLIED');
 assert.equal(claimed.applied, true);
 assert.equal(rewardCalls.length, 1);
+
+const rewardVisibilityService = freshService();
+rewardVisibilityService.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' });
+const rewardVisibility = [];
+rewardVisibilityService.claim('M4-10-L01', () => {
+  rewardVisibility.push(rewardVisibilityService.getTask('M4-10-L01').claimed);
+});
+assert.deepEqual(rewardVisibility, [true], 'reward callback must run after the claim state is durably committed');
+
+const rewardFailureService = freshService();
+rewardFailureService.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' });
+expectCode('REWARD_FAILED', () => rewardFailureService.claim('M4-10-L01', () => {
+  throw new Error('reward sink unavailable');
+}), 'reward callback failure');
+assert.equal(rewardFailureService.getTask('M4-10-L01').claimed, true, 'reward callback failure must not roll back the durable claim');
+
+let failClaimPersist = false;
+let retryRewardCalls = 0;
+const retryClaimService = freshService({
+  persist: () => {
+    if (failClaimPersist) throw new Error('claim disk full');
+  },
+});
+retryClaimService.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' });
+const beforeClaimRetry = retryClaimService.serialize();
+failClaimPersist = true;
+expectCode('PERSISTENCE_FAILED', () => retryClaimService.claim('M4-10-L01', () => {
+  retryRewardCalls += 1;
+}), 'claim persistence failure');
+assert.equal(retryRewardCalls, 0, 'a failed claim persistence must not invoke its reward callback');
+assert.equal(retryClaimService.serialize(), beforeClaimRetry, 'failed claim persistence must preserve the prior state');
+failClaimPersist = false;
+assert.equal(retryClaimService.claim('M4-10-L01', () => {
+  retryRewardCalls += 1;
+}).code, 'APPLIED');
+assert.equal(retryRewardCalls, 1, 'a retried claim must invoke the reward callback exactly once');
+assert.equal(retryClaimService.claim('M4-10-L01', () => {
+  retryRewardCalls += 1;
+}).code, 'DUPLICATE');
+assert.equal(retryRewardCalls, 1, 'the stable business key must protect duplicate reward callbacks');
 assert.equal(rewardCalls[0].businessKey, 'mainline:CHAPTER01:M4-10-L01');
 assert.equal(service.getTask('M4-10-L01').claimed, true);
 
@@ -124,24 +176,76 @@ const campaignState = createMainlineTaskState(MAINLINE_TASK_DEFINITIONS);
 assert.equal(campaignState.chapter.progress, 0);
 const syncService = freshService();
 const synced = syncService.syncCampaign({
-  chapterId: campaignDefinition.chapterId,
-  levels: Object.fromEntries(CHAPTER01_LEVEL_IDS.map((levelId, index) => [levelId, {
-    levelId,
-    unlocked: index < 3,
-    stars: index < 2 ? 3 : 0,
-    firstClear: index < 2,
-    clearCount: index < 2 ? 1 : 0,
-    replayCount: 0,
-    failureCount: 0,
-    failed: false,
-    lastOutcome: index < 2 ? 'CLEARED' : 'NONE',
-  }])),
+  ...campaignSnapshotAfterClears(2),
 });
 assert.equal(synced.chapter.completedTaskCount, 2);
 assert.equal(syncService.getTask('M4-10-L01').progress, 1);
 assert.equal(syncService.getTask('M4-10-L02').progress, 1);
 assert.equal(syncService.getTask('M4-10-L03').progress, 0);
 assert.equal(syncService.isFeatureUnlocked('hero'), false);
+
+const invalidCampaign = JSON.parse(JSON.stringify(campaignSnapshotAfterClears(2)));
+invalidCampaign.levels.L04.firstClear = true;
+invalidCampaign.levels.L04.clearCount = 1;
+invalidCampaign.levels.L04.stars = 3;
+invalidCampaign.levels.L04.lastOutcome = 'CLEARED';
+const atomicCampaignService = freshService();
+const beforeInvalidCampaign = atomicCampaignService.snapshot();
+const beforeInvalidCampaignSerialized = atomicCampaignService.serialize();
+expectCode('INVALID_SYNC', () => atomicCampaignService.syncCampaign(invalidCampaign), 'forged campaign sync');
+assert.strictEqual(atomicCampaignService.snapshot(), beforeInvalidCampaign, 'invalid campaign sync must not partially advance tasks');
+assert.equal(atomicCampaignService.serialize(), beforeInvalidCampaignSerialized, 'invalid campaign sync must not partially persist');
+
+const invalidCampaignFields = JSON.parse(JSON.stringify(campaignSnapshotAfterClears(1)));
+invalidCampaignFields.levels.L01.failed = true;
+const beforeInvalidFields = atomicCampaignService.snapshot();
+expectCode('INVALID_SYNC', () => atomicCampaignService.syncCampaign(invalidCampaignFields), 'inconsistent campaign fields');
+assert.strictEqual(atomicCampaignService.snapshot(), beforeInvalidFields, 'inconsistent campaign fields must not mutate state');
+
+const incompleteCampaign = JSON.parse(JSON.stringify(campaignSnapshotAfterClears(1)));
+delete incompleteCampaign.levels.L02;
+expectCode('INVALID_SYNC', () => atomicCampaignService.syncCampaign(incompleteCampaign), 'incomplete campaign level set');
+assert.strictEqual(atomicCampaignService.snapshot(), beforeInvalidFields, 'incomplete campaign sync must not mutate state');
+
+const wrongChapterCampaign = JSON.parse(JSON.stringify(campaignSnapshotAfterClears(1)));
+wrongChapterCampaign.chapterId = 'CHAPTER02';
+expectCode('CHAPTER_MISMATCH', () => atomicCampaignService.syncCampaign(wrongChapterCampaign), 'wrong campaign chapter');
+assert.strictEqual(atomicCampaignService.snapshot(), beforeInvalidFields, 'wrong chapter sync must not mutate state');
+
+let campaignPersistCalls = 0;
+const campaignPersistFailureService = freshService({
+  persist: () => {
+    campaignPersistCalls += 1;
+    if (campaignPersistCalls === 1) throw new Error('sync disk full');
+  },
+});
+const beforeCampaignPersistFailure = campaignPersistFailureService.serialize();
+expectCode('PERSISTENCE_FAILED', () => campaignPersistFailureService.syncCampaign(campaignSnapshotAfterClears(2)), 'campaign sync persistence failure');
+assert.equal(campaignPersistFailureService.serialize(), beforeCampaignPersistFailure, 'campaign sync persistence failure must be atomic');
+
+const storyDefinitions = [
+  { id: 'story-one', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: 'NODE-1' }, unlocks: [] },
+  { id: 'story-two', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: 'NODE-2' }, unlocks: [] },
+];
+const storyService = new MainlineTaskService({ definitions: storyDefinitions, initialFeatures: [] });
+const beforeInvalidStory = storyService.snapshot();
+const beforeInvalidStorySerialized = storyService.serialize();
+expectCode('INVALID_SYNC', () => storyService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1', 'NODE-1'] }), 'duplicate story sync');
+assert.strictEqual(storyService.snapshot(), beforeInvalidStory, 'invalid story sync must not partially advance tasks');
+assert.equal(storyService.serialize(), beforeInvalidStorySerialized, 'invalid story sync must not partially persist');
+
+let storyPersistCalls = 0;
+const storyPersistFailureService = new MainlineTaskService({
+  definitions: storyDefinitions,
+  initialFeatures: [],
+  persist: () => {
+    storyPersistCalls += 1;
+    if (storyPersistCalls === 1) throw new Error('story sync disk full');
+  },
+});
+const beforeStoryPersistFailure = storyPersistFailureService.serialize();
+expectCode('PERSISTENCE_FAILED', () => storyPersistFailureService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1', 'NODE-2'] }), 'story sync persistence failure');
+assert.equal(storyPersistFailureService.serialize(), beforeStoryPersistFailure, 'story sync persistence failure must be atomic');
 
 const restored = MainlineTaskService.fromSave(MAINLINE_TASK_DEFINITIONS, service.serialize(), {
   initialFeatures: ['campaign', 'tasks'],

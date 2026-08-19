@@ -1,6 +1,7 @@
 import {
   CAMPAIGN_CHAPTER_ID,
   CAMPAIGN_LEVEL_IDS,
+  restoreCampaignState,
   type CampaignState,
 } from '../../campaign/CampaignState.ts';
 
@@ -139,6 +140,10 @@ export interface MainlineClaimResult {
   readonly state: MainlineTaskState;
 }
 
+/**
+ * Called only after the claim state has been persisted. The business key is stable
+ * across retries and must be used by the reward sink as its idempotency key.
+ */
 export type MainlineRewardClaim = (
   task: MainlineTaskDefinition,
   businessKey: string,
@@ -159,6 +164,11 @@ const DEFAULT_FEATURE_UNLOCKS: Readonly<Record<string, readonly string[]>> = Obj
   L09: Object.freeze(['inventory']),
   L12: Object.freeze(['chapter02']),
 });
+
+const CAMPAIGN_DEFINITION = Object.freeze(CAMPAIGN_LEVEL_IDS.map((id, index) => Object.freeze({
+  id,
+  prerequisiteLevelId: index === 0 ? null : CAMPAIGN_LEVEL_IDS[index - 1],
+})));
 
 export const MAINLINE_TASK_DEFINITIONS: readonly MainlineTaskDefinition[] = Object.freeze(
   CHAPTER01_LEVEL_IDS.map((levelId) => Object.freeze({
@@ -634,15 +644,54 @@ function eventKey(task: MainlineTaskDefinition, event: MainlineTaskEvent): strin
 
 function sameEventAlreadySeen(
   config: NormalizedConfig,
-  state: MainlineTaskState,
+  tasks: Readonly<Record<string, MainlineTaskProgress | MutableTaskProgress>>,
   event: MainlineTaskEvent,
 ): { readonly taskId: string; readonly key: string } | null {
   for (const definition of config.definitions) {
     if (!triggerMatches(definition.trigger, event)) continue;
     const key = eventKey(definition, event);
-    if (state.tasks[definition.id].eventKeys.includes(key)) return { taskId: definition.id, key };
+    if (tasks[definition.id].eventKeys.includes(key)) return { taskId: definition.id, key };
   }
   return null;
+}
+
+function validateCampaignSnapshot(value: unknown): CampaignState {
+  assertPlainRecord(value, 'campaign sync', 'INVALID_SYNC');
+  assertChapterId(value.chapterId, 'campaign sync.chapterId', 'CHAPTER_MISMATCH');
+  try {
+    const validated = restoreCampaignState(CAMPAIGN_DEFINITION, JSON.stringify(value));
+    let blocked = false;
+    for (const levelId of CAMPAIGN_LEVEL_IDS) {
+      const level = validated.levels[levelId];
+      if (level.firstClear && !level.unlocked) fail('INVALID_SYNC', `${levelId} cannot be cleared while locked`);
+      if (level.firstClear && blocked) fail('INVALID_SYNC', 'campaign first clears must be a continuous prefix');
+      if (!level.firstClear) blocked = true;
+    }
+    return validated;
+  } catch (error) {
+    if (error instanceof MainlineTaskError) throw error;
+    fail('INVALID_SYNC', 'campaign sync state is invalid', error);
+  }
+}
+
+function validateStorySync(value: unknown): readonly MainlineTaskEvent[] {
+  assertPlainRecord(value, 'story sync', 'INVALID_SYNC');
+  assertAllowedKeys(value, ['chapterId', 'readNodeIds', 'currentNodeId', 'schemaVersion'], 'story sync', 'INVALID_SYNC');
+  assertChapterId(value.chapterId, 'story sync.chapterId', 'CHAPTER_MISMATCH');
+  if (value.schemaVersion !== undefined && value.schemaVersion !== 1) fail('INVALID_SYNC', 'unsupported story sync version');
+  if (value.currentNodeId !== undefined && value.currentNodeId !== null) {
+    assertIdentifier(value.currentNodeId, 'story sync.currentNodeId', 'INVALID_SYNC');
+  }
+  if (!Array.isArray(value.readNodeIds)) fail('INVALID_SYNC', 'story sync.readNodeIds must be an array');
+  const seen = new Set<string>();
+  const events: MainlineTaskEvent[] = [];
+  for (const [index, nodeId] of value.readNodeIds.entries()) {
+    assertIdentifier(nodeId, `story sync.readNodeIds[${index}]`, 'INVALID_SYNC');
+    if (seen.has(nodeId)) fail('INVALID_SYNC', 'story sync.readNodeIds must not contain duplicates');
+    seen.add(nodeId);
+    events.push({ type: 'STORY_NODE_READ', nodeId });
+  }
+  return Object.freeze(events);
 }
 
 function normalizeOptions(
@@ -741,35 +790,14 @@ export class MainlineTaskService {
   }
 
   advance(input: MainlineTaskEvent): MainlineAdvanceResult {
-    this.assertIdle();
-    const event = normalizedEvent(input);
-    const duplicate = sameEventAlreadySeen(this.config, this.current, event);
-    if (duplicate !== null) {
-      return Object.freeze({
-        applied: false,
-        code: 'DUPLICATE_EVENT' as const,
-        taskId: duplicate.taskId,
-        state: this.current,
-      });
-    }
-    const activeDefinition = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
-    if (activeDefinition === undefined) fail('CHAPTER_COMPLETE', 'all mainline tasks are already complete');
-    if (!triggerMatches(activeDefinition.trigger, event)) {
-      const futureMatch = this.config.definitions.some((definition) => definition.id !== activeDefinition.id && !this.current.tasks[definition.id].completed && triggerMatches(definition.trigger, event));
-      if (futureMatch) fail('TASK_NOT_AVAILABLE', `event cannot advance before task ${activeDefinition.id} is complete`);
-      fail('INVALID_EVENT', `event does not match active task ${activeDefinition.id}`);
-    }
-    const key = eventKey(activeDefinition, event);
-    const next = copyMutableState(this.current);
-    const task = next.tasks[activeDefinition.id];
-    task.eventKeys.push(key);
-    task.progress += 1;
-    task.completed = task.progress >= task.target;
-    next.features = deriveFeatures(this.config, next.tasks);
-    next.chapter = deriveChapter(this.config, next.tasks);
-    const nextState = freezeState(next);
-    this.commit(nextState);
-    return Object.freeze({ applied: true, code: 'APPLIED' as const, taskId: activeDefinition.id, state: this.current });
+    const batch = this.applyEvents([input]);
+    const result = batch.results[0];
+    return Object.freeze({
+      applied: result.applied,
+      code: result.code,
+      taskId: result.taskId,
+      state: batch.state,
+    });
   }
 
   claim(taskId: string, rewardClaim?: MainlineRewardClaim): MainlineClaimResult {
@@ -789,47 +817,33 @@ export class MainlineTaskService {
     next.features = deriveFeatures(this.config, next.tasks);
     next.chapter = deriveChapter(this.config, next.tasks);
     const nextState = freezeState(next);
-    this.commit(nextState, rewardClaim === undefined ? undefined : () => rewardClaim(definition, businessKey));
+    this.commit(nextState);
+    if (rewardClaim !== undefined) {
+      try {
+        rewardClaim(definition, businessKey);
+      } catch (error) {
+        if (error instanceof MainlineTaskError) throw error;
+        throw new MainlineTaskError('REWARD_FAILED', 'mainline task reward callback failed', error);
+      }
+    }
     return Object.freeze({ applied: true, code: 'APPLIED' as const, taskId: id, businessKey, state: this.current });
   }
 
-  syncCampaign(campaign: Pick<CampaignState, 'chapterId' | 'levels'>): MainlineTaskState {
-    assertPlainRecord(campaign, 'campaign sync', 'INVALID_SYNC');
-    assertChapterId(campaign.chapterId, 'campaign sync.chapterId', 'CHAPTER_MISMATCH');
-    assertPlainRecord(campaign.levels, 'campaign sync.levels', 'INVALID_SYNC');
-    assertExactKeys(campaign.levels, [...CAMPAIGN_LEVEL_IDS], 'campaign sync.levels', 'INVALID_SYNC');
-    let blocked = false;
-    for (const levelId of CAMPAIGN_LEVEL_IDS) {
-      const level = campaign.levels[levelId];
-      assertPlainRecord(level, `campaign sync.levels.${levelId}`, 'INVALID_SYNC');
-      if (!Object.prototype.hasOwnProperty.call(level, 'firstClear')) fail('INVALID_SYNC', `${levelId}.firstClear is required`);
-      assertBoolean(level.firstClear, `${levelId}.firstClear`, 'INVALID_SYNC');
-      if (level.firstClear && blocked) fail('INVALID_SYNC', 'campaign first clears must be a continuous prefix');
-      if (!level.firstClear) {
-        blocked = true;
-        continue;
-      }
-      const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
-      if (active?.trigger.type !== 'CAMPAIGN_LEVEL_CLEARED') return this.current;
-      this.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId });
-    }
-    return this.current;
+  syncCampaign(campaign: CampaignState): MainlineTaskState {
+    const validated = validateCampaignSnapshot(campaign);
+    const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
+    if (active?.trigger.type !== 'CAMPAIGN_LEVEL_CLEARED') return this.current;
+    const events = CAMPAIGN_LEVEL_IDS
+      .filter((levelId) => validated.levels[levelId].firstClear)
+      .map((levelId) => ({ type: 'CAMPAIGN_LEVEL_CLEARED' as const, levelId }));
+    return this.applyEvents(events).state;
   }
 
   syncStory(story: { readonly chapterId: string; readonly readNodeIds: readonly string[] }): MainlineTaskState {
-    assertPlainRecord(story, 'story sync', 'INVALID_SYNC');
-    assertChapterId(story.chapterId, 'story sync.chapterId', 'CHAPTER_MISMATCH');
-    if (!Array.isArray(story.readNodeIds)) fail('INVALID_SYNC', 'story sync.readNodeIds must be an array');
-    const seen = new Set<string>();
-    for (const [index, nodeId] of story.readNodeIds.entries()) {
-      assertIdentifier(nodeId, `story sync.readNodeIds[${index}]`, 'INVALID_SYNC');
-      if (seen.has(nodeId)) fail('INVALID_SYNC', 'story sync.readNodeIds must not contain duplicates');
-      seen.add(nodeId);
-      const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
-      if (active?.trigger.type !== 'STORY_NODE_READ') return this.current;
-      this.advance({ type: 'STORY_NODE_READ', nodeId });
-    }
-    return this.current;
+    const events = validateStorySync(story);
+    const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
+    if (active?.trigger.type !== 'STORY_NODE_READ') return this.current;
+    return this.applyEvents(events).state;
   }
 
   syncDeck(deckId?: string): MainlineTaskState {
@@ -860,19 +874,51 @@ export class MainlineTaskService {
     if (this.committing) fail('REENTRANT', 'mainline task mutation cannot re-enter persistence');
   }
 
-  private commit(next: MainlineTaskState, beforePersist?: () => void): void {
+  private applyEvents(inputs: readonly MainlineTaskEvent[]): {
+    readonly state: MainlineTaskState;
+    readonly results: readonly Readonly<{ applied: boolean; code: MainlineAdvanceCode; taskId: string }>[];
+  } {
+    this.assertIdle();
+    const events = inputs.map((input) => normalizedEvent(input));
+    const next = copyMutableState(this.current);
+    const results: Array<{ applied: boolean; code: MainlineAdvanceCode; taskId: string }> = [];
+    let changed = false;
+
+    for (const event of events) {
+      const duplicate = sameEventAlreadySeen(this.config, next.tasks, event);
+      if (duplicate !== null) {
+        results.push({ applied: false, code: 'DUPLICATE_EVENT', taskId: duplicate.taskId });
+        continue;
+      }
+      const activeDefinition = this.config.definitions.find((definition) => !next.tasks[definition.id].completed);
+      if (activeDefinition === undefined) fail('CHAPTER_COMPLETE', 'all mainline tasks are already complete');
+      if (!triggerMatches(activeDefinition.trigger, event)) {
+        const futureMatch = this.config.definitions.some((definition) => definition.id !== activeDefinition.id && !next.tasks[definition.id].completed && triggerMatches(definition.trigger, event));
+        if (futureMatch) fail('TASK_NOT_AVAILABLE', `event cannot advance before task ${activeDefinition.id} is complete`);
+        fail('INVALID_EVENT', `event does not match active task ${activeDefinition.id}`);
+      }
+      const key = eventKey(activeDefinition, event);
+      const task = next.tasks[activeDefinition.id];
+      task.eventKeys.push(key);
+      task.progress += 1;
+      task.completed = task.progress >= task.target;
+      changed = true;
+      results.push({ applied: true, code: 'APPLIED', taskId: activeDefinition.id });
+    }
+
+    if (!changed) return { state: this.current, results: Object.freeze(results) };
+    next.features = deriveFeatures(this.config, next.tasks);
+    next.chapter = deriveChapter(this.config, next.tasks);
+    const nextState = freezeState(next);
+    this.commit(nextState);
+    return { state: this.current, results: Object.freeze(results) };
+  }
+
+  private commit(next: MainlineTaskState): void {
     this.assertIdle();
     const serialized = serializeState(next);
     this.committing = true;
     try {
-      if (beforePersist !== undefined) {
-        try {
-          beforePersist();
-        } catch (error) {
-          if (error instanceof MainlineTaskError && error.code === 'REENTRANT') throw error;
-          throw new MainlineTaskError('REWARD_FAILED', 'mainline task reward callback failed', error);
-        }
-      }
       if (this.persist !== undefined) this.persist(serialized);
     } catch (error) {
       if (error instanceof MainlineTaskError) throw error;
