@@ -26,7 +26,20 @@
         {
           "type": "PLAYER_HERO_DEFEATED"
         }
-      ]
+      ],
+      "scenarioRules": {
+        "playerHeroHp": 30,
+        "enemyHeroHp": 30,
+        "laneCount": 2,
+        "laneLength": 12,
+        "summonZone": { "laneCount": 2, "depth": 3 },
+        "deckSize": 30,
+        "controlModes": ["MANUAL", "AUTO"],
+        "canToggleAuto": true,
+        "roundLimit": 80,
+        "seed": 20260712,
+        "specialRules": "NONE"
+      }
     }
   ]
 }
