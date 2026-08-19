@@ -26,16 +26,20 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-const level = readJson(levelPath);
+const levelDocument = readJson(levelPath);
+const level = levelDocument.chapterLevels[0];
 const manifest = readJson(path.join(configRoot, 'manifest.json'));
 const decks = readJson(path.join(configRoot, 'decks.json'));
 const cards = readJson(path.join(configRoot, 'cards.json'));
 const units = readJson(path.join(configRoot, 'units.json'));
 const skills = readJson(path.join(configRoot, 'skills.json'));
+const enumCoverage = readJson(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'));
 const deckIds = new Set(decks.decks.map(({ id }) => id));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
+const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
-  chapterLevelIds: new Set(['L01']),
+  chapterLevelIds,
   targetIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
   unitIds: new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id)),
   skillIds: new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id)),
@@ -45,11 +49,10 @@ const references = {
     ...(card.unitId ? { unitId: card.unitId } : {}),
     ...(card.skillId ? { skillId: card.skillId } : {}),
   }])),
-  unlockIds: new Set(['OUTPOST']),
-  chestIds: new Set(['CHAPTER-CHEST']),
-  flagIds: new Set(['OUTCAST-CAMP']),
+  unlockIds: rewardIds('UNLOCK'),
+  chestIds: rewardIds('CHEST'),
+  flagIds: rewardIds('FLAG'),
 };
-const levelContract = { chapterLevels: [level] };
 
 assert.deepEqual(
   Object.keys(level).sort(),
@@ -82,9 +85,19 @@ assert.deepEqual(level.scenarioRules, {
   openingSkillCardsAllowed: false,
   enemyOpeningCardFilter: 'UNITS_ONLY',
 }, 'L01 must encode the one-lane deployment tutorial rules');
+function assertL01ScenarioRules(rules) {
+  assert.equal(rules.playerHeroHp, 30);
+  assert.equal(rules.activeLaneCount, 1);
+  assert.equal(rules.playerSummonSlots, 3);
+  assert.equal(rules.unlockSecondLaneOnFirstDeployment, true);
+  assert.equal(rules.openingSkillCardsAllowed, false);
+  assert.equal(rules.enemyOpeningCardFilter, 'UNITS_ONLY');
+}
+assertL01ScenarioRules(level.scenarioRules);
+assert.throws(() => assertL01ScenarioRules({ ...level.scenarioRules, playerHeroHp: 0 }));
 
 assert.doesNotThrow(
-  () => assertChapterLevelContract(levelContract, manifest, decks, references, 'config/levels/chapter01/L01'),
+  () => assertChapterLevelContract(levelDocument, manifest, decks, references, 'config/levels/chapter01/L01'),
   'real L01 must pass the shared chapter-level contract',
 );
 

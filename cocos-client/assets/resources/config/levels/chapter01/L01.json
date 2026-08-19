@@ -1,4 +1,5 @@
 {
+  "chapterLevels": [{
   "id": "L01",
   "prerequisiteLevelId": null,
   "enemyDeckId": "D001",
@@ -28,4 +29,5 @@
     "openingSkillCardsAllowed": false,
     "enemyOpeningCardFilter": "UNITS_ONLY"
   }
+  }]
 }
