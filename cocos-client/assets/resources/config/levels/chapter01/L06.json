@@ -1,0 +1,21 @@
+{
+  "chapterLevels": [{
+    "id": "L06",
+    "prerequisiteLevelId": "L05",
+    "enemyDeckId": "D001",
+    "environmentElement": "WATER",
+    "objectives": [{ "type": "DEFEAT_ENEMY_HERO" }],
+    "rewards": [{ "type": "CARD", "id": "S004", "quantity": 1, "cardType": "SKILL" }],
+    "failureConditions": [{ "type": "PLAYER_HERO_DEFEATED" }],
+    "scenarioRules": {
+      "rewardPolicy": "CURRENT_PROFESSION_SKILL_I",
+      "environmentElement": "WATER",
+      "sameElementEffectBonusPercent": 10,
+      "fireEffectPenaltyPercent": -10,
+      "freezeStatus": "FREEZE",
+      "purifyAvailable": true,
+      "preBattleEnvironmentReadRequired": true,
+      "alternateSolutions": ["PURIFY", "SPREAD_DEPLOYMENT", "LANE_SWAP", "FIRE_DAMAGE"]
+    }
+  }]
+}
