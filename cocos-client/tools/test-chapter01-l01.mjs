@@ -36,7 +36,7 @@ const skills = readJson(path.join(configRoot, 'skills.json'));
 const enumCoverage = readJson(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'));
 const deckIds = new Set(decks.decks.map(({ id }) => id));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
-const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const chapterLevelIds = new Set([level.id]);
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
   chapterLevelIds,
@@ -138,6 +138,21 @@ expectFailure(
   'invalid target ID',
   (invalidLevel) => { invalidLevel.objectives = [{ type: 'DESTROY_TARGET', targetId: 'U_001' }]; },
   'config/levels/chapter01/L01.chapterLevels[0].objectives[0].targetId',
+);
+expectFailure(
+  'unknown reward ID',
+  (invalidLevel) => { invalidLevel.rewards[0].id = 'D001'; },
+  'config/levels/chapter01/L01.chapterLevels[0].rewards[0].id',
+);
+expectFailure(
+  'reward copy limit overflow',
+  (invalidLevel) => { invalidLevel.rewards[0].quantity = 5; },
+  'config/levels/chapter01/L01.chapterLevels[0].rewards[0].quantity',
+);
+expectFailure(
+  'invalid failure condition type',
+  (invalidLevel) => { invalidLevel.failureConditions[0].type = 'UNSUPPORTED'; },
+  'config/levels/chapter01/L01.chapterLevels[0].failureConditions[0].type',
 );
 
 console.log('Chapter 01 L01 config: real fields and references PASS; invalid prerequisite, unknown enemy deck, invalid ID, missing failure conditions, and invalid target ID FAIL as expected');
