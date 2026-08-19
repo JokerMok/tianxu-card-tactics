@@ -4,8 +4,15 @@ import {
   restoreCampaignState,
   type CampaignState,
 } from '../../campaign/CampaignState.ts';
+import {
+  CHAPTER01_STORY_NODE_IDS,
+  STORY_SAVE_VERSION,
+  type Chapter01StorySnapshot,
+} from '../../story/Chapter01Story.ts';
 
-export const MAINLINE_TASK_SCHEMA_VERSION = 1 as const;
+/** Root save version 2 adds the durable reward outbox; v1 saves are rejected, not silently reinterpreted. */
+export const MAINLINE_TASK_SCHEMA_VERSION = 2 as const;
+export const MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION = 1 as const;
 export const MAINLINE_CHAPTER_ID = CAMPAIGN_CHAPTER_ID;
 export const CHAPTER01_LEVEL_IDS = CAMPAIGN_LEVEL_IDS;
 
@@ -72,12 +79,26 @@ export interface MainlineChapterProgress {
   readonly currentTaskId: string | null;
 }
 
+export type MainlineRewardOutboxStatus = 'PENDING' | 'ACKNOWLEDGED';
+
+export interface MainlineRewardOutboxEntry {
+  readonly businessKey: string;
+  readonly taskId: string;
+  readonly status: MainlineRewardOutboxStatus;
+}
+
+export interface MainlineRewardOutboxState {
+  readonly schemaVersion: typeof MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION;
+  readonly entries: Readonly<Record<string, MainlineRewardOutboxEntry>>;
+}
+
 export interface MainlineTaskState {
   readonly schemaVersion: typeof MAINLINE_TASK_SCHEMA_VERSION;
   readonly chapterId: typeof MAINLINE_CHAPTER_ID;
   readonly tasks: Readonly<Record<string, MainlineTaskProgress>>;
   readonly features: Readonly<Record<string, MainlineFeatureProgress>>;
   readonly chapter: MainlineChapterProgress;
+  readonly rewardOutbox: MainlineRewardOutboxState;
 }
 
 export interface MainlineTaskServiceOptions {
@@ -140,9 +161,30 @@ export interface MainlineClaimResult {
   readonly state: MainlineTaskState;
 }
 
+export type MainlineRewardAcknowledgeCode = 'APPLIED' | 'DUPLICATE';
+
+export interface MainlineRewardAcknowledgeResult {
+  readonly applied: boolean;
+  readonly code: MainlineRewardAcknowledgeCode;
+  readonly businessKey: string;
+  readonly state: MainlineTaskState;
+}
+
+export type MainlineRewardFlushCode = 'DELIVERED' | 'FAILED';
+
+export interface MainlineRewardFlushResult {
+  readonly code: MainlineRewardFlushCode;
+  readonly taskId: string;
+  readonly businessKey: string;
+  readonly acknowledged: boolean;
+  readonly state: MainlineTaskState;
+}
+
 /**
- * Called only after the claim state has been persisted. The business key is stable
- * across retries and must be used by the reward sink as its idempotency key.
+ * Legacy delivery callback, called only after the claim state has been persisted.
+ * A normal return means only that this delivery attempt returned; it is not an
+ * exactly-once acknowledgement. Call acknowledgeReward with the same businessKey
+ * after the external sink explicitly confirms success.
  */
 export type MainlineRewardClaim = (
   task: MainlineTaskDefinition,
@@ -208,6 +250,18 @@ interface MutableState {
   tasks: Record<string, MutableTaskProgress>;
   features: Record<string, MutableFeatureProgress>;
   chapter: MainlineChapterProgress;
+  rewardOutbox: MutableRewardOutboxState;
+}
+
+interface MutableRewardOutboxEntry {
+  businessKey: string;
+  taskId: string;
+  status: MainlineRewardOutboxStatus;
+}
+
+interface MutableRewardOutboxState {
+  schemaVersion: typeof MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION;
+  entries: Record<string, MutableRewardOutboxEntry>;
 }
 
 function fail(code: MainlineTaskErrorCode, message: string, cause?: unknown): never {
@@ -412,6 +466,10 @@ function initialMutableState(config: NormalizedConfig): MutableState {
       completed: false,
       currentTaskId: config.definitions[0].id,
     },
+    rewardOutbox: {
+      schemaVersion: MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION,
+      entries: {},
+    },
   };
 }
 
@@ -420,12 +478,20 @@ function copyMutableState(state: MainlineTaskState): MutableState {
   for (const [id, task] of Object.entries(state.tasks)) tasks[id] = { ...task, eventKeys: [...task.eventKeys] };
   const features: Record<string, MutableFeatureProgress> = {};
   for (const [id, feature] of Object.entries(state.features)) features[id] = { ...feature };
+  const rewardEntries: Record<string, MutableRewardOutboxEntry> = {};
+  for (const [businessKey, entry] of Object.entries(state.rewardOutbox.entries)) {
+    rewardEntries[businessKey] = { ...entry };
+  }
   return {
     schemaVersion: state.schemaVersion,
     chapterId: state.chapterId,
     tasks,
     features,
     chapter: { ...state.chapter },
+    rewardOutbox: {
+      schemaVersion: state.rewardOutbox.schemaVersion,
+      entries: rewardEntries,
+    },
   };
 }
 
@@ -466,6 +532,61 @@ function deriveChapter(config: NormalizedConfig, tasks: Record<string, MutableTa
   };
 }
 
+function businessKeyForTask(taskId: string): string {
+  return `mainline:${MAINLINE_CHAPTER_ID}:${taskId}`;
+}
+
+function validateRewardOutbox(
+  value: unknown,
+  config: NormalizedConfig,
+  tasks: Record<string, MutableTaskProgress>,
+): MutableRewardOutboxState {
+  assertPlainRecord(value, 'mainline task state.rewardOutbox', 'INVALID_STATE');
+  assertExactKeys(value, ['schemaVersion', 'entries'], 'mainline task state.rewardOutbox', 'INVALID_STATE');
+  if (value.schemaVersion !== MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION) {
+    fail('SAVE_VERSION', 'unsupported mainline reward outbox save version');
+  }
+  assertPlainRecord(value.entries, 'mainline task state.rewardOutbox.entries', 'INVALID_STATE');
+  const claimedBusinessKeys = config.definitions
+    .filter((definition) => tasks[definition.id].claimed)
+    .map((definition) => businessKeyForTask(definition.id));
+  assertExactKeys(
+    value.entries,
+    claimedBusinessKeys,
+    'mainline task state.rewardOutbox.entries',
+    'INVALID_STATE',
+  );
+
+  const entries: Record<string, MutableRewardOutboxEntry> = {};
+  for (const definition of config.definitions) {
+    if (!tasks[definition.id].claimed) continue;
+    const businessKey = businessKeyForTask(definition.id);
+    const entry = value.entries[businessKey];
+    assertPlainRecord(entry, `mainline task state.rewardOutbox.entries.${businessKey}`, 'INVALID_STATE');
+    assertExactKeys(
+      entry,
+      ['businessKey', 'taskId', 'status'],
+      `mainline task state.rewardOutbox.entries.${businessKey}`,
+      'INVALID_STATE',
+    );
+    if (entry.businessKey !== businessKey || entry.taskId !== definition.id) {
+      fail('INVALID_STATE', `reward outbox entry does not match ${definition.id}`);
+    }
+    if (entry.status !== 'PENDING' && entry.status !== 'ACKNOWLEDGED') {
+      fail('INVALID_STATE', `reward outbox entry status is invalid: ${businessKey}`);
+    }
+    entries[businessKey] = {
+      businessKey,
+      taskId: definition.id,
+      status: entry.status,
+    };
+  }
+  return {
+    schemaVersion: MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION,
+    entries,
+  };
+}
+
 function freezeState(state: MutableState): MainlineTaskState {
   const tasks: Record<string, MainlineTaskProgress> = {};
   for (const [id, task] of Object.entries(state.tasks)) {
@@ -473,19 +594,27 @@ function freezeState(state: MutableState): MainlineTaskState {
   }
   const features: Record<string, MainlineFeatureProgress> = {};
   for (const [id, feature] of Object.entries(state.features)) features[id] = Object.freeze({ ...feature });
+  const rewardEntries: Record<string, MainlineRewardOutboxEntry> = {};
+  for (const [businessKey, entry] of Object.entries(state.rewardOutbox.entries)) {
+    rewardEntries[businessKey] = Object.freeze({ ...entry });
+  }
   return Object.freeze({
     schemaVersion: MAINLINE_TASK_SCHEMA_VERSION,
     chapterId: MAINLINE_CHAPTER_ID,
     tasks: Object.freeze(tasks),
     features: Object.freeze(features),
     chapter: Object.freeze({ ...state.chapter }),
+    rewardOutbox: Object.freeze({
+      schemaVersion: MAINLINE_REWARD_OUTBOX_SCHEMA_VERSION,
+      entries: Object.freeze(rewardEntries),
+    }),
   });
 }
 
 function validateState(state: unknown, config: NormalizedConfig): MainlineTaskState {
   assertPlainRecord(state, 'mainline task state', 'INVALID_STATE');
-  assertExactKeys(state, ['schemaVersion', 'chapterId', 'tasks', 'features', 'chapter'], 'mainline task state', 'INVALID_STATE');
   if (state.schemaVersion !== MAINLINE_TASK_SCHEMA_VERSION) fail('SAVE_VERSION', 'unsupported mainline task save version');
+  assertExactKeys(state, ['schemaVersion', 'chapterId', 'tasks', 'features', 'chapter', 'rewardOutbox'], 'mainline task state', 'INVALID_STATE');
   assertChapterId(state.chapterId, 'mainline task state.chapterId', 'CHAPTER_MISMATCH');
   assertPlainRecord(state.tasks, 'mainline task state.tasks', 'INVALID_STATE');
   assertExactKeys(state.tasks, config.definitions.map(({ id }) => id), 'mainline task state.tasks', 'INVALID_STATE');
@@ -521,6 +650,8 @@ function validateState(state: unknown, config: NormalizedConfig): MainlineTaskSt
       eventKeys,
     };
   }
+
+  const rewardOutbox = validateRewardOutbox(state.rewardOutbox, config, tasks);
 
   assertPlainRecord(state.features, 'mainline task state.features', 'INVALID_STATE');
   assertExactKeys(state.features, config.featureIds, 'mainline task state.features', 'INVALID_STATE');
@@ -569,6 +700,7 @@ function validateState(state: unknown, config: NormalizedConfig): MainlineTaskSt
     tasks,
     features,
     chapter: derivedChapter,
+    rewardOutbox,
   });
 }
 
@@ -586,6 +718,10 @@ function serializeState(state: MainlineTaskState): string {
     }])),
     features: Object.fromEntries(Object.entries(state.features).map(([id, feature]) => [id, { ...feature }])),
     chapter: { ...state.chapter },
+    rewardOutbox: {
+      schemaVersion: state.rewardOutbox.schemaVersion,
+      entries: Object.fromEntries(Object.entries(state.rewardOutbox.entries).map(([businessKey, entry]) => [businessKey, { ...entry }])),
+    },
   });
 }
 
@@ -674,14 +810,30 @@ function validateCampaignSnapshot(value: unknown): CampaignState {
   }
 }
 
-function validateStorySync(value: unknown): readonly MainlineTaskEvent[] {
+function usesChapter01StoryContract(config: NormalizedConfig): boolean {
+  return config.definitions.every((definition) => {
+    if (definition.trigger.type !== 'STORY_NODE_READ') return true;
+    return CHAPTER01_STORY_NODE_IDS.includes(definition.trigger.nodeId!);
+  });
+}
+
+function validateStorySync(
+  value: unknown,
+  strictChapter01: boolean,
+): readonly MainlineTaskEvent[] {
   assertPlainRecord(value, 'story sync', 'INVALID_SYNC');
-  assertAllowedKeys(value, ['chapterId', 'readNodeIds', 'currentNodeId', 'schemaVersion'], 'story sync', 'INVALID_SYNC');
-  assertChapterId(value.chapterId, 'story sync.chapterId', 'CHAPTER_MISMATCH');
-  if (value.schemaVersion !== undefined && value.schemaVersion !== 1) fail('INVALID_SYNC', 'unsupported story sync version');
-  if (value.currentNodeId !== undefined && value.currentNodeId !== null) {
-    assertIdentifier(value.currentNodeId, 'story sync.currentNodeId', 'INVALID_SYNC');
+  if (strictChapter01) {
+    assertExactKeys(value, ['chapterId', 'readNodeIds', 'currentNodeId', 'schemaVersion'], 'story sync', 'INVALID_SYNC');
+  } else {
+    assertAllowedKeys(value, ['chapterId', 'readNodeIds', 'currentNodeId', 'schemaVersion'], 'story sync', 'INVALID_SYNC');
   }
+  assertChapterId(value.chapterId, 'story sync.chapterId', 'CHAPTER_MISMATCH');
+  if (strictChapter01) {
+    if (value.schemaVersion !== STORY_SAVE_VERSION) fail('INVALID_SYNC', 'unsupported story sync version');
+  } else if (value.schemaVersion !== undefined && value.schemaVersion !== STORY_SAVE_VERSION) {
+    fail('INVALID_SYNC', 'unsupported story sync version');
+  }
+  if (value.currentNodeId !== undefined && value.currentNodeId !== null) assertIdentifier(value.currentNodeId, 'story sync.currentNodeId', 'INVALID_SYNC');
   if (!Array.isArray(value.readNodeIds)) fail('INVALID_SYNC', 'story sync.readNodeIds must be an array');
   const seen = new Set<string>();
   const events: MainlineTaskEvent[] = [];
@@ -689,7 +841,21 @@ function validateStorySync(value: unknown): readonly MainlineTaskEvent[] {
     assertIdentifier(nodeId, `story sync.readNodeIds[${index}]`, 'INVALID_SYNC');
     if (seen.has(nodeId)) fail('INVALID_SYNC', 'story sync.readNodeIds must not contain duplicates');
     seen.add(nodeId);
+    if (strictChapter01 && nodeId !== CHAPTER01_STORY_NODE_IDS[index]) {
+      fail('INVALID_SYNC', 'CHAPTER01 story readNodeIds must be the real continuous prefix');
+    }
     events.push({ type: 'STORY_NODE_READ', nodeId });
+  }
+  if (strictChapter01) {
+    const readCount = value.readNodeIds.length;
+    const expectedCurrentNodeIds = readCount === 0
+      ? [null]
+      : readCount === CHAPTER01_STORY_NODE_IDS.length
+        ? [null, CHAPTER01_STORY_NODE_IDS[readCount - 1]]
+        : [CHAPTER01_STORY_NODE_IDS[readCount - 1]];
+    if (!expectedCurrentNodeIds.includes(value.currentNodeId as string | null | undefined)) {
+      fail('INVALID_SYNC', 'story sync.currentNodeId does not match the read prefix');
+    }
   }
   return Object.freeze(events);
 }
@@ -789,6 +955,14 @@ export class MainlineTaskService {
     return this.current.features[id].unlocked;
   }
 
+  pendingRewards(): readonly MainlineRewardOutboxEntry[] {
+    return Object.freeze(
+      Object.values(this.current.rewardOutbox.entries)
+        .filter((entry) => entry.status === 'PENDING')
+        .map((entry) => entry),
+    );
+  }
+
   advance(input: MainlineTaskEvent): MainlineAdvanceResult {
     const batch = this.applyEvents([input]);
     const result = batch.results[0];
@@ -814,6 +988,11 @@ export class MainlineTaskService {
     }
     const next = copyMutableState(this.current);
     next.tasks[id].claimed = true;
+    next.rewardOutbox.entries[businessKey] = {
+      businessKey,
+      taskId: id,
+      status: 'PENDING',
+    };
     next.features = deriveFeatures(this.config, next.tasks);
     next.chapter = deriveChapter(this.config, next.tasks);
     const nextState = freezeState(next);
@@ -829,6 +1008,55 @@ export class MainlineTaskService {
     return Object.freeze({ applied: true, code: 'APPLIED' as const, taskId: id, businessKey, state: this.current });
   }
 
+  flushRewards(rewardClaim: MainlineRewardClaim): readonly MainlineRewardFlushResult[] {
+    if (typeof rewardClaim !== 'function') fail('INVALID_ARGUMENT', 'reward flush callback must be a function');
+    this.assertIdle();
+    const results: MainlineRewardFlushResult[] = [];
+    for (const pending of this.pendingRewards()) {
+      const entry = this.current.rewardOutbox.entries[pending.businessKey];
+      if (entry === undefined || entry.status !== 'PENDING') continue;
+      const definition = this.config.definitions.find((candidate) => candidate.id === pending.taskId)!;
+      try {
+        rewardClaim(definition, pending.businessKey);
+        results.push(Object.freeze({
+          code: 'DELIVERED' as const,
+          taskId: pending.taskId,
+          businessKey: pending.businessKey,
+          acknowledged: this.current.rewardOutbox.entries[pending.businessKey].status === 'ACKNOWLEDGED',
+          state: this.current,
+        }));
+      } catch {
+        results.push(Object.freeze({
+          code: 'FAILED' as const,
+          taskId: pending.taskId,
+          businessKey: pending.businessKey,
+          acknowledged: this.current.rewardOutbox.entries[pending.businessKey].status === 'ACKNOWLEDGED',
+          state: this.current,
+        }));
+      }
+    }
+    return Object.freeze(results);
+  }
+
+  acknowledgeReward(businessKey: string): MainlineRewardAcknowledgeResult {
+    this.assertIdle();
+    assertIdentifier(businessKey, 'reward business key', 'INVALID_ARGUMENT');
+    const entry = this.current.rewardOutbox.entries[businessKey];
+    if (entry === undefined) fail('INVALID_ARGUMENT', `unknown mainline reward business key: ${businessKey}`);
+    if (entry.status === 'ACKNOWLEDGED') {
+      return Object.freeze({ applied: false, code: 'DUPLICATE' as const, businessKey, state: this.current });
+    }
+    const next = copyMutableState(this.current);
+    next.rewardOutbox.entries[businessKey].status = 'ACKNOWLEDGED';
+    const nextState = freezeState(next);
+    this.commit(nextState);
+    return Object.freeze({ applied: true, code: 'APPLIED' as const, businessKey, state: this.current });
+  }
+
+  ackReward(businessKey: string): MainlineRewardAcknowledgeResult {
+    return this.acknowledgeReward(businessKey);
+  }
+
   syncCampaign(campaign: CampaignState): MainlineTaskState {
     const validated = validateCampaignSnapshot(campaign);
     const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
@@ -839,8 +1067,8 @@ export class MainlineTaskService {
     return this.applyEvents(events).state;
   }
 
-  syncStory(story: { readonly chapterId: string; readonly readNodeIds: readonly string[] }): MainlineTaskState {
-    const events = validateStorySync(story);
+  syncStory(story: Chapter01StorySnapshot | { readonly chapterId: string; readonly readNodeIds: readonly string[] }): MainlineTaskState {
+    const events = validateStorySync(story, usesChapter01StoryContract(this.config));
     const active = this.config.definitions.find((definition) => !this.current.tasks[definition.id].completed);
     if (active?.trigger.type !== 'STORY_NODE_READ') return this.current;
     return this.applyEvents(events).state;

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { CampaignStateService } from '../assets/scripts/meta/campaign/index.ts';
+import { CHAPTER01_STORY_NODE_IDS } from '../assets/scripts/meta/story/index.ts';
 import {
   CHAPTER01_LEVEL_IDS,
   MAINLINE_FEATURE_IDS,
@@ -17,6 +18,19 @@ const campaignDefinition = {
     prerequisiteLevelId: index === 0 ? null : CHAPTER01_LEVEL_IDS[index - 1],
   })),
 };
+
+function chapter01StorySnapshot(readCount, overrides = {}) {
+  const readNodeIds = CHAPTER01_STORY_NODE_IDS.slice(0, readCount);
+  return {
+    schemaVersion: 1,
+    chapterId: 'CHAPTER01',
+    readNodeIds,
+    currentNodeId: readCount === 0 || readCount === CHAPTER01_STORY_NODE_IDS.length
+      ? null
+      : readNodeIds[readNodeIds.length - 1],
+    ...overrides,
+  };
+}
 
 function expectCode(code, callback, label) {
   assert.throws(callback, (error) => {
@@ -119,6 +133,15 @@ const claimed = service.claim('M4-10-L01', (task, businessKey) => {
 assert.equal(claimed.code, 'APPLIED');
 assert.equal(claimed.applied, true);
 assert.equal(rewardCalls.length, 1);
+assert.equal(service.snapshot().rewardOutbox.entries[claimed.businessKey].status, 'PENDING');
+
+const acknowledged = service.acknowledgeReward(claimed.businessKey);
+assert.equal(acknowledged.code, 'APPLIED');
+assert.equal(acknowledged.applied, true);
+assert.equal(service.snapshot().rewardOutbox.entries[claimed.businessKey].status, 'ACKNOWLEDGED');
+const duplicateAcknowledgement = service.acknowledgeReward(claimed.businessKey);
+assert.equal(duplicateAcknowledgement.code, 'DUPLICATE');
+assert.equal(duplicateAcknowledgement.applied, false);
 
 const rewardVisibilityService = freshService();
 rewardVisibilityService.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' });
@@ -134,6 +157,27 @@ expectCode('REWARD_FAILED', () => rewardFailureService.claim('M4-10-L01', () => 
   throw new Error('reward sink unavailable');
 }), 'reward callback failure');
 assert.equal(rewardFailureService.getTask('M4-10-L01').claimed, true, 'reward callback failure must not roll back the durable claim');
+const failedRewardKey = 'mainline:CHAPTER01:M4-10-L01';
+assert.equal(rewardFailureService.snapshot().rewardOutbox.entries[failedRewardKey].status, 'PENDING');
+let rewardSinkAvailable = false;
+const failedFlush = rewardFailureService.flushRewards(() => {
+  if (!rewardSinkAvailable) throw new Error('reward sink unavailable');
+});
+assert.equal(failedFlush.length, 1);
+assert.equal(failedFlush[0].code, 'FAILED');
+assert.equal(rewardFailureService.snapshot().rewardOutbox.entries[failedRewardKey].status, 'PENDING');
+rewardSinkAvailable = true;
+let retryFlushCalls = 0;
+const successfulFlush = rewardFailureService.flushRewards(() => {
+  retryFlushCalls += 1;
+});
+assert.equal(successfulFlush[0].code, 'DELIVERED');
+assert.equal(retryFlushCalls, 1);
+assert.equal(rewardFailureService.acknowledgeReward(failedRewardKey).code, 'APPLIED');
+const flushAfterAck = rewardFailureService.flushRewards(() => {
+  throw new Error('acknowledged reward must not be delivered again');
+});
+assert.deepEqual(flushAfterAck, [], 'acknowledged rewards must not be flushed again');
 
 let failClaimPersist = false;
 let retryRewardCalls = 0;
@@ -155,6 +199,7 @@ assert.equal(retryClaimService.claim('M4-10-L01', () => {
   retryRewardCalls += 1;
 }).code, 'APPLIED');
 assert.equal(retryRewardCalls, 1, 'a retried claim must invoke the reward callback exactly once');
+assert.equal(retryClaimService.snapshot().rewardOutbox.entries['mainline:CHAPTER01:M4-10-L01'].status, 'PENDING');
 assert.equal(retryClaimService.claim('M4-10-L01', () => {
   retryRewardCalls += 1;
 }).code, 'DUPLICATE');
@@ -228,11 +273,13 @@ const storyDefinitions = [
   { id: 'story-two', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: 'NODE-2' }, unlocks: [] },
 ];
 const storyService = new MainlineTaskService({ definitions: storyDefinitions, initialFeatures: [] });
+const genericStorySynced = storyService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1'] });
+assert.equal(genericStorySynced.tasks['story-one'].completed, true, 'custom story definitions must use the generic sync contract');
 const beforeInvalidStory = storyService.snapshot();
 const beforeInvalidStorySerialized = storyService.serialize();
 expectCode('INVALID_SYNC', () => storyService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1', 'NODE-1'] }), 'duplicate story sync');
-assert.strictEqual(storyService.snapshot(), beforeInvalidStory, 'invalid story sync must not partially advance tasks');
-assert.equal(storyService.serialize(), beforeInvalidStorySerialized, 'invalid story sync must not partially persist');
+assert.strictEqual(storyService.snapshot(), beforeInvalidStory, 'invalid custom story sync must not mutate state');
+assert.equal(storyService.serialize(), beforeInvalidStorySerialized, 'invalid custom story sync must not persist');
 
 let storyPersistCalls = 0;
 const storyPersistFailureService = new MainlineTaskService({
@@ -246,6 +293,59 @@ const storyPersistFailureService = new MainlineTaskService({
 const beforeStoryPersistFailure = storyPersistFailureService.serialize();
 expectCode('PERSISTENCE_FAILED', () => storyPersistFailureService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1', 'NODE-2'] }), 'story sync persistence failure');
 assert.equal(storyPersistFailureService.serialize(), beforeStoryPersistFailure, 'story sync persistence failure must be atomic');
+
+const realStoryDefinitions = [
+  { id: 'real-story-one', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: CHAPTER01_STORY_NODE_IDS[0] }, unlocks: [] },
+  { id: 'real-story-two', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: CHAPTER01_STORY_NODE_IDS[1] }, unlocks: [] },
+];
+const realStoryService = new MainlineTaskService({ definitions: realStoryDefinitions, initialFeatures: [] });
+const invalidRealStoryInputs = [
+  ['missing schemaVersion', { ...chapter01StorySnapshot(1), schemaVersion: undefined }],
+  ['missing currentNodeId', (() => { const value = chapter01StorySnapshot(1); delete value.currentNodeId; return value; })()],
+  ['wrong schemaVersion', chapter01StorySnapshot(1, { schemaVersion: 2 })],
+  ['unknown node', chapter01StorySnapshot(1, { readNodeIds: ['CH01-NOPE'], currentNodeId: 'CH01-NOPE' })],
+  ['jumped prefix', chapter01StorySnapshot(2, { readNodeIds: [CHAPTER01_STORY_NODE_IDS[0], CHAPTER01_STORY_NODE_IDS[2]], currentNodeId: CHAPTER01_STORY_NODE_IDS[2] })],
+  ['wrong order', chapter01StorySnapshot(1, { readNodeIds: [CHAPTER01_STORY_NODE_IDS[1]], currentNodeId: CHAPTER01_STORY_NODE_IDS[1] })],
+  ['inconsistent current node', chapter01StorySnapshot(1, { currentNodeId: CHAPTER01_STORY_NODE_IDS[1] })],
+];
+for (const [label, input] of invalidRealStoryInputs) {
+  const before = realStoryService.snapshot();
+  const beforeSerialized = realStoryService.serialize();
+  expectCode('INVALID_SYNC', () => realStoryService.syncStory(input), `real story ${label}`);
+  assert.strictEqual(realStoryService.snapshot(), before, `real story ${label} must not mutate state`);
+  assert.equal(realStoryService.serialize(), beforeSerialized, `real story ${label} must not persist`);
+}
+assert.strictEqual(realStoryService.syncStory(chapter01StorySnapshot(0)), realStoryService.snapshot(), 'empty real story prefix is a no-op');
+assert.equal(realStoryService.syncStory(chapter01StorySnapshot(1)).tasks['real-story-one'].completed, true);
+assert.equal(realStoryService.syncStory(chapter01StorySnapshot(2)).tasks['real-story-two'].completed, true);
+
+const pendingState = retryClaimService.serialize();
+const restoredPending = MainlineTaskService.fromSave(MAINLINE_TASK_DEFINITIONS, pendingState, {
+  initialFeatures: ['campaign', 'tasks'],
+});
+assert.deepEqual(restoredPending.snapshot(), retryClaimService.snapshot(), 'outbox state must survive serialization and restore');
+assert.equal(restoredPending.snapshot().schemaVersion, 2);
+assert.equal(restoredPending.snapshot().rewardOutbox.schemaVersion, 1);
+let acknowledgementPersistCalls = 0;
+let failAcknowledgementPersist = false;
+const acknowledgementFailureService = freshService({
+  persist: () => {
+    acknowledgementPersistCalls += 1;
+    if (failAcknowledgementPersist) throw new Error('ack disk full');
+  },
+});
+acknowledgementFailureService.advance({ type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' });
+acknowledgementFailureService.claim('M4-10-L01');
+failAcknowledgementPersist = true;
+expectCode('PERSISTENCE_FAILED', () => acknowledgementFailureService.acknowledgeReward('mainline:CHAPTER01:M4-10-L01'), 'reward acknowledgement persistence failure');
+assert.equal(acknowledgementFailureService.snapshot().rewardOutbox.entries['mainline:CHAPTER01:M4-10-L01'].status, 'PENDING');
+
+const legacyV1Save = JSON.parse(freshService().serialize());
+legacyV1Save.schemaVersion = 1;
+delete legacyV1Save.rewardOutbox;
+expectCode('SAVE_VERSION', () => MainlineTaskService.fromSave(MAINLINE_TASK_DEFINITIONS, JSON.stringify(legacyV1Save), {
+  initialFeatures: ['campaign', 'tasks'],
+}), 'legacy mainline v1 save must be rejected explicitly');
 
 const restored = MainlineTaskService.fromSave(MAINLINE_TASK_DEFINITIONS, service.serialize(), {
   initialFeatures: ['campaign', 'tasks'],
