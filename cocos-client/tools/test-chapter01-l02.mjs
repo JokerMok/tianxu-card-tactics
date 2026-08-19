@@ -44,7 +44,7 @@ const sceneDoc = readText(sceneDocPath);
 const enumCoverage = readJson(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
 const unitIds = new Set(units.units.map(({ id }) => id));
-const chapterLevelIds = new Set([...Array.from({ length: 12 }, (_, index) => `L${String(index + 1).padStart(2, '0')}`), ...enumCoverage.chapterLevels.flatMap((entry) => [entry.id, entry.prerequisiteLevelId].filter(Boolean))]);
+const chapterLevelIds = new Set([level.chapterLevels[0].id, level.chapterLevels[0].prerequisiteLevelId].filter(Boolean));
 const sceneTargetIds = new Set([...sceneDoc.matchAll(/^###\s+(E\d+)\b/gmu)].map((match) => match[1]));
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
@@ -64,6 +64,8 @@ const references = {
 };
 const deck = decks.decks.find(({ id }) => id === 'D001');
 const deckCardIds = new Set(deck.cardEntries.map(({ cardId }) => cardId));
+const cardById = new Map(cards.cards.map((card) => [card.id, card]));
+const nonDeckUnitCardId = cards.cards.find((card) => card.cardType === 'UNIT' && !deckCardIds.has(card.id))?.id;
 
 assert.doesNotThrow(
   () => assertChapterLevelContract(level, manifest, decks, references),
@@ -96,6 +98,8 @@ function assertL02BattleRules(rules) {
   for (const entry of rules.enemyDeploymentOrder) {
     assert.equal(cardIds.has(entry.cardId), true);
     assert.equal(unitIds.has(entry.unitId), true);
+    assert.equal(deckCardIds.has(entry.cardId), true);
+    assert.equal(cardById.get(entry.cardId)?.unitId, entry.unitId);
   }
   assert.equal(rules.combatPreview.counterMultiplier, 1.25);
   assert.equal(rules.combatPreview.showDamageBreakdown, true);
@@ -103,6 +107,10 @@ function assertL02BattleRules(rules) {
   assert.equal(sceneTargetIds.has(rules.forbiddenSceneTargetActions[0].targetId), true);
 }
 assertL02BattleRules(level.chapterLevels[0].battleRules);
+assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, enemyDeploymentOrder: [{ phase: 1, kind: 'BASIC_MELEE', cardId: 'U001', unitId: 'U004' }, { phase: 2, kind: 'RANGED', cardId: 'U004', unitId: 'U004' }] }));
+assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, enemyDeploymentOrder: [{ phase: 1, kind: 'BASIC_MELEE', cardId: nonDeckUnitCardId, unitId: nonDeckUnitCardId }, { phase: 2, kind: 'RANGED', cardId: 'U004', unitId: 'U004' }] }));
+assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, forbiddenSceneTargetActions: [{ targetId: 'E999', action: 'AREA_FIRE' }] }));
+assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, forbiddenSceneTargetActions: [{ targetId: 'E102', action: 'DESTROY' }] }));
 assert.throws(() => assertL02BattleRules({ ...level.chapterLevels[0].battleRules, combatPreview: { counterMultiplier: 1, showDamageBreakdown: true } }));
 assert.match(story, /### 4\.2 1-2 烽台失名/);
 assert.match(story, /敌方先部署轻装役兵，再部署远射单位/);
