@@ -146,11 +146,13 @@ function hasChangingTrack(animation, property) {
 function validateActionSemantics(unitId, animations) {
   assert.equal(animations.Idle.loop, true, `${unitId} Idle must loop`);
   assert.equal(animations.Move.loop, true, `${unitId} Move must loop`);
+  assert.equal(animations.Move.tracks.some((track) => track.bone === 'root'
+    && ['translateX', 'translateY'].includes(track.property)), false, `${unitId} Move must leave root translation to battle logic`);
+  assert.equal(hasChangingTrack(animations.Move, 'translateY') || hasChangingTrack(animations.Move, 'rotate'), true, `${unitId} Move must animate an in-place gait or body motion`);
   for (const action of ['Attack', 'Hit', 'Death']) {
     assert.equal(animations[action].loop, false, `${unitId} ${action} must not loop`);
   }
   assert.equal(hasChangingTrack(animations.Idle, 'scaleY') || hasChangingTrack(animations.Idle, 'rotate'), true, `${unitId} Idle must contain visible transform motion`);
-  assert.equal(hasChangingTrack(animations.Move, 'translateX'), true, `${unitId} Move must translate on the horizontal axis`);
   assert.equal(hasChangingTrack(animations.Attack, 'rotate') || hasChangingTrack(animations.Attack, 'translateX'), true, `${unitId} Attack must animate a strike`);
   assert.equal(hasChangingTrack(animations.Hit, 'translateX') || hasChangingTrack(animations.Hit, 'opacity'), true, `${unitId} Hit must animate a reaction`);
   assert.equal(hasChangingTrack(animations.Death, 'rotate') || hasChangingTrack(animations.Death, 'opacity'), true, `${unitId} Death must animate a removal pose`);
@@ -329,4 +331,12 @@ const invalidCanvasSize = structuredClone(samples[0].skeleton);
 invalidCanvasSize.canvas.width = 1024;
 assert.throws(() => validateSkeleton('U002', invalidCanvasSize), /canvas size must be 512x512/);
 
-console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 13 contract counterexamples rejected`);
+const movingRoot = structuredClone(samples[1].skeleton);
+movingRoot.animations.Move.tracks.push({
+  bone: 'root',
+  property: 'translateX',
+  frames: [{ time: 0, value: 0 }, { time: 0.4, value: 20 }, { time: 0.8, value: 0 }]
+});
+assert.throws(() => validateSkeleton('U008', movingRoot), /Move must leave root translation to battle logic/);
+
+console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 14 contract counterexamples rejected`);
