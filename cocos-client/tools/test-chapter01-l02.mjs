@@ -34,6 +34,7 @@ const { assertChapterLevelContract, ConfigLoadError } = await import(
 );
 
 const level = readJson(levelPath);
+const previousLevel = readJson(path.join(configRoot, 'levels/chapter01/L01.json'));
 const manifest = readJson(manifestPath);
 const decks = readJson(decksPath);
 const cards = readJson(cardsPath);
@@ -44,7 +45,10 @@ const sceneDoc = readText(sceneDocPath);
 const enumCoverage = readJson(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'));
 const cardIds = new Set(cards.cards.map(({ id }) => id));
 const unitIds = new Set(units.units.map(({ id }) => id));
-const chapterLevelIds = new Set([level.chapterLevels[0].id, level.chapterLevels[0].prerequisiteLevelId].filter(Boolean));
+const chapterLevelIds = new Set([
+  ...previousLevel.chapterLevels.map((entry) => entry.id),
+  ...level.chapterLevels.map((entry) => entry.id),
+]);
 const sceneTargetIds = new Set([...sceneDoc.matchAll(/^###\s+(E\d+)\b/gmu)].map((match) => match[1]));
 const rewardIds = (type) => new Set(enumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 const references = {
@@ -88,6 +92,7 @@ assert.deepEqual(level.chapterLevels, [{
     forbiddenSceneTargetActions: [{ targetId: 'E102', action: 'AREA_FIRE' }],
   },
 }], 'L02 must retain the frozen field values');
+assert.equal(previousLevel.chapterLevels[0].id, 'L01', 'L02 prerequisite must exist in the preceding real level file');
 assert.equal(cardIds.has('U002'), true, 'the L02 reward must reference the existing U002 card');
 assert.equal(deckCardIds.has('U001'), true, 'D001 must contain the frontline teaching card U001');
 assert.equal(deckCardIds.has('U004'), true, 'D001 must contain the ranged teaching card U004');
