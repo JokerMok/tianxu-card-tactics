@@ -1,0 +1,36 @@
+{
+  "id": "DROP-POOLS-TEST-FIXTURE",
+  "fixtureOnly": true,
+  "pools": [
+    {
+      "id": "STAGE-N001",
+      "maxClaims": 4,
+      "firstClear": {
+        "id": "stage-n001-first",
+        "rewards": {
+          "gold": 100
+        }
+      },
+      "repeat": [
+        {
+          "id": "stage-n001-gold",
+          "weight": 3,
+          "rewards": {
+            "gold": 10
+          }
+        },
+        {
+          "id": "stage-n001-rare-essence",
+          "weight": 1,
+          "rewards": {
+            "essence": 1
+          }
+        }
+      ],
+      "pity": {
+        "rareRewardId": "stage-n001-rare-essence",
+        "guaranteedAfterMisses": 2
+      }
+    }
+  ]
+}
