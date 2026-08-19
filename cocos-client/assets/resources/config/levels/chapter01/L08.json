@@ -1,0 +1,33 @@
+{
+  "chapterLevels": [{
+    "id": "L08",
+    "prerequisiteLevelId": "L07",
+    "enemyDeckId": "D001",
+    "environmentElement": "NONE",
+    "objectives": [
+      { "type": "PROTECT_TARGET", "targetId": "C009" },
+      { "type": "SURVIVE_ROUNDS", "rounds": 8 }
+    ],
+    "rewards": [
+      { "type": "CARD", "id": "U008", "quantity": 1 },
+      { "type": "CARD", "id": "S006", "quantity": 1, "cardType": "SKILL" }
+    ],
+    "failureConditions": [
+      { "type": "PLAYER_HERO_DEFEATED" },
+      { "type": "TARGET_DESTROYED", "targetId": "C009" },
+      { "type": "ROUND_LIMIT_REACHED", "rounds": 8 }
+    ],
+    "scenarioRules": {
+      "protectedTargetId": "C009",
+      "roundLimit": 8,
+      "playerHeroNamingImmune": true,
+      "namingTargetPolicy": "NON_HERO_UNITS_ONLY",
+      "prepareIncrease": 1,
+      "shortControlDurationRounds": 1,
+      "professionSkillPolicy": "CURRENT_PROFESSION_SKILL_II",
+      "professionSkillIdForP001": "S006",
+      "recordProfessionAfterVictory": true,
+      "professionSwitchPreview": true
+    }
+  }]
+}
