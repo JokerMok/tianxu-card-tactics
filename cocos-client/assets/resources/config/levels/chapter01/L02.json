@@ -1,0 +1,36 @@
+{
+  "chapterLevels": [
+    {
+      "id": "L02",
+      "prerequisiteLevelId": "L01",
+      "enemyDeckId": "D001",
+      "environmentElement": "NONE",
+      "objectives": [
+        {
+          "type": "DESTROY_TARGET",
+          "targetId": "U013"
+        },
+        {
+          "type": "PROTECT_TARGET",
+          "targetId": "E102"
+        }
+      ],
+      "rewards": [
+        {
+          "type": "CARD",
+          "id": "U002",
+          "quantity": 4
+        }
+      ],
+      "failureConditions": [
+        {
+          "type": "PLAYER_HERO_DEFEATED"
+        },
+        {
+          "type": "TARGET_DESTROYED",
+          "targetId": "E102"
+        }
+      ]
+    }
+  ]
+}
