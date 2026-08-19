@@ -1,6 +1,8 @@
 # UI 资产拆层清单
 
-范围：Image2-v1 的九张正式 UI 视觉稿。每个界面按背景、角色、装饰、九宫格、图标、文字、状态各记录一项；每项均记录其来源图。`availability: "absent"` 仅记录视觉依据中的缺失类别，不可当作资产使用。
+范围与依据：本清单以 `美术素材/UI全界面/Image2-v1-1920` 下的九张正式 Image2-v1 视觉稿为唯一视觉依据，统一采用原生 `1920×1080` 坐标系。每个界面按背景、角色、装饰、九宫格、图标、文字、状态各记录一项；坐标是该层在整屏视觉稿中的合理视觉包围盒，z 按背景到状态的渲染顺序排列。
+
+来源规则：当前范围只提供整屏视觉稿，没有可复用的独立 Cocos 资产。因而 `present` 层的 `assetPath` 必须定位到对应整屏视觉源图，`assetId` 保留为 `null`；`absent` 层不把场景元素冒充角色或资产，`assetPath` 与 `assetId` 均为 `null`。
 
 ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DEC、9S、ICO、TXT、STA；验证器解析下列清单并校验全部 63 项。
 
@@ -21,7 +23,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "云海仙山与主城广场",
           "reusable": false,
           "verification": "中央至远景为云海、山峰、楼阁与石阶。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "z": 0
         },
         {
           "id": "UI01-CHR-01",
@@ -30,7 +39,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "左侧红黑甲持剑主将",
           "reusable": false,
           "verification": "左侧前景可见完整男性持剑立绘。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 360,
+          "y": 190,
+          "width": 300,
+          "height": 820,
+          "z": 1
         },
         {
           "id": "UI01-DEC-01",
@@ -39,7 +55,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "顶部纹样、右侧战旗与石栏",
           "reusable": true,
           "verification": "顶部、右侧和底部有独立玉石金属纹样与旗帜。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 0,
+          "y": 70,
+          "width": 1920,
+          "height": 1010,
+          "z": 2
         },
         {
           "id": "UI01-9S-01",
@@ -48,7 +71,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "章节牌、目标框与按钮边框",
           "reusable": true,
           "verification": "中央章节牌、右侧目标牌和继续征战按钮均有框体。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 760,
+          "y": 220,
+          "width": 1000,
+          "height": 770,
+          "z": 3
         },
         {
           "id": "UI01-ICO-01",
@@ -57,7 +87,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "资源、导航与底部入口图标",
           "reusable": true,
           "verification": "资源栏、九项导航和三个底部入口均有图标。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 35,
+          "y": 180,
+          "width": 1730,
+          "height": 785,
+          "z": 4
         },
         {
           "id": "UI01-TXT-01",
@@ -66,7 +103,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "章节、关卡、目标、导航与资源文字",
           "reusable": true,
           "verification": "中央和四周均有可读文字。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 55,
+          "y": 20,
+          "width": 1700,
+          "height": 970,
+          "z": 5
         },
         {
           "id": "UI01-STA-01",
@@ -75,7 +119,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "主城选中与目标进度",
           "reusable": true,
           "verification": "主城高亮，今日目标显示 3/4、0/1 与进度条。",
-          "source": "UI01-主城.png"
+          "source": "UI01-主城.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI01-主城.png",
+          "assetId": null,
+          "x": 40,
+          "y": 170,
+          "width": 1700,
+          "height": 820,
+          "z": 6
         }
       ]
     },
@@ -91,7 +142,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "白鹿古道山川战役地图",
           "reusable": false,
           "verification": "主区域为山川、水道与城寨战役地图。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 280,
+          "y": 60,
+          "width": 1440,
+          "height": 800,
+          "z": 0
         },
         {
           "id": "UI02-CHR-01",
@@ -100,7 +158,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": null,
           "reusable": false,
           "verification": "未见独立人物或生物立绘；地图节点和场景不算角色。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": null,
+          "assetId": null,
+          "x": 280,
+          "y": 60,
+          "width": 1440,
+          "height": 800,
+          "z": 1
         },
         {
           "id": "UI02-DEC-01",
@@ -109,7 +174,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "龙纹挂饰、卷轴与罗盘",
           "reusable": true,
           "verification": "详情牌上方有龙纹挂饰，底部案面有卷轴和罗盘。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 0,
+          "y": 70,
+          "width": 1920,
+          "height": 1010,
+          "z": 2
         },
         {
           "id": "UI02-9S-01",
@@ -118,7 +190,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "详情牌、奖励格与操作按钮框",
           "reusable": true,
           "verification": "右侧关卡牌、奖励格和按钮均为带角饰框体。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 1450,
+          "y": 170,
+          "width": 430,
+          "height": 700,
+          "z": 3
         },
         {
           "id": "UI02-ICO-01",
@@ -127,7 +206,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "关卡、锁、星级、奖励与导航图标",
           "reusable": true,
           "verification": "地图有编号节点、锁和星级，详情牌有奖励图标。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 340,
+          "y": 330,
+          "width": 980,
+          "height": 470,
+          "z": 4
         },
         {
           "id": "UI02-TXT-01",
@@ -136,7 +222,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "主线征战、关卡条件、战力与按钮文字",
           "reusable": true,
           "verification": "左上和右侧详情牌均有文字。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 310,
+          "y": 85,
+          "width": 1570,
+          "height": 780,
+          "z": 5
         },
         {
           "id": "UI02-STA-01",
@@ -145,7 +238,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "征战选中、已通关与锁定关卡",
           "reusable": true,
           "verification": "征战高亮；1至4有星级，5至12显示锁定。",
-          "source": "UI02-征战.png"
+          "source": "UI02-征战.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI02-征战.png",
+          "assetId": null,
+          "x": 30,
+          "y": 160,
+          "width": 1750,
+          "height": 720,
+          "z": 6
         }
       ]
     },
@@ -161,7 +261,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "云海城阙与石质地台",
           "reusable": false,
           "verification": "卡牌后方可见云海、宫阙、山峰和地台。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI03-CHR-01",
@@ -170,7 +277,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "卡牌内单位与法术人物插画",
           "reusable": false,
           "verification": "多张卡牌包含弓手、守卫和术士人物图像。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 300,
+          "y": 265,
+          "width": 1160,
+          "height": 590,
+          "z": 1
         },
         {
           "id": "UI03-DEC-01",
@@ -179,7 +293,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "兽首、旗帜与金属花纹",
           "reusable": true,
           "verification": "右侧详情牌顶部有兽首，边缘有旗帜和纹样。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 0,
+          "y": 60,
+          "width": 1920,
+          "height": 1020,
+          "z": 2
         },
         {
           "id": "UI03-9S-01",
@@ -188,7 +309,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "卡牌外框、详情牌与升级按钮框",
           "reusable": true,
           "verification": "十二张卡、右侧详情区和升级按钮都有边框。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 300,
+          "y": 260,
+          "width": 1460,
+          "height": 620,
+          "z": 3
         },
         {
           "id": "UI03-ICO-01",
@@ -197,7 +325,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "导航、费用角标与单位类别图标",
           "reusable": true,
           "verification": "导航、卡牌左上角和类别行均有图标。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 300,
+          "y": 265,
+          "width": 1450,
+          "height": 590,
+          "z": 4
         },
         {
           "id": "UI03-TXT-01",
@@ -206,7 +341,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "卡名、等级、收藏进度与详情属性",
           "reusable": true,
           "verification": "卡牌、顶部与右侧均有文字。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 300,
+          "y": 110,
+          "width": 1450,
+          "height": 780,
+          "z": 5
         },
         {
           "id": "UI03-STA-01",
@@ -215,7 +357,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "卡库选中与折锋枪兵详情选中",
           "reusable": true,
           "verification": "卡库高亮，右侧详情为折锋枪兵。",
-          "source": "UI03-卡库.png"
+          "source": "UI03-卡库.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI03-卡库.png",
+          "assetId": null,
+          "x": 40,
+          "y": 220,
+          "width": 1700,
+          "height": 700,
+          "z": 6
         }
       ]
     },
@@ -231,7 +380,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "云海城景与军械桌",
           "reusable": false,
           "verification": "编队板后方为云海宫阙，前景为军械桌。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI04-CHR-01",
@@ -240,7 +396,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "十张编队卡内单位与技能插画",
           "reusable": false,
           "verification": "两行十张卡均含单位或技能人物图像。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 350,
+          "y": 330,
+          "width": 1000,
+          "height": 520,
+          "z": 1
         },
         {
           "id": "UI04-DEC-01",
@@ -249,7 +412,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "兵器架、香炉、卷轴与桌面玉饰",
           "reusable": true,
           "verification": "左右兵器架、左下香炉卷轴和底部玉饰独立可见。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 0,
+          "y": 60,
+          "width": 1920,
+          "height": 1020,
+          "z": 2
         },
         {
           "id": "UI04-9S-01",
@@ -258,7 +428,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "编队板、卡框、检查牌与按钮框",
           "reusable": true,
           "verification": "中央板、十个卡框、右侧检查牌和按钮均有框体。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 330,
+          "y": 245,
+          "width": 1390,
+          "height": 680,
+          "z": 3
         },
         {
           "id": "UI04-ICO-01",
@@ -267,7 +444,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "导航、单位类别、技能火焰与检查图标",
           "reusable": true,
           "verification": "导航、卡牌类别与技能卡均有图标。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 380,
+          "y": 325,
+          "width": 1000,
+          "height": 570,
+          "z": 4
         },
         {
           "id": "UI04-TXT-01",
@@ -276,7 +460,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "编队、卡名、10/10 与检查文字",
           "reusable": true,
           "verification": "中央、卡牌和右侧检查牌均有文本。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 330,
+          "y": 170,
+          "width": 1400,
+          "height": 700,
+          "z": 5
         },
         {
           "id": "UI04-STA-01",
@@ -285,7 +476,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "编队选中与数量上限通过",
           "reusable": true,
           "verification": "编队高亮，检查牌显示 10/10、8/8、2/2。",
-          "source": "UI04-编队.png"
+          "source": "UI04-编队.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI04-编队.png",
+          "assetId": null,
+          "x": 40,
+          "y": 210,
+          "width": 1700,
+          "height": 760,
+          "z": 6
         }
       ]
     },
@@ -301,7 +499,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "山城庭院与石质地面",
           "reusable": false,
           "verification": "人物与装备架后方为山城、旗帜和庭院地面。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI05-CHR-01",
@@ -310,7 +515,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "岳沉戈主将立绘",
           "reusable": false,
           "verification": "左中区域可见完整持剑红黑甲人物，名字标为岳沉戈。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 430,
+          "y": 95,
+          "width": 460,
+          "height": 900,
+          "z": 1
         },
         {
           "id": "UI05-DEC-01",
@@ -319,7 +531,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "旗帜、装备架角饰与流苏",
           "reusable": true,
           "verification": "左侧旗帜和右侧装备架的角饰、流苏独立可见。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 0,
+          "y": 60,
+          "width": 1920,
+          "height": 1020,
+          "z": 2
         },
         {
           "id": "UI05-9S-01",
@@ -328,7 +547,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "属性框、装备槽与切换职业按钮框",
           "reusable": true,
           "verification": "五条属性、三个装备槽和按钮均有边框容器。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 900,
+          "y": 135,
+          "width": 880,
+          "height": 760,
+          "z": 3
         },
         {
           "id": "UI05-ICO-01",
@@ -337,7 +563,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "生命、攻势、护甲、术强、统御与导航图标",
           "reusable": true,
           "verification": "五条属性左侧和导航均有图标。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 900,
+          "y": 360,
+          "width": 850,
+          "height": 430,
+          "z": 4
         },
         {
           "id": "UI05-TXT-01",
@@ -346,7 +579,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "标题、角色名、等级、属性与按钮文字",
           "reusable": true,
           "verification": "标题、岳沉戈、Lv.8、数值和按钮文字清晰可见。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 900,
+          "y": 120,
+          "width": 850,
+          "height": 770,
+          "z": 5
         },
         {
           "id": "UI05-STA-01",
@@ -355,7 +595,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "主将导航选中",
           "reusable": true,
           "verification": "左侧主将条目以绿色高亮显示。",
-          "source": "UI05-主将.png"
+          "source": "UI05-主将.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI05-主将.png",
+          "assetId": null,
+          "x": 35,
+          "y": 175,
+          "width": 1730,
+          "height": 400,
+          "z": 6
         }
       ]
     },
@@ -371,7 +618,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "云海山峦与石阶试炼场景",
           "reusable": false,
           "verification": "三座试炼门后方为山峦、云海和石阶。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI06-CHR-01",
@@ -380,7 +634,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "吞厢玄龟 Boss",
           "reusable": false,
           "verification": "右侧试炼门内可见带甲壳的大型玄龟生物。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 1410,
+          "y": 300,
+          "width": 360,
+          "height": 520,
+          "z": 1
         },
         {
           "id": "UI06-DEC-01",
@@ -389,7 +650,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "试炼门龙纹、玉珠流苏与旗帜",
           "reusable": true,
           "verification": "三座门框有龙纹、玉珠和流苏，右侧有旗帜。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 300,
+          "y": 80,
+          "width": 1580,
+          "height": 890,
+          "z": 2
         },
         {
           "id": "UI06-9S-01",
@@ -398,7 +666,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "试炼门标题牌、名称牌与挑战按钮框",
           "reusable": true,
           "verification": "每座试炼门均有标题牌、名称牌和挑战按钮。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 330,
+          "y": 160,
+          "width": 1400,
+          "height": 730,
+          "z": 3
         },
         {
           "id": "UI06-ICO-01",
@@ -407,7 +682,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "导航与试炼门主题图标",
           "reusable": true,
           "verification": "左侧导航和三座试炼门顶部均有图形标识。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 330,
+          "y": 140,
+          "width": 1400,
+          "height": 760,
+          "z": 4
         },
         {
           "id": "UI06-TXT-01",
@@ -416,7 +698,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "副本、挑战塔、Boss、名称与挑战文字",
           "reusable": true,
           "verification": "三座门的标题、名称和按钮均有文本。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 330,
+          "y": 150,
+          "width": 1400,
+          "height": 760,
+          "z": 5
         },
         {
           "id": "UI06-STA-01",
@@ -425,7 +714,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "历练导航选中",
           "reusable": true,
           "verification": "左侧历练条目以绿色高亮显示。",
-          "source": "UI06-历练.png"
+          "source": "UI06-历练.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI06-历练.png",
+          "assetId": null,
+          "x": 35,
+          "y": 550,
+          "width": 230,
+          "height": 110,
+          "z": 6
         }
       ]
     },
@@ -441,7 +737,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "浮空城、山峦与瀑布",
           "reusable": false,
           "verification": "主体为多层城寨、浮岛、瀑布与远山。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI07-CHR-01",
@@ -450,7 +753,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": null,
           "reusable": false,
           "verification": "未见独立人物或生物立绘；建筑、飞艇与城景不算角色。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": null,
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 1
         },
         {
           "id": "UI07-DEC-01",
@@ -459,7 +769,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "飞艇、旗帜、锻炉火光与玉石细节",
           "reusable": true,
           "verification": "右侧有飞艇旗帜，左下有锻炉火光和建筑细节。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 270,
+          "y": 100,
+          "width": 1650,
+          "height": 900,
+          "z": 2
         },
         {
           "id": "UI07-9S-01",
@@ -468,7 +785,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "建筑名称牌、升级与派遣按钮框",
           "reusable": true,
           "verification": "四处建筑名称牌和操作按钮均为边框容器。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 480,
+          "y": 270,
+          "width": 1070,
+          "height": 610,
+          "z": 3
         },
         {
           "id": "UI07-ICO-01",
@@ -477,7 +801,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "导航与建筑交互图标",
           "reusable": true,
           "verification": "左侧导航和建筑交互区均有图形标识。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 380,
+          "y": 300,
+          "width": 1250,
+          "height": 620,
+          "z": 4
         },
         {
           "id": "UI07-TXT-01",
@@ -486,7 +817,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "标题、建筑等级、升级与派遣文字",
           "reusable": true,
           "verification": "标题、四处建筑名称和操作按钮均有文本。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 330,
+          "y": 105,
+          "width": 1400,
+          "height": 780,
+          "z": 5
         },
         {
           "id": "UI07-STA-01",
@@ -495,7 +833,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "营造导航选中",
           "reusable": true,
           "verification": "左侧营造条目以绿色高亮显示。",
-          "source": "UI07-营造.png"
+          "source": "UI07-营造.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI07-营造.png",
+          "assetId": null,
+          "x": 35,
+          "y": 640,
+          "width": 230,
+          "height": 110,
+          "z": 6
         }
       ]
     },
@@ -511,7 +856,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "云海城景与案台",
           "reusable": false,
           "verification": "任务卷轴后方可见云海、城景和案台。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI08-CHR-01",
@@ -520,7 +872,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": null,
           "reusable": false,
           "verification": "未见独立人物或生物立绘；任务图标不算角色。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": null,
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 1
         },
         {
           "id": "UI08-DEC-01",
@@ -529,7 +888,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "卷轴轴杆、旗帜、龙像与案面器物",
           "reusable": true,
           "verification": "任务列表为卷轴，右侧有旗帜龙像，底部有器物。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 270,
+          "y": 65,
+          "width": 1650,
+          "height": 1010,
+          "z": 2
         },
         {
           "id": "UI08-9S-01",
@@ -538,7 +904,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "任务行、奖励格、领取与前往按钮框",
           "reusable": true,
           "verification": "三条任务行、奖励格和操作按钮均有边框。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 450,
+          "y": 410,
+          "width": 1120,
+          "height": 520,
+          "z": 3
         },
         {
           "id": "UI08-ICO-01",
@@ -547,7 +920,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "活跃度奖励、任务类型、货币、水晶与导航图标",
           "reusable": true,
           "verification": "上方奖励、任务行左侧和奖励格均有图标。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 390,
+          "y": 230,
+          "width": 1200,
+          "height": 650,
+          "z": 4
         },
         {
           "id": "UI08-TXT-01",
@@ -556,7 +936,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "任务、活跃、条件、进度与操作文字",
           "reusable": true,
           "verification": "标题、活跃度、三条任务和按钮均有文本。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 400,
+          "y": 150,
+          "width": 1300,
+          "height": 710,
+          "z": 5
         },
         {
           "id": "UI08-STA-01",
@@ -565,7 +952,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "任务选中与任务完成进度",
           "reusable": true,
           "verification": "任务高亮，三行显示 3/3、1/1、0/1。",
-          "source": "UI08-任务.png"
+          "source": "UI08-任务.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI08-任务.png",
+          "assetId": null,
+          "x": 35,
+          "y": 710,
+          "width": 230,
+          "height": 110,
+          "z": 6
         }
       ]
     },
@@ -581,7 +975,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "工坊、货架与山城远景",
           "reusable": false,
           "verification": "物品柜周围可见工坊结构、货架和山城远景。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 0
         },
         {
           "id": "UI09-CHR-01",
@@ -590,7 +991,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": null,
           "reusable": false,
           "verification": "未见独立人物或生物立绘；物品图像不算角色。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": null,
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 1
         },
         {
           "id": "UI09-DEC-01",
@@ -599,7 +1007,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "旗帜、宝箱、卷轴与案面器物",
           "reusable": true,
           "verification": "物品柜周围有旗帜、宝箱、卷轴和金属器物。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 270,
+          "y": 60,
+          "width": 1650,
+          "height": 1020,
+          "z": 2
         },
         {
           "id": "UI09-9S-01",
@@ -608,7 +1023,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "物品格、分类标签、详情牌与使用按钮框",
           "reusable": true,
           "verification": "十五个物品格、分类标签、详情牌和按钮均为框体。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 480,
+          "y": 310,
+          "width": 1270,
+          "height": 590,
+          "z": 3
         },
         {
           "id": "UI09-ICO-01",
@@ -617,7 +1039,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "分类、物品、水晶与导航图标",
           "reusable": true,
           "verification": "顶部分类栏、物品格、详情大图和导航均有图标。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 500,
+          "y": 250,
+          "width": 1220,
+          "height": 670,
+          "z": 4
         },
         {
           "id": "UI09-TXT-01",
@@ -626,7 +1055,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "标题、分类、数量、强化石说明与使用文字",
           "reusable": true,
           "verification": "顶部标题、数量、右侧说明和按钮均有文本。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 500,
+          "y": 155,
+          "width": 1220,
+          "height": 750,
+          "z": 5
         },
         {
           "id": "UI09-STA-01",
@@ -635,7 +1071,14 @@ ID 规则：`UI编号-层级代码-序号`。层级代码依次为 BG、CHR、DE
           "asset": "行囊选中与全部分类选中",
           "reusable": true,
           "verification": "左侧行囊和顶部全部分类均以绿色高亮显示。",
-          "source": "UI09-行囊.png"
+          "source": "UI09-行囊.png",
+          "assetPath": "美术素材/UI全界面/Image2-v1-1920/UI09-行囊.png",
+          "assetId": null,
+          "x": 35,
+          "y": 790,
+          "width": 230,
+          "height": 110,
+          "z": 6
         }
       ]
     }
