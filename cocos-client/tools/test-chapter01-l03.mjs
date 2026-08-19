@@ -1,0 +1,119 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
+import path from 'node:path';
+
+const root = path.resolve(import.meta.dirname, '..');
+const levelPath = path.join(root, 'assets/resources/config/levels/chapter01/L03.json');
+const manifestPath = path.join(root, 'assets/resources/config/manifest.json');
+const decksPath = path.join(root, 'assets/resources/config/decks.json');
+const cardsPath = path.join(root, 'assets/resources/config/cards.json');
+const storyPath = path.join(root, '..', '首章剧情关卡-v1.1.md');
+const characterPath = path.join(root, '..', '首发角色视觉设定-v1.0.md');
+
+const loaderSource = fs.readFileSync(path.join(root, 'assets/scripts/config/ConfigLoader.ts'), 'utf8');
+const contractSource = fs.readFileSync(path.join(root, 'assets/scripts/config/levels/ChapterLevelContract.ts'), 'utf8');
+const mockCcSource = `
+const mockCc = {
+  JsonAsset: class JsonAsset {},
+  resources: { load() { throw new Error('not used by chapter 01 L03 contract test'); } },
+};
+`;
+const executableSource = stripTypeScriptTypes(
+  `${loaderSource.replace("import { JsonAsset, resources } from 'cc';", `${mockCcSource}\nconst { JsonAsset, resources } = mockCc;`)}\n${contractSource.replace("import { assertConfigManifest, ConfigLoadError, type ConfigManifest } from '../ConfigLoader';", '')}`,
+  { mode: 'transform' },
+);
+const { assertChapterLevelContract, ConfigLoadError } = await import(
+  `data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}`,
+);
+
+const levelConfig = JSON.parse(fs.readFileSync(levelPath, 'utf8'));
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+const decks = JSON.parse(fs.readFileSync(decksPath, 'utf8'));
+const cards = JSON.parse(fs.readFileSync(cardsPath, 'utf8'));
+const story = fs.readFileSync(storyPath, 'utf8');
+const characterSheet = fs.readFileSync(characterPath, 'utf8');
+
+assert.doesNotThrow(
+  () => assertChapterLevelContract(levelConfig, manifest, decks, 'config/levels/chapter01/L03.json'),
+  'the real L03 config must pass the shared chapter level contract',
+);
+
+assert.equal(levelConfig.chapterLevels.length, 1, 'L03 file must contain exactly one level');
+const [level] = levelConfig.chapterLevels;
+assert.deepEqual(
+  {
+    id: level.id,
+    prerequisiteLevelId: level.prerequisiteLevelId,
+    enemyDeckId: level.enemyDeckId,
+    environmentElement: level.environmentElement,
+  },
+  {
+    id: 'L03',
+    prerequisiteLevelId: 'L02',
+    enemyDeckId: 'D001',
+    environmentElement: 'NONE',
+  },
+  'L03 identity, prerequisite, enemy deck, and environment must match the chapter data',
+);
+assert.deepEqual(
+  level.objectives,
+  [
+    { type: 'DEFEAT_ENEMY_HERO' },
+    { type: 'PROTECT_TARGET', targetId: 'C002' },
+  ],
+  'L03 must defeat the enemy and protect 翎照',
+);
+assert.deepEqual(
+  level.rewards,
+  [{ type: 'CARD', id: 'U004', quantity: 4 }],
+  'L03 must grant four 岚羽游射手 cards',
+);
+assert.deepEqual(
+  level.failureConditions,
+  [
+    { type: 'PLAYER_HERO_DEFEATED' },
+    { type: 'TARGET_DESTROYED', targetId: 'C002' },
+  ],
+  'L03 must fail when the player hero or 翎照 is defeated',
+);
+
+assert.equal(decks.decks.some((deck) => deck.id === level.enemyDeckId), true, 'L03 must use a real enemy deck');
+assert.equal(cards.cards.some((card) => card.id === 'U004'), true, 'L03 reward U004 must exist in cards.json');
+assert.match(story, /\| 1-2 \| 烽台失名 \|/u, 'L02 must be a real preceding chapter node');
+assert.match(story, /### 4\.3 1-3 风谷截路/u, 'L03 must be grounded in the chapter story');
+assert.match(story, /岚羽游射手军契×4/u, 'the L03 reward quantity must be grounded in the chapter story');
+assert.match(characterSheet, /\| C002 \| 翎照 \|/u, 'C002 must be a real documented target');
+
+function expectFailure(label, mutate, expectedPath) {
+  const fixture = structuredClone(levelConfig);
+  mutate(fixture);
+  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, 'config/levels/chapter01/L03.json'), (error) => {
+    assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
+    assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
+    return true;
+  });
+}
+
+expectFailure(
+  'illegal prerequisite',
+  (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'L03'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].prerequisiteLevelId',
+);
+expectFailure(
+  'unknown enemy deck',
+  (fixture) => { fixture.chapterLevels[0].enemyDeckId = 'D404'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].enemyDeckId',
+);
+expectFailure(
+  'invalid level ID',
+  (fixture) => { fixture.chapterLevels[0].id = 'L_03'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].id',
+);
+expectFailure(
+  'missing failure conditions',
+  (fixture) => { delete fixture.chapterLevels[0].failureConditions; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].failureConditions',
+);
+
+console.log('Chapter 01 L03: real config, L02 prerequisite, D001 deck, C002 protection target, U004 x4 reward, and failure conditions PASS; illegal prerequisite, unknown deck, invalid ID, and missing failure conditions FAIL as expected');
