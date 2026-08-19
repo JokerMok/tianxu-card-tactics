@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 1,
+  "contractId": "T251-BATTLE-FEEDBACK",
+  "contractVersion": "1.0.0",
+  "engine": "Cocos Creator 3.8.8",
+  "resourceRoot": "assets/resources",
+  "productionTask": "T251",
+  "validation": {
+    "requiredCategories": [
+      "attack",
+      "spell",
+      "heal",
+      "hit",
+      "death",
+      "button",
+      "settlement"
+    ],
+    "effect": {
+      "format": "png",
+      "minBytes": 1024,
+      "width": 256,
+      "height": 256,
+      "durationMs": {
+        "min": 80,
+        "max": 1200
+      }
+    },
+    "audio": {
+      "format": "wav",
+      "minBytes": 1000,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitDepth": 16,
+      "durationMs": {
+        "min": 80,
+        "max": 1000
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "VFX-BATTLE-ATTACK-SLASH",
+      "category": "attack",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_attack_slash_v001.png",
+      "resourcePath": "art/battle/effects/vfx_attack_slash_v001.png",
+      "sha256": "3252e6dd608b800c79c5bd2311092f9583df5261a5c6a1fcd0385c5f1ea0b385",
+      "bytes": 1952,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 260,
+      "event": {
+        "type": "attack.impact",
+        "atMs": 140
+      },
+      "runtime": {
+        "anchor": "target.hitPoint",
+        "direction": "source-to-target",
+        "coverage": "single-target",
+        "blend": "additive",
+        "maxAlpha": 0.86
+      },
+      "productionTask": "T251",
+      "usage": "普攻命中点的单次横向斩击，轮廓、运动方向和命中位置独立可读。"
+    },
+    {
+      "id": "SFX-BATTLE-ATTACK-IMPACT",
+      "category": "attack",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_attack_impact_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_attack_impact_v001.wav",
+      "sha256": "998c354bd73e67337d777b5b1268e08e445ed6ce0c772118c3e4d47dd6ba1c94",
+      "bytes": 21164,
+      "durationMs": 220,
+      "event": {
+        "type": "attack.impact",
+        "atMs": 140
+      },
+      "runtime": {
+        "mixGroup": "battle.feedback",
+        "spatial": true,
+        "priority": 70
+      },
+      "productionTask": "T251",
+      "usage": "普攻命中时播放的短促金属冲击，和受击反馈分离。"
+    },
+    {
+      "id": "VFX-BATTLE-SPELL-BURST",
+      "category": "spell",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_spell_burst_v001.png",
+      "resourcePath": "art/battle/effects/vfx_spell_burst_v001.png",
+      "sha256": "5025fecc5bfbfd2159ed2e6ad694f608a6fa94017d42987f3fa267a4161ebb6d",
+      "bytes": 4145,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 520,
+      "event": {
+        "type": "spell.resolve",
+        "atMs": 280
+      },
+      "runtime": {
+        "anchor": "target.center",
+        "direction": "radial",
+        "coverage": "single-target",
+        "blend": "additive",
+        "maxAlpha": 0.82
+      },
+      "productionTask": "T251",
+      "usage": "法术结算时的断环术式与玉青内核，不能被误读为普通紫色魔法阵。"
+    },
+    {
+      "id": "SFX-BATTLE-SPELL-RESOLVE",
+      "category": "spell",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_spell_resolve_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_spell_resolve_v001.wav",
+      "sha256": "7c8f4fe9e3a6c17fffa2ca8522c1ec6a05357056e26feb1f1e7aa0c5a02e00e3",
+      "bytes": 36524,
+      "durationMs": 380,
+      "event": {
+        "type": "spell.resolve",
+        "atMs": 280
+      },
+      "runtime": {
+        "mixGroup": "battle.feedback",
+        "spatial": true,
+        "priority": 65
+      },
+      "productionTask": "T251",
+      "usage": "法术命中时播放的短旋律与脉冲尾音。"
+    },
+    {
+      "id": "VFX-BATTLE-HEAL-PULSE",
+      "category": "heal",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_heal_pulse_v001.png",
+      "resourcePath": "art/battle/effects/vfx_heal_pulse_v001.png",
+      "sha256": "d9d6dccf66c3af860af5437d59a97002ad74db29b56ea36a4c1b612e4c0cf4ff",
+      "bytes": 1619,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 620,
+      "event": {
+        "type": "heal.pulse",
+        "atMs": 310
+      },
+      "runtime": {
+        "anchor": "target.body",
+        "direction": "bottom-to-top",
+        "coverage": "single-target",
+        "blend": "additive",
+        "maxAlpha": 0.78
+      },
+      "productionTask": "T251",
+      "usage": "治疗线由下向上汇聚并在目标身上产生一次白色脉冲，不使用十字标志。"
+    },
+    {
+      "id": "SFX-BATTLE-HEAL-PULSE",
+      "category": "heal",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_heal_pulse_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_heal_pulse_v001.wav",
+      "sha256": "b4eb291ec3dba9fea832f00870cce9e4be9e88f6badc5df0c37a15777a7b4bc8",
+      "bytes": 40364,
+      "durationMs": 420,
+      "event": {
+        "type": "heal.pulse",
+        "atMs": 310
+      },
+      "runtime": {
+        "mixGroup": "battle.feedback",
+        "spatial": true,
+        "priority": 60
+      },
+      "productionTask": "T251",
+      "usage": "治疗生命值实际结算时的上行音阶反馈。"
+    },
+    {
+      "id": "VFX-BATTLE-HIT-CRACK",
+      "category": "hit",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_hit_crack_v001.png",
+      "resourcePath": "art/battle/effects/vfx_hit_crack_v001.png",
+      "sha256": "922eccfc4cae1286e93b486b426749b1c3f8103217701e731e33d29fe8f86408",
+      "bytes": 2187,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 180,
+      "event": {
+        "type": "hit.impact",
+        "atMs": 70
+      },
+      "runtime": {
+        "anchor": "target.hitPoint",
+        "direction": "radial",
+        "coverage": "single-target",
+        "blend": "alpha",
+        "maxAlpha": 0.9
+      },
+      "productionTask": "T251",
+      "usage": "受击点的朱砂冲击裂纹和放射碎片，不能遮挡面部与生命条。"
+    },
+    {
+      "id": "SFX-BATTLE-HIT-IMPACT",
+      "category": "hit",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_hit_impact_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_hit_impact_v001.wav",
+      "sha256": "a4fda6bd87ab94fc7daff60815253c070e26af92f3558f9ead2afc21a73068d9",
+      "bytes": 15404,
+      "durationMs": 160,
+      "event": {
+        "type": "hit.impact",
+        "atMs": 70
+      },
+      "runtime": {
+        "mixGroup": "battle.feedback",
+        "spatial": true,
+        "priority": 80
+      },
+      "productionTask": "T251",
+      "usage": "受击瞬间的低频短噪声，不替代普攻动作音。"
+    },
+    {
+      "id": "VFX-BATTLE-DEATH-RELEASE",
+      "category": "death",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_death_release_v001.png",
+      "resourcePath": "art/battle/effects/vfx_death_release_v001.png",
+      "sha256": "9c1ae8c864346f576713f8630ffe0d4588a2356ec673bcb48eb2f4ad27d9e6fe",
+      "bytes": 2762,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 760,
+      "event": {
+        "type": "death.release",
+        "atMs": 420
+      },
+      "runtime": {
+        "anchor": "target.center",
+        "direction": "downward-dissolve",
+        "coverage": "single-target",
+        "blend": "alpha",
+        "maxAlpha": 0.72
+      },
+      "productionTask": "T251",
+      "usage": "死亡退场的断裂轮廓与向下沉降碎片，不出现血液、骷髅或尸体特写。"
+    },
+    {
+      "id": "SFX-BATTLE-DEATH-RELEASE",
+      "category": "death",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_death_release_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_death_release_v001.wav",
+      "sha256": "1dc3778f451dc32c522948d620fa25836954438f98a4536a579a9057489b816d",
+      "bytes": 51884,
+      "durationMs": 540,
+      "event": {
+        "type": "death.release",
+        "atMs": 420
+      },
+      "runtime": {
+        "mixGroup": "battle.feedback",
+        "spatial": true,
+        "priority": 75
+      },
+      "productionTask": "T251",
+      "usage": "单位死亡退场的下沉音色，尾音在退场事件后自然收束。"
+    },
+    {
+      "id": "VFX-BATTLE-BUTTON-PRESS",
+      "category": "button",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_button_press_v001.png",
+      "resourcePath": "art/battle/effects/vfx_button_press_v001.png",
+      "sha256": "e944260f60b49126f7b1d3ae1e3f8c7b96a8a0068104dd1ec51d18aa21185a8d",
+      "bytes": 1211,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 160,
+      "event": {
+        "type": "ui.button.activate",
+        "atMs": 90
+      },
+      "runtime": {
+        "anchor": "ui.button",
+        "direction": "radial",
+        "coverage": "ui-control",
+        "blend": "alpha",
+        "maxAlpha": 0.8
+      },
+      "productionTask": "T251",
+      "usage": "按钮按下时的切角边框与中央短脉冲，不烘入中文文字。"
+    },
+    {
+      "id": "SFX-BATTLE-BUTTON-ACTIVATE",
+      "category": "button",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_button_activate_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_button_activate_v001.wav",
+      "sha256": "a90de8015c420f98f23c5bda8805f7d0969b5cf16ae9de930db716853167b050",
+      "bytes": 11564,
+      "durationMs": 120,
+      "event": {
+        "type": "ui.button.activate",
+        "atMs": 90
+      },
+      "runtime": {
+        "mixGroup": "ui.feedback",
+        "spatial": false,
+        "priority": 50
+      },
+      "productionTask": "T251",
+      "usage": "按钮激活反馈，短促、非空间化、可重复触发。"
+    },
+    {
+      "id": "VFX-BATTLE-SETTLEMENT-RING",
+      "category": "settlement",
+      "kind": "effect",
+      "format": "png",
+      "fileName": "vfx_settlement_ring_v001.png",
+      "resourcePath": "art/battle/effects/vfx_settlement_ring_v001.png",
+      "sha256": "89a5bc6573d9f18ea6a0aa53bfec5b870b70106363e2a283e64e20605270eecd",
+      "bytes": 3108,
+      "dimensions": {
+        "width": 256,
+        "height": 256
+      },
+      "durationMs": 900,
+      "event": {
+        "type": "battle.settlement.reveal",
+        "atMs": 470
+      },
+      "runtime": {
+        "anchor": "ui.settlement",
+        "direction": "upward-reassemble",
+        "coverage": "settlement-panel",
+        "blend": "additive",
+        "maxAlpha": 0.84
+      },
+      "productionTask": "T251",
+      "usage": "战斗结算时重组玉青开放圆环并收束赤金碎片，保持克制。"
+    },
+    {
+      "id": "SFX-BATTLE-SETTLEMENT-REVEAL",
+      "category": "settlement",
+      "kind": "audio",
+      "format": "wav",
+      "fileName": "sfx_settlement_reveal_v001.wav",
+      "resourcePath": "art/battle/audio/sfx_settlement_reveal_v001.wav",
+      "sha256": "5dfe361f6ad44414db67058722d7df946e435960b7beff0b68fdc5a81f0bf1a0",
+      "bytes": 74924,
+      "durationMs": 780,
+      "event": {
+        "type": "battle.settlement.reveal",
+        "atMs": 470
+      },
+      "runtime": {
+        "mixGroup": "ui.feedback",
+        "spatial": false,
+        "priority": 55
+      },
+      "productionTask": "T251",
+      "usage": "结算标题和奖励区域揭示时的三段上行音阶。"
+    }
+  ],
+  "samples": [
+    {
+      "id": "SAMPLE-BATTLE-ATTACK",
+      "category": "attack",
+      "trigger": "attack.impact",
+      "target": "unit.hitPoint",
+      "effectId": "VFX-BATTLE-ATTACK-SLASH",
+      "audioId": "SFX-BATTLE-ATTACK-IMPACT"
+    },
+    {
+      "id": "SAMPLE-BATTLE-SPELL",
+      "category": "spell",
+      "trigger": "spell.resolve",
+      "target": "unit.center",
+      "effectId": "VFX-BATTLE-SPELL-BURST",
+      "audioId": "SFX-BATTLE-SPELL-RESOLVE"
+    },
+    {
+      "id": "SAMPLE-BATTLE-HEAL",
+      "category": "heal",
+      "trigger": "heal.pulse",
+      "target": "unit.body",
+      "effectId": "VFX-BATTLE-HEAL-PULSE",
+      "audioId": "SFX-BATTLE-HEAL-PULSE"
+    },
+    {
+      "id": "SAMPLE-BATTLE-HIT",
+      "category": "hit",
+      "trigger": "hit.impact",
+      "target": "unit.hitPoint",
+      "effectId": "VFX-BATTLE-HIT-CRACK",
+      "audioId": "SFX-BATTLE-HIT-IMPACT"
+    },
+    {
+      "id": "SAMPLE-BATTLE-DEATH",
+      "category": "death",
+      "trigger": "death.release",
+      "target": "unit.center",
+      "effectId": "VFX-BATTLE-DEATH-RELEASE",
+      "audioId": "SFX-BATTLE-DEATH-RELEASE"
+    },
+    {
+      "id": "SAMPLE-BATTLE-BUTTON",
+      "category": "button",
+      "trigger": "ui.button.activate",
+      "target": "ui.button",
+      "effectId": "VFX-BATTLE-BUTTON-PRESS",
+      "audioId": "SFX-BATTLE-BUTTON-ACTIVATE"
+    },
+    {
+      "id": "SAMPLE-BATTLE-SETTLEMENT",
+      "category": "settlement",
+      "trigger": "battle.settlement.reveal",
+      "target": "ui.settlement",
+      "effectId": "VFX-BATTLE-SETTLEMENT-RING",
+      "audioId": "SFX-BATTLE-SETTLEMENT-REVEAL"
+    }
+  ]
+}
