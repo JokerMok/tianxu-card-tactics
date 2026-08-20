@@ -20,6 +20,11 @@ assert.equal(loaded.floorCount, TOWER_FLOOR_COUNT);
 assert.equal(loaded.stages.length, TOWER_FLOOR_COUNT / TOWER_STAGE_SIZE);
 assert.equal(loaded.floors.length, TOWER_FLOOR_COUNT);
 assert.deepEqual(createTowerConfig(), towerConfig, 'tower generation must be deterministic');
+assert.deepEqual(
+  loadTowerConfig(JSON.parse(JSON.stringify(towerConfig)), knownUnitIds),
+  towerConfig,
+  'normal JSON config must remain loadable',
+);
 
 for (const [index, floor] of loaded.floors.entries()) {
   assert.equal(floor.floor, index + 1, 'floors must be contiguous');
@@ -83,7 +88,40 @@ expectRejected('inherited unknown field', (candidate) => {
 expectRejected('inherited required field', (candidate) => {
   delete candidate.floors[0].floor;
   Object.setPrototypeOf(candidate.floors[0], { floor: 1 });
-}, 'config.floors[0].floor');
+}, 'config.floors[0].__proto__');
+expectRejected('custom empty prototype', (candidate) => {
+  Object.setPrototypeOf(candidate.floors[0], Object.create(null));
+});
+expectRejected('custom prototype same-name field', (candidate) => {
+  Object.setPrototypeOf(candidate.floors[0], { floor: candidate.floors[0].floor });
+});
+
+function expectRejectedForObjectPrototypeMutation(label, mutatePrototype) {
+  const candidate = cloneConfig();
+  const existingKeys = new Set(Reflect.ownKeys(Object.prototype));
+  mutatePrototype();
+  try {
+    assert.throws(
+      () => loadTowerConfig(candidate, knownUnitIds),
+      (error) => error instanceof TowerConfigError && error.configPath === 'config.__proto__',
+      `${label} must be rejected by the real tower loader`,
+    );
+  } finally {
+    for (const key of Reflect.ownKeys(Object.prototype)) {
+      if (!existingKeys.has(key)) delete Object.prototype[key];
+    }
+  }
+}
+
+expectRejectedForObjectPrototypeMutation('legal enumerable Object.prototype pollution', () => {
+  Object.prototype.floor = 1;
+});
+expectRejectedForObjectPrototypeMutation('non-enumerable Object.prototype pollution', () => {
+  Object.defineProperty(Object.prototype, '__towerTestHidden', { value: true, enumerable: false, configurable: true });
+});
+expectRejectedForObjectPrototypeMutation('symbol Object.prototype pollution', () => {
+  Object.defineProperty(Object.prototype, Symbol('towerTestPollution'), { value: true, configurable: true });
+});
 expectRejected('regressing threat', (candidate) => {
   candidate.floors[25].rules.threatMultiplierPercent = candidate.floors[24].rules.threatMultiplierPercent;
 });

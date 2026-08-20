@@ -83,6 +83,21 @@ const SPECIAL_RULES: readonly TowerSpecialRule[] = [
   'ASCENSION_TEST',
 ];
 
+const STANDARD_OBJECT_PROTOTYPE_OWN_KEYS: readonly PropertyKey[] = [
+  'constructor',
+  '__defineGetter__',
+  '__defineSetter__',
+  'hasOwnProperty',
+  '__lookupGetter__',
+  '__lookupSetter__',
+  'isPrototypeOf',
+  'propertyIsEnumerable',
+  'toString',
+  'valueOf',
+  '__proto__',
+  'toLocaleString',
+];
+
 const STAGE_BLUEPRINTS: ReadonlyArray<{
   readonly difficulty: TowerDifficulty;
   readonly environmentElement: TowerEnvironment;
@@ -127,7 +142,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function assertStandardObjectPrototype(configPath: string): void {
+  const expectedKeys = new Set(STANDARD_OBJECT_PROTOTYPE_OWN_KEYS);
+  const actualKeys = Reflect.ownKeys(Object.prototype);
+  if (actualKeys.length !== expectedKeys.size || actualKeys.some((key) => !expectedKeys.has(key))) {
+    throw new TowerConfigError(`${configPath}.__proto__`, 'Object.prototype own-key 基线不匹配');
+  }
+}
+
 function exactKeys(record: Record<string, unknown>, keys: readonly string[], configPath: string): void {
+  const prototype = Object.getPrototypeOf(record);
+  assertStandardObjectPrototype(configPath);
+  if (prototype !== Object.prototype) {
+    throw new TowerConfigError(`${configPath}.__proto__`, '配置对象 prototype 必须是 Object.prototype');
+  }
   const allowed = new Set(keys);
   for (const key of keys) {
     if (!Object.prototype.hasOwnProperty.call(record, key)) {
@@ -137,13 +165,6 @@ function exactKeys(record: Record<string, unknown>, keys: readonly string[], con
   for (const key of Reflect.ownKeys(record)) {
     if (typeof key !== 'string' || !allowed.has(key)) {
       throw new TowerConfigError(`${configPath}.${String(key)}`, '不允许未知字段');
-    }
-  }
-  for (let prototype = Object.getPrototypeOf(record); prototype !== null && prototype !== Object.prototype; prototype = Object.getPrototypeOf(prototype)) {
-    for (const key of Reflect.ownKeys(prototype)) {
-      if (typeof key !== 'string' || !allowed.has(key)) {
-        throw new TowerConfigError(`${configPath}.${String(key)}`, '原型上不允许未知字段');
-      }
     }
   }
 }
