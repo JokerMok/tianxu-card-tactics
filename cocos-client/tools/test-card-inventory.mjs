@@ -73,10 +73,22 @@ inventory.setSort({ field: 'quantity', direction: 'asc' });
 assert.deepEqual(inventory.query().map(({ cardId }) => cardId), ['U003', 'U004', 'U005', 'U001'], 'equal sort values must preserve insertion order');
 inventory.setSort({ field: 'quality', direction: 'desc' });
 assert.deepEqual(inventory.query().map(({ cardId }) => cardId), ['U001', 'U003', 'U004', 'U005'], 'descending quality sorting must be deterministic');
+inventory.setFilter({ qualities: [1], sources: [source], locked: false });
+assert.deepEqual(inventory.query().map(({ cardId }) => cardId), ['U004', 'U005'], 'the persisted view must have a non-empty filter');
 
 const serialized = inventory.save();
 const recovered = CardInventoryService.restore(cardsTable, serialized);
 assert.deepEqual(recovered.snapshot(), inventory.snapshot(), 'save and restore must preserve records and view state');
+assert.deepEqual(
+  recovered.query().map(({ cardId }) => cardId),
+  ['U004', 'U005'],
+  'restored filter and sort must drive the recovered query',
+);
+assert.deepEqual(
+  recovered.getRecord({ cardId: 'U001', quality: card('U001').rarity, source }),
+  { cardId: 'U001', quantity: 4, quality: card('U001').rarity, locked: true, source },
+  'restored entries must retain quantity, quality, lock and source fields',
+);
 assert.equal(recovered.save(), serialized, 'the same state must serialize deterministically');
 assert.notStrictEqual(recovered.snapshot(), recovered.snapshot(), 'snapshots must be defensive objects');
 assert.deepEqual(JSON.parse(saved.at(-1)), JSON.parse(serialized), 'successful mutations must persist the latest state');
