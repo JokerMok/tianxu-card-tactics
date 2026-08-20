@@ -15,6 +15,10 @@ const day = (local) => local.slice(0, 10);
 let now = shanghai('2026-08-20T10:00:00');
 const clock = { now: () => now };
 const saved = [];
+const latestPersisted = (records, label) => {
+  assert(records.length > 0, `${label} must have persisted at least once`);
+  return records[records.length - 1];
+};
 
 assert.equal(towerConfig.floors.length, TOWER_FLOOR_COUNT, 'lifecycle must use the configured 50-floor tower');
 assert.equal(towerCycleKeyAt(shanghai('2026-08-23T23:59:59')), '2026-08-17');
@@ -83,10 +87,12 @@ assert.equal(nextDayFree.activeAttempt.cost, 'FREE', 'the free entry is per loca
 service.completeBattle({ outcome: 'won' }, now);
 assert.equal(service.snapshot().floor, 4);
 
-const restored = new TowerLifecycleService({ clock, initialState: service.save() });
+const persistedServiceState = latestPersisted(saved, 'main service');
+assert.equal(persistedServiceState, service.save(), 'persist callback must receive the current serialized state');
+const restored = new TowerLifecycleService({ clock, initialState: persistedServiceState });
 assert.deepEqual(restored.snapshot(), service.snapshot(), 'a valid persisted state must round-trip exactly');
-assert.deepEqual(restoreTowerLifecycle(service.save()), service.snapshot());
-assert.equal(serializeTowerLifecycle(service.snapshot()), service.save());
+assert.deepEqual(restoreTowerLifecycle(persistedServiceState), service.snapshot());
+assert.equal(serializeTowerLifecycle(service.snapshot()), persistedServiceState);
 
 const finalState = JSON.stringify({
   schemaVersion: 1,
@@ -115,6 +121,7 @@ assert.throws(
 const resetAt = shanghai('2026-08-23T12:00:00');
 let resetNow = resetAt;
 const resetClock = { now: () => resetNow };
+const resetSaves = [];
 const paidState = JSON.stringify({
   schemaVersion: 1,
   cycleKey: towerCycleKeyAt(resetAt),
@@ -128,7 +135,11 @@ const paidState = JSON.stringify({
   lastFailure: null,
   lastReset: null,
 });
-const resetService = new TowerLifecycleService({ clock: resetClock, initialState: paidState });
+const resetService = new TowerLifecycleService({
+  clock: resetClock,
+  initialState: paidState,
+  persist: (value) => resetSaves.push(value),
+});
 const paidResetEntry = resetService.startChallenge(resetAt);
 assert.equal(paidResetEntry.activeAttempt.cost, 'TICKET');
 assert.equal(paidResetEntry.tickets, 0);
@@ -142,9 +153,105 @@ assert.equal(resetService.snapshot().floor, 1);
 assert.equal(resetService.snapshot().bestFloor, 4, 'weekly reset must not erase the all-time best floor');
 assert.equal(resetService.snapshot().tickets, 1, 'a paid failed attempt invalidated by reset is refunded once');
 assert.equal(resetService.snapshot().freeEntryDayKey, null);
+const persistedResetState = latestPersisted(resetSaves, 'weekly reset');
+assert.deepEqual(restoreTowerLifecycle(persistedResetState), resetService.snapshot(), 'weekly reset must be recoverable from persist output');
+assert.equal(persistedResetState, resetService.save());
 assert.equal(resetService.synchronize(resetNow).reset, null, 'the same reset must be idempotent');
 const afterResetFree = resetService.startChallenge(resetNow);
 assert.equal(afterResetFree.activeAttempt.cost, 'FREE');
+
+let monotonicNow = shanghai('2026-08-24T10:00:00');
+const monotonicSaves = [];
+const monotonicService = new TowerLifecycleService({
+  clock: { now: () => monotonicNow },
+  persist: (value) => monotonicSaves.push(value),
+});
+monotonicService.startChallenge(monotonicNow);
+monotonicService.completeBattle({ outcome: 'won' }, monotonicNow);
+const mondaySnapshot = monotonicService.snapshot();
+const sundayBeforeMonday = shanghai('2026-08-23T12:00:00');
+assert.throws(
+  () => monotonicService.synchronize(sundayBeforeMonday),
+  (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_TRANSITION',
+  'moving from Monday back to Sunday must be rejected',
+);
+assert.strictEqual(monotonicService.snapshot(), mondaySnapshot, 'a stale synchronize must keep the latest cycle');
+assert.throws(
+  () => monotonicService.startChallenge(sundayBeforeMonday),
+  (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_TRANSITION',
+  'a stale start must not re-grant a free entry',
+);
+assert.equal(monotonicService.snapshot().cycleKey, '2026-08-24');
+assert.equal(monotonicService.snapshot().floor, 2);
+assert.equal(monotonicSaves.length, 2, 'rejected stale operations must not persist a rollback');
+
+const crossCycleOldAt = shanghai('2026-08-23T12:00:00');
+const crossCycleNewAt = shanghai('2026-08-24T05:00:00');
+const crossCycleOldKey = towerCycleKeyAt(crossCycleOldAt);
+const crossCycleOldDay = day('2026-08-23T12:00:00');
+const crossCycleActiveState = JSON.stringify({
+  schemaVersion: 1,
+  cycleKey: crossCycleOldKey,
+  status: 'active',
+  floor: 5,
+  bestFloor: 4,
+  tickets: 0,
+  freeEntryDayKey: crossCycleOldDay,
+  attemptCount: 8,
+  activeAttempt: { attemptId: 8, floor: 5, cost: 'TICKET', startedAt: crossCycleOldAt },
+  lastFailure: null,
+  lastReset: null,
+});
+const crossCycleCompleteSaves = [];
+const crossCycleCompleteService = new TowerLifecycleService({
+  clock: { now: () => crossCycleOldAt },
+  initialState: crossCycleActiveState,
+  persist: (value) => crossCycleCompleteSaves.push(value),
+});
+assert.throws(
+  () => crossCycleCompleteService.completeBattle({ outcome: 'won', attemptId: 8 }, crossCycleNewAt),
+  (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_TRANSITION',
+  'settling an expired active attempt must still reject the battle result',
+);
+const persistedCompleteReset = latestPersisted(crossCycleCompleteSaves, 'cross-cycle complete');
+const completeResetState = restoreTowerLifecycle(persistedCompleteReset);
+assert.deepEqual(completeResetState, crossCycleCompleteService.snapshot(), 'completeBattle must persist the reset before rejecting');
+assert.equal(completeResetState.cycleKey, '2026-08-24');
+assert.equal(completeResetState.tickets, 1);
+assert.equal(completeResetState.lastReset.compensationTickets, 1);
+assert.equal(crossCycleCompleteSaves.length, 1, 'completeBattle reset and compensation must be one persisted record');
+
+const crossCycleFailedState = JSON.stringify({
+  schemaVersion: 1,
+  cycleKey: crossCycleOldKey,
+  status: 'failed',
+  floor: 5,
+  bestFloor: 4,
+  tickets: 0,
+  freeEntryDayKey: crossCycleOldDay,
+  attemptCount: 8,
+  activeAttempt: null,
+  lastFailure: { attemptId: 8, floor: 5, cost: 'TICKET', failedAt: crossCycleOldAt },
+  lastReset: null,
+});
+const crossCycleContinueSaves = [];
+const crossCycleContinueService = new TowerLifecycleService({
+  clock: { now: () => crossCycleOldAt },
+  initialState: crossCycleFailedState,
+  persist: (value) => crossCycleContinueSaves.push(value),
+});
+assert.throws(
+  () => crossCycleContinueService.continueChallenge(crossCycleNewAt),
+  (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_TRANSITION',
+  'continuing an expired failed attempt must still reject the retry',
+);
+const persistedContinueReset = latestPersisted(crossCycleContinueSaves, 'cross-cycle continue');
+const continueResetState = restoreTowerLifecycle(persistedContinueReset);
+assert.deepEqual(continueResetState, crossCycleContinueService.snapshot(), 'continueChallenge must persist the reset before rejecting');
+assert.equal(continueResetState.cycleKey, '2026-08-24');
+assert.equal(continueResetState.tickets, 1);
+assert.equal(continueResetState.lastReset.compensationTickets, 1);
+assert.equal(crossCycleContinueSaves.length, 1, 'continueChallenge reset and compensation must be one persisted record');
 
 let boundaryNow = shanghai('2026-08-24T04:59:59');
 const boundaryService = new TowerLifecycleService({ clock: { now: () => boundaryNow }, tickets: 0 });
@@ -179,14 +286,27 @@ assert.throws(
   (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_TRANSITION',
 );
 
-for (const invalidState of [
+const persistedStateObject = JSON.parse(persistedServiceState);
+const persistedResetStateObject = JSON.parse(persistedResetState);
+const invalidStateCases = [
   '',
   '{',
-  JSON.stringify({ ...JSON.parse(service.save()), extra: true }),
-  JSON.stringify({ ...JSON.parse(service.save()), status: 'active' }),
-  JSON.stringify({ ...JSON.parse(service.save()), floor: 0 }),
-  JSON.stringify({ ...JSON.parse(service.save()), floor: TOWER_FLOOR_COUNT }),
-]) {
+  JSON.stringify({ ...persistedStateObject, extra: true }),
+  JSON.stringify({ ...persistedStateObject, status: 'active' }),
+  JSON.stringify({ ...persistedStateObject, floor: 0 }),
+  JSON.stringify({ ...persistedStateObject, floor: TOWER_FLOOR_COUNT }),
+  JSON.stringify({ ...persistedStateObject, cycleKey: '2026-02-30' }),
+  JSON.stringify({ ...persistedStateObject, freeEntryDayKey: '2026-99-99' }),
+  JSON.stringify({
+    ...persistedResetStateObject,
+    lastReset: { ...persistedResetStateObject.lastReset, fromCycleKey: persistedResetStateObject.lastReset.toCycleKey },
+  }),
+  JSON.stringify({
+    ...persistedResetStateObject,
+    lastReset: { ...persistedResetStateObject.lastReset, compensationTickets: 99 },
+  }),
+];
+for (const invalidState of invalidStateCases) {
   assert.throws(
     () => restoreTowerLifecycle(invalidState),
     (error) => error instanceof TowerLifecycleError && error.code === 'INVALID_STATE',
@@ -225,4 +345,4 @@ persistenceShouldFail = false;
 persistenceService.startChallenge(now);
 assert.equal(persistenceService.snapshot().status, 'active');
 
-console.log(`T220 tower lifecycle PASS: floors=${TOWER_FLOOR_COUNT}, daily-free=2, paid-retry=1, weekly-reset=2, invalid-cases=16, saves=${saved.length}`);
+console.log(`T220 tower lifecycle PASS: floors=${TOWER_FLOOR_COUNT}, daily-free=2, paid-retry=1, weekly-reset=2, invalid-cases=${invalidStateCases.length}, saves=${saved.length}`);

@@ -133,6 +133,29 @@ function assertNonNegativeInteger(
 
 function assertDateKey(value: unknown, path: string, pattern = DATE_KEY_PATTERN): asserts value is string {
   if (typeof value !== 'string' || !pattern.test(value)) fail('INVALID_STATE', `${path} is invalid`);
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  date.setUTCHours(0, 0, 0, 0);
+  if (
+    date.getUTCFullYear() !== year
+    || date.getUTCMonth() !== month - 1
+    || date.getUTCDate() !== day
+  ) {
+    fail('INVALID_STATE', `${path} is not a real calendar date`);
+  }
+}
+
+function assertCycleKey(value: unknown, path: string): asserts value is string {
+  assertDateKey(value, path, CYCLE_KEY_PATTERN);
+  const date = new Date(0);
+  date.setUTCFullYear(Number(value.slice(0, 4)), Number(value.slice(5, 7)) - 1, Number(value.slice(8, 10)));
+  date.setUTCHours(0, 0, 0, 0);
+  if (date.getUTCDay() !== TOWER_RESET_WEEKDAY) {
+    fail('INVALID_STATE', `${path} must be a Monday cycle key`);
+  }
 }
 
 function assertPlainRecord(value: unknown, path: string): asserts value is Record<string, unknown> {
@@ -187,10 +210,16 @@ function validateReset(value: unknown, path: string): asserts value is TowerRese
   if (value === null) return;
   assertPlainRecord(value, path);
   assertExactKeys(value, ['fromCycleKey', 'toCycleKey', 'at', 'compensationTickets'], path);
-  assertDateKey(value.fromCycleKey, `${path}.fromCycleKey`, CYCLE_KEY_PATTERN);
-  assertDateKey(value.toCycleKey, `${path}.toCycleKey`, CYCLE_KEY_PATTERN);
+  assertCycleKey(value.fromCycleKey, `${path}.fromCycleKey`);
+  assertCycleKey(value.toCycleKey, `${path}.toCycleKey`);
+  if (value.fromCycleKey >= value.toCycleKey) {
+    fail('INVALID_STATE', `${path}.fromCycleKey must be before toCycleKey`);
+  }
   assertTimestamp(value.at, `${path}.at`, 'INVALID_STATE');
   assertNonNegativeInteger(value.compensationTickets, `${path}.compensationTickets`, 'INVALID_STATE');
+  if (value.compensationTickets > 1) {
+    fail('INVALID_STATE', `${path}.compensationTickets must be 0 or 1`);
+  }
 }
 
 function assertFloor(value: unknown, path: string): asserts value is number {
@@ -206,7 +235,7 @@ function validateState(value: unknown): asserts value is TowerLifecycleState {
     'attemptCount', 'activeAttempt', 'lastFailure', 'lastReset',
   ], 'state');
   if (value.schemaVersion !== TOWER_LIFECYCLE_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported schema version');
-  assertDateKey(value.cycleKey, 'state.cycleKey', CYCLE_KEY_PATTERN);
+  assertCycleKey(value.cycleKey, 'state.cycleKey');
   assertStatus(value.status, 'state.status');
   assertFloor(value.floor, 'state.floor');
   assertNonNegativeInteger(value.bestFloor, 'state.bestFloor', 'INVALID_STATE');
@@ -347,6 +376,7 @@ export class TowerLifecycleService {
   private readonly timezone: string;
   private readonly persist: TowerLifecyclePersistence;
   private current: TowerLifecycleState;
+  private lastObservedAt: number;
   private committing = false;
 
   constructor(options: TowerLifecycleOptions = {}) {
@@ -358,6 +388,7 @@ export class TowerLifecycleService {
     if (typeof this.persist !== 'function') fail('INVALID_CONFIG', 'persist must be a function');
 
     const now = this.now();
+    this.lastObservedAt = now;
     if (options.initialState === undefined) {
       const tickets = options.tickets === undefined ? DEFAULT_TOWER_TICKETS : options.tickets;
       assertTickets(tickets, 'tickets');
@@ -423,6 +454,7 @@ export class TowerLifecycleService {
     assertTimestamp(at, 'at');
     this.ensureNotCommitting();
     const prepared = this.prepare(at);
+    if (prepared.reset !== null) this.commit(prepared.state);
     const current = prepared.state;
     if (current.status !== 'failed' || current.lastFailure === null) {
       fail('INVALID_TRANSITION', 'only a failed challenge can be continued');
@@ -456,6 +488,7 @@ export class TowerLifecycleService {
     assertTimestamp(at, 'at');
     this.ensureNotCommitting();
     const prepared = this.prepare(at);
+    if (prepared.reset !== null) this.commit(prepared.state);
     const current = prepared.state;
     if (current.status !== 'active' || current.activeAttempt === null) {
       if (current.status === 'completed') fail('TOWER_COMPLETED', 'tower has already been cleared this cycle');
@@ -500,7 +533,26 @@ export class TowerLifecycleService {
   }
 
   private prepare(at: number): { state: TowerLifecycleState; reset: TowerResetRecord | null } {
+    if (at < this.lastObservedAt) {
+      fail('INVALID_TRANSITION', 'tower lifecycle time cannot move backwards');
+    }
     const cycleKey = towerCycleKeyAt(at, this.timezone);
+    if (cycleKey < this.current.cycleKey) {
+      fail('INVALID_TRANSITION', 'tower lifecycle cycle cannot move backwards');
+    }
+    if (this.current.freeEntryDayKey !== null && dayKeyAt(at, this.timezone) < this.current.freeEntryDayKey) {
+      fail('INVALID_TRANSITION', 'tower lifecycle day cannot move backwards');
+    }
+    for (const recordedAt of [
+      this.current.activeAttempt?.startedAt,
+      this.current.lastFailure?.failedAt,
+      this.current.lastReset?.at,
+    ]) {
+      if (recordedAt !== undefined && at < recordedAt) {
+        fail('INVALID_TRANSITION', 'tower lifecycle time predates the current state');
+      }
+    }
+    this.lastObservedAt = at;
     if (cycleKey === this.current.cycleKey) return { state: this.current, reset: null };
     const result = resetStateAt(this.current, cycleKey, at);
     return { state: result.next, reset: result.reset };
