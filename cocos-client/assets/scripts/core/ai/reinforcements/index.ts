@@ -195,15 +195,31 @@ function enumValue<T extends string>(value: unknown, values: ReadonlySet<T>, pat
   return value as T;
 }
 
+function firstMissingArrayIndex(value: readonly unknown[]): number | null {
+  for (let index = 0; index < value.length; index += 1) {
+    if (!Object.hasOwn(value, index)) return index;
+  }
+  return null;
+}
+
 function uniqueEnumArray<T extends string>(value: unknown, values: ReadonlySet<T>, path: string): T[] {
   if (!Array.isArray(value) || value.length === 0) throw new ReinforcementConfigError(path, '必须是非空数组');
-  const result = value.map((item, index) => enumValue(item, values, `${path}[${index}]`));
+  const missingIndex = firstMissingArrayIndex(value);
+  if (missingIndex !== null) throw new ReinforcementConfigError(`${path}[${missingIndex}]`, '不得包含洞位');
+  const result: T[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    result.push(enumValue(value[index], values, `${path}[${index}]`));
+  }
   if (new Set(result).size !== result.length) throw new ReinforcementConfigError(path, '不得包含重复值');
   return result;
 }
 
 function cloneDeep<T>(value: T): T {
-  if (Array.isArray(value)) return value.map((child) => cloneDeep(child)) as T;
+  if (Array.isArray(value)) {
+    const copy: unknown[] = [];
+    for (let index = 0; index < value.length; index += 1) copy.push(cloneDeep(value[index]));
+    return copy as T;
+  }
   if (isRecord(value)) {
     const copy: Record<string, unknown> = {};
     for (const [key, child] of Object.entries(value)) copy[key] = cloneDeep(child);
@@ -286,16 +302,22 @@ export function validateReinforcementConfig(value: unknown, configPath = 'reinfo
   exactKeys(value, ['id', 'version', 'reinforcements'], configPath);
   const id = nonEmptyString(value.id, `${configPath}.id`);
   const version = safeInteger(value.version, `${configPath}.version`, 1);
-  if (!Array.isArray(value.reinforcements) || value.reinforcements.length < 1 || value.reinforcements.length > 3) {
+  if (!Array.isArray(value.reinforcements)) {
+    throw new ReinforcementConfigError(`${configPath}.reinforcements`, '必须包含 1 到 3 名援军');
+  }
+  const missingIndex = firstMissingArrayIndex(value.reinforcements);
+  if (missingIndex !== null) throw new ReinforcementConfigError(`${configPath}.reinforcements[${missingIndex}]`, '不得包含洞位');
+  if (value.reinforcements.length < 1 || value.reinforcements.length > 3) {
     throw new ReinforcementConfigError(`${configPath}.reinforcements`, '必须包含 1 到 3 名援军');
   }
   const ids = new Set<string>();
-  const reinforcements = value.reinforcements.map((unit, index) => {
-    const parsed = validateUnitConfig(unit, `${configPath}.reinforcements[${index}]`);
+  const reinforcements: ReinforcementConfig[] = [];
+  for (let index = 0; index < value.reinforcements.length; index += 1) {
+    const parsed = validateUnitConfig(value.reinforcements[index], `${configPath}.reinforcements[${index}]`);
     if (ids.has(parsed.id)) throw new ReinforcementConfigError(`${configPath}.reinforcements[${index}].id`, `重复援军: ${parsed.id}`);
     ids.add(parsed.id);
-    return parsed;
-  });
+    reinforcements.push(parsed);
+  }
   return copyConfig({ id, version, reinforcements });
 }
 
@@ -342,6 +364,25 @@ function stateError(code: ReinforcementStateErrorCode, message: string): never {
   throw new ReinforcementStateError(code, message);
 }
 
+function assertDenseStateArray(value: unknown, path: string): asserts value is unknown[] {
+  if (!Array.isArray(value)) stateError('INVALID_STATE', `${path} must be an array`);
+  const missingIndex = firstMissingArrayIndex(value);
+  if (missingIndex !== null) stateError('INVALID_STATE', `${path}[${missingIndex}] must not be a hole`);
+}
+
+function assertNoSparseStateArrays(value: unknown, path: string, seen = new WeakSet<object>()): void {
+  if (value === null || typeof value !== 'object' || seen.has(value)) return;
+  seen.add(value);
+  if (Array.isArray(value)) {
+    assertDenseStateArray(value, path);
+    for (let index = 0; index < value.length; index += 1) {
+      assertNoSparseStateArrays(value[index], `${path}[${index}]`, seen);
+    }
+    return;
+  }
+  for (const [key, child] of Object.entries(value)) assertNoSparseStateArrays(child, `${path}.${key}`, seen);
+}
+
 function makeRuntime(config: ReinforcementConfig): ReinforcementRuntimeState {
   return {
     id: config.id, profession: config.profession, battleRole: config.battleRole, status: 'ACTIVE',
@@ -375,7 +416,7 @@ function assertSafeStateNumber(value: unknown, path: string, minimum: number): n
   return value as number;
 }
 
-function validateRuntime(value: unknown, config: ReinforcementConfig, path: string): ReinforcementRuntimeState {
+function validateRuntime(value: unknown, config: ReinforcementConfig, stateRound: number, path: string): ReinforcementRuntimeState {
   if (!isRecord(value)) stateError('INVALID_STATE', `${path} must be an object`);
   stateExactKeys(value, [
     'id', 'profession', 'battleRole', 'status', 'hp', 'maxHp', 'downCount', 'recoveriesUsed', 'downedAtRound', 'recoveryReadyRound',
@@ -393,8 +434,16 @@ function validateRuntime(value: unknown, config: ReinforcementConfig, path: stri
   if (value.status !== 'ACTIVE' && hp !== 0) stateError('INVALID_STATE', `${path}.hp must be 0 when not ACTIVE`);
   const downedAtRound = value.downedAtRound === null ? null : assertSafeStateNumber(value.downedAtRound, `${path}.downedAtRound`, 0);
   const recoveryReadyRound = value.recoveryReadyRound === null ? null : assertSafeStateNumber(value.recoveryReadyRound, `${path}.recoveryReadyRound`, 0);
-  if (value.status === 'DOWNED' && (downCount === 0 || downedAtRound === null || recoveryReadyRound === null || recoveryReadyRound < downedAtRound)) {
-    stateError('INVALID_STATE', `${path} downed metadata is invalid`);
+  if (value.status === 'DOWNED') {
+    if (downCount === 0 || downedAtRound === null || recoveryReadyRound === null) {
+      stateError('INVALID_STATE', `${path} downed metadata is invalid`);
+    }
+    if (downedAtRound > stateRound) stateError('INVALID_STATE', `${path}.downedAtRound cannot be after state.round`);
+    const delayRounds = config.recovery.delayRounds;
+    if (downedAtRound > Number.MAX_SAFE_INTEGER - delayRounds) stateError('INVALID_STATE', `${path}.recoveryReadyRound overflows`);
+    if (recoveryReadyRound !== downedAtRound + delayRounds) {
+      stateError('INVALID_STATE', `${path}.recoveryReadyRound does not match recovery delay`);
+    }
   }
   if (value.status === 'DOWNED' && recoveriesUsed >= config.recovery.maxUses) {
     stateError('INVALID_STATE', `${path} is downed with an exhausted recovery budget`);
@@ -415,6 +464,7 @@ function validateEvent(value: unknown, index: number, stateRound: number): Reinf
   if (round > stateRound || typeof value.type !== 'string' || !EVENT_TYPES.has(value.type as ReinforcementEventType) || !isRecord(value.payload)) {
     stateError('INVALID_STATE', `events[${index}] has invalid fields`);
   }
+  assertNoSparseStateArrays(value.payload, `events[${index}].payload`);
   return { eventId, round, type: value.type as ReinforcementEventType, payload: cloneDeep(value.payload) };
 }
 
@@ -425,10 +475,15 @@ export function validateReinforcementState(configInput: unknown, value: unknown)
   if (value.schemaVersion !== REINFORCEMENT_SAVE_SCHEMA_VERSION) stateError('INVALID_STATE', 'unsupported reinforcement save version');
   if (value.configId !== config.id) stateError('CONFIG_MISMATCH', `state config mismatch: ${String(value.configId)}`);
   const round = assertSafeStateNumber(value.round, 'state.round', 0);
-  if (!Array.isArray(value.reinforcements) || value.reinforcements.length !== config.reinforcements.length) stateError('INVALID_STATE', 'reinforcements count does not match config');
-  const reinforcements = config.reinforcements.map((unit, index) => validateRuntime((value.reinforcements as unknown[])[index], unit, `state.reinforcements[${index}]`));
-  if (!Array.isArray(value.events)) stateError('INVALID_STATE', 'state.events must be an array');
-  const events = value.events.map((event, index) => validateEvent(event, index, round));
+  assertDenseStateArray(value.reinforcements, 'state.reinforcements');
+  if (value.reinforcements.length !== config.reinforcements.length) stateError('INVALID_STATE', 'reinforcements count does not match config');
+  const reinforcements: ReinforcementRuntimeState[] = [];
+  for (let index = 0; index < config.reinforcements.length; index += 1) {
+    reinforcements.push(validateRuntime(value.reinforcements[index], config.reinforcements[index], round, `state.reinforcements[${index}]`));
+  }
+  assertDenseStateArray(value.events, 'state.events');
+  const events: ReinforcementEvent[] = [];
+  for (let index = 0; index < value.events.length; index += 1) events.push(validateEvent(value.events[index], index, round));
   let expectedEventId = 1;
   for (const event of events) {
     if (event.eventId !== expectedEventId) stateError('INVALID_STATE', 'event IDs must be contiguous');
@@ -436,8 +491,13 @@ export function validateReinforcementState(configInput: unknown, value: unknown)
   }
   const nextEventId = assertSafeStateNumber(value.nextEventId, 'state.nextEventId', 1);
   if (nextEventId !== expectedEventId) stateError('INVALID_STATE', 'nextEventId does not follow events');
-  if (!Array.isArray(value.processedActionIds) || value.processedActionIds.some((id) => typeof id !== 'string' || id.length === 0)) stateError('INVALID_STATE', 'processedActionIds is invalid');
-  const processedActionIds = [...value.processedActionIds] as string[];
+  assertDenseStateArray(value.processedActionIds, 'state.processedActionIds');
+  const processedActionIds: string[] = [];
+  for (let index = 0; index < value.processedActionIds.length; index += 1) {
+    const id = value.processedActionIds[index];
+    if (typeof id !== 'string' || id.length === 0) stateError('INVALID_STATE', `state.processedActionIds[${index}] is invalid`);
+    processedActionIds.push(id);
+  }
   if (new Set(processedActionIds).size !== processedActionIds.length) stateError('INVALID_STATE', 'processedActionIds must be unique');
   const nextActionSequence = assertSafeStateNumber(value.nextActionSequence, 'state.nextActionSequence', 1);
   return freezeCopy({
@@ -672,32 +732,11 @@ export function executeReinforcementAction(configInput: unknown, stateInput: Rei
   return { state: next, effects: effect ? [effect] : [], applied: true, idempotent: false };
 }
 
-function validateSerializableState(value: unknown): ReinforcementState {
-  if (!isRecord(value)) stateError('INVALID_STATE', 'reinforcement state must be an object');
-  stateExactKeys(value, ['schemaVersion', 'configId', 'round', 'reinforcements', 'events', 'nextEventId', 'processedActionIds', 'nextActionSequence'], 'state');
-  if (value.schemaVersion !== REINFORCEMENT_SAVE_SCHEMA_VERSION || typeof value.configId !== 'string' || value.configId.length === 0) stateError('INVALID_STATE', 'save header is invalid');
-  const round = assertSafeStateNumber(value.round, 'state.round', 0);
-  if (!Array.isArray(value.reinforcements) || !Array.isArray(value.events) || !Array.isArray(value.processedActionIds)) stateError('INVALID_STATE', 'save arrays are invalid');
-  const reinforcements = value.reinforcements.map((item, index) => {
-    if (!isRecord(item)) stateError('INVALID_STATE', `state.reinforcements[${index}] must be an object`);
-    return { ...item } as ReinforcementRuntimeState;
-  });
-  const events = value.events.map((event, index) => validateEvent(event, index, round));
-  let expectedEventId = 1;
-  for (const event of events) {
-    if (event.eventId !== expectedEventId) stateError('INVALID_STATE', 'event IDs must be contiguous');
-    expectedEventId += 1;
-  }
-  const nextEventId = assertSafeStateNumber(value.nextEventId, 'state.nextEventId', 1);
-  if (nextEventId !== expectedEventId) stateError('INVALID_STATE', 'nextEventId does not follow events');
-  const processedActionIds = [...value.processedActionIds] as string[];
-  if (processedActionIds.some((id) => typeof id !== 'string' || id.length === 0) || new Set(processedActionIds).size !== processedActionIds.length) stateError('INVALID_STATE', 'processedActionIds is invalid');
-  const nextActionSequence = assertSafeStateNumber(value.nextActionSequence, 'state.nextActionSequence', 1);
-  return freezeCopy({ schemaVersion: REINFORCEMENT_SAVE_SCHEMA_VERSION, configId: value.configId, round, reinforcements, events, nextEventId, processedActionIds, nextActionSequence } as ReinforcementState);
-}
-
-export function serializeReinforcementState(state: ReinforcementState): string {
-  return JSON.stringify(validateSerializableState(state));
+export function serializeReinforcementState(
+  state: ReinforcementState,
+  configInput: unknown = DEFAULT_REINFORCEMENT_CONFIG,
+): string {
+  return JSON.stringify(validateReinforcementState(configInput, state));
 }
 
 export function restoreReinforcementState(configInput: unknown, serialized: string | unknown): ReinforcementState {
