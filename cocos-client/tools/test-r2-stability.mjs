@@ -59,8 +59,8 @@ const ROUND_LIMIT_SEEDS = Object.freeze([
   6, 8, 14, 18, 20, 26, 28, 34, 36, 42, 44, 48, 54, 56, 62, 64, 70, 72, 78, 82,
   84, 90, 92, 98, 100, 106, 108, 112, 118, 120, 126, 130, 132, 138, 140, 144, 150,
   152, 158, 160, 166, 168, 174, 178, 180, 186, 188, 194, 196, 202, 204, 208, 214,
-  216, 222, 224, 230, 232, 238, 242, 244, 250, 252,
-].slice(0, BATTLE_COUNT));
+  216, 222, 224, 230, 232, 238, 242,
+]);
 assert.equal(ROUND_LIMIT_SEEDS.length, BATTLE_COUNT, 'round-limit seed fixture must match battle count');
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -460,7 +460,7 @@ function runNegativeCases() {
   });
   assert.equal(cliInput.status, 0, 'runner CLI valid input must exit zero');
   const cliOutput = JSON.parse(cliInput.stdout);
-  assertRunnerContract(cliOutput, runnerInput.actions.length, 'runner CLI valid output');
+  assertRunnerContract(cliOutput, runnerInput.actions.length, 'runner CLI valid output', runnerInput.seed);
   assert.deepEqual(cliOutput, inProcessOutput, 'runner CLI and in-process output must be identical');
 
   const invalidProtocolInput = { ...runnerInput, protocol: 'tianxu.cocos-battle-runner/invalid' };
