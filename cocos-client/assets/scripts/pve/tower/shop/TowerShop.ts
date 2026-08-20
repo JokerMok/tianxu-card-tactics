@@ -194,8 +194,6 @@ function assertState(value: unknown, config: TowerShopConfig): asserts value is 
     value.purchaseCount,
     value.purchaseSequence,
   );
-  assertStringStringMap(value.processedRefreshes, 'state.processedRefreshes');
-
   if (!Array.isArray(value.offers) || value.offers.length !== config.offerCount) {
     fail('INVALID_STATE', 'state.offers has an invalid count');
   }
@@ -208,6 +206,7 @@ function assertState(value: unknown, config: TowerShopConfig): asserts value is 
     }
     offerIds.add(itemId);
   }
+  assertProcessedRefreshes(value.processedRefreshes, config, value.refreshCount, value.offers);
   for (const [rewardId, quantity] of Object.entries(value.inventory)) {
     if (!rewardIds.has(rewardId)) fail('INVALID_STATE', `state.inventory.${rewardId} is not a shop reward`);
     if (quantity <= 0) fail('INVALID_STATE', `state.inventory.${rewardId} must be positive when present`);
@@ -228,12 +227,30 @@ function assertStringNumberMap(value: unknown, path: string): asserts value is R
   }
 }
 
-function assertStringStringMap(value: unknown, path: string): asserts value is Record<string, string> {
-  assertPlainRecord(value, path);
-  for (const [key, fingerprint] of Object.entries(value)) {
-    if (key.length === 0 || key.trim() !== key || typeof fingerprint !== 'string' || fingerprint.length === 0) {
-      fail('INVALID_STATE', `${path} contains an invalid transaction`);
+function assertProcessedRefreshes(
+  value: unknown,
+  config: TowerShopConfig,
+  refreshCount: number,
+  offers: readonly string[],
+): asserts value is Record<string, string> {
+  assertPlainRecord(value, 'state.processedRefreshes');
+  const refreshIds = Object.keys(value);
+  if (new Set(refreshIds).size !== refreshIds.length) {
+    fail('INVALID_STATE', 'state.processedRefreshes contains duplicate keys');
+  }
+  if (refreshIds.length !== refreshCount) {
+    fail('INVALID_STATE', 'state.processedRefreshes count must match state.refreshCount');
+  }
+  for (const refreshId of refreshIds) {
+    assertStateBusinessKey(refreshId, `state.processedRefreshes.${refreshId}`);
+    if (value[refreshId] !== 'refresh') {
+      fail('INVALID_STATE', `state.processedRefreshes.${refreshId} must be refresh`);
     }
+  }
+
+  const expectedOffers = selectOffers(config, refreshCount);
+  if (offers.some((itemId, index) => itemId !== expectedOffers[index])) {
+    fail('INVALID_STATE', 'state.offers does not match state.refreshCount');
   }
 }
 

@@ -145,6 +145,7 @@ const firstRefresh = service.refresh('refresh-1');
 assert.equal(firstRefresh.code, 'APPLIED');
 assert.equal(firstRefresh.spent, 10);
 assert.equal(service.snapshot().towerCoins, 375);
+assert.deepEqual(service.snapshot().processedRefreshes, { 'refresh-1': 'refresh' });
 assert.deepEqual(service.snapshot().offers, ['TOWER_RELIC_EMBLEM', 'TOWER_MATERIAL_CACHE', 'TOWER_ORNAMENT_JADE']);
 assert.equal(service.snapshot().refreshCount, 1);
 const duplicateRefresh = service.refresh('refresh-1');
@@ -212,6 +213,24 @@ const invalidLedgerSaves = [
   }),
 ];
 for (const candidate of invalidLedgerSaves) expectError('invalid purchase ledger save', () => restoreTowerShop(candidate), 'INVALID_STATE');
+
+const invalidRefreshSaves = [];
+const deletedRefresh = JSON.parse(saved);
+delete deletedRefresh.processedRefreshes['refresh-1'];
+invalidRefreshSaves.push(JSON.stringify(deletedRefresh));
+const alteredRefresh = JSON.parse(saved);
+alteredRefresh.processedRefreshes['refresh-1'] = 'not-refresh';
+invalidRefreshSaves.push(JSON.stringify(alteredRefresh));
+const addedRefresh = JSON.parse(saved);
+addedRefresh.processedRefreshes['refresh-2'] = 'refresh';
+invalidRefreshSaves.push(JSON.stringify(addedRefresh));
+const invalidRefreshKey = JSON.parse(saved);
+invalidRefreshKey.processedRefreshes[' '] = 'refresh';
+invalidRefreshSaves.push(JSON.stringify(invalidRefreshKey));
+const invalidRefreshOffers = JSON.parse(saved);
+invalidRefreshOffers.offers = ['TOWER_ORNAMENT_IRON', 'TOWER_ITEM_REINFORCER', 'TOWER_RELIC_EMBLEM'];
+invalidRefreshSaves.push(JSON.stringify(invalidRefreshOffers));
+for (const candidate of invalidRefreshSaves) expectError('invalid processed refresh save', () => restoreTowerShop(candidate), 'INVALID_STATE');
 
 const beforeCycleReset = restored.snapshot();
 const cycleReset = restored.synchronizeCycle('2026-08-24');
@@ -360,6 +379,11 @@ for (const reservedId of ['__proto__', 'constructor', 'prototype']) {
 const customConfig = structuredClone(towerShopConfig);
 customConfig.refreshCost = 999;
 const custom = new TowerShopService({ config: loadTowerShopConfig(customConfig), cycleKey: '2026-10-12', towerCoins: 1000 });
-assert.equal(custom.refresh('custom-refresh').spent, 999, 'configured refresh cost must drive the real transaction');
+const customRefresh = custom.refresh('custom-refresh');
+assert.equal(customRefresh.spent, 999, 'configured refresh cost must drive the real transaction');
+assert.equal(custom.snapshot().towerCoins, 1, 'refresh must deduct exactly the configured refresh cost');
+assert.equal(custom.snapshot().refreshCount, 1);
+assert.deepEqual(custom.snapshot().processedRefreshes, { 'custom-refresh': 'refresh' });
+assert.deepEqual(custom.snapshot().offers, ['TOWER_RELIC_EMBLEM', 'TOWER_MATERIAL_CACHE', 'TOWER_ORNAMENT_JADE']);
 
-console.log(`T221 tower shop PASS: ${persisted.length + restoredSaves.length} persisted commits, ${towerShopConfig.guaranteedCoinDrops.length} guaranteed floors, save/idempotency/limit/refresh/error paths verified`);
+console.log(`T221 tower shop verified: ${persisted.length + restoredSaves.length} persisted commits, ${towerShopConfig.guaranteedCoinDrops.length} guaranteed floors`);
