@@ -20,7 +20,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 90,
       "defendWeight": 100,
       "emptyLaneWeight": 20,
@@ -70,6 +70,9 @@
         "sameLaneFallback": "SEEDED",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "UNITS_ONLY",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -89,7 +92,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 100,
       "defendWeight": 75,
       "emptyLaneWeight": 30,
@@ -140,6 +143,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -160,7 +166,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 110,
       "defendWeight": 80,
       "emptyLaneWeight": 125,
@@ -211,6 +217,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -250,7 +259,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 125,
       "defendWeight": 100,
       "emptyLaneWeight": 80,
@@ -303,6 +312,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -323,7 +335,7 @@
         }
       ],
       "environmentElement": "FIRE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 130,
       "defendWeight": 95,
       "emptyLaneWeight": 55,
@@ -375,6 +387,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -396,7 +411,7 @@
         }
       ],
       "environmentElement": "WATER",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 100,
       "defendWeight": 105,
       "emptyLaneWeight": 70,
@@ -448,6 +463,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -469,7 +487,7 @@
         }
       ],
       "environmentElement": "EARTH",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 135,
       "defendWeight": 120,
       "emptyLaneWeight": 45,
@@ -521,6 +539,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -542,7 +563,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 105,
       "defendWeight": 140,
       "emptyLaneWeight": 40,
@@ -594,6 +615,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 8
       }
     },
@@ -615,7 +639,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 145,
       "defendWeight": 90,
       "emptyLaneWeight": 60,
@@ -667,6 +691,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -688,7 +715,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 115,
       "defendWeight": 135,
       "emptyLaneWeight": 95,
@@ -740,6 +767,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": null,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "NOT_APPLICABLE",
         "maxRounds": 80
       }
     },
@@ -763,7 +793,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 135,
       "defendWeight": 110,
       "emptyLaneWeight": 75,
@@ -815,6 +845,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": 3,
+        "phasePolicy": "NOT_APPLICABLE",
+        "specialRule": "L11_NAME_CHECK",
         "maxRounds": 80
       }
     },
@@ -847,7 +880,7 @@
         }
       ],
       "environmentElement": "NONE",
-      "maxCardsPerAction": 1,
+      "maxCardsPerAction": 0,
       "lethalWeight": 155,
       "defendWeight": 145,
       "emptyLaneWeight": 85,
@@ -900,6 +933,9 @@
         "sameLaneFallback": "PRESS_OTHER_LANE",
         "reserveSkillWhenNoLegalTarget": true,
         "openingCardPolicy": "ALL_LEGAL",
+        "enemyActionInterval": 3,
+        "phasePolicy": "L12_BOSS_PHASE_TRANSITION",
+        "specialRule": "L12_POINT_BOOK",
         "maxRounds": 80
       }
     }

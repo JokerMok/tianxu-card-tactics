@@ -59,6 +59,8 @@ const NO_LEGAL_TARGET_POLICIES = new Set(['HOLD', 'END_ACTION']);
 const TIE_BREAKS = new Set(['SEEDED']);
 const LANE_FALLBACKS = new Set(['PRESS_OTHER_LANE', 'SEEDED']);
 const OPENING_POLICIES = new Set(['UNITS_ONLY', 'ALL_LEGAL']);
+const PHASE_POLICIES = new Set(['NOT_APPLICABLE', 'L12_BOSS_PHASE_TRANSITION']);
+const SPECIAL_RULES = new Set(['NOT_APPLICABLE', 'L11_NAME_CHECK', 'L12_POINT_BOOK']);
 const ROOT_KEYS = new Set(['schemaVersion', 'table', 'evidenceLevel', 'version', 'enabled', 'strategies']);
 const STRATEGY_KEYS = new Set([
   'id', 'levelId', 'deckId', 'unitIds', 'skillRules', 'environmentElement', 'maxCardsPerAction',
@@ -68,7 +70,10 @@ const STRATEGY_KEYS = new Set([
 const SKILL_RULE_KEYS = new Set(['skillId', 'targetPolicy', 'reserveIfNoLegalTarget']);
 const TARGET_KEYS = new Set(['enemyUnitOrder', 'enemyLaneOrder', 'allyUnitOrder', 'allyLaneOrder', 'priorityTargetUnitIds', 'noLegalTarget', 'tieBreak']);
 const DIFFICULTY_KEYS = new Set(['tier', 'threatMultiplierPercent', 'skillReserveTurns']);
-const RULE_BOUNDARY_KEYS = new Set(['maxConsecutiveSameLane', 'sameLaneFallback', 'reserveSkillWhenNoLegalTarget', 'openingCardPolicy', 'maxRounds']);
+const RULE_BOUNDARY_KEYS = new Set([
+  'maxConsecutiveSameLane', 'sameLaneFallback', 'reserveSkillWhenNoLegalTarget', 'openingCardPolicy',
+  'enemyActionInterval', 'phasePolicy', 'specialRule', 'maxRounds',
+]);
 
 function fail(message) {
   throw new Error(`敌方策略配置无效：${message}`);
@@ -88,6 +93,11 @@ function integerField(value, key, min, max, configPath) {
   if (!Number.isInteger(value[key]) || value[key] < min || value[key] > max) {
     fail(`${configPath}.${key} 必须是 ${min} 到 ${max} 的整数`);
   }
+  return value[key];
+}
+
+function nullableIntegerField(value, key, min, max, configPath) {
+  if (value[key] !== null) integerField(value, key, min, max, configPath);
   return value[key];
 }
 
@@ -165,6 +175,69 @@ function deckCardIds(deck, cardType) {
   return ids;
 }
 
+function assertLevelBoundaries(level, boundary, boundaryPath) {
+  const levelPath = `config/levels/chapter01/${level.id}`;
+  const scenarioRules = level.scenarioRules === undefined
+    ? {}
+    : record(level.scenarioRules, `${levelPath}.scenarioRules`);
+  const battleRules = level.battleRules === undefined
+    ? {}
+    : record(level.battleRules, `${levelPath}.battleRules`);
+  const roundLimits = [scenarioRules.roundLimit, battleRules.roundLimit].filter((value) => value !== undefined);
+  roundLimits.forEach((value) => {
+    if (!Number.isInteger(value) || value < 1 || value > 80) fail(`${levelPath} 的 roundLimit 必须是 1 到 80 的整数`);
+  });
+  if (new Set(roundLimits).size > 1) fail(`${levelPath} 的 scenarioRules/battleRules.roundLimit 不一致`);
+  const expectedRoundLimit = roundLimits[0] ?? 80;
+  if (boundary.maxRounds !== expectedRoundLimit) {
+    fail(`${boundaryPath}.maxRounds 必须遵循真实关卡回合边界 ${expectedRoundLimit}`);
+  }
+
+  if (level.id === 'L01') {
+    if (typeof scenarioRules.enemyOpeningCardFilter !== 'string') fail(`${levelPath}.scenarioRules.enemyOpeningCardFilter 缺失`);
+    if (boundary.openingCardPolicy !== scenarioRules.enemyOpeningCardFilter) {
+      fail(`${boundaryPath}.openingCardPolicy 必须遵循 L01 真实开局规则 ${scenarioRules.enemyOpeningCardFilter}`);
+    }
+  }
+
+  let expectedEnemyActionInterval = null;
+  let expectedSpecialRule = 'NOT_APPLICABLE';
+  let expectedPhasePolicy = 'NOT_APPLICABLE';
+  if (level.id === 'L11') {
+    const nameCheckRule = record(scenarioRules.nameCheckRule, `${levelPath}.scenarioRules.nameCheckRule`);
+    expectedEnemyActionInterval = integerField(nameCheckRule, 'enemyActionInterval', 1, 80, `${levelPath}.scenarioRules.nameCheckRule`);
+    expectedSpecialRule = 'L11_NAME_CHECK';
+  }
+  if (level.id === 'L12') {
+    const pointBookRule = record(scenarioRules.pointBookRule, `${levelPath}.scenarioRules.pointBookRule`);
+    expectedEnemyActionInterval = integerField(pointBookRule, 'enemyActionInterval', 1, 80, `${levelPath}.scenarioRules.pointBookRule`);
+    const phaseTransition = record(scenarioRules.phaseTransition, `${levelPath}.scenarioRules.phaseTransition`);
+    const phaseExpectations = {
+      triggerBossHpPercent: 50,
+      bossEntersBattle: true,
+      bossRole: 'HIGH_HP_ELITE',
+      unitCardPreparationNormal: true,
+    };
+    Object.entries(phaseExpectations).forEach(([key, expected]) => {
+      if (phaseTransition[key] !== expected) fail(`${levelPath}.scenarioRules.phaseTransition.${key} 不符合真实阶段规则`);
+    });
+    if (!Array.isArray(phaseTransition.nameLockAffects) || !phaseTransition.nameLockAffects.includes('SKILL_CARD')) {
+      fail(`${levelPath}.scenarioRules.phaseTransition.nameLockAffects 必须包含 SKILL_CARD`);
+    }
+    expectedSpecialRule = 'L12_POINT_BOOK';
+    expectedPhasePolicy = 'L12_BOSS_PHASE_TRANSITION';
+  }
+  if (boundary.enemyActionInterval !== expectedEnemyActionInterval) {
+    fail(`${boundaryPath}.enemyActionInterval 必须匹配真实关卡边界 ${expectedEnemyActionInterval ?? 'NOT_APPLICABLE'}`);
+  }
+  if (boundary.specialRule !== expectedSpecialRule) {
+    fail(`${boundaryPath}.specialRule 必须匹配真实特殊规则 ${expectedSpecialRule}`);
+  }
+  if (boundary.phasePolicy !== expectedPhasePolicy) {
+    fail(`${boundaryPath}.phasePolicy 必须匹配真实阶段规则 ${expectedPhasePolicy}`);
+  }
+}
+
 function validateStrategy(row, index) {
   const configPath = `config/enemy/strategies.strategies[${index}]`;
   record(row, configPath);
@@ -213,7 +286,8 @@ function validateStrategy(row, index) {
 
   enumField(row, 'environmentElement', ENVIRONMENTS, configPath);
   if (row.environmentElement !== level.environmentElement) fail(`${configPath}.environmentElement 与真实关卡环境不一致`);
-  integerField(row, 'maxCardsPerAction', 1, deck.totalCards, configPath);
+  integerField(row, 'maxCardsPerAction', 0, deck.totalCards, configPath);
+  if (row.maxCardsPerAction !== 0) fail(`${configPath}.maxCardsPerAction 必须遵循核心规则 R1=0`);
   ['lethalWeight', 'defendWeight', 'emptyLaneWeight', 'rangedSupportWeight'].forEach((key) => integerField(row, key, 0, 1000, configPath));
   integerField(row, 'randomness', 0, 10000, configPath);
   if (row.lethalWeight + row.defendWeight + row.emptyLaneWeight + row.rangedSupportWeight === 0) fail(`${configPath} 行动权重不得全为 0`);
@@ -259,13 +333,11 @@ function validateStrategy(row, index) {
   enumField(boundary, 'sameLaneFallback', LANE_FALLBACKS, boundaryPath);
   booleanField(boundary, 'reserveSkillWhenNoLegalTarget', boundaryPath);
   enumField(boundary, 'openingCardPolicy', OPENING_POLICIES, boundaryPath);
+  nullableIntegerField(boundary, 'enemyActionInterval', 1, 80, boundaryPath);
+  enumField(boundary, 'phasePolicy', PHASE_POLICIES, boundaryPath);
+  enumField(boundary, 'specialRule', SPECIAL_RULES, boundaryPath);
   integerField(boundary, 'maxRounds', 1, 80, boundaryPath);
-  if (level.scenarioRules?.roundLimit && boundary.maxRounds !== level.scenarioRules.roundLimit) {
-    fail(`${boundaryPath}.maxRounds 必须遵循真实关卡回合边界 ${level.scenarioRules.roundLimit}`);
-  }
-  if (level.id === 'L01' && boundary.openingCardPolicy !== level.scenarioRules.enemyOpeningCardFilter) {
-    fail(`${boundaryPath}.openingCardPolicy 必须遵循 L01 真实开局规则`);
-  }
+  assertLevelBoundaries(level, boundary, boundaryPath);
 }
 
 function assertStrategies(value) {
@@ -291,6 +363,15 @@ function assertStrategies(value) {
 }
 
 assertStrategies(enemy);
+enemy.strategies.forEach((strategy) => {
+  assert.equal(strategy.maxCardsPerAction, 0, `${strategy.id} 必须遵循核心规则 R1=0`);
+});
+assert.equal(enemy.strategies[10].ruleBoundary.enemyActionInterval, 3, 'L11 必须映射真实 enemyActionInterval=3');
+assert.equal(enemy.strategies[10].ruleBoundary.specialRule, 'L11_NAME_CHECK', 'L11 必须映射真实特殊规则');
+assert.equal(enemy.strategies[10].ruleBoundary.phasePolicy, 'NOT_APPLICABLE', 'L11 阶段规则必须明确不适用');
+assert.equal(enemy.strategies[11].ruleBoundary.enemyActionInterval, 3, 'L12 必须映射真实 enemyActionInterval=3');
+assert.equal(enemy.strategies[11].ruleBoundary.specialRule, 'L12_POINT_BOOK', 'L12 必须映射真实特殊规则');
+assert.equal(enemy.strategies[11].ruleBoundary.phasePolicy, 'L12_BOSS_PHASE_TRANSITION', 'L12 必须映射真实阶段规则');
 
 const valid = structuredClone(enemy);
 const expectFailure = (label, mutate, matcher) => {
@@ -329,8 +410,16 @@ const negativeCases = [
   ['invalid difficulty enum', (fixture) => { fixture.strategies[0].difficulty.tier = 'NIGHTMARE'; }, /非法枚举值/],
   ['out-of-range difficulty', (fixture) => { fixture.strategies[0].difficulty.threatMultiplierPercent = 151; }, /必须是 50 到 150 的整数/],
   ['missing difficulty field', (fixture) => { delete fixture.strategies[0].difficulty.skillReserveTurns; }, /skillReserveTurns 缺少必填字段/],
-  ['zero max cards', (fixture) => { fixture.strategies[0].maxCardsPerAction = 0; }, /必须是 1 到 30 的整数/],
+  ['non-zero max cards violates R1', (fixture) => { fixture.strategies[0].maxCardsPerAction = 1; }, /maxCardsPerAction 必须遵循核心规则 R1=0/],
+  ['negative max cards', (fixture) => { fixture.strategies[0].maxCardsPerAction = -1; }, /必须是 0 到 30 的整数/],
+  ['over-limit max cards', (fixture) => { fixture.strategies[0].maxCardsPerAction = 31; }, /必须是 0 到 30 的整数/],
+  ['L01 default round boundary', (fixture) => { fixture.strategies[0].ruleBoundary.maxRounds = 79; }, /必须遵循真实关卡回合边界 80/],
   ['L08 round boundary', (fixture) => { fixture.strategies[7].ruleBoundary.maxRounds = 9; }, /必须遵循真实关卡回合边界 8/],
+  ['L11 enemy action interval', (fixture) => { fixture.strategies[10].ruleBoundary.enemyActionInterval = 2; }, /enemyActionInterval 必须匹配真实关卡边界 3/],
+  ['L12 enemy action interval', (fixture) => { fixture.strategies[11].ruleBoundary.enemyActionInterval = 2; }, /enemyActionInterval 必须匹配真实关卡边界 3/],
+  ['L11 phase mismatch', (fixture) => { fixture.strategies[10].ruleBoundary.phasePolicy = 'L12_BOSS_PHASE_TRANSITION'; }, /phasePolicy 必须匹配真实阶段规则 NOT_APPLICABLE/],
+  ['L12 phase mismatch', (fixture) => { fixture.strategies[11].ruleBoundary.phasePolicy = 'NOT_APPLICABLE'; }, /phasePolicy 必须匹配真实阶段规则 L12_BOSS_PHASE_TRANSITION/],
+  ['L12 special rule mismatch', (fixture) => { fixture.strategies[11].ruleBoundary.specialRule = 'NOT_APPLICABLE'; }, /specialRule 必须匹配真实特殊规则 L12_POINT_BOOK/],
   ['invalid lane fallback', (fixture) => { fixture.strategies[0].ruleBoundary.sameLaneFallback = 'RANDOM'; }, /非法枚举值/],
   ['missing rule boundary field', (fixture) => { delete fixture.strategies[0].ruleBoundary.maxRounds; }, /maxRounds 缺少必填字段/],
   ['empty strategy weights', (fixture) => {
