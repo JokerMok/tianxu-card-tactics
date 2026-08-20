@@ -79,6 +79,8 @@ assert.deepEqual(inventory.query().map(({ cardId }) => cardId), ['U004', 'U005']
 const serialized = inventory.save();
 const recovered = CardInventoryService.restore(cardsTable, serialized);
 assert.deepEqual(recovered.snapshot(), inventory.snapshot(), 'save and restore must preserve records and view state');
+assert.deepEqual(recovered.snapshot().sort, { field: 'quality', direction: 'desc' }, 'restored sort must remain explicit');
+assert.deepEqual(recovered.snapshot().filter, { qualities: [1], sources: [source], locked: false }, 'restored filter must remain explicit');
 assert.deepEqual(
   recovered.query().map(({ cardId }) => cardId),
   ['U004', 'U005'],
