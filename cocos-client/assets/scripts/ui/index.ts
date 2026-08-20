@@ -387,8 +387,8 @@ export class ModalModel {
   }
 
   open(payload: UiSerializable | null = null): boolean {
-    const safePayload = payload === null ? null : cloneSerializable(payload, 'modal payload');
     if (this.stateValue.isOpen) return false;
+    const safePayload = payload === null ? null : cloneSerializable(payload, 'modal payload');
     this.stateValue = freezeState({
       ...this.stateValue,
       isOpen: true,

@@ -14,7 +14,9 @@ import {
 const source = fs.readFileSync(new URL('../assets/scripts/ui/index.ts', import.meta.url), 'utf8');
 assert.doesNotMatch(source, /(?:from|require\()\s*["'](?:node:|cc)/, 'UI models must be runtime-neutral');
 assert.doesNotMatch(source, /\b(?:window|document|setTimeout|setInterval)\b/, 'UI models must not require DOM or timers');
-assert.match(source, /export class (?:ButtonModel|LabelModel|ResourceBarModel|ModalModel|ListModel|TabsModel|ToastQueueModel)/);
+for (const component of ['ButtonModel', 'LabelModel', 'ResourceBarModel', 'ModalModel', 'ListModel', 'TabsModel', 'ToastQueueModel']) {
+  assert.match(source, new RegExp(`export class ${component}\\b`), `${component} must be implemented`);
+}
 
 function errorCode(error, code) {
   return error instanceof UiContractError && error.code === code;
@@ -88,18 +90,19 @@ cannotMutate(resource.snapshot, (state) => { state.value = 0; });
 
 // Modal: payloads are copied, open/close are idempotent, and cyclic payloads are rejected.
 const payload = { reward: { silver: 100 } };
+const cyclicWhileOpen = {};
+cyclicWhileOpen.self = cyclicWhileOpen;
 const modal = new ModalModel({ id: 'reward' });
 assert.equal(modal.open(payload), true);
 payload.reward.silver = 0;
 assert.deepEqual(modal.snapshot.payload, { reward: { silver: 100 } });
 const modalOpenState = modal.snapshot;
 assert.equal(modal.open({ ignored: true }), false);
+assert.equal(modal.open(cyclicWhileOpen), false);
 assert.strictEqual(modal.snapshot, modalOpenState);
 assert.equal(modal.close(), true);
 assert.equal(modal.close(), false);
-const cyclic = {};
-cyclic.self = cyclic;
-rejects(() => modal.open(cyclic), 'INVALID_SERIALIZABLE');
+rejects(() => modal.open(cyclicWhileOpen), 'INVALID_SERIALIZABLE');
 immutable(modal.snapshot);
 immutable(modal.snapshot.payload);
 cannotMutate(modal.snapshot, (state) => { state.isOpen = true; });
