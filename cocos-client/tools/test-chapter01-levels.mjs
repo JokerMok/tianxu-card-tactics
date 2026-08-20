@@ -10,6 +10,7 @@ const manifest = readJson(path.join(configRoot, 'manifest.json'));
 const index = readJson(path.join(configRoot, 'levels/chapter01/index.json'));
 const loaderSource = fs.readFileSync(path.join(root, 'assets/scripts/config/ConfigLoader.ts'), 'utf8');
 const contractSource = fs.readFileSync(path.join(root, 'assets/scripts/config/levels/ChapterLevelContract.ts'), 'utf8');
+const bootstrapSource = fs.readFileSync(path.join(root, 'assets/scripts/a0/BattleA0Bootstrap.ts'), 'utf8');
 const executableLoaderSource = loaderSource
   .replace("import type { ChapterLevelConfig, ChapterLevelReferences } from './levels/ChapterLevelContract';", '')
   .replace("const chapterContract = await import('./levels/ChapterLevelContract');", 'const chapterContract = { assertChapterLevelContract };')
@@ -19,8 +20,15 @@ const executableContractSource = contractSource.replace(
   '',
 );
 let moduleId = 0;
+const initialEnemyHelperSource = bootstrapSource.match(
+  /export function selectA0InitialEnemyUnit[\s\S]*?\n}\n/,
+)?.[0];
+assert(initialEnemyHelperSource, 'A0 must expose the strategy-to-initial-enemy selector for the runtime contract test');
+const initialEnemyHelper = await import(
+  `data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(initialEnemyHelperSource, { mode: 'transform' })).toString('base64')}#${moduleId++}`,
+);
 
-const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'];
+const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks', 'strategies'];
 function buildResources() {
   const resourcesByPath = {
     'config/manifest': manifest,
@@ -76,6 +84,7 @@ assert.deepEqual(
 );
 for (const entry of index.levels) {
   assert.equal(entry.resource, `config/levels/chapter01/${entry.id}`);
+  assert.equal(entry.enemyStrategyId, `ES_${entry.id}`);
   const document = readJson(path.join(configRoot, `${entry.resource.replace('config/', '')}.json`));
   assert.equal(document.chapterLevels.length, 1, `${entry.id} must contain exactly one level`);
   assert.equal(document.chapterLevels[0].id, entry.id, `${entry.id} file must match its index entry`);
@@ -83,7 +92,39 @@ for (const entry of index.levels) {
 
 const resourcesByPath = buildResources();
 const loader = await loadModule(resourcesByPath);
-assert.deepEqual(await loader.loadConfigManifest(), manifest, 'real chapter resources must load through the startup loader');
+const loadedRuntime = await loader.loadConfigRuntime();
+assert.deepEqual(loadedRuntime.manifest, manifest, 'real chapter resources must load through the startup loader');
+assert.deepEqual(
+  [...loadedRuntime.chapter01.strategyByLevelId.entries()].map(([levelId, strategy]) => [levelId, strategy.id]),
+  index.levels.map(({ id, enemyStrategyId }) => [id, enemyStrategyId]),
+  'chapter runtime must expose the strategy registry injected by ConfigLoader',
+);
+const l01Strategy = loadedRuntime.chapter01.strategyByLevelId.get('L01');
+assert(l01Strategy, 'L01 runtime strategy must be available to A0');
+assert.equal(loadedRuntime.chapter01.strategyById.get('ES_L01'), l01Strategy, 'both readonly indexes must share the same strategy object');
+assert(Object.isFrozen(l01Strategy), 'runtime strategy object must be frozen');
+assert(Object.isFrozen(l01Strategy.unitIds), 'runtime strategy unitIds must be frozen');
+assert(Object.isFrozen(l01Strategy.skillRules), 'runtime strategy skillRules must be frozen');
+assert(Object.isFrozen(l01Strategy.targetSelection.enemyUnitOrder), 'nested runtime strategy arrays must be frozen');
+const l01Snapshot = structuredClone(l01Strategy);
+assert.equal(typeof loadedRuntime.chapter01.strategyByLevelId.set, 'undefined', 'readonly strategy map must not expose set');
+assert.throws(() => loadedRuntime.chapter01.strategyByLevelId.set('L99', l01Strategy), TypeError, 'strategy map set must fail');
+assert.throws(() => { l01Strategy.unitIds.push('U002'); }, TypeError, 'strategy unitIds push must fail');
+assert.throws(() => { l01Strategy.targetSelection.enemyUnitOrder[0] = 'FORGED'; }, TypeError, 'nested strategy array write must fail');
+assert.throws(() => { l01Strategy.id = 'FORGED'; }, TypeError, 'strategy field write must fail');
+assert.deepEqual(l01Strategy, l01Snapshot, 'failed mutation probes must not change the runtime strategy');
+
+assert.equal(initialEnemyHelper.selectA0InitialEnemyUnit({ unitIds: ['U001'] }), 'U001');
+assert.equal(initialEnemyHelper.selectA0InitialEnemyUnit({ unitIds: ['U008'] }), 'U008');
+assert.notEqual(
+  initialEnemyHelper.selectA0InitialEnemyUnit({ unitIds: ['U001'] }),
+  initialEnemyHelper.selectA0InitialEnemyUnit({ unitIds: ['U008'] }),
+  'changing the L01 strategy roster must change the A0 initial enemy input and displayed unit label',
+);
+assert.match(bootstrapSource, /strategyByLevelId\.get\('L01'\)/, 'A0 initialization must read the L01 runtime strategy');
+assert.match(bootstrapSource, /selectA0InitialEnemyUnit\(strategy\)/, 'A0 initialization must select from strategy.unitIds');
+assert.match(bootstrapSource, /spawnUnit\(0, 9, 'enemy', enemyUnitId\)/, 'A0 must pass the configured unit ID into actual enemy spawning');
+assert.match(bootstrapSource, /createLabel\(unit, 'UnitName', name/, 'the configured enemy unit ID must reach the displayed unit label');
 assert.deepEqual(
   loader.resourceLoadPaths,
   [
@@ -99,7 +140,7 @@ async function expectFailure(label, mutate, expectedPath) {
   const candidate = structuredClone(resourcesByPath);
   mutate(candidate);
   const candidateLoader = await loadModule(candidate);
-  await assert.rejects(candidateLoader.loadConfigManifest(), (error) => {
+  await assert.rejects(candidateLoader.loadConfigRuntime(), (error) => {
     assert.equal(error?.name, 'ConfigLoadError', `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report the exact resource path`);
     return true;
@@ -112,6 +153,25 @@ await expectFailure('missing index', (candidate) => {
 await expectFailure('missing L12', (candidate) => {
   delete candidate['config/levels/chapter01/L12'];
 }, 'config/levels/chapter01/L12');
+await expectFailure('missing ES_L12', (candidate) => {
+  candidate[manifest.tables.strategies].strategies.pop();
+}, `${manifest.tables.strategies}.strategies`);
+await expectFailure('wrong strategy mapping', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].levelId = 'L02';
+}, `${manifest.tables.strategies}.strategies[0].levelId`);
+await expectFailure('strategy deck mismatch', (candidate) => {
+  const decks = candidate[manifest.tables.decks].decks;
+  const alternateDeck = structuredClone(decks[0]);
+  alternateDeck.id = 'D002';
+  decks.push(alternateDeck);
+  candidate['config/levels/chapter01/L01'].chapterLevels[0].enemyDeckId = 'D002';
+}, `${manifest.tables.strategies}.strategies[0].deckId`);
+await expectFailure('unknown strategy field', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].forgedAction = 'DEPLOY_FRONTLINE';
+}, `${manifest.tables.strategies}.strategies[0].forgedAction`);
+await expectFailure('illegal strategy reference', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].unitIds[0] = 'U999';
+}, `${manifest.tables.strategies}.strategies[0].unitIds[0]`);
 await expectFailure('invalid L08 prerequisite', (candidate) => {
   candidate['config/levels/chapter01/L08'].chapterLevels[0].prerequisiteLevelId = 'L99';
 }, 'config/levels/chapter01/L08.chapterLevels[0].prerequisiteLevelId');
@@ -121,6 +181,30 @@ await expectFailure('wrong but registered L08 prerequisite', (candidate) => {
 await expectFailure('unknown L10 deck', (candidate) => {
   candidate['config/levels/chapter01/L10'].chapterLevels[0].enemyDeckId = 'D404';
 }, 'config/levels/chapter01/L10.chapterLevels[0].enemyDeckId');
+await expectFailure('unknown reward registry field', (candidate) => {
+  candidate[manifest.chapters.chapter01].rewardRegistries.forged = ['FORGED'];
+}, `${manifest.chapters.chapter01}.rewardRegistries.forged`);
+await expectFailure('unknown level field', (candidate) => {
+  candidate['config/levels/chapter01/L01'].chapterLevels[0].forged = true;
+}, 'config/levels/chapter01/L01.chapterLevels[0].forged');
+await expectFailure('unknown level reward field', (candidate) => {
+  candidate['config/levels/chapter01/L01'].chapterLevels[0].rewards[0].forged = true;
+}, 'config/levels/chapter01/L01.chapterLevels[0].rewards[0].forged');
+await expectFailure('unknown L01 scenario rule field', (candidate) => {
+  candidate['config/levels/chapter01/L01'].chapterLevels[0].scenarioRules.forged = true;
+}, 'config/levels/chapter01/L01.chapterLevels[0].scenarioRules.forged');
+await expectFailure('unknown L02 battle rule field', (candidate) => {
+  candidate['config/levels/chapter01/L02'].chapterLevels[0].battleRules.forged = true;
+}, 'config/levels/chapter01/L02.chapterLevels[0].battleRules.forged');
+await expectFailure('unknown L07 nested rule field', (candidate) => {
+  candidate['config/levels/chapter01/L07'].chapterLevels[0].scenarioRules.impactCounter.forged = true;
+}, 'config/levels/chapter01/L07.chapterLevels[0].scenarioRules.impactCounter.forged');
+await expectFailure('unknown L11 profession advantage nested field', (candidate) => {
+  candidate['config/levels/chapter01/L11'].chapterLevels[0].scenarioRules.professionAdvantageRules.P001.forged = true;
+}, 'config/levels/chapter01/L11.chapterLevels[0].scenarioRules.professionAdvantageRules.P001.forged');
+await expectFailure('unknown L12 phase transition field', (candidate) => {
+  candidate['config/levels/chapter01/L12'].chapterLevels[0].scenarioRules.phaseTransition.forged = true;
+}, 'config/levels/chapter01/L12.chapterLevels[0].scenarioRules.phaseTransition.forged');
 await expectFailure('duplicate unit ID', (candidate) => {
   const rows = candidate['config/units'].units;
   rows.push(structuredClone(rows[0]));
@@ -130,4 +214,4 @@ await expectFailure('duplicate chapter target ID', (candidate) => {
   chapterIndex.targetIds.push(chapterIndex.targetIds[0]);
 }, `${manifest.chapters.chapter01}.targetIds[10]`);
 
-console.log('Chapter 01 index and loader integration: L01-L12 load PASS; missing index, missing L12, invalid prerequisite, wrong prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');
+console.log('Chapter 01 runtime integration: strategy-driven A0 input/display, readonly strategy indexes, L01-L12 registry load PASS; unknown chapter-rule fields (including nested rules), deck mismatch, unknown reward/level field, missing strategy, wrong mapping, illegal reference, missing index/L12, invalid prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');
