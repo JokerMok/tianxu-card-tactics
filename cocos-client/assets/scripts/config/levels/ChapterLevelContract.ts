@@ -237,10 +237,24 @@ function deckIds(value: unknown): Set<string> {
   return new Set((value as DeckTable).decks.map((deck) => deck.id));
 }
 
-function assertStringRegistry(value: unknown, configPath: string, pattern: RegExp): ReadonlySet<string> {
+function normalizeStringRegistry(value: unknown, configPath: string, pattern: RegExp): ReadonlySet<string> {
   if (!(value instanceof Set) || value.size === 0) throw new ConfigLoadError(configPath, '必须是非空 Set');
-  for (const id of value) assertId(id, `${configPath}[${id}]`, pattern);
-  return value;
+  const normalized = new Set<string>();
+  const addCandidate = (candidate: unknown, candidatePath: string): void => {
+    if (candidate instanceof Set) {
+      if (candidate.size === 0) throw new ConfigLoadError(candidatePath, '必须是非空 Set');
+      candidate.forEach((nestedCandidate) => addCandidate(nestedCandidate, `${candidatePath}[${nestedCandidate}]`));
+      return;
+    }
+    normalized.add(assertId(candidate, candidatePath, pattern));
+  };
+  value.forEach((candidate) => addCandidate(candidate, `${configPath}[${candidate}]`));
+  if (normalized.size === 0) throw new ConfigLoadError(configPath, '必须是非空 Set');
+  return normalized;
+}
+
+function addRegistry(target: Set<string>, registry: ReadonlySet<string>): void {
+  registry.forEach((id) => target.add(id));
 }
 
 function assertCardRegistry(
@@ -274,21 +288,21 @@ function assertReferences(value: ChapterLevelReferences, configPath: string, pat
   for (const key of Object.keys(value)) {
     if (!expectedKeys.includes(key)) throw new ConfigLoadError(`${configPath}.${key}`, '不允许未知字段');
   }
-  assertStringRegistry(value.chapterLevelIds, `${configPath}.chapterLevelIds`, pattern);
-  for (const id of value.chapterLevelIds) {
+  const chapterLevelIds = normalizeStringRegistry(value.chapterLevelIds, `${configPath}.chapterLevelIds`, pattern);
+  for (const id of chapterLevelIds) {
     if (!CHAPTER_LEVEL_ID.test(id)) throw new ConfigLoadError(`${configPath}.chapterLevelIds[${id}]`, '仅允许章节内 L01 至 L12');
   }
-  assertStringRegistry(value.targetIds, `${configPath}.targetIds`, pattern);
-  assertStringRegistry(value.unitIds, `${configPath}.unitIds`, pattern);
-  assertStringRegistry(value.skillIds, `${configPath}.skillIds`, pattern);
-  assertCardRegistry(value.cards, `${configPath}.cards`, pattern, value.unitIds, value.skillIds);
-  assertStringRegistry(value.unlockIds, `${configPath}.unlockIds`, pattern);
-  assertStringRegistry(value.chestIds, `${configPath}.chestIds`, pattern);
-  assertStringRegistry(value.flagIds, `${configPath}.flagIds`, pattern);
+  const targetIds = normalizeStringRegistry(value.targetIds, `${configPath}.targetIds`, pattern);
+  const unitIds = normalizeStringRegistry(value.unitIds, `${configPath}.unitIds`, pattern);
+  const skillIds = normalizeStringRegistry(value.skillIds, `${configPath}.skillIds`, pattern);
+  const cards = assertCardRegistry(value.cards, `${configPath}.cards`, pattern, unitIds, skillIds);
+  const unlockIds = normalizeStringRegistry(value.unlockIds, `${configPath}.unlockIds`, pattern);
+  const chestIds = normalizeStringRegistry(value.chestIds, `${configPath}.chestIds`, pattern);
+  const flagIds = normalizeStringRegistry(value.flagIds, `${configPath}.flagIds`, pattern);
   const rewardRegistries = [
-    ['unlockIds', value.unlockIds],
-    ['chestIds', value.chestIds],
-    ['flagIds', value.flagIds],
+    ['unlockIds', unlockIds],
+    ['chestIds', chestIds],
+    ['flagIds', flagIds],
   ] as const;
   for (let leftIndex = 0; leftIndex < rewardRegistries.length; leftIndex += 1) {
     for (let rightIndex = leftIndex + 1; rightIndex < rewardRegistries.length; rightIndex += 1) {
@@ -301,10 +315,12 @@ function assertReferences(value: ChapterLevelReferences, configPath: string, pat
       }
     }
   }
+  const cardIds = new Set<string>();
+  cards.forEach((_card, id) => cardIds.add(id));
   const protectedRegistries = [
-    ['chapterLevelIds', value.chapterLevelIds],
-    ['targetIds', value.targetIds],
-    ['cards', new Set(value.cards.keys())],
+    ['chapterLevelIds', chapterLevelIds],
+    ['targetIds', targetIds],
+    ['cards', cardIds],
   ] as const;
   for (const [rewardName, rewardRegistry] of rewardRegistries) {
     for (const [protectedName, protectedRegistry] of protectedRegistries) {
@@ -315,7 +331,17 @@ function assertReferences(value: ChapterLevelReferences, configPath: string, pat
       }
     }
   }
-  return value;
+  return {
+    ...value,
+    chapterLevelIds,
+    targetIds,
+    unitIds,
+    skillIds,
+    cards,
+    unlockIds,
+    chestIds,
+    flagIds,
+  };
 }
 
 export function assertChapterLevelContract(
@@ -329,7 +355,10 @@ export function assertChapterLevelContract(
   const pattern = idPattern(manifest);
   const registeredReferences = assertReferences(references, `${configPath}.references`, pattern);
   const validDeckIds = deckIds(decks);
-  const forbiddenRewardIds = new Set([...validDeckIds, ...registeredReferences.targetIds, ...registeredReferences.cards.keys()]);
+  const forbiddenRewardIds = new Set<string>();
+  addRegistry(forbiddenRewardIds, validDeckIds);
+  addRegistry(forbiddenRewardIds, registeredReferences.targetIds);
+  registeredReferences.cards.forEach((_card, id) => forbiddenRewardIds.add(id));
   if (!isLevelRecord(value)) throw new ConfigLoadError(configPath, '根值必须是 JSON object');
   const levelValues = levelRequired(value, 'chapterLevels', configPath);
   if (!Array.isArray(levelValues) || levelValues.length === 0) {

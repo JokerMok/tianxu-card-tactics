@@ -84,6 +84,27 @@ const valid = {
   }],
 };
 
+// Cocos Creator 3.8.8 将 new Set([...unitIds, ...index.targetIds]) 转译为
+// new Set([].concat(unitIds, index.targetIds))；这里保留其嵌套 Set 形态作为运行时回归样本。
+const cocosTranspiledReferences = {
+  ...references,
+  targetIds: new Set([unitIds, ...targetIds]),
+  unitIds: new Set([unitIds]),
+};
+
+assert.doesNotThrow(
+  () => assertChapterLevelContract(valid, manifest, decks, cocosTranspiledReferences),
+  'a nested Cocos-transpiled target/unit registry must still allow legal U001 references',
+);
+const nestedUnitUnknownTarget = structuredClone(valid);
+nestedUnitUnknownTarget.chapterLevels[0].objectives[1].targetId = 'U999';
+expectFailureWithReferences(
+  'nested unit IDs must not authorize unknown U999 target',
+  nestedUnitUnknownTarget,
+  cocosTranspiledReferences,
+  'config/levels.chapterLevels[0].objectives[1].targetId',
+);
+
 assert.doesNotThrow(
   () => assertChapterLevelContract(valid, manifest, decks, references),
   'valid chapter level contract must pass',
@@ -158,6 +179,15 @@ function expectFailureWithReferences(label, fixture, customReferences, expectedP
   });
 }
 
+function expectFailureWithReferencesMessage(label, fixture, customReferences, expectedPath, expectedMessage) {
+  assert.throws(() => assertChapterLevelContract(fixture, manifest, decks, customReferences), (error) => {
+    assert(error instanceof ConfigLoadError, `${label} must throw ConfigLoadError`);
+    assert.equal(error.configPath, expectedPath, `${label} must report ${expectedPath}`);
+    assert.match(error.message, expectedMessage, `${label} must preserve the rejection reason`);
+    return true;
+  });
+}
+
 expectFailure('missing field', (fixture) => { delete fixture.chapterLevels[0].objectives; }, 'config/levels.chapterLevels[0].objectives');
 expectFailure('invalid ID', (fixture) => { fixture.chapterLevels[0].id = 'L_01'; }, 'config/levels.chapterLevels[0].id');
 expectFailure('out-of-chapter ID', (fixture) => { fixture.chapterLevels[0].id = 'L13'; }, 'config/levels.chapterLevels[0].id');
@@ -194,6 +224,33 @@ expectFailure('deck ID cannot be an unlock reward', (fixture) => { fixture.chapt
 expectFailure('unit ID cannot be a chest reward', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'CHEST', id: 'U001', quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
 expectFailure('skill ID cannot be a flag reward', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'FLAG', id: skillCardId, quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
 expectFailure('reward type registry mismatch', (fixture) => { fixture.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'CHAPTER-CHEST', quantity: 1 }; }, 'config/levels.chapterLevels[0].rewards[0].id');
+const cocosDeckReward = structuredClone(valid);
+cocosDeckReward.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'D001', quantity: 1 };
+expectFailureWithReferencesMessage(
+  'Cocos-transpiled forbidden registry must reject D001 unlock reward',
+  cocosDeckReward,
+  { ...cocosTranspiledReferences, unlockIds: new Set(['D001']) },
+  'config/levels.chapterLevels[0].rewards[0].id',
+  /不得将牌组、目标或卡牌 ID作为解锁奖励: D001/,
+);
+const cocosUnitReward = structuredClone(valid);
+cocosUnitReward.chapterLevels[0].rewards[0] = { type: 'CHEST', id: 'U001', quantity: 1 };
+expectFailureWithReferencesMessage(
+  'Cocos-transpiled forbidden registry must reject U001 chest reward',
+  cocosUnitReward,
+  { ...cocosTranspiledReferences, chestIds: new Set(['U001']) },
+  'config/levels.references.chestIds[U001]',
+  /不得与 targetIds 重复注册: U001/,
+);
+const cocosSkillReward = structuredClone(valid);
+cocosSkillReward.chapterLevels[0].rewards[0] = { type: 'FLAG', id: 'S001', quantity: 1 };
+expectFailureWithReferencesMessage(
+  'Cocos-transpiled forbidden registry must reject S001 flag reward',
+  cocosSkillReward,
+  { ...cocosTranspiledReferences, flagIds: new Set(['S001']) },
+  'config/levels.references.flagIds[S001]',
+  /不得与 cards 重复注册: S001/,
+);
 const forgedUnlockReferences = { ...references, unlockIds: new Set(['U001']) };
 const forgedUnlockFixture = structuredClone(valid);
 forgedUnlockFixture.chapterLevels[0].rewards[0] = { type: 'UNLOCK', id: 'U001', quantity: 1 };
