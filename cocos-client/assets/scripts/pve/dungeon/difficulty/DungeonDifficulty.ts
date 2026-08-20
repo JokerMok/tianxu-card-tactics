@@ -1,4 +1,4 @@
-export const DUNGEON_DIFFICULTY_SCHEMA_VERSION = 1 as const;
+export const DUNGEON_DIFFICULTY_SCHEMA_VERSION = 2 as const;
 export const DUNGEON_DIFFICULTY_STAGE_COUNT = 3 as const;
 export const DUNGEON_DIFFICULTY_IDS = Object.freeze(['NORMAL', 'HARD'] as const);
 
@@ -58,12 +58,19 @@ export type DungeonDifficultyRun = Readonly<{
   stages: readonly DungeonDifficultyStage[];
 }>;
 
+export type DungeonDifficultySettledRun = Readonly<{
+  runId: string;
+  difficultyId: DungeonDifficultyId;
+  attemptNumber: number;
+  outcome: DungeonRunOutcome;
+}>;
+
 export type DungeonDifficultySnapshot = Readonly<{
   schemaVersion: typeof DUNGEON_DIFFICULTY_SCHEMA_VERSION;
   nextRunNumber: number;
   difficulties: readonly DungeonDifficultyProgress[];
   activeRuns: readonly DungeonDifficultyRun[];
-  settledRunIds: readonly string[];
+  settledRuns: readonly DungeonDifficultySettledRun[];
 }>;
 
 export type DungeonDifficultySettlement = Readonly<{
@@ -338,12 +345,19 @@ type PersistedRun = Readonly<{
   attemptNumber: number;
 }>;
 
+type PersistedSettledRun = Readonly<{
+  runId: string;
+  difficultyId: DungeonDifficultyId;
+  attemptNumber: number;
+  outcome: DungeonRunOutcome;
+}>;
+
 type PersistedState = Readonly<{
   schemaVersion: typeof DUNGEON_DIFFICULTY_SCHEMA_VERSION;
   nextRunNumber: number;
   progress: readonly PersistedProgress[];
   activeRuns: readonly PersistedRun[];
-  settledRunIds: readonly string[];
+  settledRuns: readonly PersistedSettledRun[];
 }>;
 
 function defaultState(config: DungeonDifficultyConfig): PersistedState {
@@ -358,7 +372,7 @@ function defaultState(config: DungeonDifficultyConfig): PersistedState {
       activeRunId: null,
     })),
     activeRuns: [],
-    settledRunIds: [],
+    settledRuns: [],
   };
 }
 
@@ -374,7 +388,7 @@ function parseState(serialized: string, config: DungeonDifficultyConfig): Persis
     fail('INVALID_STATE', 'dungeon difficulty state is not valid JSON');
   }
   if (!isRecord(parsed)) fail('INVALID_STATE', 'dungeon difficulty state must be an object');
-  exactStateKeys(parsed, ['schemaVersion', 'nextRunNumber', 'progress', 'activeRuns', 'settledRunIds'], 'state');
+  exactStateKeys(parsed, ['schemaVersion', 'nextRunNumber', 'progress', 'activeRuns', 'settledRuns'], 'state');
   if (parsed.schemaVersion !== DUNGEON_DIFFICULTY_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported dungeon difficulty schema version');
   assertSafeInteger(parsed.nextRunNumber, 'state.nextRunNumber', 1, 'INVALID_STATE');
   if (!Array.isArray(parsed.progress) || parsed.progress.length !== config.length) fail('INVALID_STATE', 'state.progress must match configured difficulties');
@@ -410,6 +424,7 @@ function parseState(serialized: string, config: DungeonDifficultyConfig): Persis
   if (!Array.isArray(parsed.activeRuns)) fail('INVALID_STATE', 'state.activeRuns must be an array');
   const runIds = new Set<string>();
   const runNumbers = new Set<number>();
+  const activeRunCounts = new Map<DungeonDifficultyId, number>();
   let highestRunNumber = 0;
   parsed.activeRuns.forEach((run, index) => {
     const path = `state.activeRuns[${index}]`;
@@ -424,6 +439,9 @@ function parseState(serialized: string, config: DungeonDifficultyConfig): Persis
     highestRunNumber = Math.max(highestRunNumber, parsedRunId.runNumber);
     assertDifficultyId(run.difficultyId, `${path}.difficultyId`, 'INVALID_STATE');
     if (parsedRunId.difficultyId !== run.difficultyId) fail('INVALID_STATE', `${path}.runId does not match difficultyId`);
+    const activeRunCount = (activeRunCounts.get(run.difficultyId) ?? 0) + 1;
+    if (activeRunCount > 1) fail('INVALID_STATE', `${path}.difficultyId has multiple active runs`);
+    activeRunCounts.set(run.difficultyId, activeRunCount);
     assertSafeInteger(run.attemptNumber, `${path}.attemptNumber`, 1, 'INVALID_STATE');
     if (run.attemptNumber > (config.find(({ id }) => id === run.difficultyId)?.attemptLimit ?? 0)) {
       fail('INVALID_STATE', `${path}.attemptNumber exceeds attemptLimit`);
@@ -440,15 +458,23 @@ function parseState(serialized: string, config: DungeonDifficultyConfig): Persis
     const activeRunId = (progress as Record<string, unknown>).activeRunId;
     if (activeRunId !== null && !runIds.has(activeRunId as string)) fail('INVALID_STATE', 'state progress references a missing active run');
   });
-  if (!Array.isArray(parsed.settledRunIds)) fail('INVALID_STATE', 'state.settledRunIds must be an array');
-  const settledRunIds = new Set<string>();
-  parsed.settledRunIds.forEach((runId, index) => {
-    assertTrimmedString(runId, `state.settledRunIds[${index}]`, 'INVALID_STATE');
-    const parsedRunId = parseDungeonRunId(runId, `state.settledRunIds[${index}]`);
-    if (settledRunIds.has(runId)) fail('INVALID_STATE', `state.settledRunIds contains duplicate run ${runId}`);
-    if (runIds.has(runId)) fail('INVALID_STATE', `state run ${runId} cannot be active and settled`);
+  if (!Array.isArray(parsed.settledRuns)) fail('INVALID_STATE', 'state.settledRuns must be an array');
+  const settledRuns = parsed.settledRuns as PersistedSettledRun[];
+  parsed.settledRuns.forEach((run, index) => {
+    const path = `state.settledRuns[${index}]`;
+    if (!isRecord(run)) fail('INVALID_STATE', `${path} must be an object`);
+    exactStateKeys(run, ['runId', 'difficultyId', 'attemptNumber', 'outcome'], path);
+    assertTrimmedString(run.runId, `${path}.runId`, 'INVALID_STATE');
+    const parsedRunId = parseDungeonRunId(run.runId, `${path}.runId`);
+    if (runIds.has(run.runId)) fail('INVALID_STATE', `state contains duplicate run ${run.runId}`);
+    if (parsedRunId.difficultyId !== run.difficultyId) fail('INVALID_STATE', `${path}.runId does not match difficultyId`);
+    assertDifficultyId(run.difficultyId, `${path}.difficultyId`, 'INVALID_STATE');
+    assertSafeInteger(run.attemptNumber, `${path}.attemptNumber`, 1, 'INVALID_STATE');
+    const definition = config.find(({ id }) => id === run.difficultyId);
+    if (!definition || run.attemptNumber > definition.attemptLimit) fail('INVALID_STATE', `${path}.attemptNumber exceeds attemptLimit`);
+    if (run.outcome !== 'won' && run.outcome !== 'lost') fail('INVALID_STATE', `${path}.outcome is invalid`);
     if (runNumbers.has(parsedRunId.runNumber)) fail('INVALID_STATE', `state contains duplicate run number ${parsedRunId.runNumber}`);
-    settledRunIds.add(runId);
+    runIds.add(run.runId);
     runNumbers.add(parsedRunId.runNumber);
     highestRunNumber = Math.max(highestRunNumber, parsedRunId.runNumber);
   });
@@ -457,8 +483,45 @@ function parseState(serialized: string, config: DungeonDifficultyConfig): Persis
   }
   for (const difficultyId of DUNGEON_DIFFICULTY_IDS) {
     const nextRunId = dungeonRunId(difficultyId, parsed.nextRunNumber);
-    if (runIds.has(nextRunId) || settledRunIds.has(nextRunId)) {
+    if (runIds.has(nextRunId)) {
       fail('INVALID_STATE', `state.nextRunNumber would generate an existing run ${nextRunId}`);
+    }
+  }
+  for (const progress of parsed.progress as PersistedProgress[]) {
+    const activeRuns = (parsed.activeRuns as PersistedRun[]).filter(({ difficultyId }) => difficultyId === progress.difficultyId);
+    const settledRunsForDifficulty = settledRuns.filter(({ difficultyId }) => difficultyId === progress.difficultyId);
+    const allRuns = [...activeRuns, ...settledRunsForDifficulty];
+    if (allRuns.length !== progress.attemptsUsed) {
+      fail('INVALID_STATE', `state.progress for ${progress.difficultyId} must match persisted attempt evidence`);
+    }
+    const attemptNumbers = new Set<number>();
+    for (const run of allRuns) {
+      if (attemptNumbers.has(run.attemptNumber)) fail('INVALID_STATE', `state contains duplicate attempt number for ${progress.difficultyId}`);
+      attemptNumbers.add(run.attemptNumber);
+    }
+    for (let attemptNumber = 1; attemptNumber <= progress.attemptsUsed; attemptNumber += 1) {
+      if (!attemptNumbers.has(attemptNumber)) fail('INVALID_STATE', `state is missing attempt ${attemptNumber} for ${progress.difficultyId}`);
+    }
+    const clearCount = settledRunsForDifficulty.filter(({ outcome }) => outcome === 'won').length;
+    if (progress.clearCount !== clearCount) {
+      fail('INVALID_STATE', `state.progress for ${progress.difficultyId} must match settled won evidence`);
+    }
+    const latestSettledRun = settledRunsForDifficulty.reduce<PersistedSettledRun | null>((latest, candidate) => {
+      if (latest === null) return candidate;
+      const latestNumber = parseDungeonRunId(latest.runId, 'state.settledRuns').runNumber;
+      const candidateNumber = parseDungeonRunId(candidate.runId, 'state.settledRuns').runNumber;
+      return candidateNumber > latestNumber ? candidate : latest;
+    }, null);
+    const expectedLastOutcome = latestSettledRun?.outcome ?? null;
+    if (progress.lastOutcome !== expectedLastOutcome) {
+      fail('INVALID_STATE', `state.progress for ${progress.difficultyId} must match its latest settled outcome`);
+    }
+    const activeRun = activeRuns[0];
+    if (activeRun && progress.activeRunId !== activeRun.runId) {
+      fail('INVALID_STATE', `state.progress for ${progress.difficultyId} must reference its active run`);
+    }
+    if (!activeRun && progress.activeRunId !== null) {
+      fail('INVALID_STATE', `state.progress for ${progress.difficultyId} references a missing active run`);
     }
   }
   return freezeDeep(clone(parsed));
@@ -525,7 +588,7 @@ function snapshotFromState(state: PersistedState, config: DungeonDifficultyConfi
     nextRunNumber: state.nextRunNumber,
     difficulties,
     activeRuns,
-    settledRunIds: [...state.settledRunIds],
+    settledRuns: clone(state.settledRuns),
   });
 }
 
@@ -541,7 +604,7 @@ export function serializeDungeonDifficultyState(state: DungeonDifficultySnapshot
       activeRunId,
     })),
     activeRuns: state.activeRuns.map(({ runId, difficultyId, attemptNumber }) => ({ runId, difficultyId, attemptNumber })),
-    settledRunIds: [...state.settledRunIds],
+    settledRuns: state.settledRuns.map(({ runId, difficultyId, attemptNumber, outcome }) => ({ runId, difficultyId, attemptNumber, outcome })),
   });
 }
 
@@ -607,7 +670,7 @@ export class DungeonDifficultyService {
     if (this.current.nextRunNumber === Number.MAX_SAFE_INTEGER) fail('INVALID_STATE', 'state.nextRunNumber cannot allocate another run');
 
     const runId = dungeonRunId(difficultyId, this.current.nextRunNumber);
-    if (this.current.activeRuns.some((candidate) => candidate.runId === runId) || this.current.settledRunIds.includes(runId)) {
+    if (this.current.activeRuns.some((candidate) => candidate.runId === runId) || this.current.settledRuns.some((candidate) => candidate.runId === runId)) {
       fail('INVALID_STATE', `generated run id ${runId} already exists`);
     }
     const run: PersistedRun = {
@@ -642,7 +705,7 @@ export class DungeonDifficultyService {
     if (outcome !== 'won' && outcome !== 'lost') fail('INVALID_OUTCOME', 'dungeon run outcome must be won or lost');
     const run = this.current.activeRuns.find((candidate) => candidate.runId === runId);
     if (!run) {
-      fail(this.current.settledRunIds.includes(runId) ? 'RUN_SETTLED' : 'RUN_NOT_FOUND', `dungeon run ${runId} is not active`);
+      fail(this.current.settledRuns.some((candidate) => candidate.runId === runId) ? 'RUN_SETTLED' : 'RUN_NOT_FOUND', `dungeon run ${runId} is not active`);
     }
     const definition = findDefinition(this.config, run.difficultyId);
     const progress = findProgress(this.current, run.difficultyId);
@@ -658,7 +721,7 @@ export class DungeonDifficultyService {
       ...this.current,
       progress: this.current.progress.map((candidate) => candidate.difficultyId === run.difficultyId ? nextProgress : candidate),
       activeRuns: this.current.activeRuns.filter((candidate) => candidate.runId !== runId),
-      settledRunIds: [...this.current.settledRunIds, runId],
+      settledRuns: [...this.current.settledRuns, { runId, difficultyId: run.difficultyId, attemptNumber: run.attemptNumber, outcome }],
     };
     this.commit(next);
     const nextSnapshot = this.snapshot();

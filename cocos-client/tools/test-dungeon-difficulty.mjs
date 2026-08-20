@@ -92,6 +92,7 @@ assert.equal(progress(service, 'HARD').attemptsUsed, 0);
 const normalBeforeHardFailure = progress(service, 'NORMAL');
 const hardFailureRun = service.startRun('HARD');
 assert.equal(hardFailureRun.runId, 'dungeon-hard-3');
+assert.deepEqual(hardFailureRun.stages, hardDefinition.stages, 'hard run must use the configured hard stages and enemies');
 const hardFailure = service.settleRun(hardFailureRun.runId, 'lost');
 assert.equal(hardFailure.firstClear, false);
 assert.deepEqual(hardFailure.rewards, [], 'failed run must not grant rewards');
@@ -171,19 +172,33 @@ expectError('negative difficulty progress', () => restoreDungeonDifficultyState(
 const inconsistentProgressState = JSON.parse(activeService.save());
 inconsistentProgressState.progress[0].activeRunId = null;
 expectError('settled attempts without outcome', () => restoreDungeonDifficultyState(JSON.stringify(inconsistentProgressState)), 'INVALID_STATE');
+const forgedClearWithoutEvidenceState = JSON.parse(activeService.save());
+const forgedNormalProgress = forgedClearWithoutEvidenceState.progress.find((candidate) => candidate.difficultyId === 'NORMAL');
+assert(forgedNormalProgress);
+forgedNormalProgress.clearCount = 1;
+forgedNormalProgress.lastOutcome = 'won';
+forgedNormalProgress.activeRunId = null;
+forgedClearWithoutEvidenceState.activeRuns = [];
+forgedClearWithoutEvidenceState.settledRuns = [];
+expectError('clear count without settled win evidence', () => restoreDungeonDifficultyState(JSON.stringify(forgedClearWithoutEvidenceState)), 'INVALID_STATE');
+const forgedFailureOutcomeState = JSON.parse(service.save());
+const forgedFailureProgress = forgedFailureOutcomeState.progress.find((candidate) => candidate.difficultyId === 'NORMAL');
+assert(forgedFailureProgress);
+forgedFailureProgress.lastOutcome = 'won';
+expectError('failed settlement outcome mismatch', () => restoreDungeonDifficultyState(JSON.stringify(forgedFailureOutcomeState)), 'INVALID_STATE');
 
 const rolledBackRunNumberState = JSON.parse(activeService.save());
 rolledBackRunNumberState.nextRunNumber = 1;
 expectError('rolled-back next run number', () => restoreDungeonDifficultyState(JSON.stringify(rolledBackRunNumberState)), 'INVALID_STATE');
 const historicalRunIdConflictState = JSON.parse(activeService.save());
 historicalRunIdConflictState.nextRunNumber = 3;
-historicalRunIdConflictState.settledRunIds = ['dungeon-normal-3'];
+historicalRunIdConflictState.settledRuns = [{ runId: 'dungeon-normal-3', difficultyId: 'NORMAL', attemptNumber: 1, outcome: 'won' }];
 expectError('historical run id conflicts with next run', () => restoreDungeonDifficultyState(JSON.stringify(historicalRunIdConflictState)), 'INVALID_STATE');
 const duplicateSettledRunState = JSON.parse(service.save());
-duplicateSettledRunState.settledRunIds.push(duplicateSettledRunState.settledRunIds[0]);
+duplicateSettledRunState.settledRuns.push(clone(duplicateSettledRunState.settledRuns[0]));
 expectError('duplicate settled run id', () => restoreDungeonDifficultyState(JSON.stringify(duplicateSettledRunState)), 'INVALID_STATE');
 const activeSettledConflictState = JSON.parse(activeService.save());
-activeSettledConflictState.settledRunIds = [activeSettledConflictState.activeRuns[0].runId];
+activeSettledConflictState.settledRuns = [{ ...activeSettledConflictState.activeRuns[0], outcome: 'lost' }];
 expectError('active and settled run id conflict', () => restoreDungeonDifficultyState(JSON.stringify(activeSettledConflictState)), 'INVALID_STATE');
 
 const invalidConfigs = [
@@ -213,10 +228,10 @@ assert.deepEqual(
   'persisted run numbers must advance without rollback',
 );
 for (const [index, persistedState] of persistedStates.entries()) {
-  const runIds = [...persistedState.activeRuns.map(({ runId }) => runId), ...persistedState.settledRunIds];
+  const runIds = [...persistedState.activeRuns.map(({ runId }) => runId), ...persistedState.settledRuns.map(({ runId }) => runId)];
   assert.equal(new Set(runIds).size, runIds.length, `persisted state ${index + 1} must not duplicate active or settled run ids`);
-  assert(persistedState.settledRunIds.every((runId) => !persistedState.activeRuns.some((run) => run.runId === runId)));
+  assert(persistedState.settledRuns.every(({ runId }) => !persistedState.activeRuns.some((run) => run.runId === runId)));
 }
-assert.equal(negativeCases, 34, 'all expected negative and regression cases must execute');
+assert.equal(negativeCases, 36, 'all expected negative and regression cases must execute');
 
 console.log(`T217 dungeon difficulty PASS: difficulties=${DEFAULT_DUNGEON_DIFFICULTY_CONFIG.length}, stages=${normalDefinition.stages.length}, rewards=${normalDefinition.firstClearRewards.length + hardDefinition.firstClearRewards.length}, negative-cases=${negativeCases}, saves=${saves.length}`);
