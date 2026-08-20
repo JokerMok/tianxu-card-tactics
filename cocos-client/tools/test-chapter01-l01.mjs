@@ -154,5 +154,3 @@ expectFailure(
   (invalidLevel) => { invalidLevel.failureConditions[0].type = 'UNSUPPORTED'; },
   'config/levels/chapter01/L01.chapterLevels[0].failureConditions[0].type',
 );
-
-console.log('Chapter 01 L01 config: real fields and references PASS; invalid prerequisite, unknown enemy deck, invalid ID, missing failure conditions, and invalid target ID FAIL as expected');
