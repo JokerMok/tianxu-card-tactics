@@ -202,6 +202,17 @@ function deepFreeze<T>(value: T): T {
   return value;
 }
 
+function sameStringArray(actual: readonly string[], expected: readonly string[]): boolean {
+  return actual.length === expected.length && actual.every((value, index) => value === expected[index]);
+}
+
+function buildFloorEnemyIds(floorIndex: number, unitIds: readonly string[]): string[] {
+  const maxEnemyUnits = Math.min(6, 2 + Math.floor(floorIndex / 10));
+  const count = Math.min(maxEnemyUnits, unitIds.length);
+  const offset = floorIndex % unitIds.length;
+  return Array.from({ length: count }, (_item, index) => unitIds[(offset + index) % unitIds.length]);
+}
+
 function buildEnemyPools(): TowerEnemyPool[] {
   return ENEMY_POOL_BLUEPRINTS.map((unitIds, index) => ({
     id: `POOL_${String(index + 1).padStart(2, '0')}`,
@@ -229,9 +240,7 @@ function buildFloors(stages: readonly TowerStage[], pools: readonly TowerEnemyPo
     const pool = poolsById.get(stage.enemyPoolId)!;
     const maxEnemyUnits = Math.min(6, 2 + Math.floor(floorIndex / 10));
     const enemyActionInterval = Math.max(1, 5 - Math.floor(floorIndex / 10));
-    const count = Math.min(maxEnemyUnits, pool.unitIds.length);
-    const offset = floorIndex % pool.unitIds.length;
-    const enemyIds = Array.from({ length: count }, (_item, index) => pool.unitIds[(offset + index) % pool.unitIds.length]);
+    const enemyIds = buildFloorEnemyIds(floorIndex, pool.unitIds);
     return {
       floor,
       stageId: stage.id,
@@ -309,6 +318,9 @@ export function loadTowerConfig(
     if (poolIds.has(id)) throw new TowerConfigError(`${configPath}.id`, `重复敌方池 ID: ${id}`);
     poolIds.add(id);
     if (tier !== index + 1) throw new TowerConfigError(`${configPath}.tier`, '敌方池 tier 必须按 1 到 10 顺序');
+    if (!sameStringArray(unitIds, ENEMY_POOL_BLUEPRINTS[index])) {
+      throw new TowerConfigError(`${configPath}.unitIds`, '敌方池内容必须与对应 tier 的区间配置一致，且不得与其他池同质');
+    }
     unitIds.forEach((unitId, unitIndex) => {
       if (!configuredEnemyIds.has(unitId)) throw new TowerConfigError(`${configPath}.unitIds[${unitIndex}]`, `未注册敌方单位: ${unitId}`);
       if (!knownEnemyUnitIds.has(unitId)) throw new TowerConfigError(`${configPath}.unitIds[${unitIndex}]`, `未知敌方单位: ${unitId}`);
@@ -323,6 +335,8 @@ export function loadTowerConfig(
   const stages: TowerStage[] = [];
   const stageIds = new Set<string>();
   let previousDifficultyRank = -1;
+  let hasDifficultyProgression = false;
+  let hasSpecialRuleProgression = false;
   stageValues.forEach((stageValue, index) => {
     const configPath = `config.stages[${index}]`;
     if (!isRecord(stageValue)) throw new TowerConfigError(configPath, '必须是 object');
@@ -344,11 +358,25 @@ export function loadTowerConfig(
     if (pools[index].tier !== index + 1 || enemyPoolId !== pools[index].id) {
       throw new TowerConfigError(`${configPath}.enemyPoolId`, '阶段敌方池必须按 POOL_01 至 POOL_10 顺序递进');
     }
+    const expectedStage = STAGE_BLUEPRINTS[index];
+    if (difficulty !== expectedStage.difficulty) {
+      throw new TowerConfigError(`${configPath}.difficulty`, '阶段难度序列必须与当前塔配置一致并真实递进');
+    }
+    if (environmentElement !== expectedStage.environmentElement) {
+      throw new TowerConfigError(`${configPath}.environmentElement`, '阶段环境序列必须与当前塔配置一致');
+    }
+    if (specialRule !== expectedStage.specialRule) {
+      throw new TowerConfigError(`${configPath}.specialRule`, '阶段特殊规则序列必须与当前塔配置一致并真实递进');
+    }
     const difficultyRank = DIFFICULTIES.indexOf(difficulty);
     if (difficultyRank < previousDifficultyRank) throw new TowerConfigError(`${configPath}.difficulty`, '难度不得随阶段下降');
+    if (index > 0 && difficultyRank > previousDifficultyRank) hasDifficultyProgression = true;
+    if (index > 0 && specialRule !== stages[index - 1].specialRule) hasSpecialRuleProgression = true;
     previousDifficultyRank = difficultyRank;
     stages.push({ id, floorStart, floorEnd, difficulty, enemyPoolId, environmentElement, specialRule });
   });
+  if (!hasDifficultyProgression) throw new TowerConfigError('config.stages', '阶段难度必须包含真实递进');
+  if (!hasSpecialRuleProgression) throw new TowerConfigError('config.stages', '阶段特殊规则必须包含真实递进');
 
   const floorValues = value.floors;
   if (!Array.isArray(floorValues) || floorValues.length !== TOWER_FLOOR_COUNT) {
@@ -372,6 +400,10 @@ export function loadTowerConfig(
     if (floor < stage.floorStart || floor > stage.floorEnd) throw new TowerConfigError(`${configPath}.stageId`, '楼层与阶段范围不匹配');
     if (enemyPoolId !== stage.enemyPoolId) throw new TowerConfigError(`${configPath}.enemyPoolId`, '楼层敌方池必须与阶段一致');
     const pool = poolById.get(enemyPoolId)!;
+    const expectedEnemyIds = buildFloorEnemyIds(index, ENEMY_POOL_BLUEPRINTS[Math.floor(index / TOWER_STAGE_SIZE)]);
+    if (!sameStringArray(enemyIds, expectedEnemyIds)) {
+      throw new TowerConfigError(`${configPath}.enemyIds`, '楼层敌人必须按阶段和楼层递进，不能使用固定组合');
+    }
     enemyIds.forEach((unitId, enemyIndex) => {
       if (!pool.unitIds.includes(unitId)) throw new TowerConfigError(`${configPath}.enemyIds[${enemyIndex}]`, `敌人不属于配置池: ${unitId}`);
     });

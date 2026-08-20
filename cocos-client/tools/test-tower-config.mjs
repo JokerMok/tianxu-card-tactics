@@ -38,12 +38,13 @@ function cloneConfig() {
   return structuredClone(towerConfig);
 }
 
-function expectRejected(label, mutate) {
+function expectRejected(label, mutate, expectedConfigPath) {
   const candidate = cloneConfig();
   mutate(candidate);
   assert.throws(
     () => loadTowerConfig(candidate, knownUnitIds),
-    (error) => error instanceof TowerConfigError,
+    (error) => error instanceof TowerConfigError
+      && (!expectedConfigPath || error.configPath === expectedConfigPath),
     `${label} must be rejected by the real tower loader`,
   );
 }
@@ -54,6 +55,21 @@ expectRejected('floor above upper boundary', (candidate) => { candidate.floors[4
 expectRejected('illegal floor boundary', (candidate) => { candidate.floors[0].rules.maxEnemyUnits = 1; });
 expectRejected('unknown enemy reference', (candidate) => { candidate.enemyPools[0].unitIds[0] = 'U999'; });
 expectRejected('stage enemy pool regression', (candidate) => { candidate.stages[1].enemyPoolId = 'POOL_01'; });
+expectRejected('flat stage difficulty sequence', (candidate) => {
+  candidate.stages.forEach((stage) => { stage.difficulty = 'STANDARD'; });
+}, 'config.stages[2].difficulty');
+expectRejected('regressing stage special rule sequence', (candidate) => {
+  candidate.stages[1].specialRule = candidate.stages[0].specialRule;
+  candidate.floors.slice(5, 10).forEach((floor) => { floor.rules.specialRule = candidate.stages[1].specialRule; });
+}, 'config.stages[1].specialRule');
+expectRejected('homogeneous enemy pools', (candidate) => {
+  const sharedUnitIds = [...candidate.enemyPools[0].unitIds];
+  candidate.enemyPools.forEach((pool) => { pool.unitIds = [...sharedUnitIds]; });
+  candidate.floors.forEach((floor) => { floor.enemyIds = ['U001', 'U002']; });
+}, 'config.enemyPools[1].unitIds');
+expectRejected('fixed floor enemy combination', (candidate) => {
+  candidate.floors.forEach((floor) => { floor.enemyIds = ['U001', 'U002']; });
+}, 'config.floors[1].enemyIds');
 expectRejected('unknown field', (candidate) => { candidate.floors[0].rules.extra = true; });
 expectRejected('regressing threat', (candidate) => {
   candidate.floors[25].rules.threatMultiplierPercent = candidate.floors[24].rules.threatMultiplierPercent;
@@ -61,4 +77,4 @@ expectRejected('regressing threat', (candidate) => {
 
 console.log(`tower config loaded: ${loaded.floors.length} floors, ${loaded.stages.length} stages, ${loaded.enemyPools.length} enemy pools`);
 console.log('progression checks passed: threat, enemy cap, action interval, round limit');
-console.log('rejection checks passed: missing floor, boundary, unknown enemy, pool regression, unknown field, regression');
+console.log('rejection checks passed: missing floor, boundary, unknown enemy, pool/stage progression, enemy variation, unknown field, regression');
