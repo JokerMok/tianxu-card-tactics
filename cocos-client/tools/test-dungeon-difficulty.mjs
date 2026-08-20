@@ -81,6 +81,7 @@ expectError('settled run', () => service.settleRun(normalRun.runId, 'won'), 'RUN
 expectError('unknown settled run id', () => service.settleRun('unknown-after-settle', 'won'), 'RUN_NOT_FOUND');
 
 const normalRepeatRun = service.startRun('NORMAL');
+assert.equal(normalRepeatRun.runId, 'dungeon-normal-2');
 const normalRepeat = service.settleRun(normalRepeatRun.runId, 'won');
 assert.equal(normalRepeat.firstClear, false);
 assert.deepEqual(normalRepeat.rewards, normalDefinition.repeatClearRewards);
@@ -90,6 +91,7 @@ assert.equal(progress(service, 'HARD').attemptsUsed, 0);
 
 const normalBeforeHardFailure = progress(service, 'NORMAL');
 const hardFailureRun = service.startRun('HARD');
+assert.equal(hardFailureRun.runId, 'dungeon-hard-3');
 const hardFailure = service.settleRun(hardFailureRun.runId, 'lost');
 assert.equal(hardFailure.firstClear, false);
 assert.deepEqual(hardFailure.rewards, [], 'failed run must not grant rewards');
@@ -98,6 +100,7 @@ assert.equal(progress(service, 'HARD').attemptsUsed, 1);
 assert.deepEqual(progress(service, 'NORMAL'), normalBeforeHardFailure, 'hard failure must not change normal progress');
 
 const hardSecondRun = service.startRun('HARD');
+assert.equal(hardSecondRun.runId, 'dungeon-hard-4');
 const hardFirstClear = service.settleRun(hardSecondRun.runId, 'won');
 assert.equal(hardFirstClear.firstClear, true);
 assert.deepEqual(hardFirstClear.rewards, hardDefinition.firstClearRewards);
@@ -107,6 +110,7 @@ expectError('hard attempt exhaustion', () => service.startRun('HARD'), 'ATTEMPTS
 assert.equal(progress(service, 'NORMAL').attemptsRemaining, 1, 'hard exhaustion must not consume normal attempts');
 
 const normalLastRun = service.startRun('NORMAL');
+assert.equal(normalLastRun.runId, 'dungeon-normal-5');
 const normalFailure = service.settleRun(normalLastRun.runId, 'lost');
 assert.deepEqual(normalFailure.rewards, []);
 assert.equal(progress(service, 'NORMAL').attemptsRemaining, 0);
@@ -154,6 +158,34 @@ const mismatchedAttemptState = JSON.parse(activeService.save());
 mismatchedAttemptState.activeRuns[0].attemptNumber = 2;
 expectError('active run attempt mismatch', () => restoreDungeonDifficultyState(JSON.stringify(mismatchedAttemptState)), 'INVALID_STATE');
 
+for (const difficultyId of ['NORMAL', 'HARD']) {
+  const forgedProgressState = JSON.parse(activeService.save());
+  const forgedProgress = forgedProgressState.progress.find((candidate) => candidate.difficultyId === difficultyId);
+  assert(forgedProgress);
+  forgedProgress.clearCount = forgedProgress.attemptsUsed + 1;
+  expectError(`forged ${difficultyId} clear progress`, () => restoreDungeonDifficultyState(JSON.stringify(forgedProgressState)), 'INVALID_STATE');
+}
+const negativeProgressState = JSON.parse(activeService.save());
+negativeProgressState.progress[1].attemptsUsed = -1;
+expectError('negative difficulty progress', () => restoreDungeonDifficultyState(JSON.stringify(negativeProgressState)), 'INVALID_STATE');
+const inconsistentProgressState = JSON.parse(activeService.save());
+inconsistentProgressState.progress[0].activeRunId = null;
+expectError('settled attempts without outcome', () => restoreDungeonDifficultyState(JSON.stringify(inconsistentProgressState)), 'INVALID_STATE');
+
+const rolledBackRunNumberState = JSON.parse(activeService.save());
+rolledBackRunNumberState.nextRunNumber = 1;
+expectError('rolled-back next run number', () => restoreDungeonDifficultyState(JSON.stringify(rolledBackRunNumberState)), 'INVALID_STATE');
+const historicalRunIdConflictState = JSON.parse(activeService.save());
+historicalRunIdConflictState.nextRunNumber = 3;
+historicalRunIdConflictState.settledRunIds = ['dungeon-normal-3'];
+expectError('historical run id conflicts with next run', () => restoreDungeonDifficultyState(JSON.stringify(historicalRunIdConflictState)), 'INVALID_STATE');
+const duplicateSettledRunState = JSON.parse(service.save());
+duplicateSettledRunState.settledRunIds.push(duplicateSettledRunState.settledRunIds[0]);
+expectError('duplicate settled run id', () => restoreDungeonDifficultyState(JSON.stringify(duplicateSettledRunState)), 'INVALID_STATE');
+const activeSettledConflictState = JSON.parse(activeService.save());
+activeSettledConflictState.settledRunIds = [activeSettledConflictState.activeRuns[0].runId];
+expectError('active and settled run id conflict', () => restoreDungeonDifficultyState(JSON.stringify(activeSettledConflictState)), 'INVALID_STATE');
+
 const invalidConfigs = [
   ['duplicate difficulty', (candidate) => { candidate[1].id = candidate[0].id; }],
   ['wrong stage count', (candidate) => { candidate[0].stages.pop(); }],
@@ -173,6 +205,18 @@ for (const [label, mutate] of invalidConfigs) {
 
 assert.throws(() => { normalDefinition.displayName = 'mutated'; }, TypeError, 'configuration must be deeply frozen');
 assert.equal(normalDefinition.displayName, '普通');
-assert(saves.length >= 7, 'successful starts and settlements must be persisted');
+assert.equal(saves.length, 10, 'each successful start and settlement must be persisted exactly once');
+const persistedStates = saves.map((serialized) => JSON.parse(serialized));
+assert.deepEqual(
+  persistedStates.map(({ nextRunNumber }) => nextRunNumber),
+  [2, 2, 3, 3, 4, 4, 5, 5, 6, 6],
+  'persisted run numbers must advance without rollback',
+);
+for (const [index, persistedState] of persistedStates.entries()) {
+  const runIds = [...persistedState.activeRuns.map(({ runId }) => runId), ...persistedState.settledRunIds];
+  assert.equal(new Set(runIds).size, runIds.length, `persisted state ${index + 1} must not duplicate active or settled run ids`);
+  assert(persistedState.settledRunIds.every((runId) => !persistedState.activeRuns.some((run) => run.runId === runId)));
+}
+assert.equal(negativeCases, 34, 'all expected negative and regression cases must execute');
 
 console.log(`T217 dungeon difficulty PASS: difficulties=${DEFAULT_DUNGEON_DIFFICULTY_CONFIG.length}, stages=${normalDefinition.stages.length}, rewards=${normalDefinition.firstClearRewards.length + hardDefinition.firstClearRewards.length}, negative-cases=${negativeCases}, saves=${saves.length}`);
