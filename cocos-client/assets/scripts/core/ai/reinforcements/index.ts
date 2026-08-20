@@ -202,6 +202,16 @@ function uniqueEnumArray<T extends string>(value: unknown, values: ReadonlySet<T
   return result;
 }
 
+function cloneDeep<T>(value: T): T {
+  if (Array.isArray(value)) return value.map((child) => cloneDeep(child)) as T;
+  if (isRecord(value)) {
+    const copy: Record<string, unknown> = {};
+    for (const [key, child] of Object.entries(value)) copy[key] = cloneDeep(child);
+    return copy as T;
+  }
+  return value;
+}
+
 function freezeDeep<T>(value: T): T {
   if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
     for (const child of Object.values(value as Record<string, unknown>)) freezeDeep(child);
@@ -210,8 +220,12 @@ function freezeDeep<T>(value: T): T {
   return value;
 }
 
+function freezeCopy<T>(value: T): T {
+  return freezeDeep(cloneDeep(value));
+}
+
 function copyConfig(config: ReinforcementRosterConfig): ReinforcementRosterConfig {
-  return freezeDeep({
+  return freezeCopy({
     id: config.id,
     version: config.version,
     reinforcements: config.reinforcements.map((unit) => ({
@@ -256,7 +270,7 @@ function validateUnitConfig(value: unknown, path: string): ReinforcementConfig {
   const recoverHp = safeInteger(value.recovery.recoverHp, `${path}.recovery.recoverHp`, 1);
   if (recoverHp > maxHp) throw new ReinforcementConfigError(`${path}.recovery.recoverHp`, '不得超过 maxHp');
   const maxUses = safeInteger(value.recovery.maxUses, `${path}.recovery.maxUses`, 0);
-  if (maxUses > maxOccurrences) throw new ReinforcementConfigError(`${path}.recovery.maxUses`, '不得超过 downed.maxOccurrences');
+  if (maxOccurrences > maxUses) throw new ReinforcementConfigError(`${path}.downed.maxOccurrences`, '不得超过 recovery.maxUses');
   if (!downedEnabled && maxUses !== 0) throw new ReinforcementConfigError(`${path}.recovery.maxUses`, '禁用倒地时恢复次数必须为 0');
 
   return {
@@ -343,12 +357,17 @@ function addEvent(
   patch: Partial<ReinforcementState> = {},
 ): ReinforcementState {
   if (state.nextEventId >= Number.MAX_SAFE_INTEGER) stateError('INVALID_STATE', 'event id would overflow');
-  const event: ReinforcementEvent = { eventId: state.nextEventId, round: state.round, type, payload };
-  return freezeDeep({ ...state, ...patch, events: [...state.events, event], nextEventId: state.nextEventId + 1 });
+  const event: ReinforcementEvent = {
+    eventId: state.nextEventId,
+    round: state.round,
+    type,
+    payload: cloneDeep(payload),
+  };
+  return freezeCopy({ ...state, ...patch, events: [...state.events, event], nextEventId: state.nextEventId + 1 });
 }
 
 function replaceRuntime(state: ReinforcementState, runtime: ReinforcementRuntimeState): ReinforcementState {
-  return freezeDeep({ ...state, reinforcements: state.reinforcements.map((item) => item.id === runtime.id ? runtime : item) });
+  return freezeCopy({ ...state, reinforcements: state.reinforcements.map((item) => item.id === runtime.id ? runtime : item) });
 }
 
 function assertSafeStateNumber(value: unknown, path: string, minimum: number): number {
@@ -377,6 +396,9 @@ function validateRuntime(value: unknown, config: ReinforcementConfig, path: stri
   if (value.status === 'DOWNED' && (downCount === 0 || downedAtRound === null || recoveryReadyRound === null || recoveryReadyRound < downedAtRound)) {
     stateError('INVALID_STATE', `${path} downed metadata is invalid`);
   }
+  if (value.status === 'DOWNED' && recoveriesUsed >= config.recovery.maxUses) {
+    stateError('INVALID_STATE', `${path} is downed with an exhausted recovery budget`);
+  }
   if (value.status === 'ACTIVE' && (downedAtRound !== null || recoveryReadyRound !== null)) stateError('INVALID_STATE', `${path} has stale downed metadata`);
   return {
     id: value.id as string, profession: value.profession as ReinforcementProfession, battleRole: value.battleRole as ReinforcementBattleRole,
@@ -393,7 +415,7 @@ function validateEvent(value: unknown, index: number, stateRound: number): Reinf
   if (round > stateRound || typeof value.type !== 'string' || !EVENT_TYPES.has(value.type as ReinforcementEventType) || !isRecord(value.payload)) {
     stateError('INVALID_STATE', `events[${index}] has invalid fields`);
   }
-  return { eventId, round, type: value.type as ReinforcementEventType, payload: { ...value.payload } };
+  return { eventId, round, type: value.type as ReinforcementEventType, payload: cloneDeep(value.payload) };
 }
 
 export function validateReinforcementState(configInput: unknown, value: unknown): ReinforcementState {
@@ -418,7 +440,7 @@ export function validateReinforcementState(configInput: unknown, value: unknown)
   const processedActionIds = [...value.processedActionIds] as string[];
   if (new Set(processedActionIds).size !== processedActionIds.length) stateError('INVALID_STATE', 'processedActionIds must be unique');
   const nextActionSequence = assertSafeStateNumber(value.nextActionSequence, 'state.nextActionSequence', 1);
-  return freezeDeep({
+  return freezeCopy({
     schemaVersion: REINFORCEMENT_SAVE_SCHEMA_VERSION, configId: config.id, round, reinforcements, events,
     nextEventId, processedActionIds, nextActionSequence,
   });
@@ -430,7 +452,7 @@ export function createReinforcementState(configInput: unknown = DEFAULT_REINFORC
   const config = validateReinforcementConfig(configInput);
   const round = options.round ?? 0;
   if (!Number.isSafeInteger(round) || round < 0) throw new ReinforcementStateError('INVALID_STATE', 'initial round is invalid');
-  return freezeDeep({
+  return freezeCopy({
     schemaVersion: REINFORCEMENT_SAVE_SCHEMA_VERSION,
     configId: config.id,
     round,
@@ -464,7 +486,11 @@ export function damageReinforcement(configInput: unknown, stateInput: Reinforcem
     const next = replaceRuntime(state, { ...runtime, hp });
     return addEvent(next, 'REINFORCEMENT_DAMAGED', { id, amount, hp });
   }
-  if (unitConfig.downed.enabled && runtime.downCount < unitConfig.downed.maxOccurrences) {
+  if (
+    unitConfig.downed.enabled
+    && runtime.downCount < unitConfig.downed.maxOccurrences
+    && runtime.recoveriesUsed < unitConfig.recovery.maxUses
+  ) {
     if (state.round > Number.MAX_SAFE_INTEGER - unitConfig.recovery.delayRounds) stateError('INVALID_STATE', 'recovery round would overflow');
     const downed = {
       ...runtime, status: 'DOWNED' as const, hp: 0, downCount: runtime.downCount + 1,
@@ -479,7 +505,13 @@ export function damageReinforcement(configInput: unknown, stateInput: Reinforcem
 }
 
 function recoverInternal(config: ReinforcementConfig, state: ReinforcementState, runtime: ReinforcementRuntimeState): ReinforcementState {
-  if (runtime.status !== 'DOWNED' || runtime.recoveryReadyRound === null || state.round < runtime.recoveryReadyRound) return state;
+  if (
+    runtime.status !== 'DOWNED'
+    || runtime.downedAtRound === null
+    || runtime.recoveryReadyRound === null
+    || state.round <= runtime.downedAtRound
+    || state.round < runtime.recoveryReadyRound
+  ) return state;
   if (runtime.recoveriesUsed >= config.recovery.maxUses) return state;
   const recovered = {
     ...runtime, status: 'ACTIVE' as const, hp: config.recovery.recoverHp, recoveriesUsed: runtime.recoveriesUsed + 1,
@@ -494,16 +526,14 @@ export function recoverReinforcement(configInput: unknown, stateInput: Reinforce
   const { config, state } = checkedState(configInput, stateInput);
   const unitConfig = configFor(config, id);
   const runtime = runtimeById(state, id);
-  if (runtime.status !== 'DOWNED' || runtime.recoveryReadyRound === null || state.round < runtime.recoveryReadyRound || runtime.recoveriesUsed >= unitConfig.recovery.maxUses) {
-    return stateInput;
-  }
-  return recoverInternal(unitConfig, state, runtime);
+  const recovered = recoverInternal(unitConfig, state, runtime);
+  return recovered === state ? stateInput : recovered;
 }
 
 export function advanceReinforcementRound(configInput: unknown, stateInput: ReinforcementState): ReinforcementState {
   const { config, state } = checkedState(configInput, stateInput);
   if (state.round >= Number.MAX_SAFE_INTEGER) stateError('INVALID_STATE', 'round would overflow');
-  let next = addEvent(freezeDeep({ ...state, round: state.round + 1 }), 'ROUND_ADVANCED', { round: state.round + 1 });
+  let next = addEvent(freezeCopy({ ...state, round: state.round + 1 }), 'ROUND_ADVANCED', { round: state.round + 1 });
   for (const unit of config.reinforcements) {
     if (unit.recovery.trigger !== 'ROUND_START') continue;
     next = recoverInternal(unit, next, runtimeById(next, unit.id));
@@ -637,7 +667,7 @@ export function executeReinforcementAction(configInput: unknown, stateInput: Rei
   }
   if (state.nextActionSequence >= Number.MAX_SAFE_INTEGER) stateError('INVALID_STATE', 'action sequence would overflow');
   const processedActionIds = [...state.processedActionIds, action.actionId];
-  const actionState = freezeDeep({ ...state, processedActionIds, nextActionSequence: state.nextActionSequence + 1 });
+  const actionState = freezeCopy({ ...state, processedActionIds, nextActionSequence: state.nextActionSequence + 1 });
   const next = addEvent(actionState, 'ACTION_EXECUTED', { actionId: action.actionId, actorId: action.actorId, type: action.type, targetId: action.targetId });
   return { state: next, effects: effect ? [effect] : [], applied: true, idempotent: false };
 }
@@ -663,12 +693,11 @@ function validateSerializableState(value: unknown): ReinforcementState {
   const processedActionIds = [...value.processedActionIds] as string[];
   if (processedActionIds.some((id) => typeof id !== 'string' || id.length === 0) || new Set(processedActionIds).size !== processedActionIds.length) stateError('INVALID_STATE', 'processedActionIds is invalid');
   const nextActionSequence = assertSafeStateNumber(value.nextActionSequence, 'state.nextActionSequence', 1);
-  return freezeDeep({ schemaVersion: REINFORCEMENT_SAVE_SCHEMA_VERSION, configId: value.configId, round, reinforcements, events, nextEventId, processedActionIds, nextActionSequence } as ReinforcementState);
+  return freezeCopy({ schemaVersion: REINFORCEMENT_SAVE_SCHEMA_VERSION, configId: value.configId, round, reinforcements, events, nextEventId, processedActionIds, nextActionSequence } as ReinforcementState);
 }
 
 export function serializeReinforcementState(state: ReinforcementState): string {
-  validateSerializableState(state);
-  return JSON.stringify(state);
+  return JSON.stringify(validateSerializableState(state));
 }
 
 export function restoreReinforcementState(configInput: unknown, serialized: string | unknown): ReinforcementState {

@@ -49,8 +49,12 @@ expectConfigError('invalid profession', (candidate) => { candidate.reinforcement
 expectConfigError('empty priorities', (candidate) => { candidate.reinforcements[0].targetPriority = []; }, 'reinforcements.reinforcements[0].targetPriority');
 expectConfigError('duplicate action', (candidate) => { candidate.reinforcements[0].actionPriority[1] = 'REVIVE'; }, 'reinforcements.reinforcements[0].actionPriority');
 expectConfigError('invalid recovery hp', (candidate) => { candidate.reinforcements[0].recovery.recoverHp = 99; }, 'reinforcements.reinforcements[0].recovery.recoverHp');
-expectConfigError('recovery over max uses', (candidate) => { candidate.reinforcements[0].recovery.maxUses = 2; }, 'reinforcements.reinforcements[0].recovery.maxUses');
+expectConfigError('downed occurrences over recovery budget', (candidate) => { candidate.reinforcements[0].downed.maxOccurrences = 2; }, 'reinforcements.reinforcements[0].downed.maxOccurrences');
 expectConfigError('disabled downed with occurrences', (candidate) => { candidate.reinforcements[0].downed.enabled = false; }, 'reinforcements.reinforcements[0].downed.maxOccurrences');
+
+const extraRecoveryBudget = clone(DEFAULT_REINFORCEMENT_CONFIG);
+extraRecoveryBudget.reinforcements[0].recovery.maxUses = 2;
+assert.doesNotThrow(() => validateReinforcementConfig(extraRecoveryBudget), 'a recovery budget may exceed the downed occurrence cap');
 
 const configurable = clone(DEFAULT_REINFORCEMENT_CONFIG);
 configurable.reinforcements[1].profession = 'MYSTIC';
@@ -60,6 +64,20 @@ configurable.reinforcements[1].recovery.recoverHp = 10;
 const customConfig = validateReinforcementConfig(configurable);
 assert.equal(customConfig.reinforcements[1].profession, 'MYSTIC');
 assert.deepEqual(customConfig.reinforcements[1].targetPriority, ['LOWEST_HP_ENEMY', 'BOSS']);
+
+const delayZeroConfigValue = clone(DEFAULT_REINFORCEMENT_CONFIG);
+delayZeroConfigValue.reinforcements[0].recovery.delayRounds = 0;
+const delayZeroConfig = validateReinforcementConfig(delayZeroConfigValue);
+const delayZeroDowned = damageReinforcement(delayZeroConfig, createReinforcementState(delayZeroConfig), 'C001', 999);
+assert.equal(delayZeroDowned.reinforcements[0].recoveryReadyRound, 0);
+assert.strictEqual(
+  recoverReinforcement(delayZeroConfig, delayZeroDowned, 'C001'),
+  delayZeroDowned,
+  'ROUND_START recovery with delay=0 must wait for a round boundary',
+);
+const delayZeroRecovered = advanceReinforcementRound(delayZeroConfig, delayZeroDowned);
+assert.equal(delayZeroRecovered.round, 1);
+assert.equal(delayZeroRecovered.reinforcements[0].status, 'ACTIVE');
 
 let state = createReinforcementState(DEFAULT_REINFORCEMENT_CONFIG);
 assert.equal(state.round, 0);
@@ -115,9 +133,11 @@ assert.equal(downedState.reinforcements[2].recoveryReadyRound, 2);
 assert.equal(downedState.events.at(-1).type, 'REINFORCEMENT_DOWNED');
 const repeatedDamage = damageReinforcement(DEFAULT_REINFORCEMENT_CONFIG, downedState, 'C003', 999);
 assert.strictEqual(repeatedDamage, downedState, 'damage on a downed unit is idempotent');
+assert.strictEqual(recoverReinforcement(DEFAULT_REINFORCEMENT_CONFIG, downedState, 'C003'), downedState, 'delay>0 recovery must reject before its boundary');
 const beforeRecovery = advanceReinforcementRound(DEFAULT_REINFORCEMENT_CONFIG, downedState);
 assert.equal(beforeRecovery.round, 1);
 assert.equal(beforeRecovery.reinforcements[2].status, 'DOWNED');
+assert.strictEqual(recoverReinforcement(DEFAULT_REINFORCEMENT_CONFIG, beforeRecovery, 'C003'), beforeRecovery, 'delay>0 recovery must reject before the ready round');
 const recovered = advanceReinforcementRound(DEFAULT_REINFORCEMENT_CONFIG, beforeRecovery);
 assert.equal(recovered.round, 2);
 assert.equal(recovered.reinforcements[2].status, 'ACTIVE');
@@ -127,6 +147,10 @@ assert.equal(recovered.events.at(-1).type, 'REINFORCEMENT_RECOVERED');
 assert.strictEqual(recoverReinforcement(DEFAULT_REINFORCEMENT_CONFIG, recovered, 'C003'), recovered, 'recovery after active is idempotent');
 const defeated = damageReinforcement(DEFAULT_REINFORCEMENT_CONFIG, recovered, 'C003', 999);
 assert.equal(defeated.reinforcements[2].status, 'DEFEATED', 'an exhausted recovery budget must defeat the unit');
+assert.equal(defeated.reinforcements[2].downCount, 1);
+assert.equal(defeated.reinforcements[2].recoveriesUsed, 1);
+assert.equal(defeated.events.at(-1).type, 'REINFORCEMENT_DEFEATED');
+assert.strictEqual(recoverReinforcement(DEFAULT_REINFORCEMENT_CONFIG, defeated, 'C003'), defeated, 'DEFEATED units cannot re-enter recovery');
 assert.strictEqual(damageReinforcement(DEFAULT_REINFORCEMENT_CONFIG, defeated, 'C003', 1), defeated);
 assert.equal(planReinforcementAction(DEFAULT_REINFORCEMENT_CONFIG, defeated, 'C003', fullContext).action, null);
 
@@ -135,8 +159,10 @@ manualConfigValue.reinforcements[0].recovery.trigger = 'MANUAL';
 manualConfigValue.reinforcements[0].recovery.delayRounds = 0;
 const manualConfig = validateReinforcementConfig(manualConfigValue);
 const manualDowned = damageReinforcement(manualConfig, createReinforcementState(manualConfig), 'C001', 999);
-assert.equal(advanceReinforcementRound(manualConfig, manualDowned).reinforcements[0].status, 'DOWNED');
-const manuallyRecovered = recoverReinforcement(manualConfig, manualDowned, 'C001');
+assert.strictEqual(recoverReinforcement(manualConfig, manualDowned, 'C001'), manualDowned, 'manual recovery also requires a completed round boundary');
+const manualAfterRound = advanceReinforcementRound(manualConfig, manualDowned);
+assert.equal(manualAfterRound.reinforcements[0].status, 'DOWNED');
+const manuallyRecovered = recoverReinforcement(manualConfig, manualAfterRound, 'C001');
 assert.equal(manuallyRecovered.reinforcements[0].status, 'ACTIVE');
 assert.equal(manuallyRecovered.reinforcements[0].hp, 6);
 
@@ -155,6 +181,21 @@ assert.deepEqual(restored, reviveResult.state, 'valid save must restore exact ru
 assert.equal(serializeReinforcementState(restored), saved, 'save serialization must be deterministic');
 assert.notStrictEqual(restored, reviveResult.state);
 assert.notStrictEqual(restored.reinforcements, reviveResult.state.reinforcements);
+const serializeMutationProbe = JSON.parse(saved);
+serializeMutationProbe.events[0].payload = { nested: { marker: 'original' } };
+const serializeNestedPayload = serializeMutationProbe.events[0].payload.nested;
+const serializedProbe = serializeReinforcementState(serializeMutationProbe);
+assert.equal(Object.isFrozen(serializeNestedPayload), false, 'serialization must not freeze caller payloads');
+serializeNestedPayload.marker = 'changed-after-serialize';
+assert.match(serializedProbe, /original/, 'serialization must use the cloned payload');
+const restoreMutationProbe = JSON.parse(saved);
+restoreMutationProbe.events[0].payload = { nested: { marker: 'original' } };
+const restoreNestedPayload = restoreMutationProbe.events[0].payload.nested;
+const restoredMutationProbe = restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, restoreMutationProbe);
+assert.equal(Object.isFrozen(restoreNestedPayload), false, 'restore must not freeze caller payloads');
+restoreNestedPayload.marker = 'changed-after-restore';
+assert.equal(restoredMutationProbe.events[0].payload.nested.marker, 'original');
+assert.equal(Object.isFrozen(restoredMutationProbe.events[0].payload.nested), true, 'restored payload must be frozen');
 const corrupted = JSON.parse(saved);
 corrupted.reinforcements[0].hp = 999;
 assert.throws(() => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, JSON.stringify(corrupted)), /ACTIVE/);
@@ -166,6 +207,12 @@ badVersion.schemaVersion = 2;
 assert.throws(() => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, JSON.stringify(badVersion)), (error) => error instanceof ReinforcementStateError && error.code === 'INVALID_SAVE');
 assert.throws(() => restoreReinforcementState({ ...DEFAULT_REINFORCEMENT_CONFIG, id: 'other' }, saved), (error) => error instanceof ReinforcementStateError && error.code === 'CONFIG_MISMATCH');
 assert.throws(() => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, '{'), /valid JSON/);
+const exhaustedDownedSave = JSON.parse(serializeReinforcementState(recovered));
+exhaustedDownedSave.reinforcements[2].status = 'DOWNED';
+exhaustedDownedSave.reinforcements[2].hp = 0;
+exhaustedDownedSave.reinforcements[2].downedAtRound = recovered.round;
+exhaustedDownedSave.reinforcements[2].recoveryReadyRound = recovered.round;
+assert.throws(() => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, exhaustedDownedSave), /exhausted recovery budget/);
 
 const noDownedConfigValue = clone(DEFAULT_REINFORCEMENT_CONFIG);
 noDownedConfigValue.reinforcements[2].downed = { enabled: false, maxOccurrences: 0 };
