@@ -43,6 +43,8 @@ export type RevealRewardState = Readonly<{
 
 export type RevealRewardPersistence = (serialized: string) => void;
 
+export type RevealRewardDayKeySource = string | (() => string);
+
 export type RevealResultCode =
   | 'APPLIED'
   | 'DUPLICATE'
@@ -59,7 +61,7 @@ export type RevealResult = Readonly<{
   source: RevealClaimSource | null;
 }>;
 
-export type RevealMutationCode = 'APPLIED' | 'DUPLICATE' | 'LIMIT_REACHED';
+export type RevealMutationCode = 'APPLIED' | 'DUPLICATE' | 'LIMIT_REACHED' | 'NO_OP';
 
 export type RevealMutationResult = Readonly<{
   applied: boolean;
@@ -81,6 +83,7 @@ export type RevealRewardErrorCode =
   | 'SESSION_NOT_FOUND'
   | 'SESSION_EXISTS'
   | 'SESSION_EXPIRED'
+  | 'FUTURE_DAY'
   | 'CARD_NOT_FOUND'
   | 'CARD_ALREADY_REVEALED'
   | 'PERSISTENCE_FAILED'
@@ -174,6 +177,17 @@ function assertDayKey(value: unknown, path: string, code: RevealRewardErrorCode)
   }
 }
 
+function systemTodayDayKey(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function resolveTodayDayKey(source: RevealRewardDayKeySource | undefined): string {
+  const value = typeof source === 'function' ? source() : (source ?? systemTodayDayKey());
+  assertDayKey(value, 'todayDayKey', 'INVALID_CONFIG');
+  return value;
+}
+
 function assertResourceMap(value: unknown, path: string, code: RevealRewardErrorCode): asserts value is RevealRewardAmounts {
   if (!isPlainRecord(value) || Object.keys(value).length === 0) fail(code, `${path} must be a non-empty resource map`);
   const ownKeys = Reflect.ownKeys(value);
@@ -236,7 +250,11 @@ function normalizeConfig(value: unknown): RevealRewardConfig {
   return freezeDeep(clone(value));
 }
 
-function validateState(value: unknown, config?: RevealRewardConfig): asserts value is RevealRewardState {
+function validateState(
+  value: unknown,
+  config?: RevealRewardConfig,
+  todayDayKey?: string,
+): asserts value is RevealRewardState {
   if (!isPlainRecord(value)) fail('INVALID_STATE', 'reveal reward state must be an object');
   exactKeys(value, [
     'schemaVersion',
@@ -251,6 +269,9 @@ function validateState(value: unknown, config?: RevealRewardConfig): asserts val
   ], 'state', 'INVALID_STATE');
   if (value.schemaVersion !== REVEAL_REWARD_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported reveal reward schema version');
   assertDayKey(value.dayKey, 'state.dayKey', 'INVALID_STATE');
+  if (todayDayKey !== undefined && value.dayKey > todayDayKey) {
+    fail('INVALID_STATE', `state.dayKey ${value.dayKey} is after todayDayKey ${todayDayKey}`);
+  }
   assertNonNegativeInteger(value.freeClaimsUsed, 'state.freeClaimsUsed', 'INVALID_STATE');
   assertNonNegativeInteger(value.additionalClaimsGranted, 'state.additionalClaimsGranted', 'INVALID_STATE');
   assertNonNegativeInteger(value.additionalClaimsUsed, 'state.additionalClaimsUsed', 'INVALID_STATE');
@@ -282,6 +303,9 @@ function validateState(value: unknown, config?: RevealRewardConfig): asserts val
     sessionIds.add(session.sessionId);
     assertTrimmedString(session.poolId, `${path}.poolId`, 'INVALID_STATE');
     assertDayKey(session.createdDayKey, `${path}.createdDayKey`, 'INVALID_STATE');
+    if (todayDayKey !== undefined && session.createdDayKey > todayDayKey) {
+      fail('INVALID_STATE', `${path}.createdDayKey ${session.createdDayKey} is after todayDayKey ${todayDayKey}`);
+    }
     assertKeyList(session.claimedCardIds, `${path}.claimedCardIds`, 'INVALID_STATE');
     if (config !== undefined) {
       const pool = config.pools.find((candidate) => candidate.id === session.poolId);
@@ -309,10 +333,14 @@ function assertDayArgument(value: unknown, path: string): asserts value is strin
   assertDayKey(value, path, 'INVALID_ARGUMENT');
 }
 
-function initialState(config: RevealRewardConfig, resources: Readonly<Record<string, number>> = { gold: 0, essence: 0 }): RevealRewardState {
+function initialState(
+  config: RevealRewardConfig,
+  todayDayKey: string,
+  resources: Readonly<Record<string, number>> = { gold: 0, essence: 0 },
+): RevealRewardState {
   const next = {
     schemaVersion: REVEAL_REWARD_SCHEMA_VERSION,
-    dayKey: '1970-01-01',
+    dayKey: todayDayKey,
     freeClaimsUsed: 0,
     additionalClaimsGranted: 0,
     additionalClaimsUsed: 0,
@@ -321,7 +349,7 @@ function initialState(config: RevealRewardConfig, resources: Readonly<Record<str
     processedGrantKeys: [],
     sessions: [],
   } satisfies RevealRewardState;
-  validateState(next, config);
+  validateState(next, config, todayDayKey);
   return copyState(next);
 }
 
@@ -399,15 +427,17 @@ export function serializeRevealRewardState(state: RevealRewardState): string {
 export function restoreRevealRewardState(
   serialized: string,
   config: RevealRewardConfig = DEFAULT_REVEAL_REWARD_CONFIG,
+  todayDayKey?: RevealRewardDayKeySource,
 ): RevealRewardState {
   const normalizedConfig = normalizeConfig(config);
+  const currentDayKey = resolveTodayDayKey(todayDayKey);
   let parsed: unknown;
   try {
     parsed = JSON.parse(serialized);
   } catch {
     fail('INVALID_STATE', 'reveal reward state is not valid JSON');
   }
-  validateState(parsed, normalizedConfig);
+  validateState(parsed, normalizedConfig, currentDayKey);
   return copyState(parsed);
 }
 
@@ -416,6 +446,8 @@ export type RevealRewardServiceOptions = Readonly<{
   initialState?: string | RevealRewardState;
   resources?: Readonly<Record<string, number>>;
   persist?: RevealRewardPersistence;
+  /** Inject the current business day for deterministic tests; defaults to the local calendar day. */
+  todayDayKey?: RevealRewardDayKeySource;
 }>;
 
 /**
@@ -430,6 +462,7 @@ export type RevealRewardServiceOptions = Readonly<{
 export class RevealRewardService {
   private readonly config: RevealRewardConfig;
   private readonly persist: RevealRewardPersistence;
+  private readonly todayDayKey: RevealRewardDayKeySource;
   private current: RevealRewardState;
   private committing = false;
 
@@ -437,12 +470,14 @@ export class RevealRewardService {
     this.config = normalizeConfig(options.config ?? DEFAULT_REVEAL_REWARD_CONFIG);
     this.persist = options.persist ?? (() => {});
     if (typeof this.persist !== 'function') fail('INVALID_CONFIG', 'persist must be a function');
+    this.todayDayKey = options.todayDayKey ?? systemTodayDayKey;
+    const currentDayKey = this.currentBusinessDay();
     if (options.initialState === undefined) {
-      this.current = initialState(this.config, options.resources);
+      this.current = initialState(this.config, currentDayKey, options.resources);
     } else if (typeof options.initialState === 'string') {
-      this.current = restoreRevealRewardState(options.initialState, this.config);
+      this.current = restoreRevealRewardState(options.initialState, this.config, currentDayKey);
     } else {
-      validateState(options.initialState, this.config);
+      validateState(options.initialState, this.config, currentDayKey);
       this.current = copyState(options.initialState);
     }
   }
@@ -485,10 +520,11 @@ export class RevealRewardService {
     return { reset: true, state: this.current };
   }
 
-  openSession(sessionId: string, poolId: string, dayKey = this.current.dayKey): RevealMutationResult {
+  openSession(sessionId: string, poolId: string, dayKey = this.currentBusinessDay()): RevealMutationResult {
     assertBusinessKey(sessionId, 'sessionId');
     assertBusinessKey(poolId, 'poolId');
     assertDayArgument(dayKey, 'dayKey');
+    this.assertNotFuture(dayKey);
     poolFor(this.config, poolId);
 
     const existing = this.current.sessions.find((candidate) => candidate.sessionId === sessionId);
@@ -509,19 +545,16 @@ export class RevealRewardService {
     return { applied: true, code: 'APPLIED', state: this.current };
   }
 
-  createSession(sessionId: string, poolId: string, dayKey = this.current.dayKey): RevealMutationResult {
+  createSession(sessionId: string, poolId: string, dayKey = this.currentBusinessDay()): RevealMutationResult {
     return this.openSession(sessionId, poolId, dayKey);
   }
 
   grantAdditionalClaims(
     businessKey: string,
     countOrDayKey: number | string = this.config.additionalClaimsPerCompletion,
-    dayKey = this.current.dayKey,
+    dayKey = this.currentBusinessDay(),
   ): RevealMutationResult {
     assertBusinessKey(businessKey, 'businessKey');
-    if (this.current.processedGrantKeys.includes(businessKey)) {
-      return { applied: false, code: 'DUPLICATE', state: this.current };
-    }
 
     let count: number;
     let effectiveDayKey = dayKey;
@@ -531,9 +564,21 @@ export class RevealRewardService {
     } else {
       count = countOrDayKey;
     }
-    assertPositiveInteger(count, 'additionalClaims', 'INVALID_ARGUMENT');
+    assertNonNegativeInteger(count, 'additionalClaims', 'INVALID_ARGUMENT');
     assertDayArgument(effectiveDayKey, 'dayKey');
+    this.assertNotFuture(effectiveDayKey);
+    if (this.current.processedGrantKeys.includes(businessKey)) {
+      return { applied: false, code: 'DUPLICATE', state: this.current };
+    }
     const base = this.forDay(effectiveDayKey);
+    if (count === 0) {
+      const next: RevealRewardState = {
+        ...base,
+        processedGrantKeys: [...base.processedGrantKeys, businessKey],
+      };
+      this.commit(next);
+      return { applied: false, code: 'NO_OP', state: this.current };
+    }
     if (base.additionalClaimsGranted > this.config.maxDailyAdditionalClaims - count) {
       return { applied: false, code: 'LIMIT_REACHED', state: this.current };
     }
@@ -550,34 +595,34 @@ export class RevealRewardService {
   addAdditionalClaims(
     businessKey: string,
     countOrDayKey: number | string = this.config.additionalClaimsPerCompletion,
-    dayKey = this.current.dayKey,
+    dayKey = this.currentBusinessDay(),
   ): RevealMutationResult {
     return this.grantAdditionalClaims(businessKey, countOrDayKey, dayKey);
   }
 
-  reveal(sessionId: string, cardId: string, businessKey: string, dayKey = this.current.dayKey): RevealResult {
+  reveal(sessionId: string, cardId: string, businessKey: string, dayKey = this.currentBusinessDay()): RevealResult {
     assertBusinessKey(businessKey, 'businessKey');
-    if (this.current.processedRewardKeys.includes(businessKey)) {
-      return { applied: false, code: 'DUPLICATE', state: this.current, reward: null, source: null };
-    }
     assertBusinessKey(sessionId, 'sessionId');
     assertBusinessKey(cardId, 'cardId');
     assertDayArgument(dayKey, 'dayKey');
+    this.assertNotFuture(dayKey);
+    if (this.current.processedRewardKeys.includes(businessKey)) {
+      return { applied: false, code: 'DUPLICATE', state: this.current, reward: null, source: null };
+    }
 
     const base = this.forDay(dayKey);
     const session = base.sessions.find((candidate) => candidate.sessionId === sessionId);
     if (session === undefined) fail('SESSION_NOT_FOUND', `reveal session ${sessionId} was not found`);
     if (session.createdDayKey !== dayKey) fail('SESSION_EXPIRED', `reveal session ${sessionId} expired on ${session.createdDayKey}`);
     const pool = poolFor(this.config, session.poolId);
-    const card = rewardFor(pool, cardId);
-    if (session.claimedCardIds.includes(cardId)) {
-      fail('CARD_ALREADY_REVEALED', `card ${cardId} was already revealed in ${sessionId}`);
-    }
-
     const unclaimedCount = pool.cards.filter(({ id }) => !session.claimedCardIds.includes(id)).length;
     if (unclaimedCount === 0) {
       return { applied: false, code: 'POOL_EXHAUSTED', state: this.current, reward: null, source: null };
     }
+    if (session.claimedCardIds.includes(cardId)) {
+      fail('CARD_ALREADY_REVEALED', `card ${cardId} was already revealed in ${sessionId}`);
+    }
+    const card = rewardFor(pool, cardId);
 
     const freeRemaining = this.config.dailyFreeClaims - base.freeClaimsUsed;
     const additionalRemaining = base.additionalClaimsGranted - base.additionalClaimsUsed;
@@ -615,7 +660,7 @@ export class RevealRewardService {
     };
   }
 
-  claim(sessionId: string, cardId: string, businessKey: string, dayKey = this.current.dayKey): RevealResult {
+  claim(sessionId: string, cardId: string, businessKey: string, dayKey = this.currentBusinessDay()): RevealResult {
     return this.reveal(sessionId, cardId, businessKey, dayKey);
   }
 
@@ -626,14 +671,26 @@ export class RevealRewardService {
   }
 
   private assertNotStale(dayKey: string): void {
+    this.assertNotFuture(dayKey);
     if (dayKey < this.current.dayKey) {
       fail('STALE_DAY', `day ${dayKey} is before current reveal day ${this.current.dayKey}`);
     }
   }
 
+  private currentBusinessDay(): string {
+    return resolveTodayDayKey(this.todayDayKey);
+  }
+
+  private assertNotFuture(dayKey: string): void {
+    const todayDayKey = this.currentBusinessDay();
+    if (dayKey > todayDayKey) {
+      fail('FUTURE_DAY', `day ${dayKey} is after todayDayKey ${todayDayKey}`);
+    }
+  }
+
   private commit(next: RevealRewardState): void {
     if (this.committing) fail('PERSISTENCE_REENTRANT', 'reveal reward persistence re-entered settlement');
-    validateState(next, this.config);
+    validateState(next, this.config, this.currentBusinessDay());
     this.committing = true;
     try {
       this.persist(JSON.stringify(next));

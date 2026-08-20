@@ -33,28 +33,51 @@ const config = {
 
 const DAY_ONE = '2026-08-20';
 const DAY_TWO = '2026-08-21';
+const FUTURE_DAY = '2099-01-01';
 const saves = [];
 const service = new RevealRewardService({
   config,
   resources: { gold: 0, essence: 0 },
+  todayDayKey: DAY_ONE,
   persist: (serialized) => saves.push(serialized),
 });
 
 validateRevealRewardConfig(config);
 assert.equal(service.snapshot().schemaVersion, REVEAL_REWARD_SCHEMA_VERSION);
 assert.deepEqual(service.availableClaims(), { freeRemaining: 1, additionalRemaining: 0, totalRemaining: 1 });
-assert.equal(service.synchronize(DAY_ONE).reset, true);
+assert.equal(service.synchronize(DAY_ONE).reset, false, 'initial state already uses the injected business day');
 assert.equal(service.synchronize(DAY_ONE).reset, false, 'same day synchronization must be idempotent');
 assert.throws(
   () => service.synchronize('2026-08-19'),
   (error) => error instanceof RevealRewardError && error.code === 'STALE_DAY',
   'a stale calendar day must not replay the free allowance',
 );
+assert.throws(
+  () => service.synchronize(DAY_TWO),
+  (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
+  'a future calendar day must not advance daily allowances',
+);
 
 const opened = service.openSession('run-normal-1', 'NORMAL', DAY_ONE);
 assert.equal(opened.code, 'APPLIED');
 assert.deepEqual(service.session('run-normal-1').claimedCardIds, []);
 assert.deepEqual(service.availableClaims(), { freeRemaining: 1, additionalRemaining: 0, totalRemaining: 1 });
+assert.throws(
+  () => service.openSession('run-future', 'NORMAL', DAY_TWO),
+  (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
+);
+assert.throws(
+  () => service.grantAdditionalClaims('clear:future', DAY_TWO),
+  (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
+);
+assert.throws(
+  () => service.reveal('run-normal-1', 'normal-gold', 'reveal:future', DAY_TWO),
+  (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
+);
+assert.throws(
+  () => service.reveal('run-normal-1', 'unknown-card', 'reveal:unknown-card-before-exhaustion', DAY_ONE),
+  (error) => error instanceof RevealRewardError && error.code === 'CARD_NOT_FOUND',
+);
 
 const freeReveal = service.reveal('run-normal-1', 'normal-gold', 'reveal:run-normal-1:gold', DAY_ONE);
 assert.equal(freeReveal.code, 'APPLIED');
@@ -63,6 +86,11 @@ assert.deepEqual(freeReveal.reward, { gold: 100 });
 assert.deepEqual(service.snapshot().resources, { gold: 100, essence: 0 });
 assert.deepEqual(service.availableClaims(), { freeRemaining: 0, additionalRemaining: 0, totalRemaining: 0 });
 assert.deepEqual(service.session('run-normal-1').claimedCardIds, ['normal-gold']);
+assert.throws(
+  () => service.reveal('run-normal-1', 'normal-gold', 'reveal:run-normal-1:gold-retry', DAY_ONE),
+  (error) => error instanceof RevealRewardError && error.code === 'CARD_ALREADY_REVEALED',
+  'a repeated card must remain a card-level duplicate while another card is unclaimed',
+);
 
 const saveCountAfterFreeReveal = saves.length;
 const duplicate = service.reveal('run-normal-1', 'normal-essence', 'reveal:run-normal-1:gold', DAY_ONE);
@@ -100,9 +128,10 @@ assert.deepEqual(bundle.reward, { gold: 10, essence: 1 });
 assert.deepEqual(service.snapshot().resources, { gold: 110, essence: 3 });
 assert.deepEqual(service.session('run-normal-1').claimedCardIds, ['normal-gold', 'normal-essence', 'normal-bundle']);
 
-assert.throws(
-  () => service.reveal('run-normal-1', 'normal-bundle', 'reveal:run-normal-1:bundle-retry', DAY_ONE),
-  (error) => error instanceof RevealRewardError && error.code === 'CARD_ALREADY_REVEALED',
+assert.equal(
+  service.reveal('run-normal-1', 'normal-bundle', 'reveal:run-normal-1:bundle-retry', DAY_ONE).code,
+  'POOL_EXHAUSTED',
+  'a fully revealed pool must report exhaustion before card validation',
 );
 assert.throws(
   () => service.openSession('run-normal-1', 'HARD', DAY_ONE),
@@ -112,9 +141,10 @@ assert.throws(
   () => service.reveal('missing-run', 'normal-gold', 'reveal:missing', DAY_ONE),
   (error) => error instanceof RevealRewardError && error.code === 'SESSION_NOT_FOUND',
 );
-assert.throws(
-  () => service.reveal('run-normal-1', 'unknown-card', 'reveal:unknown-card', DAY_ONE),
-  (error) => error instanceof RevealRewardError && error.code === 'CARD_NOT_FOUND',
+assert.equal(
+  service.reveal('run-normal-1', 'unknown-card', 'reveal:unknown-card', DAY_ONE).code,
+  'POOL_EXHAUSTED',
+  'a fully revealed pool must report exhaustion before validating an unknown card',
 );
 assert.throws(
   () => service.openSession('run-unknown-pool', 'UNKNOWN', DAY_ONE),
@@ -128,8 +158,8 @@ assert(!service.snapshot().processedGrantKeys.includes('clear:run-normal-1:over-
 
 const persisted = service.save();
 assert.equal(persisted, saves.at(-1));
-assert.deepEqual(restoreRevealRewardState(persisted, config), service.snapshot());
-assert.deepEqual(restoreRevealRewardState(serializeRevealRewardState(service.snapshot()), config), service.snapshot());
+assert.deepEqual(restoreRevealRewardState(persisted, config, DAY_ONE), service.snapshot());
+assert.deepEqual(restoreRevealRewardState(serializeRevealRewardState(service.snapshot()), config, DAY_ONE), service.snapshot());
 assert(Object.isFrozen(service.snapshot()));
 assert(Object.isFrozen(service.snapshot().sessions));
 assert.throws(() => { service.snapshot().resources.gold = 999; }, TypeError, 'snapshots must be immutable');
@@ -138,6 +168,7 @@ const reloadedSaves = [];
 const reloaded = new RevealRewardService({
   config,
   initialState: persisted,
+  todayDayKey: DAY_ONE,
   persist: (serialized) => reloadedSaves.push(serialized),
 });
 const reloadedDuplicate = reloaded.reveal('run-normal-1', 'normal-gold', 'reveal:run-normal-1:gold', DAY_ONE);
@@ -145,11 +176,17 @@ assert.equal(reloadedDuplicate.code, 'DUPLICATE');
 assert.equal(reloadedSaves.length, 0, 'a reloaded duplicate must not persist');
 assert.deepEqual(reloaded.snapshot(), service.snapshot());
 
-const rollover = new RevealRewardService({ config, resources: { gold: 0, essence: 0 } });
+let rolloverTodayDayKey = DAY_ONE;
+const rollover = new RevealRewardService({
+  config,
+  resources: { gold: 0, essence: 0 },
+  todayDayKey: () => rolloverTodayDayKey,
+});
 rollover.synchronize(DAY_ONE);
 rollover.openSession('run-expired', 'NORMAL', DAY_ONE);
 rollover.grantAdditionalClaims('clear:expired', DAY_ONE);
 rollover.reveal('run-expired', 'normal-gold', 'reveal:expired:gold', DAY_ONE);
+rolloverTodayDayKey = DAY_TWO;
 const reset = rollover.synchronize(DAY_TWO);
 assert.equal(reset.reset, true);
 assert.deepEqual(rollover.availableClaims(), { freeRemaining: 1, additionalRemaining: 0, totalRemaining: 1 });
@@ -167,6 +204,7 @@ let failPersistence = true;
 const rollback = new RevealRewardService({
   config,
   resources: { gold: 0, essence: 0 },
+  todayDayKey: DAY_ONE,
   persist: () => {
     if (failPersistence) throw new Error('disk full');
   },
@@ -202,6 +240,40 @@ for (const [label, mutate] of invalidConfigs) {
   );
 }
 
+const zeroConfig = structuredClone(config);
+zeroConfig.additionalClaimsPerCompletion = 0;
+validateRevealRewardConfig(zeroConfig);
+const zeroSaves = [];
+const zeroService = new RevealRewardService({
+  config: zeroConfig,
+  todayDayKey: DAY_ONE,
+  persist: (serialized) => zeroSaves.push(serialized),
+});
+assert.equal(zeroService.snapshot().dayKey, DAY_ONE, 'injected business day must seed initial state');
+assert.equal(zeroService.grantAdditionalClaims('clear:zero', DAY_ONE).code, 'NO_OP');
+assert.equal(zeroService.snapshot().additionalClaimsGranted, 0);
+assert(zeroService.snapshot().processedGrantKeys.includes('clear:zero'), 'zero grant must be marked processed');
+assert.equal(zeroService.grantAdditionalClaims('clear:zero', DAY_ONE).code, 'DUPLICATE');
+assert.equal(zeroService.grantAdditionalClaims('clear:zero-explicit', 0, DAY_ONE).code, 'NO_OP');
+assert.equal(zeroSaves.length, 2, 'zero grants persist once and duplicate retries do not persist');
+
+const singleCardService = new RevealRewardService({
+  config: {
+    dailyFreeClaims: 2,
+    additionalClaimsPerCompletion: 0,
+    maxDailyAdditionalClaims: 0,
+    pools: [{ id: 'SINGLE', cards: [{ id: 'only-card', rewards: { gold: 1 } }] }],
+  },
+  todayDayKey: DAY_ONE,
+});
+singleCardService.openSession('run-single', 'SINGLE', DAY_ONE);
+assert.equal(singleCardService.reveal('run-single', 'only-card', 'reveal:single:first', DAY_ONE).code, 'APPLIED');
+assert.equal(
+  singleCardService.reveal('run-single', 'only-card', 'reveal:single:second', DAY_ONE).code,
+  'POOL_EXHAUSTED',
+  'a single-card pool must report exhaustion after its only card is revealed',
+);
+
 const validState = JSON.parse(persisted);
 const invalidStates = [
   { ...validState, extra: true },
@@ -212,14 +284,40 @@ const invalidStates = [
 ];
 for (const invalidState of invalidStates) {
   assert.throws(
-    () => restoreRevealRewardState(JSON.stringify(invalidState), config),
+    () => restoreRevealRewardState(JSON.stringify(invalidState), config, DAY_ONE),
     (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
     `invalid reveal save must be rejected: ${JSON.stringify(invalidState).slice(0, 60)}`,
   );
 }
 assert.throws(
-  () => restoreRevealRewardState('{', config),
+  () => restoreRevealRewardState('{', config, DAY_ONE),
   (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+);
+
+const futureState = { ...validState, dayKey: FUTURE_DAY };
+assert.throws(
+  () => restoreRevealRewardState(JSON.stringify(futureState), config, DAY_ONE),
+  (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+  'a future state day must not be restored',
+);
+const futureSessionState = {
+  ...validState,
+  sessions: validState.sessions.map((session) => ({ ...session, createdDayKey: FUTURE_DAY })),
+};
+assert.throws(
+  () => restoreRevealRewardState(JSON.stringify(futureSessionState), config, DAY_ONE),
+  (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+  'a future session day must not be restored',
+);
+assert.throws(
+  () => new RevealRewardService({ config, initialState: JSON.stringify(futureState), todayDayKey: DAY_ONE }),
+  (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+  'initial state validation must reject a future state day',
+);
+assert.throws(
+  () => new RevealRewardService({ config, initialState: futureSessionState, todayDayKey: DAY_ONE }),
+  (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+  'initial state validation must reject a future session day',
 );
 
 const nonEnumerableState = JSON.parse(persisted);
@@ -236,6 +334,7 @@ let reenterOnPersist = false;
 reentrantService = new RevealRewardService({
   config,
   resources: { gold: 0, essence: 0 },
+  todayDayKey: DAY_ONE,
   persist: () => {
     if (!reenterOnPersist) return;
     try {
