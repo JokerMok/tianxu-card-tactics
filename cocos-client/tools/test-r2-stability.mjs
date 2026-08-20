@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -54,6 +55,13 @@ const TICK_MS = 1_000;
 const SIMULATION_DURATION_MS = TICK_COUNT * TICK_MS;
 const BATTLE_INTERVAL_TICKS = 30;
 const BATTLE_COUNT = TICK_COUNT / BATTLE_INTERVAL_TICKS;
+const LONG_OBJECTIVE_CONFIG = [{ id: 'thirty-minute-survival', type: 'SURVIVE', durationMs: SIMULATION_DURATION_MS }];
+const ROUND_LIMIT_SEEDS = Object.freeze([
+  6, 8, 14, 18, 20, 26, 28, 34, 36, 42, 44, 48, 54, 56, 62, 64, 70, 72, 78, 82,
+  84, 90, 92, 98, 100, 106, 108, 112, 118, 120, 126, 130, 132, 138, 140, 144, 150,
+  152, 158, 160, 166, 168, 174, 178, 180, 186, 188, 194, 196, 202, 204, 208, 214,
+  216, 222, 224, 230, 232, 238, 242, 244, 250, 252,
+]);
 
 const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 const chapterIndex = readJson(path.join(CONFIG_ROOT, 'levels/chapter01/index.json'));
@@ -83,6 +91,7 @@ const stats = {
   recoveredExceptions: 0,
   duplicateRewards: 0,
   negativeCases: 0,
+  restoredObjectives: 0,
 };
 
 function expectCode(label, action, code, ErrorClass) {
@@ -119,6 +128,16 @@ function roundLimitActions() {
   ];
 }
 
+function battleInputFor(battleNumber) {
+  assert(battleNumber >= 1 && battleNumber <= ROUND_LIMIT_SEEDS.length, `battle ${battleNumber} must have a safe runner seed`);
+  return {
+    protocol: BATTLE_RUNNER_PROTOCOL,
+    seed: ROUND_LIMIT_SEEDS[battleNumber - 1],
+    professionId: `P00${(battleNumber % 4) + 1}`,
+    actions: roundLimitActions(),
+  };
+}
+
 function heroDeathActions() {
   return [
     { type: 'BATTLE_START' },
@@ -128,7 +147,15 @@ function heroDeathActions() {
   ];
 }
 
-function assertBattleResult(result, label) {
+function assertRunnerContract(result, expectedActionCount, label) {
+  assert.equal(result.protocol, BATTLE_RUNNER_PROTOCOL, `${label} protocol must match`);
+  assert.equal(result.status, 'ok', `${label} status must be ok`);
+  assert.equal(result.runner, 'cocos-battle', `${label} runner must match`);
+  assert.equal(result.actionCount, expectedActionCount, `${label} actionCount must match input`);
+}
+
+function assertBattleResult(result, label, expectedActionCount = result.actionCount) {
+  assertRunnerContract(result, expectedActionCount, label);
   assert.equal(result.status, 'ok', `${label} must return ok`);
   assert.equal(result.outcome.status, 'won', `${label} must settle as a win`);
   assert.equal(result.finalState.status, 'won', `${label} final state must be won`);
@@ -141,25 +168,35 @@ function assertBattleResult(result, label) {
   for (const unit of result.finalState.units) assert(unit.hp >= 0, `${label} unit HP must be non-negative`);
 }
 
-function runObjectiveBattle(battleNumber, atMs) {
-  const configs = [
-    { id: 'kill-boss', type: 'KILL', targetId: 'boss', targetSide: 'enemy', count: 1 },
-    { id: 'protect-gate', type: 'DEFEND', targetId: 'gate', minHp: 5 },
-    { id: 'timed-boss', type: 'TIMED', targetId: 'boss', targetSide: 'enemy', count: 1, timeLimitMs: 1_000 },
-    { id: 'survive-turn', type: 'SURVIVE', durationMs: 1_000 },
-  ];
-  let state = startObjectives(createObjectiveState(configs), atMs, { gate: 10 });
-  state = applyObjectiveEvent(state, { id: `gate-${battleNumber}`, type: 'TARGET_HEALTH', targetId: 'gate', hp: 10 });
-  state = applyObjectiveEvent(state, { id: `boss-${battleNumber}`, type: 'UNIT_DEFEATED', unitId: 'boss', side: 'enemy' });
-  state = applyObjectiveEvent(state, { id: `clock-${battleNumber}`, type: 'TIME_ADVANCED', deltaMs: 1_000 });
-  state = settleObjectives(state, 'won', `battle-end-${battleNumber}`);
-  assert.equal(state.lifecycle, 'won', `battle ${battleNumber} objectives must win`);
+function runObjectiveBattle(battleNumber, atMs, result) {
+  const battleEnd = [...result.events].reverse().find(({ type }) => type === 'BATTLE_END');
+  assert(battleEnd, `battle ${battleNumber} runner output must contain BATTLE_END`);
+  assert.equal(battleEnd.payload.status, result.outcome.status, `battle ${battleNumber} objective outcome must use BATTLE_END payload`);
+  assert.equal(battleEnd.payload.winner, result.outcome.winner, `battle ${battleNumber} objective winner must use BATTLE_END payload`);
+
+  const enemyHeroDefeated = battleEnd.payload.reason === 'HERO_DEFEATED'
+    && battleEnd.payload.winner === 'player'
+    && result.finalState.heroHp.enemy === 0;
+  const configs = enemyHeroDefeated
+    ? [{ id: 'kill-enemy-hero', type: 'KILL', targetId: 'enemy-hero', targetSide: 'enemy', count: 1 }]
+    : [{ id: 'protect-player-hero', type: 'DEFEND', targetId: 'player-hero', minHp: result.finalState.heroHp.player }];
+  let state = startObjectives(createObjectiveState(configs), atMs, {
+    'player-hero': result.finalState.heroHp.player,
+    'enemy-hero': result.finalState.heroHp.enemy,
+  });
+  const objectiveEvent = enemyHeroDefeated
+    ? { id: `enemy-hero-defeated-${battleNumber}`, type: 'UNIT_DEFEATED', unitId: 'enemy-hero', side: 'enemy' }
+    : { id: `player-hero-health-${battleNumber}`, type: 'TARGET_HEALTH', targetId: 'player-hero', hp: result.finalState.heroHp.player };
+  state = applyObjectiveEvent(state, objectiveEvent);
+  state = settleObjectives(state, battleEnd.payload.status, `battle-end-${battleNumber}-${battleEnd.eventId}`);
+  assert.equal(state.lifecycle, result.outcome.status, `battle ${battleNumber} objectives must match runner result`);
+  assert.equal(state.settlement?.status, result.outcome.status);
   assert.equal(state.settlement?.reason, 'OBJECTIVES_COMPLETE');
   const serialized = serializeObjectiveState(state);
   assert.deepEqual(deserializeObjectiveState(serialized, configs), state, 'objective save must restore exactly');
   if (battleNumber === 1) {
     assert.strictEqual(
-      applyObjectiveEvent(state, { id: 'boss-1', type: 'UNIT_DEFEATED', unitId: 'boss', side: 'enemy' }),
+      applyObjectiveEvent(state, objectiveEvent),
       state,
       'duplicate objective event must be idempotent',
     );
@@ -183,6 +220,7 @@ function buildServices() {
   const profileSaves = [];
   const deckSaves = [];
   const shellSaves = [];
+  const rewardSaves = [];
   let campaignPersistenceFailure = false;
   const campaignPersist = (serialized) => {
     if (campaignPersistenceFailure) throw new Error('campaign disk full');
@@ -220,7 +258,7 @@ function buildServices() {
   });
   const reward = new RewardService(
     { resources: { silver: 0, essence: 0 }, processedRewardKeys: [] },
-    () => {},
+    (state) => rewardSaves.push(state),
   );
   return {
     campaign,
@@ -238,6 +276,7 @@ function buildServices() {
     profileSaves,
     deckSaves,
     shellSaves,
+    rewardSaves,
     campaignPersist,
     setCampaignPersistenceFailure(value) { campaignPersistenceFailure = value; },
   };
@@ -245,6 +284,37 @@ function buildServices() {
 
 function runNegativeCases() {
   const runnerInput = { protocol: BATTLE_RUNNER_PROTOCOL, seed: 1, actions: [] };
+  const runnerScriptPath = path.join(PROJECT_ROOT, 'assets', 'scripts', 'battle', 'runner', 'battle-runner.ts');
+  const cliInput = spawnSync(process.execPath, ['--experimental-strip-types', runnerScriptPath], {
+    input: JSON.stringify(runnerInput),
+    encoding: 'utf8',
+  });
+  assert.equal(cliInput.status, 0, 'runner CLI valid input must exit zero');
+  const cliOutput = JSON.parse(cliInput.stdout);
+  assertRunnerContract(cliOutput, runnerInput.actions.length, 'runner CLI valid output');
+
+  const invalidProtocolInput = { ...runnerInput, protocol: 'tianxu.cocos-battle-runner/invalid' };
+  expectCode(
+    'runner invalid protocol',
+    () => runBattleRunner(invalidProtocolInput),
+    'INVALID_INPUT',
+  );
+  const cliInvalidProtocol = spawnSync(process.execPath, ['--experimental-strip-types', runnerScriptPath], {
+    input: JSON.stringify(invalidProtocolInput),
+    encoding: 'utf8',
+  });
+  assert.equal(cliInvalidProtocol.status, 1, 'runner CLI invalid protocol must exit one');
+  const cliError = JSON.parse(cliInvalidProtocol.stdout);
+  assert.equal(cliError.protocol, BATTLE_RUNNER_PROTOCOL);
+  assert.equal(cliError.status, 'error');
+  assert.equal(cliError.error.code, 'INVALID_INPUT');
+  const cliInvalidJson = spawnSync(process.execPath, ['--experimental-strip-types', runnerScriptPath], {
+    input: '{',
+    encoding: 'utf8',
+  });
+  assert.equal(cliInvalidJson.status, 1, 'runner CLI malformed JSON must exit one');
+  assert.equal(JSON.parse(cliInvalidJson.stdout).error.code, 'INVALID_JSON');
+
   expectCode(
     'runner state rehydration',
     () => runBattleRunner({ ...runnerInput, finalState: {} }),
@@ -291,6 +361,23 @@ function runNegativeCases() {
   const story = createChapter01Story();
   expectCode('story out of order', () => story.skip('CH01-L01-POST'), 'OUT_OF_ORDER', Chapter01StoryError);
   expectCode('story malformed save', () => restoreChapter01Story('{'), 'INVALID_SAVE', Chapter01StoryError);
+
+  expectCode('campaign corrupted save', () => CampaignStateService.restore(campaignConfig.config, '{'), 'INVALID_SAVE', CampaignStateError);
+  expectCode('mainline corrupted save', () => MainlineTaskService.fromSave(
+    MAINLINE_TASK_DEFINITIONS,
+    '{',
+    { initialFeatures: ['campaign', 'tasks'] },
+  ), 'INVALID_SAVE', MainlineTaskError);
+  expectCode('deck corrupted save', () => DeckManagementService.restore(cardsTable, '{', { availableCards }), 'INVALID_STATE', DeckManagementError);
+  expectCode('shell corrupted save', () => ShellService.fromSerialized('{'), 'INVALID_SAVE', ShellContractError);
+  expectCode('objective corrupted save', () => deserializeObjectiveState('{', [
+    { id: 'survive', type: 'SURVIVE', durationMs: 1_000 },
+  ]), 'INVALID_STATE', ObjectiveError);
+  expectMessage(
+    'reward corrupted save',
+    () => new RewardService(JSON.parse('{"resources":{"silver":-1},"processedRewardKeys":[]}'), () => {}),
+    /reward state resources are invalid/,
+  );
 }
 
 function runRollbackCases() {
@@ -377,7 +464,9 @@ function runRollbackCases() {
   stats.rollbackChecks += 1;
 }
 
-function checkpoint(services) {
+function checkpoint(services, longObjective) {
+  const rewardBefore = services.reward.snapshot();
+  const lastProcessedRewardKey = rewardBefore.processedRewardKeys.at(-1);
   const serialized = {
     campaign: services.campaign.save(),
     mainline: services.mainline.serialize(),
@@ -386,6 +475,8 @@ function checkpoint(services) {
     profile: services.profile.save(),
     deck: services.deck.save(),
     shell: services.shell.save(),
+    reward: JSON.stringify(rewardBefore),
+    longObjective: serializeObjectiveState(longObjective),
   };
   stats.saves += Object.keys(serialized).length;
   services.campaign = new CampaignStateService({
@@ -411,14 +502,27 @@ function checkpoint(services) {
     onSave: (value) => services.deckSaves.push(value),
   });
   services.shell = ShellService.fromSerialized(serialized.shell, (value) => services.shellSaves.push(value));
+  services.reward = new RewardService(
+    JSON.parse(serialized.reward),
+    (value) => services.rewardSaves.push(value),
+  );
+  const restoredLongObjective = deserializeObjectiveState(serialized.longObjective, LONG_OBJECTIVE_CONFIG);
+  assert.deepEqual(services.reward.snapshot(), rewardBefore, 'reward checkpoint must restore exactly');
+  if (lastProcessedRewardKey !== undefined) {
+    const duplicate = services.reward.grant(lastProcessedRewardKey, { silver: 999, essence: 999 });
+    assert.equal(duplicate.applied, false, 'restored reward key must remain idempotent');
+    assert.deepEqual(services.reward.snapshot(), rewardBefore, 'duplicate restored reward must not mutate state');
+  }
   stats.checkpoints += 1;
-  stats.restoredServices += 7;
+  stats.restoredServices += 8;
+  stats.restoredObjectives += 1;
+  return restoredLongObjective;
 }
 
 function runSimulation() {
   const services = buildServices();
   let longObjective = startObjectives(
-    createObjectiveState([{ id: 'thirty-minute-survival', type: 'SURVIVE', durationMs: SIMULATION_DURATION_MS }]),
+    createObjectiveState(LONG_OBJECTIVE_CONFIG),
     0,
   );
   const pages = ['home', 'campaign', 'deck', 'tasks'];
@@ -431,7 +535,7 @@ function runSimulation() {
     runBattleRunner({ protocol: BATTLE_RUNNER_PROTOCOL, seed: 43, actions: [{ type: 'BATTLE_START' }] }).finalHash,
     'seed must affect runner output',
   );
-  assertBattleResult(deterministicA, 'determinism probe');
+  assertBattleResult(deterministicA, 'determinism probe', deterministicInput.actions.length);
   assertFrozenBoundary('battle final state', deterministicA.finalState);
 
   const combatProbe = runBattleRunner({
@@ -449,8 +553,21 @@ function runSimulation() {
       { type: 'END_TURN' },
     ],
   });
+  assertRunnerContract(combatProbe, 9, 'combat probe');
   assert.equal(combatProbe.events.some(({ type }) => type === 'ATTACK'), true, 'combat probe must exercise attack resolution');
   assert.equal(combatProbe.events.some(({ type }) => type === 'UNIT_MOVED'), true, 'combat probe must exercise movement');
+
+  const heroDeathProbe = runBattleRunner({
+    protocol: BATTLE_RUNNER_PROTOCOL,
+    seed: 223,
+    actions: heroDeathActions(),
+  });
+  assertBattleResult(heroDeathProbe, 'hero defeat probe', heroDeathActions().length);
+  assert.equal(
+    [...heroDeathProbe.events].reverse().find(({ type }) => type === 'BATTLE_END')?.payload.reason,
+    'HERO_DEFEATED',
+    'hero defeat probe must exercise hero defeat settlement',
+  );
 
   let deckId = services.deck.createDeck({ id: 't215-stability', name: 'T215稳定编队' }).id;
   services.deck.addCard(deckId, 'U001', 1);
@@ -497,13 +614,9 @@ function runSimulation() {
         services.campaign.startLevel();
         stats.recoveredExceptions += 1;
       }
-      const battleInput = battleNumber % 2 === 0
-        ? { protocol: BATTLE_RUNNER_PROTOCOL, seed: 42, actions: roundLimitActions() }
-        : { protocol: BATTLE_RUNNER_PROTOCOL, seed: 223, actions: heroDeathActions() };
-      const result = runBattleRunner({
-        ...battleInput,
-      });
-      assertBattleResult(result, `continuous battle ${battleNumber}`);
+      const battleInput = battleInputFor(battleNumber);
+      const result = runBattleRunner(battleInput);
+      assertBattleResult(result, `continuous battle ${battleNumber}`, battleInput.actions.length);
       services.campaign.completeLevel(levelId, 3 - (battleNumber % 3 === 0 ? 1 : 0));
       if (battleNumber <= CAMPAIGN_LEVEL_IDS.length) {
         if (levelId === 'L12') {
@@ -545,7 +658,7 @@ function runSimulation() {
         stats.duplicateRewards += 1;
       }
 
-      runObjectiveBattle(battleNumber, tick * TICK_MS);
+      runObjectiveBattle(battleNumber, tick * TICK_MS, result);
       stats.battles += 1;
       stats.battleEvents += result.events.length;
     }
@@ -555,8 +668,8 @@ function runSimulation() {
     assert(services.profile.snapshot().stamina >= 0, 'profile stamina must remain non-negative');
 
     if (tick === 600 || tick === 1_200) {
-      longObjective = deserializeObjectiveState(serializeObjectiveState(longObjective), [{ id: 'thirty-minute-survival', type: 'SURVIVE', durationMs: SIMULATION_DURATION_MS }]);
-      checkpoint(services);
+      longObjective = deserializeObjectiveState(serializeObjectiveState(longObjective), LONG_OBJECTIVE_CONFIG);
+      longObjective = checkpoint(services, longObjective);
       assert.equal(services.campaign.snapshot().activeLevelId, null);
       assert.equal(services.story.snapshot().readNodeIds.length, CHAPTER01_STORY_NODE_IDS.length);
       assert.equal(services.mainline.snapshot().chapter.completed, true);
@@ -593,7 +706,9 @@ runRollbackCases();
 const finalServices = runSimulation();
 
 assert(stats.checkpoints >= 2, 'simulation must restore at least two multi-service checkpoints');
-assert.equal(stats.restoredServices, stats.checkpoints * 7);
+assert.equal(stats.restoredServices, stats.checkpoints * 8);
+assert.equal(stats.restoredObjectives, stats.checkpoints);
+assert.equal(stats.saves, stats.checkpoints * 9);
 assert.equal(stats.battles, BATTLE_COUNT);
 assert.equal(stats.objectiveBattles, BATTLE_COUNT);
 assert.equal(stats.duplicateRewards, CAMPAIGN_LEVEL_IDS.length);
