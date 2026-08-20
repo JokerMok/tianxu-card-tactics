@@ -414,6 +414,223 @@ function exactKeysWithOptional(
   });
 }
 
+const L01_SCENARIO_RULE_KEYS = [
+  'playerHeroHp', 'activeLaneCount', 'playerSummonSlots', 'unlockSecondLaneOnFirstDeployment',
+  'openingSkillCardsAllowed', 'enemyOpeningCardFilter',
+] as const;
+const L02_BATTLE_RULE_KEYS = ['enemyDeploymentOrder', 'combatPreview', 'forbiddenSceneTargetActions'] as const;
+const L02_DEPLOYMENT_RULE_KEYS = ['phase', 'kind', 'cardId', 'unitId'] as const;
+const L02_COMBAT_PREVIEW_RULE_KEYS = ['counterMultiplier', 'showDamageBreakdown'] as const;
+const L02_FORBIDDEN_ACTION_RULE_KEYS = ['targetId', 'action'] as const;
+const L03_BATTLE_RULE_KEYS = [
+  'fastUnitIds', 'guardUnitIds', 'interceptUnitIds', 'movementTrigger', 'temporaryAid', 'requiredResponses',
+] as const;
+const L03_MOVEMENT_TRIGGER_RULE_KEYS = ['distance', 'responseUnitId'] as const;
+const L03_TEMPORARY_AID_RULE_KEYS = ['targetId', 'mode'] as const;
+const L04_SCENARIO_RULE_KEYS = [
+  'playerHeroHp', 'enemyHeroHp', 'laneCount', 'laneLength', 'summonZone', 'deckSize', 'controlModes',
+  'canToggleAuto', 'roundLimit', 'seed', 'specialRules',
+] as const;
+const L04_SUMMON_ZONE_RULE_KEYS = ['laneCount', 'depth'] as const;
+const L05_SCENARIO_RULE_KEYS = [
+  'enemyFireUnitIds', 'burnStatus', 'waterCounterMultiplier', 'purifyAid', 'allowAlternateResponses',
+  'preserveControlledBeast',
+] as const;
+const L05_PURIFY_AID_RULE_KEYS = ['characterId', 'uses'] as const;
+const L06_SCENARIO_RULE_KEYS = [
+  'rewardPolicy', 'environmentElement', 'sameElementEffectBonusPercent', 'fireEffectPenaltyPercent',
+  'freezeStatus', 'purifyAvailable', 'preBattleEnvironmentReadRequired', 'alternateSolutions',
+] as const;
+const L07_SCENARIO_RULE_KEYS = [
+  'environmentElement', 'enemyHeavyUnitIds', 'enemyGiantUnitIds', 'impactCounter', 'pierceCounter',
+  'knockbackRule', 'temporaryAid', 'alternateSolutions',
+] as const;
+const L07_IMPACT_COUNTER_RULE_KEYS = ['targetDefenseType', 'requiredOffenseType', 'availableUnitIds'] as const;
+const L07_PIERCE_COUNTER_RULE_KEYS = ['targetDefenseType', 'requiredOffenseType', 'availableUnitIds'] as const;
+const L07_KNOCKBACK_RULE_KEYS = ['sourceUnitId', 'distance'] as const;
+const L07_TEMPORARY_AID_RULE_KEYS = ['characterId', 'mode', 'durationRounds'] as const;
+const L08_SCENARIO_RULE_KEYS = [
+  'protectedTargetId', 'roundLimit', 'playerHeroNamingImmune', 'namingTargetPolicy', 'prepareIncrease',
+  'shortControlDurationRounds', 'professionSkillPolicy', 'professionSkillIdForP001', 'recordProfessionAfterVictory',
+  'professionSwitchPreview',
+] as const;
+const L09_SCENARIO_RULE_KEYS = [
+  'enemySpiritUnitIds', 'spiritDefenseType', 'physicalDamageMultiplier', 'spellDamageMultiplier', 'reviveRule',
+  'temporarySpellAid', 'purifySkillId', 'alternateSolutions',
+] as const;
+const L09_REVIVE_RULE_KEYS = ['unitIds', 'maxRevives', 'reviveHp', 'trigger'] as const;
+const L09_TEMPORARY_SPELL_AID_RULE_KEYS = ['sourceCharacterId', 'cardId', 'uses'] as const;
+const L10_SCENARIO_RULE_KEYS = [
+  'sceneId', 'laneCount', 'keyTargetIds', 'laneTargetMapping', 'objectivePolicy', 'failureTargetPolicy',
+  'heroKillDoesNotEnd', 'outpostUnlockId',
+] as const;
+const L10_LANE_TARGET_RULE_KEYS = ['lane', 'targetId', 'role'] as const;
+const L11_SCENARIO_RULE_KEYS = [
+  'professionSkillPolicy', 'professionSkillIdByProfession', 'nameCheckRule', 'professionAdvantageRules',
+] as const;
+const L11_PROFESSION_KEYS = ['P001', 'P002', 'P003', 'P004'] as const;
+const L11_NAME_CHECK_RULE_KEYS = ['enemyActionInterval', 'prepareIncrease', 'tieBreak', 'seed'] as const;
+const L11_P001_ADVANTAGE_RULE_KEYS = ['counterRole', 'targetUnitIds'] as const;
+const L11_P002_ADVANTAGE_RULE_KEYS = ['counterDefenseType', 'targetUnitIds'] as const;
+const L11_P003_ADVANTAGE_RULE_KEYS = ['counterStatuses', 'targetUnitIds'] as const;
+const L11_P004_ADVANTAGE_RULE_KEYS = ['minPrepare', 'targetUnitIds'] as const;
+const L12_SCENARIO_RULE_KEYS = [
+  'sceneId', 'bossCharacterId', 'roundLimit', 'pointBookRule', 'phaseTransition', 'victoryPolicy', 'rewardRegistryIds',
+] as const;
+const L12_POINT_BOOK_RULE_KEYS = [
+  'enemyActionInterval', 'summonUnitId', 'occupiedSlotPolicy', 'overwriteUnits',
+] as const;
+const L12_PHASE_TRANSITION_RULE_KEYS = [
+  'triggerBossHpPercent', 'bossEntersBattle', 'bossRole', 'nameLockAffects', 'unitCardPreparationNormal',
+] as const;
+
+function closedRuleObject(
+  value: unknown,
+  allowedKeys: readonly string[],
+  configPath: string,
+): Record<string, unknown> {
+  const record = strategyRecord(value, configPath);
+  exactKeysWithOptional(record, [], allowedKeys, configPath);
+  return record;
+}
+
+function optionalRuleObject(
+  record: Record<string, unknown>,
+  key: string,
+  allowedKeys: readonly string[],
+  configPath: string,
+): Record<string, unknown> | undefined {
+  if (!(key in record)) return undefined;
+  return closedRuleObject(record[key], allowedKeys, `${configPath}.${key}`);
+}
+
+function optionalRuleArray(record: Record<string, unknown>, key: string, configPath: string): unknown[] | undefined {
+  if (!(key in record)) return undefined;
+  const value = record[key];
+  if (!Array.isArray(value)) throw new ConfigLoadError(`${configPath}.${key}`, '必须是 array');
+  return value;
+}
+
+function optionalRuleObjectArray(
+  record: Record<string, unknown>,
+  key: string,
+  itemKeys: readonly string[],
+  configPath: string,
+): void {
+  const value = optionalRuleArray(record, key, configPath);
+  if (!value) return;
+  value.forEach((item, index) => closedRuleObject(item, itemKeys, `${configPath}.${key}[${index}]`));
+}
+
+function assertChapterLevelRuleSchemas(
+  levelValue: Record<string, unknown>,
+  levelId: string,
+  levelPath: string,
+): void {
+  const battleLevel = levelId === 'L02' || levelId === 'L03';
+  const ruleKey = battleLevel ? 'battleRules' : 'scenarioRules';
+  const unexpectedRuleKey = battleLevel ? 'scenarioRules' : 'battleRules';
+  if (unexpectedRuleKey in levelValue) {
+    throw new ConfigLoadError(`${levelPath}.${unexpectedRuleKey}`, `不允许 ${levelId} 使用该规则容器`);
+  }
+  const rulePath = `${levelPath}.${ruleKey}`;
+  const rulesValue = required(levelValue, ruleKey, levelPath);
+
+  switch (levelId) {
+    case 'L01': {
+      closedRuleObject(rulesValue, L01_SCENARIO_RULE_KEYS, rulePath);
+      return;
+    }
+    case 'L02': {
+      const rules = closedRuleObject(rulesValue, L02_BATTLE_RULE_KEYS, rulePath);
+      optionalRuleObjectArray(rules, 'enemyDeploymentOrder', L02_DEPLOYMENT_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'combatPreview', L02_COMBAT_PREVIEW_RULE_KEYS, rulePath);
+      optionalRuleObjectArray(rules, 'forbiddenSceneTargetActions', L02_FORBIDDEN_ACTION_RULE_KEYS, rulePath);
+      return;
+    }
+    case 'L03': {
+      const rules = closedRuleObject(rulesValue, L03_BATTLE_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'fastUnitIds', rulePath);
+      optionalRuleArray(rules, 'guardUnitIds', rulePath);
+      optionalRuleArray(rules, 'interceptUnitIds', rulePath);
+      optionalRuleObject(rules, 'movementTrigger', L03_MOVEMENT_TRIGGER_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'temporaryAid', L03_TEMPORARY_AID_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'requiredResponses', rulePath);
+      return;
+    }
+    case 'L04': {
+      const rules = closedRuleObject(rulesValue, L04_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'summonZone', L04_SUMMON_ZONE_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'controlModes', rulePath);
+      return;
+    }
+    case 'L05': {
+      const rules = closedRuleObject(rulesValue, L05_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'purifyAid', L05_PURIFY_AID_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'enemyFireUnitIds', rulePath);
+      optionalRuleArray(rules, 'allowAlternateResponses', rulePath);
+      return;
+    }
+    case 'L06': {
+      const rules = closedRuleObject(rulesValue, L06_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'alternateSolutions', rulePath);
+      return;
+    }
+    case 'L07': {
+      const rules = closedRuleObject(rulesValue, L07_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'enemyHeavyUnitIds', rulePath);
+      optionalRuleArray(rules, 'enemyGiantUnitIds', rulePath);
+      optionalRuleObject(rules, 'impactCounter', L07_IMPACT_COUNTER_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'pierceCounter', L07_PIERCE_COUNTER_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'knockbackRule', L07_KNOCKBACK_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'temporaryAid', L07_TEMPORARY_AID_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'alternateSolutions', rulePath);
+      return;
+    }
+    case 'L08': {
+      closedRuleObject(rulesValue, L08_SCENARIO_RULE_KEYS, rulePath);
+      return;
+    }
+    case 'L09': {
+      const rules = closedRuleObject(rulesValue, L09_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'enemySpiritUnitIds', rulePath);
+      const reviveRule = optionalRuleObject(rules, 'reviveRule', L09_REVIVE_RULE_KEYS, rulePath);
+      if (reviveRule) optionalRuleArray(reviveRule, 'unitIds', `${rulePath}.reviveRule`);
+      optionalRuleObject(rules, 'temporarySpellAid', L09_TEMPORARY_SPELL_AID_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'alternateSolutions', rulePath);
+      return;
+    }
+    case 'L10': {
+      const rules = closedRuleObject(rulesValue, L10_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleArray(rules, 'keyTargetIds', rulePath);
+      optionalRuleObjectArray(rules, 'laneTargetMapping', L10_LANE_TARGET_RULE_KEYS, rulePath);
+      return;
+    }
+    case 'L11': {
+      const rules = closedRuleObject(rulesValue, L11_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'professionSkillIdByProfession', L11_PROFESSION_KEYS, rulePath);
+      optionalRuleObject(rules, 'nameCheckRule', L11_NAME_CHECK_RULE_KEYS, rulePath);
+      const professionAdvantages = optionalRuleObject(rules, 'professionAdvantageRules', L11_PROFESSION_KEYS, rulePath);
+      if (professionAdvantages) {
+        optionalRuleObject(professionAdvantages, 'P001', L11_P001_ADVANTAGE_RULE_KEYS, `${rulePath}.professionAdvantageRules`);
+        optionalRuleObject(professionAdvantages, 'P002', L11_P002_ADVANTAGE_RULE_KEYS, `${rulePath}.professionAdvantageRules`);
+        optionalRuleObject(professionAdvantages, 'P003', L11_P003_ADVANTAGE_RULE_KEYS, `${rulePath}.professionAdvantageRules`);
+        optionalRuleObject(professionAdvantages, 'P004', L11_P004_ADVANTAGE_RULE_KEYS, `${rulePath}.professionAdvantageRules`);
+      }
+      return;
+    }
+    case 'L12': {
+      const rules = closedRuleObject(rulesValue, L12_SCENARIO_RULE_KEYS, rulePath);
+      optionalRuleObject(rules, 'pointBookRule', L12_POINT_BOOK_RULE_KEYS, rulePath);
+      const phaseTransition = optionalRuleObject(rules, 'phaseTransition', L12_PHASE_TRANSITION_RULE_KEYS, rulePath);
+      if (phaseTransition) optionalRuleArray(phaseTransition, 'nameLockAffects', `${rulePath}.phaseTransition`);
+      return;
+    }
+    default:
+      throw new ConfigLoadError(levelPath, `未知章节关卡规则: ${levelId}`);
+  }
+}
+
 function deepFreeze<T>(value: T): T {
   if (value === null || (typeof value !== 'object' && typeof value !== 'function') || Object.isFrozen(value)) return value;
   Object.getOwnPropertyNames(value).forEach((key) => {
@@ -934,6 +1151,7 @@ export async function loadChapter01Runtime(
       ['scenarioRules', 'battleRules'],
       levelPath,
     );
+    assertChapterLevelRuleSchemas(levelValue, entry.id, levelPath);
     const objectives = levelValue.objectives;
     if (Array.isArray(objectives)) {
       objectives.forEach((objective, index) => {

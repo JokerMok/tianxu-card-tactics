@@ -190,6 +190,21 @@ await expectFailure('unknown level field', (candidate) => {
 await expectFailure('unknown level reward field', (candidate) => {
   candidate['config/levels/chapter01/L01'].chapterLevels[0].rewards[0].forged = true;
 }, 'config/levels/chapter01/L01.chapterLevels[0].rewards[0].forged');
+await expectFailure('unknown L01 scenario rule field', (candidate) => {
+  candidate['config/levels/chapter01/L01'].chapterLevels[0].scenarioRules.forged = true;
+}, 'config/levels/chapter01/L01.chapterLevels[0].scenarioRules.forged');
+await expectFailure('unknown L02 battle rule field', (candidate) => {
+  candidate['config/levels/chapter01/L02'].chapterLevels[0].battleRules.forged = true;
+}, 'config/levels/chapter01/L02.chapterLevels[0].battleRules.forged');
+await expectFailure('unknown L07 nested rule field', (candidate) => {
+  candidate['config/levels/chapter01/L07'].chapterLevels[0].scenarioRules.impactCounter.forged = true;
+}, 'config/levels/chapter01/L07.chapterLevels[0].scenarioRules.impactCounter.forged');
+await expectFailure('unknown L11 profession advantage nested field', (candidate) => {
+  candidate['config/levels/chapter01/L11'].chapterLevels[0].scenarioRules.professionAdvantageRules.P001.forged = true;
+}, 'config/levels/chapter01/L11.chapterLevels[0].scenarioRules.professionAdvantageRules.P001.forged');
+await expectFailure('unknown L12 phase transition field', (candidate) => {
+  candidate['config/levels/chapter01/L12'].chapterLevels[0].scenarioRules.phaseTransition.forged = true;
+}, 'config/levels/chapter01/L12.chapterLevels[0].scenarioRules.phaseTransition.forged');
 await expectFailure('duplicate unit ID', (candidate) => {
   const rows = candidate['config/units'].units;
   rows.push(structuredClone(rows[0]));
@@ -199,4 +214,4 @@ await expectFailure('duplicate chapter target ID', (candidate) => {
   chapterIndex.targetIds.push(chapterIndex.targetIds[0]);
 }, `${manifest.chapters.chapter01}.targetIds[10]`);
 
-console.log('Chapter 01 runtime integration: strategy-driven A0 input/display, readonly strategy indexes, L01-L12 registry load PASS; deck mismatch, unknown reward/level field, missing strategy, wrong mapping, illegal reference, missing index/L12, invalid prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');
+console.log('Chapter 01 runtime integration: strategy-driven A0 input/display, readonly strategy indexes, L01-L12 registry load PASS; unknown chapter-rule fields (including nested rules), deck mismatch, unknown reward/level field, missing strategy, wrong mapping, illegal reference, missing index/L12, invalid prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');
