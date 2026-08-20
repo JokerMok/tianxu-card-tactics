@@ -449,8 +449,12 @@ export function applyBossDamage(configInput: unknown, state: BossState, amount: 
   let next = addEvent({ ...state, bossHp: Math.max(0, state.bossHp - amount) }, 'BOSS_DAMAGED', { amount, bossHp: Math.max(0, state.bossHp - amount) });
   const currentIndex = config.phases.findIndex((phase) => phase.id === state.phaseId);
   const nextIndex = phaseIndexForHp(config, next.bossHp);
-  if (nextIndex > currentIndex) next = { ...next, phaseId: config.phases[nextIndex].id };
-  if (nextIndex > currentIndex) next = enterPhase(config, next, nextIndex, state.phaseId);
+  let previousPhaseId = state.phaseId;
+  for (let phaseIndex = currentIndex + 1; phaseIndex <= nextIndex; phaseIndex += 1) {
+    next = { ...next, phaseId: config.phases[phaseIndex].id };
+    next = enterPhase(config, next, phaseIndex, previousPhaseId);
+    previousPhaseId = config.phases[phaseIndex].id;
+  }
   return settle(config, next);
 }
 

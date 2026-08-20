@@ -55,6 +55,23 @@ assert.equal(state.activeSummons.length, 1, 'phase entry must execute configured
 assert.deepEqual(availableBossSkillIds(config, state), ['heavy-strike', 'call-rootling']);
 assert.equal(state.events.some(({ type, payload }) => type === 'SUMMON_CREATED' && payload.summonId === 'rootling'), true);
 
+const crossedPhases = applyBossDamage(config, createBossState(config, { playerHeroHp: 30 }), 81);
+assert.equal(crossedPhases.bossHp, 19);
+assert.equal(crossedPhases.phaseId, 'P3', 'large damage must reach the final configured phase');
+assert.deepEqual(
+  crossedPhases.events
+    .filter(({ type }) => type === 'PHASE_CHANGED')
+    .map(({ payload }) => payload.to),
+  ['P1', 'P2', 'P3'],
+  'crossing multiple thresholds must enter every phase in order',
+);
+const p2PhaseEvent = crossedPhases.events.find(({ type, payload }) => type === 'PHASE_CHANGED' && payload.to === 'P2');
+const p2SummonEvent = crossedPhases.events.find(({ type, payload }) => type === 'SUMMON_CREATED' && payload.summonId === 'thorn-guard');
+const p3PhaseEvent = crossedPhases.events.find(({ type, payload }) => type === 'PHASE_CHANGED' && payload.to === 'P3');
+assert(p2PhaseEvent && p2SummonEvent && p3PhaseEvent, 'crossing phases must run P2 entry summon');
+assert(p2PhaseEvent.eventId < p2SummonEvent.eventId && p2SummonEvent.eventId < p3PhaseEvent.eventId, 'P2 entry must happen before P3 entry');
+assert.equal(crossedPhases.activeSummons.some(({ summonId }) => summonId === 'thorn-guard'), true, 'P2 onEnterSummonIds must execute during a large transition');
+
 const cappedSummon = executeBossSkill(config, state, 'call-rootling');
 assert.equal(cappedSummon.activeSummons.length, 1, 'maxActive must be executed, not just validated');
 assert.equal(cappedSummon.events.some(({ type, payload }) => type === 'SUMMON_SKIPPED' && payload.reason === 'MAX_ACTIVE'), true);
