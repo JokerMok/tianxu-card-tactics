@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   CHAPTER01_ID,
   CHAPTER01_INDEX_CONFIG_REF,
@@ -14,7 +15,7 @@ import {
 } from '../assets/scripts/meta/story/Chapter01Story.ts';
 import * as storyIndex from '../assets/scripts/meta/story/index.ts';
 
-const projectRoot = path.resolve(new URL('..', import.meta.url).pathname);
+const projectRoot = fileURLToPath(new URL('..', import.meta.url));
 const resourceRoot = path.join(projectRoot, 'assets', 'resources');
 const configRoot = path.join(resourceRoot, 'config');
 const storyIndexSource = fs.readFileSync(
