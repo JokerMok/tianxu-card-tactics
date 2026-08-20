@@ -123,7 +123,15 @@ function normalizeFootprint(value: unknown, configPath: string, source: SpecialE
   if (!Array.isArray(value) || value.length === 0) {
     throw new SpecialEntityConfigError(configPath, '必须是非空数组');
   }
-  const footprint = value.map((item, index) => parseOffset(item, `${configPath}[${index}]`));
+  for (let index = 0; index < value.length; index += 1) {
+    if (!Object.prototype.hasOwnProperty.call(value, index)) {
+      throw new SpecialEntityConfigError(`${configPath}[${index}]`, '不得包含稀疏空位');
+    }
+  }
+  const footprint: FootprintOffset[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    footprint.push(parseOffset(value[index], `${configPath}[${index}]`));
+  }
   const keys = footprint.map(({ laneOffset, cellOffset }) => `${laneOffset}:${cellOffset}`);
   if (new Set(keys).size !== keys.length) {
     throw new SpecialEntityConfigError(configPath, '不得包含重复占位');
@@ -154,6 +162,25 @@ function parseAnchor(value: unknown, configPath: string): BoardCell {
   };
 }
 
+function immutableSpecialEntity(entity: SpecialEntity): SpecialEntity {
+  return Object.freeze({
+    id: entity.id,
+    source: entity.source,
+    footprint: Object.freeze(entity.footprint.map(({ laneOffset, cellOffset }) => Object.freeze({
+      laneOffset,
+      cellOffset,
+    }))),
+    anchor: Object.freeze({ lane: entity.anchor.lane, cell: entity.anchor.cell }),
+  });
+}
+
+function immutableSpecialEntityState(state: SpecialEntityBoardState): SpecialEntityBoardState {
+  return Object.freeze({
+    ...state,
+    entities: Object.freeze(state.entities.map(immutableSpecialEntity)),
+  });
+}
+
 export function validateSpecialEntityDefinition(value: unknown, configPath = 'specialEntity'): SpecialEntityDefinition {
   const root = record(value, configPath);
   exactKeys(root, ['id', 'source', 'footprint'], configPath);
@@ -177,7 +204,7 @@ export function validateSpecialEntity(value: unknown, configPath = 'specialEntit
 
 export function createSpecialEntity(definition: unknown, anchor: unknown): SpecialEntity {
   const parsed = validateSpecialEntityDefinition(definition);
-  return { ...parsed, anchor: parseAnchor(anchor, 'specialEntity.anchor') };
+  return immutableSpecialEntity({ ...parsed, anchor: parseAnchor(anchor, 'specialEntity.anchor') });
 }
 
 export function createLevelSpecialEntity(
@@ -269,7 +296,7 @@ export function canPlaceSpecialEntity(state: SpecialEntityBoardState, entityInpu
 export function placeSpecialEntity(state: SpecialEntityBoardState, entityInput: unknown): SpecialEntityBoardState {
   const placement = evaluateSpecialEntityPlacement(state, entityInput);
   if (!placement.ok) throw new SpecialEntityPlacementError(placement);
-  return { ...state, entities: [...state.entities, placement.entity] };
+  return immutableSpecialEntityState({ ...state, entities: [...state.entities, placement.entity] });
 }
 
 export function createSpecialEntityBoardState(
@@ -277,7 +304,7 @@ export function createSpecialEntityBoardState(
   entities: readonly unknown[] = [],
 ): SpecialEntityBoardState {
   if (!Array.isArray(entities)) throw new SpecialEntityConfigError('entities', '必须是数组');
-  let state: SpecialEntityBoardState = { board, entities: [] };
+  let state: SpecialEntityBoardState = immutableSpecialEntityState({ board, entities: [] });
   for (const entity of entities) state = placeSpecialEntity(state, entity);
   return state;
 }
@@ -298,7 +325,10 @@ export function getSpecialEntityAtCell(
 export function removeSpecialEntity(state: SpecialEntityBoardState, entityId: string): SpecialEntityBoardState {
   const entity = state.entities.find((candidate) => candidate.id === entityId);
   if (!entity) throw new Error(`unknown special entity: ${entityId}`);
-  return { ...state, entities: state.entities.filter((candidate) => candidate.id !== entityId) };
+  return immutableSpecialEntityState({
+    ...state,
+    entities: state.entities.filter((candidate) => candidate.id !== entityId),
+  });
 }
 
 export function moveSpecialEntity(
@@ -312,5 +342,8 @@ export function moveSpecialEntity(
   const withoutCurrent = { ...state, entities: state.entities.filter((candidate) => candidate.id !== entityId) };
   const placement = evaluateSpecialEntityPlacement(withoutCurrent, moved);
   if (!placement.ok) throw new SpecialEntityPlacementError(placement);
-  return { ...state, entities: state.entities.map((candidate) => candidate.id === entityId ? placement.entity : candidate) };
+  return immutableSpecialEntityState({
+    ...state,
+    entities: state.entities.map((candidate) => candidate.id === entityId ? placement.entity : candidate),
+  });
 }

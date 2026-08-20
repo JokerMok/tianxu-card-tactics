@@ -74,6 +74,25 @@ assert.equal(isSpecialEntityCellOccupied(state, 1, 5), true);
 assert.equal(isSpecialEntityCellOccupied(state, 0, 6), false);
 assert.equal(getSpecialEntityAtCell(state, 1, 4)?.id, 'boss-1');
 assert.equal(getSpecialEntityAtCell(state, -1, 0), undefined, 'out-of-board queries must not resolve an entity');
+assert.equal(Object.isFrozen(state), true, 'published special-entity state must be frozen');
+assert.equal(Object.isFrozen(state.entities), true, 'published entity collections must be frozen');
+assert.equal(Object.isFrozen(state.entities[0]), true, 'published entities must be frozen');
+assert.equal(Object.isFrozen(state.entities[0].footprint), true, 'published footprints must be frozen');
+assert.equal(Object.isFrozen(state.entities[0].footprint[0]), true, 'footprint offsets must be frozen');
+assert.equal(Object.isFrozen(state.entities[0].anchor), true, 'entity anchors must be frozen');
+assert.throws(() => { state.entities = []; }, TypeError, 'callers must not replace the entity collection');
+assert.throws(() => { state.entities.push(boss); }, TypeError, 'callers must not append to the entity collection');
+assert.throws(() => { state.entities[0].footprint = []; }, TypeError, 'callers must not replace an entity footprint');
+assert.throws(() => { state.entities[0].anchor = { lane: 0, cell: 0 }; }, TypeError, 'callers must not replace an entity anchor');
+assert.throws(() => { state.entities[0].footprint[0].laneOffset = 99; }, TypeError, 'callers must not mutate nested footprint coordinates');
+assert.throws(() => { state.entities[0].anchor.cell = 0; }, TypeError, 'callers must not mutate nested anchor coordinates');
+assert.deepEqual(getSpecialEntityCells(state.entities[0]), [
+  { lane: 0, cell: 4 },
+  { lane: 0, cell: 5 },
+  { lane: 1, cell: 4 },
+  { lane: 1, cell: 5 },
+], 'mutation attempts must not alter the occupancy snapshot');
+assert.equal(getSpecialEntityAtCell(state, 1, 5)?.id, 'boss-1', 'mutation attempts must not poison occupancy queries');
 
 const singleLevelEntity = createLevelSpecialEntity('beacon', { lane: 1, cell: 10 }, [origin]);
 assert.equal(getSpecialEntityCells(singleLevelEntity).length, 1, 'level entities may also occupy one cell');
@@ -97,6 +116,16 @@ assert.throws(
   () => validateSpecialEntityDefinition({ id: 'empty', source: 'LEVEL', footprint: [] }),
   /非空数组/,
   'an entity must have at least one occupied cell',
+);
+const sparseFootprint = new Array(2);
+sparseFootprint[0] = origin;
+assert.equal(Object.prototype.hasOwnProperty.call(sparseFootprint, 1), false, 'the negative fixture must contain a real hole');
+assert.throws(
+  () => validateSpecialEntityDefinition({ id: 'sparse', source: 'LEVEL', footprint: sparseFootprint }),
+  (error) => error instanceof SpecialEntityConfigError
+    && error.configPath === 'specialEntity.footprint[1]'
+    && error.message === 'specialEntity.footprint[1]: 不得包含稀疏空位',
+  'sparse footprint holes must be rejected instead of skipped by map',
 );
 assert.throws(
   () => validateSpecialEntityDefinition({ id: 'missing-anchor', source: 'LEVEL', footprint: [{ laneOffset: 1, cellOffset: 0 }] }),
