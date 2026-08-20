@@ -34,6 +34,7 @@ const config = {
 const DAY_ONE = '2026-08-20';
 const DAY_TWO = '2026-08-21';
 const FUTURE_DAY = '2099-01-01';
+const localDayKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const saves = [];
 const service = new RevealRewardService({
   config,
@@ -56,6 +57,13 @@ assert.throws(
   () => service.synchronize(DAY_TWO),
   (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
   'a future calendar day must not advance daily allowances',
+);
+const realDayService = new RevealRewardService({ config });
+assert.equal(realDayService.snapshot().dayKey, localDayKey(new Date()), 'default day must use the local calendar day');
+assert.throws(
+  () => realDayService.synchronize(localDayKey(new Date(Date.now() + 86_400_000))),
+  (error) => error instanceof RevealRewardError && error.code === 'FUTURE_DAY',
+  'the default local calendar day must reject a future synchronization day',
 );
 
 const opened = service.openSession('run-normal-1', 'NORMAL', DAY_ONE);
@@ -318,6 +326,12 @@ assert.throws(
   () => new RevealRewardService({ config, initialState: futureSessionState, todayDayKey: DAY_ONE }),
   (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
   'initial state validation must reject a future session day',
+);
+const sessionAheadOfState = { ...validState, dayKey: '2026-08-19' };
+assert.throws(
+  () => restoreRevealRewardState(JSON.stringify(sessionAheadOfState), config, DAY_ONE),
+  (error) => error instanceof RevealRewardError && error.code === 'INVALID_STATE',
+  'a restored session must not be newer than its saved state day',
 );
 
 const nonEnumerableState = JSON.parse(persisted);

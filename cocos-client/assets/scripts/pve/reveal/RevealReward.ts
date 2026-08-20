@@ -306,6 +306,9 @@ function validateState(
     if (todayDayKey !== undefined && session.createdDayKey > todayDayKey) {
       fail('INVALID_STATE', `${path}.createdDayKey ${session.createdDayKey} is after todayDayKey ${todayDayKey}`);
     }
+    if (session.createdDayKey > value.dayKey) {
+      fail('INVALID_STATE', `${path}.createdDayKey ${session.createdDayKey} is after state.dayKey ${value.dayKey}`);
+    }
     assertKeyList(session.claimedCardIds, `${path}.claimedCardIds`, 'INVALID_STATE');
     if (config !== undefined) {
       const pool = config.pools.find((candidate) => candidate.id === session.poolId);
