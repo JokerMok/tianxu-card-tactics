@@ -811,10 +811,14 @@ function validateCampaignSnapshot(value: unknown): CampaignState {
 }
 
 function usesChapter01StoryContract(config: NormalizedConfig): boolean {
-  return config.definitions.every((definition) => {
-    if (definition.trigger.type !== 'STORY_NODE_READ') return true;
-    return CHAPTER01_STORY_NODE_IDS.includes(definition.trigger.nodeId!);
-  });
+  const storyDefinitions = config.definitions.filter(
+    (definition) => definition.trigger.type === 'STORY_NODE_READ',
+  );
+  // The configured story triggers choose the protocol; an incoming node id alone
+  // cannot identify the business source. No story trigger means generic sync.
+  return storyDefinitions.length > 0 && storyDefinitions.every(
+    (definition) => CHAPTER01_STORY_NODE_IDS.includes(definition.trigger.nodeId!),
+  );
 }
 
 function validateStorySync(
@@ -848,12 +852,10 @@ function validateStorySync(
   }
   if (strictChapter01) {
     const readCount = value.readNodeIds.length;
-    const expectedCurrentNodeIds = readCount === 0
-      ? [null]
-      : readCount === CHAPTER01_STORY_NODE_IDS.length
-        ? [null, CHAPTER01_STORY_NODE_IDS[readCount - 1]]
-        : [CHAPTER01_STORY_NODE_IDS[readCount - 1]];
-    if (!expectedCurrentNodeIds.includes(value.currentNodeId as string | null | undefined)) {
+    const expectedCurrentNodeId = readCount < CHAPTER01_STORY_NODE_IDS.length
+      ? CHAPTER01_STORY_NODE_IDS[readCount]
+      : null;
+    if (value.currentNodeId !== expectedCurrentNodeId) {
       fail('INVALID_SYNC', 'story sync.currentNodeId does not match the read prefix');
     }
   }

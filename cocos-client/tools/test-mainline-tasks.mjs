@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 import { CampaignStateService } from '../assets/scripts/meta/campaign/index.ts';
-import { CHAPTER01_STORY_NODE_IDS } from '../assets/scripts/meta/story/index.ts';
+import { CHAPTER01_STORY_NODE_IDS, createChapter01Story } from '../assets/scripts/meta/story/index.ts';
 import {
   CHAPTER01_LEVEL_IDS,
   MAINLINE_FEATURE_IDS,
@@ -20,16 +20,10 @@ const campaignDefinition = {
 };
 
 function chapter01StorySnapshot(readCount, overrides = {}) {
-  const readNodeIds = CHAPTER01_STORY_NODE_IDS.slice(0, readCount);
-  return {
-    schemaVersion: 1,
-    chapterId: 'CHAPTER01',
-    readNodeIds,
-    currentNodeId: readCount === 0 || readCount === CHAPTER01_STORY_NODE_IDS.length
-      ? null
-      : readNodeIds[readNodeIds.length - 1],
-    ...overrides,
-  };
+  const story = createChapter01Story();
+  for (let index = 0; index < readCount; index += 1) assert.equal(story.skipCurrent(), true);
+  const snapshot = story.snapshot();
+  return { ...snapshot, readNodeIds: [...snapshot.readNodeIds], ...overrides };
 }
 
 function expectCode(code, callback, label) {
@@ -294,6 +288,18 @@ const beforeStoryPersistFailure = storyPersistFailureService.serialize();
 expectCode('PERSISTENCE_FAILED', () => storyPersistFailureService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: ['NODE-1', 'NODE-2'] }), 'story sync persistence failure');
 assert.equal(storyPersistFailureService.serialize(), beforeStoryPersistFailure, 'story sync persistence failure must be atomic');
 
+const realChapter01Story = createChapter01Story();
+const realChapter01InitialSnapshot = realChapter01Story.snapshot();
+assert.equal(realChapter01InitialSnapshot.currentNodeId, CHAPTER01_STORY_NODE_IDS[0], 'initial story snapshot points to the first pending node');
+assert.equal(realChapter01Story.skipCurrent(), true);
+const realChapter01AfterReadSnapshot = realChapter01Story.snapshot();
+assert.deepEqual(realChapter01AfterReadSnapshot.readNodeIds, [CHAPTER01_STORY_NODE_IDS[0]]);
+assert.equal(realChapter01AfterReadSnapshot.currentNodeId, CHAPTER01_STORY_NODE_IDS[1], 'story snapshot points to the next pending node after a read');
+while (realChapter01Story.skipCurrent()) {}
+const realChapter01CompleteSnapshot = realChapter01Story.snapshot();
+assert.equal(realChapter01CompleteSnapshot.readNodeIds.length, CHAPTER01_STORY_NODE_IDS.length);
+assert.equal(realChapter01CompleteSnapshot.currentNodeId, null, 'completed story snapshot has no pending node');
+
 const realStoryDefinitions = [
   { id: 'real-story-one', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: CHAPTER01_STORY_NODE_IDS[0] }, unlocks: [] },
   { id: 'real-story-two', target: 1, trigger: { type: 'STORY_NODE_READ', nodeId: CHAPTER01_STORY_NODE_IDS[1] }, unlocks: [] },
@@ -306,7 +312,8 @@ const invalidRealStoryInputs = [
   ['unknown node', chapter01StorySnapshot(1, { readNodeIds: ['CH01-NOPE'], currentNodeId: 'CH01-NOPE' })],
   ['jumped prefix', chapter01StorySnapshot(2, { readNodeIds: [CHAPTER01_STORY_NODE_IDS[0], CHAPTER01_STORY_NODE_IDS[2]], currentNodeId: CHAPTER01_STORY_NODE_IDS[2] })],
   ['wrong order', chapter01StorySnapshot(1, { readNodeIds: [CHAPTER01_STORY_NODE_IDS[1]], currentNodeId: CHAPTER01_STORY_NODE_IDS[1] })],
-  ['inconsistent current node', chapter01StorySnapshot(1, { currentNodeId: CHAPTER01_STORY_NODE_IDS[1] })],
+  ['last read node as current', chapter01StorySnapshot(1, { currentNodeId: CHAPTER01_STORY_NODE_IDS[0] })],
+  ['inconsistent current node', chapter01StorySnapshot(1, { currentNodeId: CHAPTER01_STORY_NODE_IDS[2] })],
 ];
 for (const [label, input] of invalidRealStoryInputs) {
   const before = realStoryService.snapshot();
@@ -315,9 +322,23 @@ for (const [label, input] of invalidRealStoryInputs) {
   assert.strictEqual(realStoryService.snapshot(), before, `real story ${label} must not mutate state`);
   assert.equal(realStoryService.serialize(), beforeSerialized, `real story ${label} must not persist`);
 }
-assert.strictEqual(realStoryService.syncStory(chapter01StorySnapshot(0)), realStoryService.snapshot(), 'empty real story prefix is a no-op');
-assert.equal(realStoryService.syncStory(chapter01StorySnapshot(1)).tasks['real-story-one'].completed, true);
+assert.strictEqual(realStoryService.syncStory(realChapter01InitialSnapshot), realStoryService.snapshot(), 'empty real story prefix is a no-op');
+assert.equal(realStoryService.syncStory(realChapter01AfterReadSnapshot).tasks['real-story-one'].completed, true);
 assert.equal(realStoryService.syncStory(chapter01StorySnapshot(2)).tasks['real-story-two'].completed, true);
+assert.strictEqual(realStoryService.syncStory(realChapter01CompleteSnapshot), realStoryService.snapshot(), 'complete real story snapshot is accepted after all matching tasks are complete');
+
+const deckOnlyService = new MainlineTaskService({
+  definitions: [{ id: 'deck-only', target: 1, trigger: { type: 'DECK_UPDATED' }, unlocks: [] }],
+  initialFeatures: [],
+});
+const beforeDeckOnlyStorySync = deckOnlyService.snapshot();
+const beforeDeckOnlyStorySerialized = deckOnlyService.serialize();
+assert.strictEqual(
+  deckOnlyService.syncStory({ chapterId: 'CHAPTER01', readNodeIds: [CHAPTER01_STORY_NODE_IDS[0]] }),
+  beforeDeckOnlyStorySync,
+  'deck-only definitions use the generic story sync contract even when an incoming node id matches Chapter01',
+);
+assert.strictEqual(deckOnlyService.serialize(), beforeDeckOnlyStorySerialized, 'deck-only story sync must not mutate task state');
 
 const pendingState = retryClaimService.serialize();
 const restoredPending = MainlineTaskService.fromSave(MAINLINE_TASK_DEFINITIONS, pendingState, {
