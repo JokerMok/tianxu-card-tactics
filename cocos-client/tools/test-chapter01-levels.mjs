@@ -20,7 +20,7 @@ const executableContractSource = contractSource.replace(
 );
 let moduleId = 0;
 
-const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'];
+const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks', 'strategies'];
 function buildResources() {
   const resourcesByPath = {
     'config/manifest': manifest,
@@ -76,6 +76,7 @@ assert.deepEqual(
 );
 for (const entry of index.levels) {
   assert.equal(entry.resource, `config/levels/chapter01/${entry.id}`);
+  assert.equal(entry.enemyStrategyId, `ES_${entry.id}`);
   const document = readJson(path.join(configRoot, `${entry.resource.replace('config/', '')}.json`));
   assert.equal(document.chapterLevels.length, 1, `${entry.id} must contain exactly one level`);
   assert.equal(document.chapterLevels[0].id, entry.id, `${entry.id} file must match its index entry`);
@@ -83,7 +84,13 @@ for (const entry of index.levels) {
 
 const resourcesByPath = buildResources();
 const loader = await loadModule(resourcesByPath);
-assert.deepEqual(await loader.loadConfigManifest(), manifest, 'real chapter resources must load through the startup loader');
+const loadedRuntime = await loader.loadConfigRuntime();
+assert.deepEqual(loadedRuntime.manifest, manifest, 'real chapter resources must load through the startup loader');
+assert.deepEqual(
+  [...loadedRuntime.chapter01.strategyByLevelId.entries()].map(([levelId, strategy]) => [levelId, strategy.id]),
+  index.levels.map(({ id, enemyStrategyId }) => [id, enemyStrategyId]),
+  'chapter runtime must expose the strategy registry injected by ConfigLoader',
+);
 assert.deepEqual(
   loader.resourceLoadPaths,
   [
@@ -99,7 +106,7 @@ async function expectFailure(label, mutate, expectedPath) {
   const candidate = structuredClone(resourcesByPath);
   mutate(candidate);
   const candidateLoader = await loadModule(candidate);
-  await assert.rejects(candidateLoader.loadConfigManifest(), (error) => {
+  await assert.rejects(candidateLoader.loadConfigRuntime(), (error) => {
     assert.equal(error?.name, 'ConfigLoadError', `${label} must throw ConfigLoadError`);
     assert.equal(error.configPath, expectedPath, `${label} must report the exact resource path`);
     return true;
@@ -112,6 +119,18 @@ await expectFailure('missing index', (candidate) => {
 await expectFailure('missing L12', (candidate) => {
   delete candidate['config/levels/chapter01/L12'];
 }, 'config/levels/chapter01/L12');
+await expectFailure('missing ES_L12', (candidate) => {
+  candidate[manifest.tables.strategies].strategies.pop();
+}, `${manifest.tables.strategies}.strategies`);
+await expectFailure('wrong strategy mapping', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].levelId = 'L02';
+}, `${manifest.tables.strategies}.strategies[0].levelId`);
+await expectFailure('unknown strategy field', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].forgedAction = 'DEPLOY_FRONTLINE';
+}, `${manifest.tables.strategies}.strategies[0].forgedAction`);
+await expectFailure('illegal strategy reference', (candidate) => {
+  candidate[manifest.tables.strategies].strategies[0].unitIds[0] = 'U999';
+}, `${manifest.tables.strategies}.strategies[0].unitIds[0]`);
 await expectFailure('invalid L08 prerequisite', (candidate) => {
   candidate['config/levels/chapter01/L08'].chapterLevels[0].prerequisiteLevelId = 'L99';
 }, 'config/levels/chapter01/L08.chapterLevels[0].prerequisiteLevelId');
@@ -130,4 +149,4 @@ await expectFailure('duplicate chapter target ID', (candidate) => {
   chapterIndex.targetIds.push(chapterIndex.targetIds[0]);
 }, `${manifest.chapters.chapter01}.targetIds[10]`);
 
-console.log('Chapter 01 index and loader integration: L01-L12 load PASS; missing index, missing L12, invalid prerequisite, wrong prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');
+console.log('Chapter 01 runtime integration: L01-L12 and ES_L01-ES_L12 registry load PASS; missing strategy, wrong mapping, unknown field, illegal reference, missing index/L12, invalid prerequisite, unknown deck, duplicate table ID, and duplicate registry ID FAIL as expected');

@@ -23,7 +23,7 @@ import {
   view,
 } from 'cc';
 import { GameShell } from '../meta/GameShell';
-import { loadConfigManifest } from '../config/ConfigLoader';
+import { loadConfigRuntime, type ConfigRuntime } from '../config/ConfigLoader';
 
 const { ccclass } = _decorator;
 
@@ -118,6 +118,7 @@ export class BattleA0Bootstrap extends Component {
   }>();
   private metrics!: A0Metrics;
   private gameShell!: GameShell;
+  private configRuntime!: ConfigRuntime;
   private startupBlocked = false;
   private startupToken = 0;
 
@@ -130,14 +131,16 @@ export class BattleA0Bootstrap extends Component {
   }
 
   private async start(token: number): Promise<void> {
+    let configRuntime: ConfigRuntime;
     try {
-      await loadConfigManifest();
+      configRuntime = await loadConfigRuntime();
     } catch (error) {
       if (!this.isStartupActive(token)) return;
       this.blockStartup(error);
       return;
     }
     if (!this.isStartupActive(token)) return;
+    this.configRuntime = configRuntime!;
     view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
     this.node.getComponent(UITransform)!.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
     this.node.setPosition(DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2);
@@ -180,6 +183,8 @@ export class BattleA0Bootstrap extends Component {
     delete runtime.__A0_SELECT_CARD__;
     delete runtime.__A0_DEPLOY__;
     delete runtime.__A0_IDLE_PHASE__;
+    delete runtime.__A0_CHAPTER01_STRATEGY_REGISTRY__;
+    delete runtime.__A0_CHAPTER01_STRATEGY_FOR_LEVEL__;
     delete runtime.__META_BATTLE_COMPLETE__;
     delete runtime.__META_STATE__;
     delete runtime.__META_NAVIGATE__;
@@ -581,6 +586,12 @@ export class BattleA0Bootstrap extends Component {
 
   private publishHarness(): void {
     const runtime = globalThis as Record<string, any>;
+    const strategyRegistry: Record<string, unknown> = {};
+    this.configRuntime.chapter01.strategyByLevelId.forEach((strategy, levelId) => {
+      strategyRegistry[levelId] = strategy;
+    });
+    runtime.__A0_CHAPTER01_STRATEGY_REGISTRY__ = strategyRegistry;
+    runtime.__A0_CHAPTER01_STRATEGY_FOR_LEVEL__ = (levelId: string) => strategyRegistry[levelId] ?? null;
     runtime.__A0_ENABLE_STRESS__ = () => this.enableStressMode();
     runtime.__A0_TRIGGER_HIT__ = () => this.triggerEnemyHit();
     runtime.__A0_SELECT_CARD__ = (index: number) => this.selectCard(index);

@@ -11,7 +11,8 @@
     "effects": "config/effects",
     "statuses": "config/statuses",
     "professions": "config/professions",
-    "decks": "config/decks"
+    "decks": "config/decks",
+    "strategies": "config/enemy/strategies"
   },
   "chapters": {
     "chapter01": "config/levels/chapter01/index"

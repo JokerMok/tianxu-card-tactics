@@ -14,7 +14,7 @@ const contractSource = fs.readFileSync(contractPath, 'utf8');
 const bootstrap = fs.readFileSync(bootstrapPath, 'utf8');
 const chapterIndex = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/levels/chapter01/index.json'), 'utf8'));
 
-const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'];
+const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks', 'strategies'];
 const resourceByPath = {
   'config/manifest': config,
   ...Object.fromEntries(
@@ -102,18 +102,29 @@ async function expectLoadConfigError(label, resourcesByPath, expectedPath) {
 }
 
 const loaderModule = await loadConfigLoader();
-const { assertConfigManifest, ConfigLoadError, loadConfigManifest } = loaderModule;
+const { assertConfigManifest, ConfigLoadError, loadConfigManifest, loadConfigRuntime } = loaderModule;
 assert.equal(typeof assertConfigManifest, 'function', 'must execute real assertConfigManifest export');
 assert.equal(typeof ConfigLoadError, 'function', 'must execute real ConfigLoadError export');
 assert.deepEqual(assertConfigManifest(config), undefined, 'valid manifest must be accepted');
-assert.deepEqual(await loadConfigManifest(), config, 'real resource loader must return validated config');
+const compatibilityLoader = await loadConfigLoader();
+assert.deepEqual(await compatibilityLoader.loadConfigManifest(), config, 'legacy manifest loader must retain its return contract');
+const loadedRuntime = await loadConfigRuntime();
+assert.deepEqual(loadedRuntime.manifest, config, 'real resource loader must return the validated manifest');
+assert.deepEqual(
+  [...loadedRuntime.chapter01.strategyByLevelId.entries()].map(([levelId, strategy]) => [levelId, strategy.id]),
+  Array.from({ length: 12 }, (_, index) => {
+    const levelId = `L${String(index + 1).padStart(2, '0')}`;
+    return [levelId, `ES_${levelId}`];
+  }),
+  'runtime must expose the twelve level-to-strategy mappings consumed by the chapter loader',
+);
 assert.deepEqual(
   loaderModule.resourceLoadPaths,
   expectedResourceLoadPaths,
   'successful loading must request the manifest and every declared table exactly once',
 );
 
-const tableNamesDeclaration = "const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks'] as const;";
+const tableNamesDeclaration = "const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions', 'decks', 'strategies'] as const;";
 const skippedDeckLoaderSource = loaderSource.replace(
   tableNamesDeclaration,
   "const tableNames = ['units', 'cards', 'skills', 'effects', 'statuses', 'professions'] as const;",
@@ -121,7 +132,7 @@ const skippedDeckLoaderSource = loaderSource.replace(
 assert.notEqual(skippedDeckLoaderSource, loaderSource, 'the skipped-deck regression source must be created');
 const skippedDeckLoader = await loadConfigLoader(resourceByPath, skippedDeckLoaderSource);
 await assert.rejects(
-  skippedDeckLoader.loadConfigManifest(),
+  skippedDeckLoader.loadConfigRuntime(),
   (error) => error?.name === 'ConfigLoadError' && error.configPath === 'config/decks',
   'the chapter loader must reject a loader that skips decks',
 );
@@ -145,6 +156,34 @@ await expectLoadConfigError('missing chapter index', missingChapterIndex, config
 const missingChapterLevel = structuredClone(resourceByPath);
 delete missingChapterLevel['config/levels/chapter01/L12'];
 await expectLoadConfigError('missing chapter level', missingChapterLevel, 'config/levels/chapter01/L12');
+
+const missingStrategy = structuredClone(resourceByPath);
+missingStrategy['config/enemy/strategies'].strategies.pop();
+await expectLoadConfigError('missing strategy', missingStrategy, 'config/enemy/strategies.strategies');
+
+const wrongStrategyMapping = structuredClone(resourceByPath);
+wrongStrategyMapping['config/enemy/strategies'].strategies[0].levelId = 'L02';
+await expectLoadConfigError(
+  'wrong strategy level mapping',
+  wrongStrategyMapping,
+  'config/enemy/strategies.strategies[0].levelId',
+);
+
+const unknownStrategyField = structuredClone(resourceByPath);
+unknownStrategyField['config/enemy/strategies'].strategies[0].forgedAction = 'DEPLOY_FRONTLINE';
+await expectLoadConfigError(
+  'unknown strategy field',
+  unknownStrategyField,
+  'config/enemy/strategies.strategies[0].forgedAction',
+);
+
+const illegalStrategyReference = structuredClone(resourceByPath);
+illegalStrategyReference['config/enemy/strategies'].strategies[0].skillRules[0].skillId = 'S404';
+await expectLoadConfigError(
+  'illegal strategy reference',
+  illegalStrategyReference,
+  'config/enemy/strategies.strategies[0].skillRules[0].skillId',
+);
 
 const invalidChapterPrerequisite = structuredClone(resourceByPath);
 invalidChapterPrerequisite['config/levels/chapter01/L08'].chapterLevels[0].prerequisiteLevelId = 'L99';
@@ -189,10 +228,16 @@ assert.match(loaderSource, /export function isConfigManifest\(value: unknown\): 
 assert.match(loaderSource, /export function assertConfigManifest\(/);
 assert.match(loaderSource, /resources\.load\(['"]config\/manifest['"]/);
 assert.match(loaderSource, /loadChapter01Levels\(/);
+assert.match(loaderSource, /loadConfigRuntime\(/);
+assert.match(loaderSource, /assertEnemyStrategyTable\(/);
+assert.match(loaderSource, /strategyByLevelId/);
+assert.match(loaderSource, /config\/enemy\/strategies/);
 assert.match(loaderSource, /chapter01: string/);
 assert.match(loaderSource, /config\/levels\/chapter01\/index/);
 assert.match(loaderSource, /ConfigLoadError/);
-assert.match(bootstrap, /loadConfigManifest\(/);
+assert.match(bootstrap, /loadConfigRuntime\(/);
+assert.match(bootstrap, /__A0_CHAPTER01_STRATEGY_REGISTRY__/);
+assert.match(bootstrap, /__A0_CHAPTER01_STRATEGY_FOR_LEVEL__/);
 assert.match(bootstrap, /startupBlocked/);
 assert.match(bootstrap, /console\.error\(/);
 assert.match(bootstrap, /startupToken/);
