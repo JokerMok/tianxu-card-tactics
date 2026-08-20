@@ -1,0 +1,907 @@
+{
+  "schemaVersion": 1,
+  "table": "strategies",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
+  "strategies": [
+    {
+      "id": "ES_L01",
+      "levelId": "L01",
+      "deckId": "D001",
+      "unitIds": [
+        "U001"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 90,
+      "defendWeight": 100,
+      "emptyLaneWeight": 20,
+      "rangedSupportWeight": 0,
+      "randomness": 1200,
+      "actionPriority": [
+        "DEPLOY_FRONTLINE",
+        "SAVE_CRITICAL_ALLY",
+        "PRESS_HIGH_THREAT",
+        "FILL_EMPTY_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "LOWEST_HP",
+          "HIGHEST_ATTACK"
+        ],
+        "enemyLaneOrder": [
+          "EMPTY_LANE",
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS"
+        ],
+        "allyUnitOrder": [
+          "MOST_MISSING_HP",
+          "LOWEST_HP",
+          "HIGHEST_VALUE"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "HIGHEST_UNIT_COUNT",
+          "RANGED_SUPPORT"
+        ],
+        "priorityTargetUnitIds": [
+          "U001"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "TUTORIAL",
+        "threatMultiplierPercent": 85,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 2,
+        "sameLaneFallback": "SEEDED",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "UNITS_ONLY",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L02",
+      "levelId": "L02",
+      "deckId": "D001",
+      "unitIds": [
+        "U001",
+        "U004"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S004",
+          "targetPolicy": "RANGED_SUPPORT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 100,
+      "defendWeight": 75,
+      "emptyLaneWeight": 30,
+      "rangedSupportWeight": 100,
+      "randomness": 900,
+      "actionPriority": [
+        "DEPLOY_FRONTLINE",
+        "SUPPORT_RANGED",
+        "PRESS_HIGH_THREAT",
+        "FILL_EMPTY_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "RANGED_SUPPORT",
+          "MOST_DAMAGED_FRONTLINE",
+          "HIGHEST_UNIT_COUNT"
+        ],
+        "priorityTargetUnitIds": [
+          "U004",
+          "U001"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "TUTORIAL",
+        "threatMultiplierPercent": 90,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L03",
+      "levelId": "L03",
+      "deckId": "D001",
+      "unitIds": [
+        "U005",
+        "U001",
+        "U002"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S014",
+          "targetPolicy": "HIGHEST_UNIT_COUNT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 110,
+      "defendWeight": 80,
+      "emptyLaneWeight": 125,
+      "rangedSupportWeight": 35,
+      "randomness": 800,
+      "actionPriority": [
+        "FILL_EMPTY_LANE",
+        "DEPLOY_FAST_UNIT",
+        "SUPPORT_RANGED",
+        "PRESS_HIGH_THREAT",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "LOWEST_HP",
+          "HIGHEST_ATTACK"
+        ],
+        "enemyLaneOrder": [
+          "EMPTY_LANE",
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS"
+        ],
+        "allyUnitOrder": [
+          "LOWEST_HP",
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP"
+        ],
+        "allyLaneOrder": [
+          "HIGHEST_UNIT_COUNT",
+          "RANGED_SUPPORT",
+          "MOST_DAMAGED_FRONTLINE"
+        ],
+        "priorityTargetUnitIds": [
+          "U005",
+          "U002"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "TUTORIAL",
+        "threatMultiplierPercent": 95,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 2,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L04",
+      "levelId": "L04",
+      "deckId": "D001",
+      "unitIds": [
+        "U001",
+        "U002",
+        "U003",
+        "U004",
+        "U005",
+        "U006",
+        "U007",
+        "U008",
+        "U009",
+        "U010",
+        "U011",
+        "U012"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S004",
+          "targetPolicy": "RANGED_SUPPORT",
+          "reserveIfNoLegalTarget": true
+        },
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        },
+        {
+          "skillId": "S014",
+          "targetPolicy": "HIGHEST_UNIT_COUNT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 125,
+      "defendWeight": 100,
+      "emptyLaneWeight": 80,
+      "rangedSupportWeight": 90,
+      "randomness": 600,
+      "actionPriority": [
+        "SAVE_CRITICAL_ALLY",
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "PRESS_HIGH_THREAT",
+        "FILL_EMPTY_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "MOST_MISSING_HP",
+          "HIGHEST_VALUE",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "RANGED_SUPPORT",
+          "HIGHEST_UNIT_COUNT"
+        ],
+        "priorityTargetUnitIds": [
+          "U002",
+          "U004",
+          "U003"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "STANDARD",
+        "threatMultiplierPercent": 100,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L05",
+      "levelId": "L05",
+      "deckId": "D001",
+      "unitIds": [
+        "U007",
+        "U001",
+        "U003"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "FIRE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 130,
+      "defendWeight": 95,
+      "emptyLaneWeight": 55,
+      "rangedSupportWeight": 45,
+      "randomness": 700,
+      "actionPriority": [
+        "SAVE_CRITICAL_ALLY",
+        "DEPLOY_FAST_UNIT",
+        "PRESS_HIGH_THREAT",
+        "DEFEND_THREATENED_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "LOWEST_HP",
+          "HIGHEST_ATTACK"
+        ],
+        "enemyLaneOrder": [
+          "MOST_UNITS",
+          "HIGHEST_PRESSURE",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "MOST_MISSING_HP",
+          "LOWEST_HP",
+          "HIGHEST_VALUE"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "HIGHEST_UNIT_COUNT",
+          "RANGED_SUPPORT"
+        ],
+        "priorityTargetUnitIds": [
+          "U003",
+          "U007",
+          "U001"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "STANDARD",
+        "threatMultiplierPercent": 105,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L06",
+      "levelId": "L06",
+      "deckId": "D001",
+      "unitIds": [
+        "U014",
+        "U018",
+        "U004",
+        "U002"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S004",
+          "targetPolicy": "HIGHEST_UNIT_COUNT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "WATER",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 100,
+      "defendWeight": 105,
+      "emptyLaneWeight": 70,
+      "rangedSupportWeight": 80,
+      "randomness": 500,
+      "actionPriority": [
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "FILL_EMPTY_LANE",
+        "PRESS_HIGH_THREAT",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "HIGHEST_ATTACK",
+          "LOWEST_HP",
+          "LETHAL_IF_POSSIBLE"
+        ],
+        "enemyLaneOrder": [
+          "MOST_UNITS",
+          "HIGHEST_PRESSURE",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "HIGHEST_UNIT_COUNT",
+          "MOST_DAMAGED_FRONTLINE",
+          "RANGED_SUPPORT"
+        ],
+        "priorityTargetUnitIds": [
+          "U014",
+          "U018",
+          "U004"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "STANDARD",
+        "threatMultiplierPercent": 105,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 2,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L07",
+      "levelId": "L07",
+      "deckId": "D001",
+      "unitIds": [
+        "U001",
+        "U012",
+        "U011",
+        "U002"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "EARTH",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 135,
+      "defendWeight": 120,
+      "emptyLaneWeight": 45,
+      "rangedSupportWeight": 110,
+      "randomness": 450,
+      "actionPriority": [
+        "SAVE_CRITICAL_ALLY",
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "PRESS_HIGH_THREAT",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "RANGED_SUPPORT",
+          "MOST_DAMAGED_FRONTLINE",
+          "HIGHEST_UNIT_COUNT"
+        ],
+        "priorityTargetUnitIds": [
+          "U012",
+          "U001",
+          "U002"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "CHALLENGE",
+        "threatMultiplierPercent": 110,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L08",
+      "levelId": "L08",
+      "deckId": "D001",
+      "unitIds": [
+        "U008",
+        "U001",
+        "U004",
+        "U012"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S014",
+          "targetPolicy": "RANGED_SUPPORT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 105,
+      "defendWeight": 140,
+      "emptyLaneWeight": 40,
+      "rangedSupportWeight": 115,
+      "randomness": 350,
+      "actionPriority": [
+        "PROTECT_OBJECTIVE",
+        "DEPLOY_ANCHOR",
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "HIGHEST_ATTACK",
+          "LETHAL_IF_POSSIBLE",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "RANGED_SUPPORT",
+          "HIGHEST_UNIT_COUNT"
+        ],
+        "priorityTargetUnitIds": [
+          "U008",
+          "U001",
+          "U004"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "CHALLENGE",
+        "threatMultiplierPercent": 112,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 8
+      }
+    },
+    {
+      "id": "ES_L09",
+      "levelId": "L09",
+      "deckId": "D001",
+      "unitIds": [
+        "U009",
+        "U010",
+        "U001",
+        "U004"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 145,
+      "defendWeight": 90,
+      "emptyLaneWeight": 60,
+      "rangedSupportWeight": 95,
+      "randomness": 400,
+      "actionPriority": [
+        "SAVE_CRITICAL_ALLY",
+        "HANDLE_REVIVE",
+        "PRESS_HIGH_THREAT",
+        "FILL_EMPTY_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "MOST_MISSING_HP",
+          "LOWEST_HP",
+          "HIGHEST_VALUE"
+        ],
+        "allyLaneOrder": [
+          "HIGHEST_UNIT_COUNT",
+          "MOST_DAMAGED_FRONTLINE",
+          "RANGED_SUPPORT"
+        ],
+        "priorityTargetUnitIds": [
+          "U009",
+          "U010",
+          "U004"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "CHALLENGE",
+        "threatMultiplierPercent": 115,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L10",
+      "levelId": "L10",
+      "deckId": "D001",
+      "unitIds": [
+        "U001",
+        "U004",
+        "U005",
+        "U006"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S004",
+          "targetPolicy": "RANGED_SUPPORT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 115,
+      "defendWeight": 135,
+      "emptyLaneWeight": 95,
+      "rangedSupportWeight": 85,
+      "randomness": 500,
+      "actionPriority": [
+        "PROTECT_OBJECTIVE",
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "FILL_EMPTY_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "HIGHEST_ATTACK",
+          "LETHAL_IF_POSSIBLE",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "MOST_UNITS",
+          "HIGHEST_PRESSURE",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "LOWEST_HP",
+          "MOST_MISSING_HP"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "HIGHEST_UNIT_COUNT",
+          "RANGED_SUPPORT"
+        ],
+        "priorityTargetUnitIds": [
+          "U001",
+          "U004",
+          "U005"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "CHALLENGE",
+        "threatMultiplierPercent": 118,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 2,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L11",
+      "levelId": "L11",
+      "deckId": "D001",
+      "unitIds": [
+        "U001",
+        "U004",
+        "U005",
+        "U008",
+        "U009",
+        "U010"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S014",
+          "targetPolicy": "HIGHEST_UNIT_COUNT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 135,
+      "defendWeight": 110,
+      "emptyLaneWeight": 75,
+      "rangedSupportWeight": 100,
+      "randomness": 300,
+      "actionPriority": [
+        "COUNTER_PLAYER_ROLE",
+        "SUPPORT_RANGED",
+        "PRESS_HIGH_THREAT",
+        "DEFEND_THREATENED_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "LOWEST_HP",
+          "MOST_MISSING_HP"
+        ],
+        "allyLaneOrder": [
+          "HIGHEST_UNIT_COUNT",
+          "RANGED_SUPPORT",
+          "MOST_DAMAGED_FRONTLINE"
+        ],
+        "priorityTargetUnitIds": [
+          "U008",
+          "U005",
+          "U009"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "CHALLENGE",
+        "threatMultiplierPercent": 122,
+        "skillReserveTurns": 1
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    },
+    {
+      "id": "ES_L12",
+      "levelId": "L12",
+      "deckId": "D001",
+      "unitIds": [
+        "U009",
+        "U001",
+        "U004",
+        "U008",
+        "U012"
+      ],
+      "skillRules": [
+        {
+          "skillId": "S004",
+          "targetPolicy": "RANGED_SUPPORT",
+          "reserveIfNoLegalTarget": true
+        },
+        {
+          "skillId": "S006",
+          "targetPolicy": "MOST_MISSING_HP",
+          "reserveIfNoLegalTarget": true
+        },
+        {
+          "skillId": "S014",
+          "targetPolicy": "HIGHEST_UNIT_COUNT",
+          "reserveIfNoLegalTarget": true
+        }
+      ],
+      "environmentElement": "NONE",
+      "maxCardsPerAction": 1,
+      "lethalWeight": 155,
+      "defendWeight": 145,
+      "emptyLaneWeight": 85,
+      "rangedSupportWeight": 120,
+      "randomness": 250,
+      "actionPriority": [
+        "HANDLE_PHASE_RULE",
+        "DEPLOY_ANCHOR",
+        "SAVE_CRITICAL_ALLY",
+        "SUPPORT_RANGED",
+        "DEFEND_THREATENED_LANE",
+        "HOLD_NO_LEGAL_ACTION"
+      ],
+      "targetSelection": {
+        "enemyUnitOrder": [
+          "LETHAL_IF_POSSIBLE",
+          "HIGHEST_ATTACK",
+          "LOWEST_HP"
+        ],
+        "enemyLaneOrder": [
+          "HIGHEST_PRESSURE",
+          "MOST_UNITS",
+          "EMPTY_LANE"
+        ],
+        "allyUnitOrder": [
+          "HIGHEST_VALUE",
+          "MOST_MISSING_HP",
+          "LOWEST_HP"
+        ],
+        "allyLaneOrder": [
+          "MOST_DAMAGED_FRONTLINE",
+          "RANGED_SUPPORT",
+          "HIGHEST_UNIT_COUNT"
+        ],
+        "priorityTargetUnitIds": [
+          "U008",
+          "U009",
+          "U001"
+        ],
+        "noLegalTarget": "HOLD",
+        "tieBreak": "SEEDED"
+      },
+      "difficulty": {
+        "tier": "BOSS",
+        "threatMultiplierPercent": 128,
+        "skillReserveTurns": 0
+      },
+      "ruleBoundary": {
+        "maxConsecutiveSameLane": 3,
+        "sameLaneFallback": "PRESS_OTHER_LANE",
+        "reserveSkillWhenNoLegalTarget": true,
+        "openingCardPolicy": "ALL_LEGAL",
+        "maxRounds": 80
+      }
+    }
+  ]
+}
