@@ -75,6 +75,7 @@ const savingService = new ProfileService(
 );
 savingService.grantExperience(1);
 assert.deepEqual(savingService.snapshot(), { level: 2, xp: 0, stamina: 10, staminaMax: 10, lastStaminaAt: 500 });
+assert.equal(persisted.length, 1, 'state mutations must persist immediately');
 const save = savingService.save();
 assert.equal(persisted.at(-1), save);
 const restored = ProfileService.fromSave(save, rules);
