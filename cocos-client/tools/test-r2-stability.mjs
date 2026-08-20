@@ -13,7 +13,6 @@ import {
   createObjectiveState,
   deserializeObjectiveState,
   serializeObjectiveState,
-  settleObjectives,
   startObjectives,
 } from '../assets/scripts/core/outcome/objectives/index.ts';
 import {
@@ -154,12 +153,21 @@ function assertRunnerContract(result, expectedActionCount, label) {
   assert.equal(result.actionCount, expectedActionCount, `${label} actionCount must match input`);
 }
 
+function battleEndEvent(result, label) {
+  const battleEnds = result.events.filter(({ type }) => type === 'BATTLE_END');
+  assert.equal(battleEnds.length, 1, `${label} must contain exactly one BATTLE_END`);
+  const battleEnd = battleEnds[0];
+  assert.equal(battleEnd.payload.status, result.outcome.status, `${label} BATTLE_END status must match outcome`);
+  assert.equal(battleEnd.payload.winner, result.outcome.winner, `${label} BATTLE_END winner must match outcome`);
+  return battleEnd;
+}
+
 function assertBattleResult(result, label, expectedActionCount = result.actionCount) {
   assertRunnerContract(result, expectedActionCount, label);
   assert.equal(result.status, 'ok', `${label} must return ok`);
   assert.equal(result.outcome.status, 'won', `${label} must settle as a win`);
   assert.equal(result.finalState.status, 'won', `${label} final state must be won`);
-  assert.equal(result.events.filter(({ type }) => type === 'BATTLE_END').length, 1, `${label} must settle exactly once`);
+  battleEndEvent(result, label);
   assert.equal(result.rngCursor, result.finalState.rngCursor, `${label} rng cursor must be state-derived`);
   assert.equal(typeof result.finalHash, 'string');
   for (const side of ['player', 'enemy']) {
@@ -168,40 +176,73 @@ function assertBattleResult(result, label, expectedActionCount = result.actionCo
   for (const unit of result.finalState.units) assert(unit.hp >= 0, `${label} unit HP must be non-negative`);
 }
 
-function runObjectiveBattle(battleNumber, atMs, result) {
-  const battleEnd = [...result.events].reverse().find(({ type }) => type === 'BATTLE_END');
-  assert(battleEnd, `battle ${battleNumber} runner output must contain BATTLE_END`);
-  assert.equal(battleEnd.payload.status, result.outcome.status, `battle ${battleNumber} objective outcome must use BATTLE_END payload`);
-  assert.equal(battleEnd.payload.winner, result.outcome.winner, `battle ${battleNumber} objective winner must use BATTLE_END payload`);
+function assertObjectiveRoundTrip(state, configs, label, repeatedEvent) {
+  const serialized = serializeObjectiveState(state);
+  const restored = deserializeObjectiveState(serialized, configs);
+  assert.deepEqual(restored, state, `${label} JSON round-trip must restore exactly`);
+  if (repeatedEvent !== undefined) {
+    assert.strictEqual(applyObjectiveEvent(restored, repeatedEvent), restored, `${label} repeated event must be idempotent`);
+  }
+  assertFrozenBoundary(label, restored);
+  return restored;
+}
 
-  const enemyHeroDefeated = battleEnd.payload.reason === 'HERO_DEFEATED'
-    && battleEnd.payload.winner === 'player'
-    && result.finalState.heroHp.enemy === 0;
-  const configs = enemyHeroDefeated
-    ? [{ id: 'kill-enemy-hero', type: 'KILL', targetId: 'enemy-hero', targetSide: 'enemy', count: 1 }]
-    : [{ id: 'protect-player-hero', type: 'DEFEND', targetId: 'player-hero', minHp: result.finalState.heroHp.player }];
-  let state = startObjectives(createObjectiveState(configs), atMs, {
+function heroDeathObjectiveEvent(result, label) {
+  const battleEnd = battleEndEvent(result, label);
+  assert.equal(battleEnd.payload.reason, 'HERO_DEFEATED', `${label} must end by HERO_DEFEATED`);
+  assert.equal(battleEnd.payload.winner, 'player', `${label} must be won by player`);
+  assert.equal(result.finalState.heroHp.enemy, 0, `${label} must prove enemy hero HP is zero`);
+  return {
+    id: `runner-${battleEnd.eventId}-enemy-hero-defeated`,
+    type: 'UNIT_DEFEATED',
+    unitId: 'enemy-hero',
+    side: 'enemy',
+  };
+}
+
+function runHeroDeathObjectives(result) {
+  const objectiveEvent = heroDeathObjectiveEvent(result, 'hero death objective source');
+  const configs = [
+    { id: 'kill-enemy-hero', type: 'KILL', targetId: 'enemy-hero', targetSide: 'enemy', count: 1 },
+    { id: 'timed-enemy-hero', type: 'TIMED', targetId: 'enemy-hero', targetSide: 'enemy', count: 1, timeLimitMs: 1_000 },
+  ];
+  for (const config of configs) {
+    let state = startObjectives(createObjectiveState([config]), 0);
+    state = applyObjectiveEvent(state, objectiveEvent);
+    assert.equal(state.objectives[0].type, config.type, `${config.type} objective type must be preserved`);
+    assert.equal(state.objectives[0].status, 'completed', `${config.type} objective must complete from hero defeat`);
+    assert.equal(state.lifecycle, 'won', `${config.type} objective must settle as won`);
+    assert.equal(state.settlement?.reason, 'OBJECTIVES_COMPLETE');
+    assertObjectiveRoundTrip(state, [config], `${config.type} objective`, objectiveEvent);
+  }
+  stats.objectiveEvents += configs.length * 2;
+}
+
+function runObjectiveBattle(battleNumber, atMs, result) {
+  const battleEnd = battleEndEvent(result, `battle ${battleNumber} objective source`);
+  assert.equal(battleEnd.payload.reason, 'ROUND_LIMIT', `battle ${battleNumber} must use real ROUND_LIMIT result for DEFEND`);
+  assert.equal(result.finalState.round, battleEnd.round, `battle ${battleNumber} DEFEND source round must be runner-derived`);
+  assert(result.finalState.heroHp.player > 0, `battle ${battleNumber} DEFEND source player HP must remain positive`);
+  const config = {
+    id: `protect-player-hero-${battleNumber}`,
+    type: 'DEFEND',
+    targetId: 'player-hero',
+    minHp: result.finalState.heroHp.player,
+  };
+  let state = startObjectives(createObjectiveState([config]), atMs, {
     'player-hero': result.finalState.heroHp.player,
-    'enemy-hero': result.finalState.heroHp.enemy,
   });
-  const objectiveEvent = enemyHeroDefeated
-    ? { id: `enemy-hero-defeated-${battleNumber}`, type: 'UNIT_DEFEATED', unitId: 'enemy-hero', side: 'enemy' }
-    : { id: `player-hero-health-${battleNumber}`, type: 'TARGET_HEALTH', targetId: 'player-hero', hp: result.finalState.heroHp.player };
+  assert.equal(state.objectives[0].currentHp, result.finalState.heroHp.player, `battle ${battleNumber} DEFEND HP must use runner state`);
+  const objectiveEvent = {
+    id: `runner-${battleEnd.eventId}-battle-ended`,
+    type: 'BATTLE_ENDED',
+    outcome: battleEnd.payload.status,
+  };
   state = applyObjectiveEvent(state, objectiveEvent);
-  state = settleObjectives(state, battleEnd.payload.status, `battle-end-${battleNumber}-${battleEnd.eventId}`);
   assert.equal(state.lifecycle, result.outcome.status, `battle ${battleNumber} objectives must match runner result`);
   assert.equal(state.settlement?.status, result.outcome.status);
   assert.equal(state.settlement?.reason, 'OBJECTIVES_COMPLETE');
-  const serialized = serializeObjectiveState(state);
-  assert.deepEqual(deserializeObjectiveState(serialized, configs), state, 'objective save must restore exactly');
-  if (battleNumber === 1) {
-    assert.strictEqual(
-      applyObjectiveEvent(state, objectiveEvent),
-      state,
-      'duplicate objective event must be idempotent',
-    );
-    assertFrozenBoundary('objective state', state);
-  }
+  assertObjectiveRoundTrip(state, [config], `DEFEND objective ${battleNumber}`);
   stats.objectiveBattles += 1;
   stats.objectiveEvents += state.events.length;
   return state;
@@ -283,7 +324,14 @@ function buildServices() {
 }
 
 function runNegativeCases() {
-  const runnerInput = { protocol: BATTLE_RUNNER_PROTOCOL, seed: 1, actions: [] };
+  const runnerInput = {
+    protocol: BATTLE_RUNNER_PROTOCOL,
+    seed: 42,
+    professionId: 'P001',
+    actions: roundLimitActions(),
+  };
+  const inProcessOutput = runBattleRunner(runnerInput);
+  assertBattleResult(inProcessOutput, 'runner in-process positive output', runnerInput.actions.length);
   const runnerScriptPath = path.join(PROJECT_ROOT, 'assets', 'scripts', 'battle', 'runner', 'battle-runner.ts');
   const cliInput = spawnSync(process.execPath, ['--experimental-strip-types', runnerScriptPath], {
     input: JSON.stringify(runnerInput),
@@ -292,6 +340,7 @@ function runNegativeCases() {
   assert.equal(cliInput.status, 0, 'runner CLI valid input must exit zero');
   const cliOutput = JSON.parse(cliInput.stdout);
   assertRunnerContract(cliOutput, runnerInput.actions.length, 'runner CLI valid output');
+  assert.deepEqual(cliOutput, inProcessOutput, 'runner CLI and in-process output must be identical');
 
   const invalidProtocolInput = { ...runnerInput, protocol: 'tianxu.cocos-battle-runner/invalid' };
   expectCode(
@@ -467,6 +516,8 @@ function runRollbackCases() {
 function checkpoint(services, longObjective) {
   const rewardBefore = services.reward.snapshot();
   const lastProcessedRewardKey = rewardBefore.processedRewardKeys.at(-1);
+  const replayObjectiveEvent = longObjective.events.at(-1);
+  assert(replayObjectiveEvent, 'long objective checkpoint must have a previously processed event');
   const serialized = {
     campaign: services.campaign.save(),
     mainline: services.mainline.serialize(),
@@ -507,6 +558,12 @@ function checkpoint(services, longObjective) {
     (value) => services.rewardSaves.push(value),
   );
   const restoredLongObjective = deserializeObjectiveState(serialized.longObjective, LONG_OBJECTIVE_CONFIG);
+  assert.deepEqual(restoredLongObjective, longObjective, 'long objective checkpoint must restore exactly');
+  assert.strictEqual(
+    applyObjectiveEvent(restoredLongObjective, replayObjectiveEvent),
+    restoredLongObjective,
+    'replaying a pre-checkpoint objective event must be idempotent after restore',
+  );
   assert.deepEqual(services.reward.snapshot(), rewardBefore, 'reward checkpoint must restore exactly');
   if (lastProcessedRewardKey !== undefined) {
     const duplicate = services.reward.grant(lastProcessedRewardKey, { silver: 999, essence: 999 });
@@ -568,6 +625,7 @@ function runSimulation() {
     'HERO_DEFEATED',
     'hero defeat probe must exercise hero defeat settlement',
   );
+  runHeroDeathObjectives(heroDeathProbe);
 
   let deckId = services.deck.createDeck({ id: 't215-stability', name: 'T215稳定编队' }).id;
   services.deck.addCard(deckId, 'U001', 1);
@@ -681,7 +739,9 @@ function runSimulation() {
 
   assert.equal(stats.ticks, TICK_COUNT);
   assert.equal(longObjective.elapsedMs, SIMULATION_DURATION_MS);
+  assert.equal(longObjective.objectives[0].type, 'SURVIVE', 'SURVIVE objective type must be preserved');
   assert.equal(longObjective.lifecycle, 'won');
+  assertObjectiveRoundTrip(longObjective, LONG_OBJECTIVE_CONFIG, 'SURVIVE long objective');
   assertFrozenBoundary('long objective final state', longObjective);
   assert.equal(services.campaign.snapshot().levels.L12.firstClear, true);
   assert.equal(services.campaign.snapshot().levels.L01.replayCount, 5);
