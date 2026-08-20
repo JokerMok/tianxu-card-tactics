@@ -130,10 +130,21 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function exactKeys(record: Record<string, unknown>, keys: readonly string[], configPath: string): void {
   const allowed = new Set(keys);
   for (const key of keys) {
-    if (!(key in record)) throw new TowerConfigError(`${configPath}.${key}`, '缺少必需字段');
+    if (!Object.prototype.hasOwnProperty.call(record, key)) {
+      throw new TowerConfigError(`${configPath}.${key}`, '缺少必需字段');
+    }
   }
-  for (const key of Object.keys(record)) {
-    if (!allowed.has(key)) throw new TowerConfigError(`${configPath}.${key}`, '不允许未知字段');
+  for (const key of Reflect.ownKeys(record)) {
+    if (typeof key !== 'string' || !allowed.has(key)) {
+      throw new TowerConfigError(`${configPath}.${String(key)}`, '不允许未知字段');
+    }
+  }
+  for (let prototype = Object.getPrototypeOf(record); prototype !== null && prototype !== Object.prototype; prototype = Object.getPrototypeOf(prototype)) {
+    for (const key of Reflect.ownKeys(prototype)) {
+      if (typeof key !== 'string' || !allowed.has(key)) {
+        throw new TowerConfigError(`${configPath}.${String(key)}`, '原型上不允许未知字段');
+      }
+    }
   }
 }
 

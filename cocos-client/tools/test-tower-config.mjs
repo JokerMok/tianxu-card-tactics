@@ -71,6 +71,19 @@ expectRejected('fixed floor enemy combination', (candidate) => {
   candidate.floors.forEach((floor) => { floor.enemyIds = ['U001', 'U002']; });
 }, 'config.floors[1].enemyIds');
 expectRejected('unknown field', (candidate) => { candidate.floors[0].rules.extra = true; });
+expectRejected('non-enumerable unknown field', (candidate) => {
+  Object.defineProperty(candidate.floors[0].rules, 'hiddenExtra', { value: true, enumerable: false });
+});
+expectRejected('unknown symbol field', (candidate) => {
+  Object.defineProperty(candidate.floors[0].rules, Symbol('unknown'), { value: true });
+});
+expectRejected('inherited unknown field', (candidate) => {
+  Object.setPrototypeOf(candidate.floors[0].rules, { inheritedExtra: true });
+});
+expectRejected('inherited required field', (candidate) => {
+  delete candidate.floors[0].floor;
+  Object.setPrototypeOf(candidate.floors[0], { floor: 1 });
+}, 'config.floors[0].floor');
 expectRejected('regressing threat', (candidate) => {
   candidate.floors[25].rules.threatMultiplierPercent = candidate.floors[24].rules.threatMultiplierPercent;
 });
