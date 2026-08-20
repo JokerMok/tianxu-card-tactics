@@ -17,6 +17,9 @@ export type DungeonStageState = Readonly<{
   heroHp: number;
   units: readonly DungeonUnitState[];
   attempts: number;
+  /** State at the beginning of the current stage; used for a loss retry. */
+  checkpointHeroHp?: number;
+  checkpointUnits?: readonly DungeonUnitState[];
 }>;
 
 export type DungeonSessionState = Readonly<{
@@ -125,6 +128,8 @@ function validateState(state: unknown, expectedStageIds: readonly string[]): ass
     if (!['pending', 'active', 'lost', 'completed'].includes(String(candidate.status))) fail('INVALID_STATE', `stages[${index}].status is invalid`);
     assertHp(candidate.heroHp, `stages[${index}].heroHp`);
     assertUnits(candidate.units, `stages[${index}].units`);
+    if (candidate.checkpointHeroHp !== undefined) assertHp(candidate.checkpointHeroHp, `stages[${index}].checkpointHeroHp`);
+    if (candidate.checkpointUnits !== undefined) assertUnits(candidate.checkpointUnits, `stages[${index}].checkpointUnits`);
     if (!Number.isSafeInteger(candidate.attempts) || (candidate.attempts as number) < 0) fail('INVALID_STATE', `stages[${index}].attempts is invalid`);
   });
   const activeStages = raw.stages.filter((stage) => (stage as Record<string, unknown>).status === 'active').length;
@@ -139,6 +144,8 @@ function makeStages(stageIds: readonly string[], heroHp = 0, units: readonly Dun
     heroHp,
     units: clone(units),
     attempts: 0,
+    checkpointHeroHp: heroHp,
+    checkpointUnits: clone(units),
   }));
 }
 
@@ -207,6 +214,7 @@ export class DungeonSessionService {
     assertTrimmedString(deckId, 'deckId');
     if (!Array.isArray(cardIds) || cardIds.length === 0) fail('INVALID_CONFIG', 'locked deck must contain cards');
     cardIds.forEach((cardId, index) => assertTrimmedString(cardId, `cardIds[${index}]`));
+    if (new Set(cardIds).size !== cardIds.length) fail('INVALID_CONFIG', 'locked deck cannot contain duplicate cards');
     assertHp(heroHp, 'heroHp');
     if (heroHp === 0) fail('INVALID_CONFIG', 'heroHp must be positive when starting a session');
     assertUnits(units, 'units');
@@ -228,6 +236,7 @@ export class DungeonSessionService {
 
   completeBattle(result: DungeonBattleResult): DungeonSessionState {
     if (this.current.status !== 'active') fail(this.current.status === 'won' || this.current.status === 'lost' ? 'SESSION_SETTLED' : 'INVALID_TRANSITION', 'dungeon session is not in an active battle');
+    if (result === null || typeof result !== 'object' || Array.isArray(result)) fail('INVALID_CONFIG', 'battle result must be an object');
     if (result.outcome !== 'won' && result.outcome !== 'lost') fail('INVALID_CONFIG', 'battle outcome is invalid');
     assertHp(result.heroHp, 'result.heroHp');
     assertUnits(result.units, 'result.units');
@@ -246,7 +255,14 @@ export class DungeonSessionService {
       return this.current;
     }
     const nextStage = stages[nextIndex];
-    stages[nextIndex] = { ...nextStage, status: 'active', heroHp: result.heroHp, units: clone(result.units) };
+    stages[nextIndex] = {
+      ...nextStage,
+      status: 'active',
+      heroHp: result.heroHp,
+      units: clone(result.units),
+      checkpointHeroHp: result.heroHp,
+      checkpointUnits: clone(result.units),
+    };
     this.commit({ ...this.current, stageIndex: nextIndex, stages });
     return this.current;
   }
@@ -254,10 +270,11 @@ export class DungeonSessionService {
   retry(): DungeonSessionState {
     if (this.current.status !== 'lost') fail('INVALID_TRANSITION', 'only a lost dungeon can be retried');
     const retryIndex = this.current.stageIndex;
-    const previous = retryIndex > 0 ? this.current.stages[retryIndex - 1] : undefined;
     const retryStage = this.current.stages[retryIndex];
-    const heroHp = previous?.heroHp ?? retryStage.heroHp;
-    const units = previous?.units ?? retryStage.units;
+    if (!retryStage) fail('INVALID_STATE', 'lost dungeon stage is missing');
+    const previous = retryIndex > 0 ? this.current.stages[retryIndex - 1] : undefined;
+    const heroHp = retryStage.checkpointHeroHp ?? previous?.heroHp ?? retryStage.heroHp;
+    const units = retryStage.checkpointUnits ?? previous?.units ?? retryStage.units;
     const stages = this.current.stages.map((stage, index) => ({
       ...stage,
       status: index < retryIndex ? stage.status : index === retryIndex ? 'active' : 'pending',
