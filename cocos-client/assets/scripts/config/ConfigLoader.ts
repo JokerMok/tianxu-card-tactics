@@ -32,75 +32,75 @@ export interface ConfigManifest {
 }
 
 export interface ChapterLevelIndexEntry {
-  id: string;
-  resource: string;
-  prerequisiteLevelId: string | null;
-  enemyStrategyId: string;
+  readonly id: string;
+  readonly resource: string;
+  readonly prerequisiteLevelId: string | null;
+  readonly enemyStrategyId: string;
 }
 
 export interface ChapterLevelIndex {
-  schemaVersion: 1;
-  id: string;
-  chapterId: string;
-  levels: ChapterLevelIndexEntry[];
-  targetIds: string[];
-  rewardRegistries: {
-    unlockIds: string[];
-    chestIds: string[];
-    flagIds: string[];
+  readonly schemaVersion: 1;
+  readonly id: string;
+  readonly chapterId: string;
+  readonly levels: readonly ChapterLevelIndexEntry[];
+  readonly targetIds: readonly string[];
+  readonly rewardRegistries: {
+    readonly unlockIds: readonly string[];
+    readonly chestIds: readonly string[];
+    readonly flagIds: readonly string[];
   };
 }
 
 export interface EnemyStrategySkillRule {
-  skillId: string;
-  targetPolicy: string;
-  reserveIfNoLegalTarget: boolean;
+  readonly skillId: string;
+  readonly targetPolicy: string;
+  readonly reserveIfNoLegalTarget: boolean;
 }
 
 export interface EnemyStrategyTargetSelection {
-  enemyUnitOrder: string[];
-  enemyLaneOrder: string[];
-  allyUnitOrder: string[];
-  allyLaneOrder: string[];
-  priorityTargetUnitIds: string[];
-  noLegalTarget: string;
-  tieBreak: string;
+  readonly enemyUnitOrder: readonly string[];
+  readonly enemyLaneOrder: readonly string[];
+  readonly allyUnitOrder: readonly string[];
+  readonly allyLaneOrder: readonly string[];
+  readonly priorityTargetUnitIds: readonly string[];
+  readonly noLegalTarget: string;
+  readonly tieBreak: string;
 }
 
 export interface EnemyStrategyDifficulty {
-  tier: string;
-  threatMultiplierPercent: number;
-  skillReserveTurns: number;
+  readonly tier: string;
+  readonly threatMultiplierPercent: number;
+  readonly skillReserveTurns: number;
 }
 
 export interface EnemyStrategyRuleBoundary {
-  maxConsecutiveSameLane: number;
-  sameLaneFallback: string;
-  reserveSkillWhenNoLegalTarget: boolean;
-  openingCardPolicy: string;
-  enemyActionInterval: number | null;
-  phasePolicy: string;
-  specialRule: string;
-  maxRounds: number;
+  readonly maxConsecutiveSameLane: number;
+  readonly sameLaneFallback: string;
+  readonly reserveSkillWhenNoLegalTarget: boolean;
+  readonly openingCardPolicy: string;
+  readonly enemyActionInterval: number | null;
+  readonly phasePolicy: string;
+  readonly specialRule: string;
+  readonly maxRounds: number;
 }
 
 export interface EnemyStrategy {
-  id: string;
-  levelId: string;
-  deckId: string;
-  unitIds: string[];
-  skillRules: EnemyStrategySkillRule[];
-  environmentElement: string;
-  maxCardsPerAction: number;
-  lethalWeight: number;
-  defendWeight: number;
-  emptyLaneWeight: number;
-  rangedSupportWeight: number;
-  randomness: number;
-  actionPriority: string[];
-  targetSelection: EnemyStrategyTargetSelection;
-  difficulty: EnemyStrategyDifficulty;
-  ruleBoundary: EnemyStrategyRuleBoundary;
+  readonly id: string;
+  readonly levelId: string;
+  readonly deckId: string;
+  readonly unitIds: readonly string[];
+  readonly skillRules: readonly EnemyStrategySkillRule[];
+  readonly environmentElement: string;
+  readonly maxCardsPerAction: number;
+  readonly lethalWeight: number;
+  readonly defendWeight: number;
+  readonly emptyLaneWeight: number;
+  readonly rangedSupportWeight: number;
+  readonly randomness: number;
+  readonly actionPriority: readonly string[];
+  readonly targetSelection: EnemyStrategyTargetSelection;
+  readonly difficulty: EnemyStrategyDifficulty;
+  readonly ruleBoundary: EnemyStrategyRuleBoundary;
 }
 
 export interface Chapter01Runtime {
@@ -225,12 +225,6 @@ function strategyInteger(
   return value;
 }
 
-function strategyBoolean(record: Record<string, unknown>, key: string, configPath: string): boolean {
-  const value = required(record, key, configPath);
-  if (typeof value !== 'boolean') throw new ConfigLoadError(`${configPath}.${key}`, '必须是 boolean');
-  return value;
-}
-
 function strategyEnum(
   record: Record<string, unknown>,
   key: string,
@@ -256,7 +250,7 @@ function strategyStringArray(
   if (new Set(items).size !== items.length) {
     throw new ConfigLoadError(`${configPath}.${key}`, '不得包含重复 ID 或枚举');
   }
-  return items;
+  return items.slice();
 }
 
 function strategyNullableInteger(
@@ -407,6 +401,45 @@ function assertIndexStringArray(value: unknown, configPath: string): string[] {
   return value as string[];
 }
 
+function exactKeysWithOptional(
+  record: Record<string, unknown>,
+  requiredKeys: readonly string[],
+  optionalKeys: readonly string[],
+  configPath: string,
+): void {
+  requiredKeys.forEach((key) => required(record, key, configPath));
+  const allowed = new Set([...requiredKeys, ...optionalKeys]);
+  Object.keys(record).forEach((key) => {
+    if (!allowed.has(key)) throw new ConfigLoadError(`${configPath}.${key}`, '不允许未知字段');
+  });
+}
+
+function deepFreeze<T>(value: T): T {
+  if (value === null || (typeof value !== 'object' && typeof value !== 'function') || Object.isFrozen(value)) return value;
+  Object.getOwnPropertyNames(value).forEach((key) => {
+    deepFreeze((value as Record<string, unknown>)[key]);
+  });
+  Object.getOwnPropertySymbols(value).forEach((symbol) => {
+    deepFreeze((value as Record<symbol, unknown>)[symbol]);
+  });
+  return Object.freeze(value);
+}
+
+function createReadonlyMap<K, V>(entries: readonly (readonly [K, V])[]): ReadonlyMap<K, V> {
+  const map = new Map(entries);
+  const view: ReadonlyMap<K, V> = {
+    get size(): number { return map.size; },
+    get: (key) => map.get(key),
+    has: (key) => map.has(key),
+    entries: () => map.entries(),
+    keys: () => map.keys(),
+    values: () => map.values(),
+    forEach: (callback, thisArg) => map.forEach((value, key) => callback.call(thisArg, value, key, view)),
+    [Symbol.iterator]: () => map[Symbol.iterator](),
+  };
+  return Object.freeze(view);
+}
+
 function assertChapterLevelIndex(value: unknown, configPath = CHAPTER01_INDEX_PATH): ChapterLevelIndex {
   if (!isRecord(value)) throw new ConfigLoadError(configPath, '根值必须是 JSON object');
   exactKeys(value, ['schemaVersion', 'id', 'chapterId', 'levels', 'targetIds', 'rewardRegistries'], configPath);
@@ -457,6 +490,7 @@ function assertChapterLevelIndex(value: unknown, configPath = CHAPTER01_INDEX_PA
   const rewardPath = `${configPath}.rewardRegistries`;
   const rewardRegistries = required(value, 'rewardRegistries', configPath);
   if (!isRecord(rewardRegistries)) throw new ConfigLoadError(rewardPath, '必须是 object');
+  exactKeys(rewardRegistries, ['unlockIds', 'chestIds', 'flagIds'], rewardPath);
   const unlockIds = assertIndexStringArray(required(rewardRegistries, 'unlockIds', rewardPath), `${rewardPath}.unlockIds`);
   const chestIds = assertIndexStringArray(required(rewardRegistries, 'chestIds', rewardPath), `${rewardPath}.chestIds`);
   const flagIds = assertIndexStringArray(required(rewardRegistries, 'flagIds', rewardPath), `${rewardPath}.flagIds`);
@@ -671,9 +705,13 @@ function parseEnemyStrategy(
     throw new ConfigLoadError(`${configPath}.id`, `必须与 ${levelId} 一一对应: ES_${levelId}`);
   }
 
+  const level = levelsById.get(levelId)!;
   const deckId = stringField(row, 'deckId', configPath);
   const deck = tables.decks.get(deckId);
   if (!deck) throw new ConfigLoadError(`${configPath}.deckId`, `未知或未启用牌组: ${deckId}`);
+  if (deckId !== level.enemyDeckId) {
+    throw new ConfigLoadError(`${configPath}.deckId`, `必须使用关卡真实敌方牌组 ${level.enemyDeckId}`);
+  }
   const deckPath = `config/decks.decks.${deckId}`;
   const deckUnitIds = deckCardIds(deck, tables.cards, 'UNIT', deckPath);
   const deckSkillIds = deckCardIds(deck, tables.cards, 'SKILL', deckPath);
@@ -714,12 +752,11 @@ function parseEnemyStrategy(
     const policies = typeof skill.targetType === 'string' ? SKILL_POLICIES_BY_TARGET.get(skill.targetType) : undefined;
     if (!policies) throw new ConfigLoadError(`${rulePath}.skillId`, `使用了未支持的技能目标类型: ${skill.targetType}`);
     const targetPolicy = strategyEnum(rule, 'targetPolicy', policies, rulePath);
-    const reserveIfNoLegalTarget = strategyBoolean(rule, 'reserveIfNoLegalTarget', rulePath);
+    const reserveIfNoLegalTarget = booleanField(rule, 'reserveIfNoLegalTarget', rulePath);
     return { skillId, targetPolicy, reserveIfNoLegalTarget };
   });
 
   const environmentElement = strategyEnum(row, 'environmentElement', STRATEGY_ENVIRONMENTS, configPath);
-  const level = levelsById.get(levelId)!;
   if (environmentElement !== level.environmentElement) {
     throw new ConfigLoadError(`${configPath}.environmentElement`, '与真实关卡环境不一致');
   }
@@ -778,7 +815,7 @@ function parseEnemyStrategy(
   exactKeys(boundaryValue, RULE_BOUNDARY_KEYS, boundaryPath);
   const maxConsecutiveSameLane = strategyInteger(boundaryValue, 'maxConsecutiveSameLane', 1, 3, boundaryPath);
   const sameLaneFallback = strategyEnum(boundaryValue, 'sameLaneFallback', LANE_FALLBACKS, boundaryPath);
-  const reserveSkillWhenNoLegalTarget = strategyBoolean(boundaryValue, 'reserveSkillWhenNoLegalTarget', boundaryPath);
+  const reserveSkillWhenNoLegalTarget = booleanField(boundaryValue, 'reserveSkillWhenNoLegalTarget', boundaryPath);
   const openingCardPolicy = strategyEnum(boundaryValue, 'openingCardPolicy', OPENING_POLICIES, boundaryPath);
   const enemyActionInterval = strategyNullableInteger(boundaryValue, 'enemyActionInterval', 1, 80, boundaryPath);
   const phasePolicy = strategyEnum(boundaryValue, 'phasePolicy', PHASE_POLICIES, boundaryPath);
@@ -879,11 +916,55 @@ export async function loadChapter01Runtime(
   const chapterContract = await import('./levels/ChapterLevelContract');
   const levels = await Promise.all(index.levels.map(async (entry) => {
     const value = await loadJsonAsset(entry.resource);
-    if (!isRecord(value) || !Array.isArray(value.chapterLevels) || value.chapterLevels.length !== 1) {
+    if (!isRecord(value)) {
+      throw new ConfigLoadError(entry.resource, '根值必须是 JSON object');
+    }
+    exactKeys(value, ['chapterLevels'], entry.resource);
+    if (!Array.isArray(value.chapterLevels) || value.chapterLevels.length !== 1) {
       throw new ConfigLoadError(entry.resource, '必须包含恰好一个 chapterLevels 条目');
     }
     const levelValue = value.chapterLevels[0];
-    if (!isRecord(levelValue) || levelValue.id !== entry.id) {
+    const levelPath = `${entry.resource}.chapterLevels[0]`;
+    if (!isRecord(levelValue)) {
+      throw new ConfigLoadError(levelPath, '必须是 object');
+    }
+    exactKeysWithOptional(
+      levelValue,
+      ['id', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'],
+      ['scenarioRules', 'battleRules'],
+      levelPath,
+    );
+    const objectives = levelValue.objectives;
+    if (Array.isArray(objectives)) {
+      objectives.forEach((objective, index) => {
+        const objectivePath = `${levelPath}.objectives[${index}]`;
+        if (!isRecord(objective)) throw new ConfigLoadError(objectivePath, '必须是 object');
+        exactKeysWithOptional(objective, ['type'], ['targetId', 'rounds'], objectivePath);
+      });
+    }
+    const rewards = levelValue.rewards;
+    if (Array.isArray(rewards)) {
+      rewards.forEach((reward, index) => {
+        const rewardItemPath = `${levelPath}.rewards[${index}]`;
+        if (!isRecord(reward)) throw new ConfigLoadError(rewardItemPath, '必须是 object');
+        exactKeysWithOptional(reward, ['type', 'id', 'quantity'], ['cardType'], rewardItemPath);
+        if ('cardType' in reward) {
+          const cardType = reward.cardType;
+          if (cardType !== 'UNIT' && cardType !== 'SKILL') {
+            throw new ConfigLoadError(`${rewardItemPath}.cardType`, '必须是 UNIT 或 SKILL');
+          }
+        }
+      });
+    }
+    const failureConditions = levelValue.failureConditions;
+    if (Array.isArray(failureConditions)) {
+      failureConditions.forEach((condition, index) => {
+        const conditionPath = `${levelPath}.failureConditions[${index}]`;
+        if (!isRecord(condition)) throw new ConfigLoadError(conditionPath, '必须是 object');
+        exactKeysWithOptional(condition, ['type'], ['targetId', 'rounds'], conditionPath);
+      });
+    }
+    if (levelValue.id !== entry.id) {
       throw new ConfigLoadError(`${entry.resource}.chapterLevels[0].id`, `必须与索引一致: ${entry.id}`);
     }
     if (levelValue.prerequisiteLevelId !== entry.prerequisiteLevelId) {
@@ -899,11 +980,12 @@ export async function loadChapter01Runtime(
   const strategiesValue = tables.get('strategies');
   if (!strategiesValue) throw new ConfigLoadError(STRATEGY_CONFIG_PATH, '敌方策略资源未加载');
   const strategies = assertEnemyStrategyTable(strategiesValue, index, levelsById, tables);
+  const frozenStrategies = strategies.map((strategy) => deepFreeze(strategy));
   return {
     index,
     levels,
-    strategyByLevelId: new Map(strategies.map((strategy) => [strategy.levelId, strategy])),
-    strategyById: new Map(strategies.map((strategy) => [strategy.id, strategy])),
+    strategyByLevelId: createReadonlyMap(frozenStrategies.map((strategy) => [strategy.levelId, strategy] as const)),
+    strategyById: createReadonlyMap(frozenStrategies.map((strategy) => [strategy.id, strategy] as const)),
   };
 }
 

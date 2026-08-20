@@ -26,9 +26,15 @@ const fixtureRoot = path.join(root, 'tools/fixtures/config-cross-table');
 const readFixture = (name) => JSON.parse(fs.readFileSync(path.join(fixtureRoot, name), 'utf8'));
 
 if (process.argv[2]) {
-  assertConfigTables(JSON.parse(fs.readFileSync(path.resolve(process.argv[2]), 'utf8')));
-  console.log(`Config fixture PASS: ${process.argv[2]}`);
-  process.exit(0);
+  try {
+    assertConfigTables(JSON.parse(fs.readFileSync(path.resolve(process.argv[2]), 'utf8')));
+    console.log(`Config fixture PASS: ${process.argv[2]}`);
+    process.exit(0);
+  } catch (error) {
+    const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.error(message);
+    process.exit(1);
+  }
 }
 
 const valid = readFixture('valid.json');

@@ -23,7 +23,7 @@ import {
   view,
 } from 'cc';
 import { GameShell } from '../meta/GameShell';
-import { loadConfigRuntime, type ConfigRuntime } from '../config/ConfigLoader';
+import { loadConfigRuntime, type ConfigRuntime, type EnemyStrategy } from '../config/ConfigLoader';
 
 const { ccclass } = _decorator;
 
@@ -81,6 +81,15 @@ interface A0Metrics {
   unitMotion: 'idle-breathing';
   selectedCard: number;
   activeDeploymentMarkers: number;
+  enemyInitialUnitId: string;
+}
+
+export function selectA0InitialEnemyUnit(strategy: Pick<EnemyStrategy, 'unitIds'>): string {
+  const initialUnitId = strategy.unitIds[0];
+  if (typeof initialUnitId !== 'string' || initialUnitId.length === 0) {
+    throw new Error('L01 敌方策略必须提供至少一个初始单位');
+  }
+  return initialUnitId;
 }
 
 @ccclass('BattleA0Bootstrap')
@@ -95,6 +104,7 @@ export class BattleA0Bootstrap extends Component {
   private enemyHpBar!: Node;
   private enemyHpLabel!: Label;
   private selectedCard = -1;
+  private enemyInitialUnitId = '';
   private enemyHp = 3600;
   private hitCount = 0;
   private activeUnits = 0;
@@ -492,8 +502,12 @@ export class BattleA0Bootstrap extends Component {
   }
 
   private spawnInitialUnits(): void {
+    const strategy = this.configRuntime.chapter01.strategyByLevelId.get('L01');
+    if (!strategy) throw new Error('缺少 L01 敌方运行时策略');
+    const enemyUnitId = selectA0InitialEnemyUnit(strategy);
+    this.enemyInitialUnitId = enemyUnitId;
     this.spawnUnit(0, 2, 'player', 'U002');
-    this.spawnUnit(0, 9, 'enemy', 'U008');
+    this.spawnUnit(0, 9, 'enemy', enemyUnitId);
     this.updateMetrics();
   }
 
@@ -623,6 +637,7 @@ export class BattleA0Bootstrap extends Component {
       unitMotion: 'idle-breathing',
       selectedCard: this.selectedCard,
       activeDeploymentMarkers: 0,
+      enemyInitialUnitId: this.enemyInitialUnitId,
     };
     runtime.__A0_METRICS__ = this.metrics;
   }
