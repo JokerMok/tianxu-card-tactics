@@ -268,7 +268,7 @@ async function main() {
 
   console.log('T328 counterexamples: PASS (missing file, invalid JSON, out-of-range integer, tampered save, config path traversal)');
   console.log('T328 conclusion: release security rehearsal PASS; covered release gate is green.');
-  console.log('T328 rollback: stop release, save the current verifier/report/samples, git revert --no-edit 94f1363c190a8bb32214a6c534419b88450c3efe then git revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59, rerun the verifier from the saved copy, record its exit code, and update no shared ledger until it passes.');
+  console.log('T328 rollback: stop release, save the current verifier/report/samples, git revert --no-edit 2b44a1f39e2e49f26916b4b9ef50725f01a78650 then git revert --no-edit 94f1363c190a8bb32214a6c534419b88450c3efe then git revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59, rerun the verifier from the saved copy, record its exit code, and update no shared ledger until it passes.');
 }
 
 main().catch((error) => {
