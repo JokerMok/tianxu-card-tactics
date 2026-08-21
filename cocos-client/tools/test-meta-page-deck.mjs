@@ -79,6 +79,29 @@ const initialPool = initial.components.find((component) => component.id === 'car
 assert.equal(initialPool?.cards.find((card) => card.cardId === 'U001')?.permitted, true);
 assert.equal(initialPool?.cards.find((card) => card.cardId === 'S001')?.permitted, false, 'skill permission must be evaluated per card');
 
+// A supplied manager is authoritative for inventory projection, even when page options disagree.
+const zeroInventoryManager = new DeckManagementService({
+  metadata: cardsTable,
+  availableCards: { ...availability, U001: 0 },
+});
+const zeroInventoryPage = new DeckPageService({ data, manager: zeroInventoryManager, availableCards: availability, authority });
+assert.equal(
+  zeroInventoryPage.snapshot().components.find((component) => component.id === 'card-pool')?.cards.find((card) => card.cardId === 'U001')?.availableCount,
+  0,
+  'page inventory projection must use the supplied manager',
+);
+
+const limitedInventoryManager = new DeckManagementService({
+  metadata: cardsTable,
+  availableCards: { ...availability, U001: 2 },
+});
+const limitedInventoryPage = new DeckPageService({ data, manager: limitedInventoryManager, availableCards: availability, authority });
+assert.equal(
+  limitedInventoryPage.snapshot().components.find((component) => component.id === 'card-pool')?.cards.find((card) => card.cardId === 'U001')?.availableCount,
+  2,
+  'page inventory projection must expose manager quantity below copyLimit',
+);
+
 // Component projection is data-driven and detached from caller mutations.
 const mutableData = createDefaultDeckPageData({ metadata: cardsTable, decks: decksTable, professionId: 'P001' });
 const isolatedPage = new DeckPageService({ data: mutableData, manager: validManager, authority });
@@ -159,6 +182,9 @@ expectDeckFailure('duplicate card entries in saved state', () => new DeckManagem
 }), 'DUPLICATE_CARD_ENTRY');
 expectDeckFailure('copy limit', () => emptyManager.addCardToDeck('deck-default', 'U001', 5), 'CARD_COPY_LIMIT_EXCEEDED');
 const fullManager = new DeckManagementService({ metadata: cardsTable, availableCards: availability, state: validState });
+const fullPage = new DeckPageService({ data, manager: fullManager, authority });
+assert.equal(fullPage.snapshot().components.find((component) => component.id === 'deck-card-U001')?.canAdd, false, 'a full deck cannot add another card');
+expectDeckFailure('manager inventory zero', () => zeroInventoryPage.addCard('U001'), 'CARD_QUANTITY_UNAVAILABLE');
 expectDeckFailure('deck total limit', () => fullManager.addCardToDeck('deck-default', 'U001', 1), 'DECK_CARD_LIMIT_EXCEEDED');
 expectPageFailure('forbidden skill', () => emptyDeckPage.addCard('S001'), 'SKILL_PROFESSION_FORBIDDEN');
 expectPageFailure('unknown selected card', () => emptyDeckPage.selectCard('U999'), 'CARD_NOT_FOUND');
@@ -172,6 +198,12 @@ expectPageFailure('empty page with manager', () => new DeckPageService({ data: c
 // Add/remove uses the actual DeckManagementService and persistence callback.
 const saves = [];
 const editable = new DeckPageService({ data, authority, availableCards: availability, persist: (serialized) => saves.push(serialized) });
+assert.equal(limitedInventoryPage.addCard('U001').accepted, true, 'a card within manager inventory must be addable');
+assert.equal(limitedInventoryPage.snapshot().components.find((component) => component.id === 'deck-card-U001')?.count, 1);
+assert.equal(limitedInventoryPage.snapshot().components.find((component) => component.id === 'deck-card-U001')?.canAdd, true);
+assert.equal(limitedInventoryPage.addCard('U001').accepted, true);
+assert.equal(limitedInventoryPage.snapshot().components.find((component) => component.id === 'deck-card-U001')?.count, 2);
+assert.equal(limitedInventoryPage.snapshot().components.find((component) => component.id === 'deck-card-U001')?.canAdd, false);
 assert.deepEqual(editable.addCard('U001'), { accepted: true, changed: true, reason: 'added', cardId: 'U001', deckId: 'deck-default' });
 assert.equal(editable.snapshot().state.decks[0].cardEntries[0].count, 1);
 assert.deepEqual(editable.removeCard('U001'), { accepted: true, changed: true, reason: 'removed', cardId: 'U001', deckId: 'deck-default' });
@@ -189,5 +221,5 @@ assert.equal(restored.snapshot().selectedCardId, 'U002');
 const restoredAgain = restored.restore(serialized);
 assert.deepEqual(restoredAgain, restored.snapshot(), 'restoring the same save must be idempotent');
 
-assert.equal(negativeCaseCount, 10, 'all malformed and boundary cases must execute');
+assert.equal(negativeCaseCount, 11, 'all malformed and boundary cases must execute');
 console.log(`T309 deck page PASS: real-cards=${realCards.length}, components=${initial.components.length}, saves=${saves.length}, negative-cases=${negativeCaseCount}, normal/empty/invalid, selection/drag, deep-freeze, save-restore-idempotent`);

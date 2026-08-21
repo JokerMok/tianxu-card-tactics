@@ -1,6 +1,7 @@
-import type {
-  Deck,
-  DeckManagementState,
+import {
+  MAX_DECK_CARDS,
+  type Deck,
+  type DeckManagementState,
 } from '../../../../decks/deck-management.ts';
 import {
   type DeckEntryComponent,
@@ -135,6 +136,8 @@ function entryComponent(
   card: DeckPageCardData,
   count: number,
   availableCount: number,
+  totalCount: number,
+  totalCapacity: number,
   interaction: DeckPageInteractionState,
 ): DeckEntryComponent {
   const selected = interaction.selectedCardId === card.id;
@@ -150,7 +153,7 @@ function entryComponent(
     selected,
     dragging,
     dropTarget,
-    canAdd: count < card.copyLimit && count < availableCount,
+    canAdd: count < card.copyLimit && count < availableCount && totalCount < totalCapacity,
     canRemove: count > 0,
   });
 }
@@ -194,6 +197,7 @@ export function createDeckPageComponents(
   const validation = projection.validation ?? defaultValidation(data, deck);
   const cardById = new Map(data.cards.map((card) => [card.id, card]));
   const computed = counts(deck, cardById);
+  const totalCapacity = Math.min(data.totalCards, MAX_DECK_CARDS);
   const header: DeckHeaderComponent = Object.freeze({
     id: 'header',
     kind: 'header',
@@ -211,7 +215,14 @@ export function createDeckPageComponents(
   const entries = deck.cardEntries.map((entry) => {
     const card = cardById.get(entry.cardId);
     if (!card) return null;
-    return entryComponent(card, entry.count, projection.availableById?.get(card.id) ?? card.copyLimit, interaction);
+    return entryComponent(
+      card,
+      entry.count,
+      projection.availableById?.get(card.id) ?? card.copyLimit,
+      computed.total,
+      totalCapacity,
+      interaction,
+    );
   }).filter((entry): entry is DeckEntryComponent => entry !== null);
   const components: DeckPageComponent[] = [
     header,

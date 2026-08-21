@@ -309,7 +309,6 @@ function parseSavedPage(value: unknown): {
 
 export class DeckPageService {
   private readonly data: DeckPageData;
-  private readonly availableById: ReadonlyMap<string, number>;
   private readonly metadata: readonly unknown[];
   private readonly availableInput: unknown;
   private readonly professionId: string | null;
@@ -330,7 +329,6 @@ export class DeckPageService {
     this.professionId = options.professionId === undefined ? this.data.professionId : options.professionId;
     this.metadata = cardRowsForManager(this.data);
     this.availableInput = options.availableCards ?? options.availableCardCounts ?? options.cardInventory;
-    this.availableById = normalizeAvailable(this.data, this.availableInput);
     this.rules = options.rules ?? buildRules(this.data, options);
     this.onSave = options.onSave ?? options.persist;
     const supplied = options.manager ?? options.deckService ?? options.deck;
@@ -384,7 +382,7 @@ export class DeckPageService {
       state: state === null ? null : cloneState(state),
       validation: cloneValidation(validation),
       components: createDeckPageComponents(this.data, state, interaction, {
-        availableById: this.availableById,
+        availableById: state === null ? undefined : this.availableByIdForManager(),
         permittedById: this.permittedById(state),
         validation,
       }),
@@ -509,7 +507,7 @@ export class DeckPageService {
     if (this.manager === null) fail('STATE_NOT_AVAILABLE', 'deck state is not available for an empty page');
     const saved = parseSavedPage(serialized);
     const restored = DeckManagementService.restore(this.metadata, JSON.stringify(saved.deckState), {
-      availableCards: this.availableInput,
+      availableCards: this.availableByIdForManager(),
       onSave: this.onSave,
     });
     this.assertDataCoversState(restored.snapshot());
@@ -576,6 +574,11 @@ export class DeckPageService {
     return this.manager?.getCurrentDeck().cardEntries.some((entry) => entry.cardId === cardId) ?? false;
   }
 
+  private availableByIdForManager(): ReadonlyMap<string, number> {
+    if (this.manager === null) return new Map();
+    return new Map(this.data.cards.map((card) => [card.id, this.manager!.getAvailableCardCount(card.id)]));
+  }
+
   private assertProfessionAllowed(cardId: string, count: number): void {
     if (this.rules === null || this.professionId === null) return;
     const current = this.manager!.getCurrentDeck();
@@ -592,47 +595,6 @@ export class DeckPageService {
 
 function isPageData(input: DeckPageData | DeckPageServiceOptions): input is DeckPageData {
   return isRecord(input) && 'schemaVersion' in input && !('data' in input);
-}
-
-function normalizeAvailable(data: DeckPageData, input: unknown): ReadonlyMap<string, number> {
-  const result = new Map<string, number>();
-  for (const card of data.cards) result.set(card.id, card.copyLimit);
-  if (input === undefined) return result;
-  let source = input;
-  if (isRecord(source) && typeof source.snapshot === 'function') source = source.snapshot();
-  if (isRecord(source) && Array.isArray(source.entries)) source = source.entries;
-  if (isRecord(source) && Array.isArray(source.cards)) source = source.cards;
-  if (source instanceof Map) {
-    for (const [id, quantity] of source.entries()) {
-      if (typeof id !== 'string' || !result.has(id) || typeof quantity !== 'number' || !Number.isSafeInteger(quantity) || quantity < 0) {
-        fail('INVALID_DATA', 'available card quantities are invalid');
-      }
-      result.set(id, quantity);
-    }
-    return result;
-  }
-  if (Array.isArray(source)) {
-    for (const raw of source) {
-      if (!isRecord(raw)) fail('INVALID_DATA', 'available card quantities are invalid');
-      const id = raw.cardId ?? raw.id;
-      const quantity = raw.quantity ?? raw.count ?? raw.copies;
-      if (typeof id !== 'string' || !result.has(id) || typeof quantity !== 'number' || !Number.isSafeInteger(quantity) || quantity < 0) {
-        fail('INVALID_DATA', 'available card quantities are invalid');
-      }
-      result.set(id, quantity);
-    }
-    return result;
-  }
-  if (isRecord(source)) {
-    for (const [id, quantity] of Object.entries(source)) {
-      if (!result.has(id) || typeof quantity !== 'number' || !Number.isSafeInteger(quantity) || quantity < 0) {
-        fail('INVALID_DATA', 'available card quantities are invalid');
-      }
-      result.set(id, quantity);
-    }
-    return result;
-  }
-  fail('INVALID_DATA', 'available card quantities are invalid');
 }
 
 function buildRules(data: DeckPageData, options: DeckPageServiceOptions): HeroProfessionRules | null {
