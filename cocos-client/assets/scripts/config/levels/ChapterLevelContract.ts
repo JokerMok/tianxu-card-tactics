@@ -63,6 +63,8 @@ const ENVIRONMENT_ELEMENTS: readonly EnvironmentElement[] = ['NONE', 'METAL', 'W
 const OBJECTIVE_TYPES: readonly LevelObjectiveType[] = ['DEFEAT_ENEMY_HERO', 'DESTROY_TARGET', 'PROTECT_TARGET', 'SURVIVE_ROUNDS'];
 const REWARD_TYPES: readonly LevelRewardType[] = ['CARD', 'UNLOCK', 'CHEST', 'FLAG'];
 const FAILURE_TYPES: readonly LevelFailureType[] = ['PLAYER_HERO_DEFEATED', 'ROUND_LIMIT_REACHED', 'TARGET_DESTROYED'];
+const MAX_REGISTRY_ITERATOR_STEPS = 1024;
+const iteratorSnapshotCache = new WeakMap<object, readonly unknown[]>();
 function isLevelRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -245,6 +247,7 @@ function normalizeStringRegistry(value: unknown, configPath: string, pattern: Re
   if (!(value instanceof Set) || value.size === 0) throw new ConfigLoadError(configPath, '必须是非空 Set');
   const normalized = new Set<string>();
   const activeCollections = new Set<object>();
+  let iteratorSteps = 0;
 
   const visitCollection = (collection: Set<unknown> | unknown[] | Iterator<unknown>, collectionPath: string): void => {
     if (activeCollections.has(collection)) throw new ConfigLoadError(collectionPath, '注册表集合不得循环引用');
@@ -257,24 +260,47 @@ function normalizeStringRegistry(value: unknown, configPath: string, pattern: Re
       }
       normalized.add(assertId(candidate, candidatePath, pattern));
     };
-    if (collection instanceof Set || Array.isArray(collection)) {
-      collection.forEach((candidate) => {
-        visit(candidate, `${collectionPath}[${count}]`);
-        count += 1;
-      });
-    } else {
-      while (true) {
-        const step = collection.next();
-        if (!isLevelRecord(step) || typeof step.done !== 'boolean') {
-          throw new ConfigLoadError(collectionPath, '必须是有效 Iterator');
+    try {
+      if (collection instanceof Set || Array.isArray(collection)) {
+        collection.forEach((candidate) => {
+          visit(candidate, `${collectionPath}[${count}]`);
+          count += 1;
+        });
+      } else {
+        let snapshot = iteratorSnapshotCache.get(collection);
+        if (!snapshot) {
+          const values: unknown[] = [];
+          while (true) {
+            iteratorSteps += 1;
+            if (iteratorSteps > MAX_REGISTRY_ITERATOR_STEPS) {
+              throw new ConfigLoadError(collectionPath, 'Iterator 遍历超过安全上限');
+            }
+            let step: IteratorResult<unknown>;
+            try {
+              step = collection.next();
+            } catch (error) {
+              if (error instanceof ConfigLoadError) throw error;
+              const reason = error instanceof Error ? error.message : String(error);
+              throw new ConfigLoadError(collectionPath, `Iterator.next() 失败: ${reason}`, { cause: error });
+            }
+            if (!isLevelRecord(step) || typeof step.done !== 'boolean') {
+              throw new ConfigLoadError(collectionPath, '必须是有效 Iterator');
+            }
+            if (step.done) break;
+            values.push(step.value);
+          }
+          snapshot = Object.freeze(values);
+          iteratorSnapshotCache.set(collection, snapshot);
         }
-        if (step.done) break;
-        visit(step.value, `${collectionPath}[${count}]`);
-        count += 1;
+        snapshot.forEach((candidate) => {
+          visit(candidate, `${collectionPath}[${count}]`);
+          count += 1;
+        });
       }
+      if (count === 0) throw new ConfigLoadError(collectionPath, '必须是非空注册表集合');
+    } finally {
+      activeCollections.delete(collection);
     }
-    activeCollections.delete(collection);
-    if (count === 0) throw new ConfigLoadError(collectionPath, '必须是非空注册表集合');
   };
 
   visitCollection(value, configPath);

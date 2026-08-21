@@ -136,6 +136,116 @@ assert.doesNotThrow(
   () => assertChapterLevelContract(valid, manifest, decks, cocosIteratorReferences),
   'nested Cocos Set/Iterator registries must still allow legal U001 references',
 );
+assert.doesNotThrow(
+  () => assertChapterLevelContract(valid, manifest, decks, cocosIteratorReferences),
+  'the same nested Cocos Iterator references must remain valid on a consecutive contract check',
+);
+
+expectFailureWithReferences(
+  'empty chapter level registry Set',
+  valid,
+  { ...references, chapterLevelIds: new Set() },
+  'config/levels.references.chapterLevelIds',
+);
+expectFailureWithReferences(
+  'empty nested chapter level registry Array',
+  valid,
+  { ...references, chapterLevelIds: new Set([[]]) },
+  'config/levels.references.chapterLevelIds[0]',
+);
+expectFailureWithReferences(
+  'empty nested chapter level registry Iterator',
+  valid,
+  { ...references, chapterLevelIds: new Set([[][Symbol.iterator]()]) },
+  'config/levels.references.chapterLevelIds[0]',
+);
+const selfReferentialRegistry = new Set();
+selfReferentialRegistry.add(selfReferentialRegistry);
+expectFailureWithReferences(
+  'self-referential chapter level registry',
+  valid,
+  { ...references, chapterLevelIds: selfReferentialRegistry },
+  'config/levels.references.chapterLevelIds[0]',
+);
+const invalidStepIterator = { next: () => ({ value: 'L01' }) };
+expectFailureWithReferences(
+  'invalid nested registry Iterator step',
+  valid,
+  { ...references, chapterLevelIds: new Set([invalidStepIterator]) },
+  'config/levels.references.chapterLevelIds[0]',
+);
+let nonTerminatingIteratorCalls = 0;
+const nonTerminatingIterator = {
+  next: () => {
+    nonTerminatingIteratorCalls += 1;
+    if (nonTerminatingIteratorCalls > 1024) throw new Error('non-terminating iterator sentinel');
+    return { done: false, value: 'L01' };
+  },
+};
+expectFailureWithReferences(
+  'non-terminating registry Iterator',
+  valid,
+  { ...references, chapterLevelIds: new Set([nonTerminatingIterator]) },
+  'config/levels.references.chapterLevelIds[0]',
+);
+let boundedIteratorCalls = 0;
+const boundedIterator = {
+  next: () => {
+    boundedIteratorCalls += 1;
+    return { done: false, value: 'L01' };
+  },
+};
+assert.throws(
+  () => assertChapterLevelContract(
+    valid,
+    manifest,
+    decks,
+    { ...references, chapterLevelIds: new Set([boundedIterator]) },
+  ),
+  (error) => {
+    assert(error instanceof ConfigLoadError, 'an infinite Iterator must throw ConfigLoadError');
+    assert.equal(error.configPath, 'config/levels.references.chapterLevelIds[0]');
+    assert.match(error.message, /Iterator 遍历超过安全上限/);
+    assert.equal(boundedIteratorCalls, 1024, 'an infinite Iterator must stop at the 1024-step limit');
+    return true;
+  },
+);
+const iteratorFailure = new Error('registry iterator exploded');
+function* throwingRegistryIterator() {
+  throw iteratorFailure;
+}
+const throwingIteratorReferences = {
+  ...references,
+  targetIds: new Set([throwingRegistryIterator()]),
+};
+assert.throws(
+  () => assertChapterLevelContract(valid, manifest, decks, throwingIteratorReferences),
+  (error) => {
+    assert(error instanceof ConfigLoadError, 'a throwing Iterator must throw ConfigLoadError');
+    assert.equal(error.configPath, 'config/levels.references.targetIds[0]');
+    assert.match(error.message, /Iterator\.next\(\) 失败: registry iterator exploded/);
+    assert.equal(error.cause, iteratorFailure, 'the original Iterator failure must remain diagnosable');
+    return true;
+  },
+);
+const nestedConfigLoadError = new ConfigLoadError('config/levels.references.inner', 'already normalized');
+const existingConfigLoadErrorIterator = {
+  next: () => {
+    throw nestedConfigLoadError;
+  },
+};
+assert.throws(
+  () => assertChapterLevelContract(
+    valid,
+    manifest,
+    decks,
+    { ...references, targetIds: new Set([existingConfigLoadErrorIterator]) },
+  ),
+  (error) => {
+    assert.equal(error, nestedConfigLoadError, 'an existing ConfigLoadError must not be wrapped twice');
+    return true;
+  },
+);
 const nestedUnitUnknownTarget = structuredClone(valid);
 nestedUnitUnknownTarget.chapterLevels[0].objectives[1].targetId = 'U999';
 expectFailureWithReferences(
