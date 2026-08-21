@@ -1,0 +1,30 @@
+export {
+  BUILD_TARGETS,
+  createBuildContext,
+  normalizeBuildDocument,
+  simulateBuild,
+  simulateBuildAcrossSeeds,
+  validateBuild,
+  validateBuildCorpus,
+} from './build-simulation.ts';
+
+export type {
+  BuildContext,
+  BuildContextInput,
+  BuildCorpusValidation,
+  BuildCoverage,
+  BuildDocumentInput,
+  BuildEntry,
+  BuildSimulationResult,
+  BuildTarget,
+  BuildValidationSummary,
+  CardDefinition,
+  DeckContract,
+  MultiSeedSimulationResult,
+  NormalizedBuild,
+  ProfessionDefinition,
+  SimulationEvent,
+  SimulationOptions,
+  SkillDefinition,
+  UnitDefinition,
+} from './build-simulation.ts';
