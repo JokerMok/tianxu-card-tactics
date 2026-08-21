@@ -141,7 +141,7 @@ function defaultDefinition(): CampaignDefinition {
 
 function isPageData(value: unknown): value is CampaignPageData {
   if (!isRecord(value)) return false;
-  return ['schemaVersion', 'chapterId', 'title', 'subtitle', 'levels']
+  return ['schemaVersion', 'chapterId', 'title', 'subtitle']
     .some((key) => Object.prototype.hasOwnProperty.call(value, key));
 }
 
@@ -158,6 +158,13 @@ function assertStateService(value: unknown): asserts value is CampaignStateServi
   if (!(value instanceof CampaignStateService)) reject('INVALID_ARGUMENT', 'campaign state service must be a CampaignStateService');
 }
 
+function projectVisibleLevelId(
+  data: CampaignPageData,
+  levelId: CampaignLevelId | null,
+): CampaignLevelId | null {
+  return levelId !== null && data.levels.some((level) => level.id === levelId) ? levelId : null;
+}
+
 export class CampaignPageService {
   private readonly data: CampaignPageData;
   private readonly campaign: CampaignStateService | null;
@@ -171,6 +178,16 @@ export class CampaignPageService {
       'data', 'campaign', 'stateService', 'config', 'index', 'levels', 'levelConfigs', 'chapterId',
       'initialState', 'onSave', 'persist',
     ], 'campaign page options');
+    const hasDefinitionOption = Object.prototype.hasOwnProperty.call(options, 'config')
+      || Object.prototype.hasOwnProperty.call(options, 'index');
+    const hasLevelsOption = Object.prototype.hasOwnProperty.call(options, 'levels')
+      || Object.prototype.hasOwnProperty.call(options, 'levelConfigs');
+    if (hasDefinitionOption && options.config === undefined && options.index === undefined) {
+      reject('INVALID_ARGUMENT', 'campaign config options cannot be undefined');
+    }
+    if (hasLevelsOption && options.levels === undefined && options.levelConfigs === undefined) {
+      reject('INVALID_ARGUMENT', 'campaign levels options cannot be undefined');
+    }
     this.data = options.data === undefined
       ? createDefaultCampaignPageData()
       : validateData(options.data);
@@ -208,8 +225,8 @@ export class CampaignPageService {
       this.campaign = suppliedCampaign;
       return;
     }
-    const configuredDefinition = options.config ?? options.index;
-    const configuredLevels = options.levels ?? options.levelConfigs;
+    const configuredDefinition = options.config !== undefined ? options.config : options.index;
+    const configuredLevels = options.levels !== undefined ? options.levels : options.levelConfigs;
     const stateOptions = configuredDefinition !== undefined
       ? { config: configuredDefinition }
       : configuredLevels !== undefined
@@ -236,8 +253,10 @@ export class CampaignPageService {
     return Object.freeze({
       schemaVersion: CAMPAIGN_PAGE_SCHEMA_VERSION,
       pageId: 'campaign',
-      selectedLevelId: state?.selectedLevelId ?? null,
-      activeLevelId: state?.activeLevelId ?? null,
+      selectedLevelId: state === null
+        ? this.data.levels[0]?.id ?? null
+        : projectVisibleLevelId(this.data, state.selectedLevelId),
+      activeLevelId: projectVisibleLevelId(this.data, state?.activeLevelId ?? null),
       state,
       components: createCampaignPageComponents(this.data, state),
     });

@@ -42,6 +42,14 @@ assert.equal(defaultData.levels[0].objective, levelConfigs[0].objectives[0].type
 assert.deepEqual(CAMPAIGN_DEFAULT_DATA.levels[11].id, index.levels[11].id, 'default data must retain the final real level');
 assert.equal(createCampaignPageComponents(defaultData).find((component) => component.id === 'detail')?.canStart, true, 'pure component projection must expose the initial playable node');
 assert.equal(createCampaignPageComponents(defaultData).find((component) => component.id === 'level-L01')?.selected, true, 'pure component projection must select the initial node');
+const l02OnlyData = { ...defaultData, levels: [defaultData.levels[1]] };
+const l02OnlyComponents = createCampaignPageComponents(l02OnlyData);
+assert.equal(l02OnlyComponents.find((component) => component.id === 'level-L02')?.selected, true, 'single-level projection must select its only visible level');
+assert.equal(l02OnlyComponents.find((component) => component.id === 'level-L02')?.state, 'selected', 'single-level projection must mark its only visible level selected');
+assert.equal(l02OnlyComponents.find((component) => component.id === 'level-L02')?.unlocked, true, 'single-level projection must expose its only visible level as playable');
+assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.levelId, 'L02', 'single-level detail must follow the visible level');
+assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.selected, true, 'single-level detail must match the selected card');
+assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.canStart, true, 'single-level detail must match the playable card');
 
 let negativeCaseCount = 0;
 function expectStateFailure(label, action, code) {
@@ -82,6 +90,23 @@ assert.equal(initial.components.find((component) => component.id === 'level-L02'
 assert.equal(initial.components.find((component) => component.id === 'detail')?.title, defaultData.levels[0].title);
 assert.equal(initial.components.find((component) => component.id === 'detail')?.canStart, true);
 
+const levelsOnly = new CampaignPageService({ levels: levelConfigs });
+assert.equal(levelsOnly.snapshot().components.find((component) => component.id === 'header')?.totalLevels, 12, 'levels-only options must use default page data');
+const dataAndLevels = new CampaignPageService({ data: defaultData, levels: levelConfigs });
+assert.equal(dataAndLevels.snapshot().components.find((component) => component.id === 'detail')?.title, defaultData.levels[0].title, 'data-plus-levels options must preserve page data');
+
+const mutableInput = createDefaultCampaignPageData();
+const isolatedInputPage = new CampaignPageService({ data: mutableInput, levels: levelConfigs });
+mutableInput.levels[0].rewards[0].quantity = 999;
+assert.equal(isolatedInputPage.pageData.levels[0].rewards[0].quantity, 900, 'construction must isolate nested input data');
+assert.equal(isolatedInputPage.snapshot().components.find((component) => component.id === 'level-L01')?.rewards[0].quantity, 900, 'construction isolation must reach components');
+
+const snapshotBeforeRewardMutation = page.snapshot();
+const snapshotReward = snapshotBeforeRewardMutation.components.find((component) => component.id === 'level-L01')?.rewards[0];
+assert(Object.isFrozen(snapshotReward), 'component reward snapshots must be frozen');
+assert.throws(() => { snapshotReward.quantity = 999; }, TypeError, 'component reward snapshots must reject mutation');
+assert.equal(page.snapshot().components.find((component) => component.id === 'level-L01')?.rewards[0].quantity, 900, 'mutating one snapshot must not contaminate later snapshots');
+
 // Selecting the already selected node is a real idempotent no-op and must not save.
 const savesBeforeSameSelection = saves.length;
 assert.deepEqual(page.selectLevel('L01'), { accepted: true, changed: false, reason: 'same', levelId: 'L01' });
@@ -109,6 +134,12 @@ assert.equal(page.snapshot().components.find((component) => component.id === 'le
 
 // A failed first attempt remains visible and does not unlock the following node.
 page.selectLevel('L02');
+const selectedL02 = page.snapshot();
+assert.equal(selectedL02.selectedLevelId, 'L02', 'selected state must follow L02');
+assert.equal(selectedL02.components.find((component) => component.id === 'level-L02')?.selected, true, 'L02 card must be selected');
+assert.equal(selectedL02.components.find((component) => component.id === 'level-L02')?.state, 'selected', 'L02 card state must be selected');
+assert.equal(selectedL02.components.find((component) => component.id === 'detail')?.levelId, 'L02', 'detail must follow selected L02');
+assert.equal(selectedL02.components.find((component) => component.id === 'detail')?.canStart, true, 'selected L02 must be startable');
 page.startLevel();
 assert.deepEqual(page.failLevel(), { accepted: true, changed: true, reason: 'failed', levelId: 'L02' });
 assert.equal(page.snapshot().components.find((component) => component.id === 'level-L02')?.state, 'failed');
