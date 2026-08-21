@@ -106,7 +106,17 @@ async function findReactUiEvidence(scanRoot = reactRoot) {
       }
     }
   }
-  for (const directory of reactEvidenceDirectories) await walk(path.join(scanRoot, directory));
+  for (const directory of reactEvidenceDirectories) {
+    const evidenceDirectory = path.join(scanRoot, directory);
+    let stat;
+    try {
+      stat = await fs.stat(evidenceDirectory);
+    } catch {
+      throw new Error('React evidence directory is unavailable: ' + directory);
+    }
+    if (!stat.isDirectory()) throw new Error('React evidence directory is unavailable: ' + directory);
+    await walk(evidenceDirectory);
+  }
   return [...new Set(evidence)];
 }
 
@@ -391,6 +401,12 @@ try {
   assert.equal(fixtureEvidence.includes('src/App.jsx (reference)'), true, 'UI01 filename reference must be captured');
   assert.equal(fixtureEvidence.includes('public/ui-state.js (reference)'), true, 'UI01 identifier reference must be captured');
   assert.equal(fixtureEvidence.includes('src/unrelated.md (reference)'), false, 'ordinary UI01 text must not be evidence');
+  await fs.rm(path.join(fixtureRoot, 'public'), { recursive: true, force: true });
+  await assert.rejects(
+    () => findReactUiEvidence(fixtureRoot),
+    (error) => error instanceof Error && error.message.includes('React evidence directory is unavailable: public'),
+    'missing React evidence directory was not rejected',
+  );
 } finally {
   await fs.rm(fixtureRoot, { recursive: true, force: true });
 }
