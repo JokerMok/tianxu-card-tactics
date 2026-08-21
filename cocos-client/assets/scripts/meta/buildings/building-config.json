@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "BUILDINGS-M6-09-V1",
+  "queue": {
+    "maxEntries": 3
+  },
+  "resources": [
+    { "id": "silver" },
+    { "id": "crystal" }
+  ],
+  "buildings": [
+    {
+      "id": "castle",
+      "initialLevel": 1,
+      "maxLevel": 5,
+      "upgrades": [
+        { "targetLevel": 2, "cost": { "silver": 1400, "crystal": 40 }, "durationMs": 30000, "prerequisites": [] },
+        { "targetLevel": 3, "cost": { "silver": 2800, "crystal": 80 }, "durationMs": 60000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 2 }] },
+        { "targetLevel": 4, "cost": { "silver": 5600, "crystal": 140 }, "durationMs": 120000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 3 }] },
+        { "targetLevel": 5, "cost": { "silver": 11200, "crystal": 240 }, "durationMs": 240000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 4 }] }
+      ]
+    },
+    {
+      "id": "alchemy",
+      "initialLevel": 1,
+      "maxLevel": 4,
+      "upgrades": [
+        { "targetLevel": 2, "cost": { "silver": 1200, "crystal": 30 }, "durationMs": 25000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 1 }] },
+        { "targetLevel": 3, "cost": { "silver": 2400, "crystal": 70 }, "durationMs": 50000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 2 }] },
+        { "targetLevel": 4, "cost": { "silver": 4800, "crystal": 130 }, "durationMs": 100000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 3 }] }
+      ]
+    },
+    {
+      "id": "forge",
+      "initialLevel": 1,
+      "maxLevel": 4,
+      "upgrades": [
+        { "targetLevel": 2, "cost": { "silver": 1300, "crystal": 30 }, "durationMs": 25000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 1 }] },
+        { "targetLevel": 3, "cost": { "silver": 2600, "crystal": 70 }, "durationMs": 50000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 2 }] },
+        { "targetLevel": 4, "cost": { "silver": 5200, "crystal": 130 }, "durationMs": 100000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 3 }] }
+      ]
+    },
+    {
+      "id": "harbor",
+      "initialLevel": 1,
+      "maxLevel": 4,
+      "upgrades": [
+        { "targetLevel": 2, "cost": { "silver": 1600, "crystal": 50 }, "durationMs": 35000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 2 }] },
+        { "targetLevel": 3, "cost": { "silver": 3200, "crystal": 100 }, "durationMs": 70000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 3 }] },
+        { "targetLevel": 4, "cost": { "silver": 6400, "crystal": 180 }, "durationMs": 140000, "prerequisites": [{ "buildingId": "castle", "requiredLevel": 4 }] }
+      ]
+    }
+  ]
+}
