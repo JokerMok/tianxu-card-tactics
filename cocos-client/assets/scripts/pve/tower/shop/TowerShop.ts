@@ -25,6 +25,11 @@ export type TowerShopPurchaseLedgerEntry = Readonly<{
   fingerprint: string;
 }>;
 
+export type TowerShopRefreshLedgerEntry = Readonly<{
+  sequence: number;
+  refreshId: string;
+}>;
+
 export type TowerShopState = Readonly<{
   schemaVersion: typeof TOWER_SHOP_SCHEMA_VERSION;
   cycleKey: string;
@@ -39,6 +44,7 @@ export type TowerShopState = Readonly<{
   purchaseCount: number;
   purchaseSequence: number;
   processedRefreshes: Readonly<Record<string, string>>;
+  refreshLedger: readonly TowerShopRefreshLedgerEntry[];
 }>;
 
 export type TowerShopPersistence = (serialized: string) => void;
@@ -174,6 +180,7 @@ function assertState(value: unknown, config: TowerShopConfig): asserts value is 
   assertExactKeys(value, [
     'schemaVersion', 'cycleKey', 'towerCoins', 'inventory', 'claimedFloorRewards', 'purchased', 'offers',
     'refreshCount', 'processedPurchases', 'purchaseLedger', 'purchaseCount', 'purchaseSequence', 'processedRefreshes',
+    'refreshLedger',
   ], 'state');
   if (value.schemaVersion !== TOWER_SHOP_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported schemaVersion');
   assertCycleKey(value.cycleKey, 'state.cycleKey', 'INVALID_STATE');
@@ -207,6 +214,7 @@ function assertState(value: unknown, config: TowerShopConfig): asserts value is 
     offerIds.add(itemId);
   }
   assertProcessedRefreshes(value.processedRefreshes, config, value.refreshCount, value.offers);
+  assertRefreshLedger(value.refreshLedger, value.processedRefreshes, value.refreshCount);
   for (const [rewardId, quantity] of Object.entries(value.inventory)) {
     if (!rewardIds.has(rewardId)) fail('INVALID_STATE', `state.inventory.${rewardId} is not a shop reward`);
     if (quantity <= 0) fail('INVALID_STATE', `state.inventory.${rewardId} must be positive when present`);
@@ -251,6 +259,37 @@ function assertProcessedRefreshes(
   const expectedOffers = selectOffers(config, refreshCount);
   if (offers.some((itemId, index) => itemId !== expectedOffers[index])) {
     fail('INVALID_STATE', 'state.offers does not match state.refreshCount');
+  }
+}
+
+function assertRefreshLedger(
+  value: unknown,
+  processedRefreshes: Record<string, string>,
+  refreshCount: number,
+): asserts value is readonly TowerShopRefreshLedgerEntry[] {
+  if (!Array.isArray(value)) fail('INVALID_STATE', 'state.refreshLedger must be an array');
+  if (value.length !== refreshCount) fail('INVALID_STATE', 'state.refreshLedger count must match state.refreshCount');
+
+  const ledgerRefreshIds: string[] = [];
+  const ledgerRefreshIdSet = new Set<string>();
+  for (const [index, entry] of value.entries()) {
+    const path = `state.refreshLedger[${index}]`;
+    assertPlainRecord(entry, path);
+    assertExactKeys(entry, ['sequence', 'refreshId'], path);
+    assertSafeInteger(entry.sequence, `${path}.sequence`, 'INVALID_STATE');
+    if (entry.sequence !== index + 1) fail('INVALID_STATE', `${path}.sequence must be contiguous`);
+    assertStateBusinessKey(entry.refreshId, `${path}.refreshId`);
+    if (ledgerRefreshIdSet.has(entry.refreshId)) fail('INVALID_STATE', `${path}.refreshId is duplicated`);
+    ledgerRefreshIdSet.add(entry.refreshId);
+    ledgerRefreshIds.push(entry.refreshId);
+  }
+
+  const processedRefreshIds = Object.keys(processedRefreshes);
+  if (
+    processedRefreshIds.length !== ledgerRefreshIds.length
+    || processedRefreshIds.some((refreshId, index) => refreshId !== ledgerRefreshIds[index])
+  ) {
+    fail('INVALID_STATE', 'state.processedRefreshes must match the refresh ledger keys and order');
   }
 }
 
@@ -443,6 +482,7 @@ function initialState(config: TowerShopConfig, cycleKey: string, towerCoins: num
     purchaseCount: 0,
     purchaseSequence: 0,
     processedRefreshes: {},
+    refreshLedger: [],
   });
 }
 
@@ -549,6 +589,10 @@ export class TowerShopService {
       offers: selectOffers(this.config, nextRefreshCount),
       refreshCount: nextRefreshCount,
       processedRefreshes: { ...this.current.processedRefreshes, [refreshId]: 'refresh' },
+      refreshLedger: [
+        ...this.current.refreshLedger,
+        { sequence: nextRefreshCount, refreshId },
+      ],
     };
     this.commit(next);
     return operation(this.current, 'APPLIED', true, { spent: this.config.refreshCost });

@@ -1,6 +1,6 @@
 import { TOWER_FLOOR_COUNT } from '../TowerConfig.ts';
 
-export const TOWER_SHOP_SCHEMA_VERSION = 2 as const;
+export const TOWER_SHOP_SCHEMA_VERSION = 3 as const;
 
 export type TowerShopRewardKind = 'ORNAMENT' | 'ITEM';
 

@@ -42,7 +42,7 @@ const service = new TowerShopService({
 });
 const initial = service.snapshot();
 assert.deepEqual(initial, {
-  schemaVersion: 2,
+  schemaVersion: 3,
   cycleKey: '2026-08-17',
   towerCoins: 0,
   inventory: {},
@@ -55,6 +55,7 @@ assert.deepEqual(initial, {
   purchaseCount: 0,
   purchaseSequence: 0,
   processedRefreshes: {},
+  refreshLedger: [],
 });
 assert(Object.isFrozen(initial));
 assert(Object.isFrozen(initial.inventory));
@@ -180,7 +181,21 @@ assert.deepEqual(service.snapshot().purchaseLedger.at(-1), {
   fingerprint: 'TOWER_RELIC_EMBLEM:1',
 });
 
+const secondRefresh = service.refresh('refresh-2');
+assert.equal(secondRefresh.code, 'APPLIED');
+assert.equal(secondRefresh.spent, 10);
+assert.deepEqual(service.snapshot().processedRefreshes, {
+  'refresh-1': 'refresh',
+  'refresh-2': 'refresh',
+});
+assert.deepEqual(service.snapshot().refreshLedger, [
+  { sequence: 1, refreshId: 'refresh-1' },
+  { sequence: 2, refreshId: 'refresh-2' },
+]);
+assert.equal(service.snapshot().refreshCount, 2);
+
 const saved = service.save();
+const savedState = JSON.parse(saved);
 const deletedWholePurchase = JSON.parse(saved);
 delete deletedWholePurchase.processedPurchases['purchase-cache-1'];
 delete deletedWholePurchase.purchased.TOWER_MATERIAL_CACHE;
@@ -216,14 +231,33 @@ for (const candidate of invalidLedgerSaves) expectError('invalid purchase ledger
 
 const invalidRefreshSaves = [];
 const deletedRefresh = JSON.parse(saved);
-delete deletedRefresh.processedRefreshes['refresh-1'];
+delete deletedRefresh.processedRefreshes['refresh-2'];
 invalidRefreshSaves.push(JSON.stringify(deletedRefresh));
 const alteredRefresh = JSON.parse(saved);
 alteredRefresh.processedRefreshes['refresh-1'] = 'not-refresh';
 invalidRefreshSaves.push(JSON.stringify(alteredRefresh));
-const addedRefresh = JSON.parse(saved);
-addedRefresh.processedRefreshes['refresh-2'] = 'refresh';
-invalidRefreshSaves.push(JSON.stringify(addedRefresh));
+const replacedRefresh = JSON.parse(saved);
+delete replacedRefresh.processedRefreshes['refresh-2'];
+replacedRefresh.processedRefreshes['refresh-replaced'] = 'refresh';
+assert.equal(Object.keys(replacedRefresh.processedRefreshes).length, savedState.refreshCount);
+assert.equal(replacedRefresh.refreshCount, savedState.refreshCount);
+assert.deepEqual(replacedRefresh.offers, savedState.offers);
+invalidRefreshSaves.push(JSON.stringify(replacedRefresh));
+const reorderedRefresh = JSON.parse(saved);
+reorderedRefresh.processedRefreshes = {
+  'refresh-2': 'refresh',
+  'refresh-1': 'refresh',
+};
+invalidRefreshSaves.push(JSON.stringify(reorderedRefresh));
+const reorderedRefreshLedger = JSON.parse(saved);
+reorderedRefreshLedger.refreshLedger.reverse();
+invalidRefreshSaves.push(JSON.stringify(reorderedRefreshLedger));
+const missingRefreshLedger = JSON.parse(saved);
+delete missingRefreshLedger.refreshLedger;
+invalidRefreshSaves.push(JSON.stringify(missingRefreshLedger));
+const shortenedRefreshLedger = JSON.parse(saved);
+shortenedRefreshLedger.refreshLedger = shortenedRefreshLedger.refreshLedger.slice(0, -1);
+invalidRefreshSaves.push(JSON.stringify(shortenedRefreshLedger));
 const invalidRefreshKey = JSON.parse(saved);
 invalidRefreshKey.processedRefreshes[' '] = 'refresh';
 invalidRefreshSaves.push(JSON.stringify(invalidRefreshKey));
@@ -246,6 +280,7 @@ assert.deepEqual(restored.snapshot().purchaseLedger, []);
 assert.equal(restored.snapshot().purchaseCount, 0);
 assert.equal(restored.snapshot().purchaseSequence, 0);
 assert.deepEqual(restored.snapshot().processedRefreshes, {});
+assert.deepEqual(restored.snapshot().refreshLedger, []);
 assert.deepEqual(restored.snapshot().offers, ['TOWER_ORNAMENT_IRON', 'TOWER_ITEM_REINFORCER', 'TOWER_RELIC_EMBLEM']);
 assert.equal(restored.snapshot().refreshCount, 0);
 assert.equal(restored.synchronizeCycle('2026-08-24').code, 'DUPLICATE');
@@ -331,6 +366,7 @@ const invalidSaves = [
   '',
   '{',
   JSON.stringify({ ...invalidSave, schemaVersion: 1 }),
+  JSON.stringify({ ...invalidSave, schemaVersion: 2 }),
   JSON.stringify({ ...invalidSave, extra: true }),
   JSON.stringify({ ...invalidSave, towerCoins: -1 }),
   JSON.stringify({ ...invalidSave, cycleKey: '' }),
@@ -384,6 +420,7 @@ assert.equal(customRefresh.spent, 999, 'configured refresh cost must drive the r
 assert.equal(custom.snapshot().towerCoins, 1, 'refresh must deduct exactly the configured refresh cost');
 assert.equal(custom.snapshot().refreshCount, 1);
 assert.deepEqual(custom.snapshot().processedRefreshes, { 'custom-refresh': 'refresh' });
+assert.deepEqual(custom.snapshot().refreshLedger, [{ sequence: 1, refreshId: 'custom-refresh' }]);
 assert.deepEqual(custom.snapshot().offers, ['TOWER_RELIC_EMBLEM', 'TOWER_MATERIAL_CACHE', 'TOWER_ORNAMENT_JADE']);
 
 console.log(`T221 tower shop verified: ${persisted.length + restoredSaves.length} persisted commits, ${towerShopConfig.guaranteedCoinDrops.length} guaranteed floors`);
