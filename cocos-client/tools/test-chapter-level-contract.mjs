@@ -4,6 +4,11 @@ import { stripTypeScriptTypes } from 'node:module';
 import path from 'node:path';
 
 const root = path.resolve(import.meta.dirname, '..');
+const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const readConfigResource = (resourcePath) => {
+  assert(resourcePath.startsWith('config/'), `config resource must be rooted at config/: ${resourcePath}`);
+  return readJson(path.join(root, 'assets/resources', `${resourcePath}.json`));
+};
 const loaderSource = fs.readFileSync(path.join(root, 'assets/scripts/config/ConfigLoader.ts'), 'utf8');
 const contractSource = fs.readFileSync(path.join(root, 'assets/scripts/config/levels/ChapterLevelContract.ts'), 'utf8');
 const mockCcSource = `
@@ -20,25 +25,21 @@ const { assertChapterLevelContract, ConfigLoadError } = await import(
   `data:text/javascript;base64,${Buffer.from(executableSource).toString('base64')}`,
 );
 
-const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/manifest.json'), 'utf8'));
-const cards = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/cards.json'), 'utf8'));
-const units = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/units.json'), 'utf8'));
-const skills = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/skills.json'), 'utf8'));
-const decks = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/decks.json'), 'utf8'));
+const manifest = readConfigResource('config/manifest');
+const chapterIndex = readConfigResource(manifest.chapters.chapter01);
+const cards = readConfigResource(manifest.tables.cards);
+const units = readConfigResource(manifest.tables.units);
+const skills = readConfigResource(manifest.tables.skills);
+const decks = readConfigResource(manifest.tables.decks);
 const enumCoverageFixture = JSON.parse(
   fs.readFileSync(path.join(root, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'), 'utf8'),
 );
 
-// 来源：当前生效《首章剧情关卡-v1.1.md》§3.1/§7；只注册本测试实际覆盖的章节节点及其文档前置。
-const chapterLevelIds = new Set([
-  'L01',
-  ...enumCoverageFixture.chapterLevels.map((level) => level.id),
-  ...enumCoverageFixture.chapterLevels
-    .map((level) => level.prerequisiteLevelId)
-    .filter((id) => id !== null),
-]);
-// 来源：真实 units.json；章节目标使用战场单位 ID，避免用卡牌、牌组或技能 ID冒充目标。
+// 来源：manifest.chapters.chapter01 指向的真实章节注册表。
+const chapterLevelIds = new Set(chapterIndex.levels.map((level) => level.id));
+// 运行时注册表由真实单位表与章节索引 targetIds 合并而成；L10 的 U001/U004 与 L03/L08 的 C002/C009 均须可解析。
 const targetIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
+chapterIndex.targetIds.forEach((id) => targetIds.add(id));
 const unitIds = new Set(units.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
 const skillIds = new Set(skills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id));
 // 来源：真实 cards.json；保留 cardType/copyLimit 元数据供奖励契约核对。
@@ -52,17 +53,42 @@ const cardReferences = new Map(
       ...(card.skillId ? { skillId: card.skillId } : {}),
     }]),
 );
-// 来源：当前生效章节奖励注册表（《首章剧情关卡-v1.1.md》§7）及 T331 enum fixture 的稳定 ID 映射。
+// 来源：manifest.chapters.chapter01 指向的真实章节奖励注册表。
 const references = {
   chapterLevelIds,
   targetIds,
   unitIds,
   skillIds,
   cards: cardReferences,
-  unlockIds: new Set(['OUTPOST']),
-  chestIds: new Set(['CHAPTER-CHEST']),
-  flagIds: new Set(['OUTCAST-CAMP']),
+  unlockIds: new Set(chapterIndex.rewardRegistries.unlockIds),
+  chestIds: new Set(chapterIndex.rewardRegistries.chestIds),
+  flagIds: new Set(chapterIndex.rewardRegistries.flagIds),
 };
+
+const realLevelDocuments = chapterIndex.levels.map((entry) => {
+  const document = readConfigResource(entry.resource);
+  assert.equal(document.chapterLevels?.length, 1, `${entry.id} must contain exactly one real chapter level`);
+  assert.equal(document.chapterLevels[0].id, entry.id, `${entry.id} document ID must match the real chapter index`);
+  assert.equal(
+    document.chapterLevels[0].prerequisiteLevelId,
+    entry.prerequisiteLevelId,
+    `${entry.id} prerequisite must match the real chapter index`,
+  );
+  return document;
+});
+
+realLevelDocuments.forEach((document, index) => {
+  const entry = chapterIndex.levels[index];
+  assert.doesNotThrow(
+    () => assertChapterLevelContract(document, manifest, decks, references, entry.resource),
+    `${entry.id} real level document must pass the shared chapter level contract`,
+  );
+});
+assert.doesNotThrow(
+  () => assertChapterLevelContract({ chapterLevels: realLevelDocuments.map((document) => document.chapterLevels[0]) }, manifest, decks, references),
+  'all twelve real chapter level documents must pass the shared contract together',
+);
+
 const skillCardId = cards.cards.find((card) => card.cardType === 'SKILL')?.id;
 assert.equal(typeof skillCardId, 'string', 'real cards.json must provide a skill card for the negative case');
 const valid = {
@@ -85,16 +111,30 @@ const valid = {
 };
 
 // Cocos Creator 3.8.8 将 new Set([...unitIds, ...index.targetIds]) 转译为
-// new Set([].concat(unitIds, index.targetIds))；这里保留其嵌套 Set 形态作为运行时回归样本。
+// new Set([].concat(unitIds, index.targetIds))；实际结果是外层 Set 包含内层 Set 与 Array。
 const cocosTranspiledReferences = {
   ...references,
-  targetIds: new Set([unitIds, ...targetIds]),
+  targetIds: new Set([unitIds, chapterIndex.targetIds]),
   unitIds: new Set([unitIds]),
 };
 
 assert.doesNotThrow(
   () => assertChapterLevelContract(valid, manifest, decks, cocosTranspiledReferences),
   'a nested Cocos-transpiled target/unit registry must still allow legal U001 references',
+);
+const cocosIteratorReferences = {
+  ...references,
+  chapterLevelIds: new Set([chapterLevelIds.values()]),
+  targetIds: new Set([unitIds.values(), chapterIndex.targetIds.values()]),
+  unitIds: new Set([unitIds.values()]),
+  skillIds: new Set([skillIds.values()]),
+  unlockIds: new Set([chapterIndex.rewardRegistries.unlockIds.values()]),
+  chestIds: new Set([chapterIndex.rewardRegistries.chestIds.values()]),
+  flagIds: new Set([chapterIndex.rewardRegistries.flagIds.values()]),
+};
+assert.doesNotThrow(
+  () => assertChapterLevelContract(valid, manifest, decks, cocosIteratorReferences),
+  'nested Cocos Set/Iterator registries must still allow legal U001 references',
 );
 const nestedUnitUnknownTarget = structuredClone(valid);
 nestedUnitUnknownTarget.chapterLevels[0].objectives[1].targetId = 'U999';
@@ -188,13 +228,36 @@ function expectFailureWithReferencesMessage(label, fixture, customReferences, ex
   });
 }
 
+const referencesWithoutL02 = {
+  ...references,
+  chapterLevelIds: new Set([...references.chapterLevelIds].filter((id) => id !== 'L02')),
+};
+const unregisteredChapterLevel = structuredClone(valid);
+unregisteredChapterLevel.chapterLevels[0].id = 'L02';
+expectFailureWithReferences(
+  'unregistered chapter level',
+  unregisteredChapterLevel,
+  referencesWithoutL02,
+  'config/levels.chapterLevels[0].id',
+);
+const referencesWithoutL06 = {
+  ...references,
+  chapterLevelIds: new Set([...references.chapterLevelIds].filter((id) => id !== 'L06')),
+};
+const unregisteredPrerequisite = structuredClone(valid);
+unregisteredPrerequisite.chapterLevels[0].prerequisiteLevelId = 'L06';
+expectFailureWithReferences(
+  'unknown registered prerequisite',
+  unregisteredPrerequisite,
+  referencesWithoutL06,
+  'config/levels.chapterLevels[0].prerequisiteLevelId',
+);
+
 expectFailure('missing field', (fixture) => { delete fixture.chapterLevels[0].objectives; }, 'config/levels.chapterLevels[0].objectives');
 expectFailure('invalid ID', (fixture) => { fixture.chapterLevels[0].id = 'L_01'; }, 'config/levels.chapterLevels[0].id');
 expectFailure('out-of-chapter ID', (fixture) => { fixture.chapterLevels[0].id = 'L13'; }, 'config/levels.chapterLevels[0].id');
-expectFailure('unregistered chapter level', (fixture) => { fixture.chapterLevels[0].id = 'L02'; }, 'config/levels.chapterLevels[0].id');
 expectFailure('unknown enemy deck', (fixture) => { fixture.chapterLevels[0].enemyDeckId = 'D404'; }, 'config/levels.chapterLevels[0].enemyDeckId');
 expectFailure('invalid prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'C01'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
-expectFailure('unknown registered prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'L06'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
 expectFailure('self prerequisite', (fixture) => { fixture.chapterLevels[0].prerequisiteLevelId = 'L01'; }, 'config/levels.chapterLevels[0].prerequisiteLevelId');
 expectFailure('invalid environment', (fixture) => { fixture.chapterLevels[0].environmentElement = 'WIND'; }, 'config/levels.chapterLevels[0].environmentElement');
 expectFailure('invalid objective', (fixture) => { fixture.chapterLevels[0].objectives[0].type = 'ESCAPE'; }, 'config/levels.chapterLevels[0].objectives[0].type');
@@ -216,6 +279,14 @@ expectFailureWithReferences(
   valid,
   { ...references, cards: new Map([['U001', { cardType: 'UNIT', copyLimit: 4, unitId: 'U999' }]]) },
   'config/levels.references.cards.U001.unitId',
+);
+const forgedSkillCardReferences = new Map(references.cards);
+forgedSkillCardReferences.set(skillCardId, { cardType: 'SKILL', copyLimit: 1, skillId: 'S999' });
+expectFailureWithReferences(
+  'missing card skill reference',
+  valid,
+  { ...references, cards: forgedSkillCardReferences },
+  `config/levels.references.cards.${skillCardId}.skillId`,
 );
 expectFailure('invalid reward type', (fixture) => { fixture.chapterLevels[0].rewards[0].type = 'GOLD'; }, 'config/levels.chapterLevels[0].rewards[0].type');
 expectFailure('missing reward quantity', (fixture) => { delete fixture.chapterLevels[0].rewards[0].quantity; }, 'config/levels.chapterLevels[0].rewards[0].quantity');
