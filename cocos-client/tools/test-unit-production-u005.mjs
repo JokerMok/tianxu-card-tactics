@@ -347,9 +347,67 @@ function containsOpaqueScenePatch(image, patch) {
   return false;
 }
 
+function luminanceSignature(rgba, width, height, x, y, sampleWidth, sampleHeight, gridSize = 6) {
+  const values = [];
+  for (let gridY = 0; gridY < gridSize; gridY += 1) {
+    const startY = y + Math.floor((gridY * sampleHeight) / gridSize);
+    const endY = y + Math.max(startY - y + 1, Math.floor(((gridY + 1) * sampleHeight) / gridSize));
+    for (let gridX = 0; gridX < gridSize; gridX += 1) {
+      const startX = x + Math.floor((gridX * sampleWidth) / gridSize);
+      const endX = x + Math.max(startX - x + 1, Math.floor(((gridX + 1) * sampleWidth) / gridSize));
+      let total = 0;
+      let count = 0;
+      for (let pixelY = startY; pixelY < Math.min(y + sampleHeight, endY); pixelY += 1) {
+        for (let pixelX = startX; pixelX < Math.min(x + sampleWidth, endX); pixelX += 1) {
+          const offset = (pixelY * width + pixelX) * 4;
+          if (rgba[offset + 3] < 248) continue;
+          total += rgba[offset] * 0.2126 + rgba[offset + 1] * 0.7152 + rgba[offset + 2] * 0.0722;
+          count += 1;
+        }
+      }
+      values.push(count === 0 ? 0 : total / count);
+    }
+  }
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  const deviation = Math.sqrt(variance);
+  return { values, mean, deviation, normalized: deviation < 1 ? values.map(() => 0) : values.map((value) => (value - mean) / deviation) };
+}
+
+function signatureCorrelation(left, right) {
+  if (left.normalized.length !== right.normalized.length || left.deviation < 1 || right.deviation < 1) return 0;
+  return left.normalized.reduce((sum, value, index) => sum + value * right.normalized[index], 0) / left.normalized.length;
+}
+
+function containsTransformedScenePatch(image, patch) {
+  const patchRgba = Buffer.alloc(patch.width * patch.height * 4);
+  for (let index = 0, sourceOffset = 0; index < patch.width * patch.height; index += 1, sourceOffset += 3) {
+    const targetOffset = index * 4;
+    patchRgba[targetOffset] = patch.pixels[sourceOffset];
+    patchRgba[targetOffset + 1] = patch.pixels[sourceOffset + 1];
+    patchRgba[targetOffset + 2] = patch.pixels[sourceOffset + 2];
+    patchRgba[targetOffset + 3] = 255;
+  }
+  const sourceSignature = luminanceSignature(patchRgba, patch.width, patch.height, 0, 0, patch.width, patch.height);
+  if (sourceSignature.deviation < 1) return false;
+  for (const scale of [0.75, 1, 1.5, 2]) {
+    const tileWidth = Math.max(6, Math.round(patch.width * scale));
+    const tileHeight = Math.max(6, Math.round(patch.height * scale));
+    if (tileWidth > image.width || tileHeight > image.height) continue;
+    for (let y = 0; y <= image.height - tileHeight; y += 4) {
+      for (let x = 0; x <= image.width - tileWidth; x += 4) {
+        const candidate = luminanceSignature(image.rgba, image.width, image.height, x, y, tileWidth, tileHeight);
+        if (signatureCorrelation(sourceSignature, candidate) >= 0.985) return true;
+      }
+    }
+  }
+  return false;
+}
+
 function assertNoSceneResidual(image, sourceImage, label) {
   for (const sample of SCENE_SAMPLE_RECTS.map((rect) => extractScenePatch(sourceImage, rect))) {
     assert.equal(containsOpaqueScenePatch(image, sample), false, `${label} contains an opaque ${sample.name} scene residual copied from U005-CARD.png`);
+    assert.equal(containsTransformedScenePatch(image, sample), false, `${label} contains a scaled or color-transformed ${sample.name} scene residual`);
   }
 }
 
@@ -368,6 +426,27 @@ function injectScenePatch(image, sourceImage, sampleRect, destination) {
       result.rgba[targetOffset + 2] = patch.pixels[patchOffset + 2];
       result.rgba[targetOffset + 3] = 255;
       patchOffset += 3;
+    }
+  }
+  return result;
+}
+
+function injectTransformedScenePatch(image, sourceImage, sampleRect, destination, scale, tint) {
+  const result = { width: image.width, height: image.height, rgba: Buffer.from(image.rgba) };
+  const patch = extractScenePatch(sourceImage, sampleRect);
+  const scaledWidth = Math.round(patch.width * scale);
+  const scaledHeight = Math.round(patch.height * scale);
+  assertRect({ ...destination, width: scaledWidth, height: scaledHeight }, { width: image.width, height: image.height }, `transformed scene destination ${sampleRect.name}`);
+  for (let y = 0; y < scaledHeight; y += 1) {
+    for (let x = 0; x < scaledWidth; x += 1) {
+      const sourceX = Math.min(patch.width - 1, Math.floor(x / scale));
+      const sourceY = Math.min(patch.height - 1, Math.floor(y / scale));
+      const sourceOffset = (sourceY * patch.width + sourceX) * 3;
+      const targetOffset = ((destination.y + y) * result.width + destination.x + x) * 4;
+      result.rgba[targetOffset] = Math.min(255, Math.round(patch.pixels[sourceOffset] * tint[0] + tint[3]));
+      result.rgba[targetOffset + 1] = Math.min(255, Math.round(patch.pixels[sourceOffset + 1] * tint[1] + tint[3]));
+      result.rgba[targetOffset + 2] = Math.min(255, Math.round(patch.pixels[sourceOffset + 2] * tint[2] + tint[3]));
+      result.rgba[targetOffset + 3] = 255;
     }
   }
   return result;
@@ -690,6 +769,10 @@ function validatePngAssets(contract, skeleton) {
   assert.throws(() => assertNoSceneResidual(fakePoseSceneResidual, sourceImage, 'fake U005 pose sheet'), /scene residual/, 'opaque ground/reflection pixels inside a valid pose must fail');
   const fakeCutoutSceneResidual = injectScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 160, y: 180, width: 24, height: 24 });
   assert.throws(() => assertNoSceneResidual(fakeCutoutSceneResidual, sourceImage, 'fake U005 cutout sheet'), /scene residual/, 'opaque city pixels inside a valid cutout must fail');
+  const fakeScaledPoseSceneResidual = injectTransformedScenePatch(poseImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 260, y: 220 }, 2, [0.72, 0.86, 1.08, 18]);
+  assert.throws(() => assertNoSceneResidual(fakeScaledPoseSceneResidual, sourceImage, 'fake scaled U005 pose sheet'), /scaled or color-transformed .* scene residual/, 'scaled and color-transformed city pixels inside a valid pose must fail');
+  const fakeTintedCutoutSceneResidual = injectTransformedScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[2], { x: 180, y: 240 }, 1.5, [1.08, 0.78, 0.64, 12]);
+  assert.throws(() => assertNoSceneResidual(fakeTintedCutoutSceneResidual, sourceImage, 'fake tinted U005 cutout sheet'), /scaled or color-transformed .* scene residual/, 'tinted ground pixels inside a valid cutout must fail');
 }
 
 function expectFailure(label, mutate, pattern) {
