@@ -8,6 +8,7 @@ import {
   CityPageService,
   createDefaultCityPageData,
   createEmptyCityPageData,
+  createCityPageComponents,
 } from '../assets/scripts/meta/ui/pages/city-tasks-inventory/city/index.ts';
 import { createDefaultState } from '../assets/scripts/meta/GameState.ts';
 
@@ -48,6 +49,20 @@ assert.equal(castle?.level, realState.buildings.castle, 'castle level must be da
 assert.equal(alchemy?.upgradeCost.silver, realState.buildings.alchemy * 1400, 'upgrade cost must use the real GameState rule');
 assert.equal(expedition?.state, 'idle');
 assert.equal(expedition?.canDispatch, true);
+
+// A GameState-backed page commits a candidate snapshot before exposing it to the attached state.
+const stateForService = createDefaultState();
+const submittedStates = [];
+const statePage = new CityPageService({ state: stateForService, onStateChange: (state) => submittedStates.push(state) });
+assert.deepEqual(statePage.upgradeBuilding('forge'), { accepted: true, changed: true, reason: 'upgraded', buildingId: 'forge' });
+assert.equal(stateForService.buildings.forge, 3);
+assert.equal(stateForService.resources.silver, 10000);
+assert.equal(submittedStates.at(-1).buildings.forge, 3);
+assert.deepEqual(statePage.dispatchExpedition(1000), { accepted: true, changed: true, reason: 'dispatched', buildingId: null });
+assert.equal(stateForService.expedition.endsAt, 61000);
+assert.deepEqual(statePage.claimExpedition(61000), { accepted: true, changed: true, reason: 'claimed', buildingId: null });
+assert.equal(stateForService.expedition.active, false);
+assert.equal(stateForService.resources.silver, 11600);
 
 const configured = new CityPageService({
   ...realData,
@@ -93,6 +108,9 @@ expectFailure('out-of-range building index', () => page.selectBuildingAt(99), 'I
 expectFailure('fractional building index', () => page.selectBuildingAt(0.5), 'INVALID_NUMBER');
 expectFailure('unknown interaction type', () => page.interact({ type: 'unknown' }), 'INVALID_ARGUMENT');
 expectFailure('negative expedition time', () => page.dispatchExpedition(-1), 'INVALID_DATA');
+expectFailure('unsafe expedition time', () => page.dispatchExpedition(Number.MAX_SAFE_INTEGER), 'INVALID_DATA');
+expectFailure('unknown interaction field', () => page.interact({ type: 'dispatchExpedition', unexpected: true }), 'INVALID_DATA');
+expectFailure('invalid interaction structure', () => page.interact({ type: 'selectBuilding', buildingId: null }), 'INVALID_ID');
 expectFailure('invalid building level', () => new CityPageService({
   ...realData,
   buildings: realData.buildings.map((building, index) => index === 0 ? { ...building, level: 0 } : { ...building }),
@@ -101,6 +119,17 @@ expectFailure('incomplete non-empty building set', () => new CityPageService({
   ...realData,
   buildings: realData.buildings.slice(1),
 }), 'INVALID_DATA');
-assert.equal(negativeCaseCount, 8, 'missing, invalid and out-of-range cases must execute');
+expectFailure('invalid game state resources', () => new CityPageService({ state: { ...realState, resources: null } }), 'INVALID_ARGUMENT');
+expectFailure('invalid component building must fail closed', () => createCityPageComponents({
+  ...realData,
+  buildings: [{ ...realData.buildings[0], id: 'unknown' }, ...realData.buildings.slice(1)],
+}), 'INVALID_ID');
+const persistenceState = createDefaultState();
+const failingStatePage = new CityPageService({ state: persistenceState, persist: () => { throw new Error('disk full'); } });
+const stateBeforeFailure = JSON.stringify(persistenceState);
+expectFailure('state persistence failure rolls back', () => failingStatePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
+assert.equal(JSON.stringify(persistenceState), stateBeforeFailure);
+assert.equal(failingStatePage.state.buildings.forge, 2);
+assert.equal(negativeCaseCount, 14, 'missing, invalid and out-of-range cases must execute');
 
 console.log(`T312 city page PASS: real-buildings=${realData.buildings.length}, components=${normal.components.length}, negative-cases=${negativeCaseCount}, normal/empty/insufficient/active/claimable`);

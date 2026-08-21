@@ -1,5 +1,32 @@
 import { createDefaultState, type GameState } from '../../../../GameState.ts';
 
+export type CityPageErrorCode =
+  | 'MISSING_FIELD'
+  | 'INVALID_ARGUMENT'
+  | 'INVALID_ID'
+  | 'INVALID_NUMBER'
+  | 'INVALID_DATA'
+  | 'DUPLICATE_ID'
+  | 'BUILDING_NOT_FOUND'
+  | 'INDEX_OUT_OF_RANGE'
+  | 'STATE_NOT_AVAILABLE'
+  | 'PERSISTENCE_FAILED'
+  | 'REENTRANT';
+
+export class CityPageError extends Error {
+  readonly code: CityPageErrorCode;
+  readonly reason: CityPageErrorCode;
+  readonly cause?: unknown;
+
+  constructor(code: CityPageErrorCode, message: string, cause?: unknown) {
+    super(message);
+    this.name = 'CityPageError';
+    this.code = code;
+    this.reason = code;
+    if (cause !== undefined) this.cause = cause;
+  }
+}
+
 export const CITY_PAGE_SCHEMA_VERSION = 1 as const;
 export const CITY_BUILDING_IDS = Object.freeze(['castle', 'alchemy', 'forge', 'harbor'] as const);
 export type CityBuildingId = (typeof CITY_BUILDING_IDS)[number];
@@ -124,6 +151,8 @@ export interface CityPageServiceOptions {
   readonly initialSelectedBuildingId?: string | null;
   readonly onSave?: (serialized: string) => void;
   readonly persist?: (serialized: string) => void;
+  /** State-boundary hook reserved for the later production integration. */
+  readonly onStateChange?: (state: GameState) => void;
 }
 
 export const CITY_BUILDING_DEFINITIONS: Readonly<Record<CityBuildingId, { readonly title: string; readonly description: string }>> = Object.freeze({
