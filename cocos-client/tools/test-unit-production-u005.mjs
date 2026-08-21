@@ -72,6 +72,24 @@ const MOUNT_CONTRACT = Object.freeze({
   shadow: Object.freeze({ bones: Object.freeze(['root']), x: Object.freeze([-24, 24]), y: Object.freeze([-24, 12]) }),
   cardAnchor: Object.freeze({ bones: Object.freeze(['root']), x: Object.freeze([-24, 24]), y: Object.freeze([72, 144]) }),
 });
+const EXPECTED_ORIENTATION = Object.freeze({
+  player: Object.freeze({ direction: 1, scaleX: 1 }),
+  enemy: Object.freeze({ direction: -1, scaleX: -1 }),
+});
+const PANEL_GUARDS = Object.freeze({
+  Idle: Object.freeze({ minAlphaPixels: 50000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.36, minInnerTransparentRatio: 0.45 }),
+  Move: Object.freeze({ minAlphaPixels: 60000, minVisibleWidth: 260, minVisibleHeight: 360, maxCoverage: 0.38, minInnerTransparentRatio: 0.4 }),
+  Attack: Object.freeze({ minAlphaPixels: 55000, minVisibleWidth: 260, minVisibleHeight: 320, maxCoverage: 0.35, minInnerTransparentRatio: 0.45 }),
+  Hit: Object.freeze({ minAlphaPixels: 45000, minVisibleWidth: 240, minVisibleHeight: 340, maxCoverage: 0.32, minInnerTransparentRatio: 0.5 }),
+  Death: Object.freeze({ minAlphaPixels: 10000, minVisibleWidth: 180, minVisibleHeight: 120, maxCoverage: 0.1, minInnerTransparentRatio: 0.85 }),
+});
+const SLICE_GUARDS = Object.freeze({
+  fullBody: Object.freeze({ minAlphaPixels: 40000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.24, minInnerTransparentRatio: 0.6 }),
+  spearThrust: Object.freeze({ minAlphaPixels: 50000, minVisibleWidth: 300, minVisibleHeight: 220, maxCoverage: 0.34, minInnerTransparentRatio: 0.45 }),
+  afterimageTrail: Object.freeze({ minAlphaPixels: 90000, minVisibleWidth: 400, minVisibleHeight: 260, maxCoverage: 0.56, minInnerTransparentRatio: 0.22 }),
+  lowerStride: Object.freeze({ minAlphaPixels: 35000, minVisibleWidth: 220, minVisibleHeight: 260, maxCoverage: 0.28, minInnerTransparentRatio: 0.55 }),
+  rigSilhouette: Object.freeze({ minAlphaPixels: 100000, minVisibleWidth: 360, minVisibleHeight: 520, maxCoverage: 0.32, minInnerTransparentRatio: 0.58 }),
+});
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -106,6 +124,7 @@ function parsePng(file) {
   let offset = 8;
   let width = 0;
   let height = 0;
+  let colorType = 0;
   const idat = [];
   while (offset + 12 <= buffer.length) {
     const length = buffer.readUInt32BE(offset);
@@ -119,7 +138,8 @@ function parsePng(file) {
       width = chunk.readUInt32BE(0);
       height = chunk.readUInt32BE(4);
       assert.equal(chunk[8], 8, `${basename(file)} must use 8-bit channels`);
-      assert.equal(chunk[9], 6, `${basename(file)} must use RGBA pixels`);
+      colorType = chunk[9];
+      assert.equal(colorType === 6 || colorType === 2, true, `${basename(file)} must use RGB or RGBA pixels`);
       assert.equal(chunk[10], 0, `${basename(file)} must use PNG default compression`);
       assert.equal(chunk[11], 0, `${basename(file)} must use PNG default filtering`);
       assert.equal(chunk[12], 0, `${basename(file)} must be non-interlaced`);
@@ -129,7 +149,8 @@ function parsePng(file) {
       break;
     }
   }
-  const stride = width * 4;
+  const bytesPerPixel = colorType === 6 ? 4 : 3;
+  const stride = width * bytesPerPixel;
   const filtered = inflateSync(Buffer.concat(idat));
   const rgba = Buffer.alloc(width * height * 4);
   let sourceOffset = 0;
@@ -140,9 +161,9 @@ function parsePng(file) {
     const row = Buffer.alloc(stride);
     for (let x = 0; x < stride; x += 1) {
       const raw = filtered[sourceOffset + x];
-      const left = x >= 4 ? row[x - 4] : 0;
+      const left = x >= bytesPerPixel ? row[x - bytesPerPixel] : 0;
       const above = previous[x];
-      const upperLeft = x >= 4 ? previous[x - 4] : 0;
+      const upperLeft = x >= bytesPerPixel ? previous[x - bytesPerPixel] : 0;
       if (filterType === 0) row[x] = raw;
       else if (filterType === 1) row[x] = (raw + left) & 255;
       else if (filterType === 2) row[x] = (raw + above) & 255;
@@ -158,16 +179,22 @@ function parsePng(file) {
         assert.fail(`${basename(file)} uses unsupported PNG filter ${filterType}`);
       }
     }
-    row.copy(rgba, y * stride);
+    for (let x = 0; x < width; x += 1) {
+      const rowOffset = x * bytesPerPixel;
+      const target = (y * width + x) * 4;
+      rgba[target] = row[rowOffset];
+      rgba[target + 1] = row[rowOffset + 1];
+      rgba[target + 2] = row[rowOffset + 2];
+      rgba[target + 3] = bytesPerPixel === 4 ? row[rowOffset + 3] : 255;
+    }
     previous = row;
     sourceOffset += stride;
   }
-  return { width, height, rgba };
+  return { width, height, rgba, colorType };
 }
 
 function cropMetrics(image, rect, label) {
   assertRect(rect, { width: image.width, height: image.height }, label);
-  const rowBytes = rect.width * 4;
   let alphaPixels = 0;
   let minX = rect.width;
   let minY = rect.height;
@@ -187,6 +214,17 @@ function cropMetrics(image, rect, label) {
     }
   }
   assert.equal(alphaPixels > 0, true, `${label} must contain visible pixels`);
+  const innerInsetX = Math.max(8, Math.floor(rect.width / 8));
+  const innerInsetY = Math.max(8, Math.floor(rect.height / 8));
+  let innerTransparentPixels = 0;
+  let innerPixels = 0;
+  for (let y = innerInsetY; y < rect.height - innerInsetY; y += 1) {
+    const base = ((rect.y + y) * image.width + rect.x) * 4;
+    for (let x = innerInsetX; x < rect.width - innerInsetX; x += 1) {
+      innerPixels += 1;
+      if (image.rgba[base + x * 4 + 3] === 0) innerTransparentPixels += 1;
+    }
+  }
   return {
     alphaPixels,
     visibleBounds: {
@@ -196,8 +234,70 @@ function cropMetrics(image, rect, label) {
       height: maxY - minY + 1,
     },
     alphaCoverage: alphaPixels / (rect.width * rect.height),
-    rowBytes,
+    innerTransparentRatio: innerPixels === 0 ? 0 : innerTransparentPixels / innerPixels,
   };
+}
+
+function assertTransparentProjection(metrics, rule, label) {
+  assert.equal(metrics.alphaPixels >= rule.minAlphaPixels, true, `${label} must contain enough visible combat pixels`);
+  assert.equal(metrics.visibleBounds.width >= rule.minVisibleWidth, true, `${label} visible silhouette is too narrow`);
+  assert.equal(metrics.visibleBounds.height >= rule.minVisibleHeight, true, `${label} visible silhouette is too short`);
+  assert.equal(metrics.alphaCoverage <= rule.maxCoverage, true, `${label} still behaves like a card-background crop`);
+  assert.equal(metrics.innerTransparentRatio >= rule.minInnerTransparentRatio, true, `${label} lacks internal transparency and still reads like a pseudo-transparent card slice`);
+}
+
+function validatePosePanels(image, panels) {
+  for (const panel of panels) {
+    const metrics = cropMetrics(image, panel.rect, `U005 pose panel ${panel.state}`);
+    assertTransparentProjection(metrics, PANEL_GUARDS[panel.state], `U005 pose panel ${panel.state}`);
+    if (panel.state === 'Death') {
+      assert.equal(metrics.visibleBounds.width > metrics.visibleBounds.height / 2, true, 'U005 Death panel must read as a fallen sideways silhouette');
+    }
+  }
+}
+
+function validateCutoutSlices(image, slices) {
+  for (const slice of slices) {
+    const metrics = cropMetrics(image, slice.rect, `U005 cutout slice ${slice.name}`);
+    assertTransparentProjection(metrics, SLICE_GUARDS[slice.name], `U005 cutout slice ${slice.name}`);
+  }
+  const thrustMetrics = cropMetrics(image, EXPECTED_SLICES.spearThrust, 'U005 spearThrust slice');
+  assert.equal(thrustMetrics.visibleBounds.x >= 24, true, 'U005 spearThrust must leave a transparent rear margin instead of filling the full card width');
+  assert.equal(thrustMetrics.visibleBounds.x + thrustMetrics.visibleBounds.width >= 430, true, 'U005 spearThrust must preserve a right-facing weapon extension');
+  const afterimageMetrics = cropMetrics(image, EXPECTED_SLICES.afterimageTrail, 'U005 afterimageTrail slice');
+  assert.equal(afterimageMetrics.alphaCoverage >= 0.3, true, 'U005 afterimageTrail must retain substantial visible afterimage content');
+}
+
+function makeBlankImage(width, height) {
+  return { width, height, rgba: Buffer.alloc(width * height * 4) };
+}
+
+function copyScaledPixel(source, sourceX, sourceY, target, targetX, targetY, alpha) {
+  const clampedX = Math.max(0, Math.min(source.width - 1, sourceX));
+  const clampedY = Math.max(0, Math.min(source.height - 1, sourceY));
+  const sourceOffset = (clampedY * source.width + clampedX) * 4;
+  const targetOffset = (targetY * target.width + targetX) * 4;
+  target.rgba[targetOffset] = source.rgba[sourceOffset];
+  target.rgba[targetOffset + 1] = source.rgba[sourceOffset + 1];
+  target.rgba[targetOffset + 2] = source.rgba[sourceOffset + 2];
+  target.rgba[targetOffset + 3] = alpha;
+}
+
+function buildEdgeTransparentCardSheet(sourceImage, entries, sheetSize) {
+  const result = makeBlankImage(sheetSize.width, sheetSize.height);
+  for (const entry of entries) {
+    const rect = entry.rect;
+    const border = Math.max(10, Math.floor(Math.min(rect.width, rect.height) * 0.03));
+    for (let y = 0; y < rect.height; y += 1) {
+      for (let x = 0; x < rect.width; x += 1) {
+        const alpha = x < border || y < border || x >= rect.width - border || y >= rect.height - border ? 0 : 255;
+        const sourceX = Math.floor((x / Math.max(1, rect.width - 1)) * (sourceImage.width - 1));
+        const sourceY = Math.floor((y / Math.max(1, rect.height - 1)) * (sourceImage.height - 1));
+        copyScaledPixel(sourceImage, sourceX, sourceY, result, rect.x + x, rect.y + y, alpha);
+      }
+    }
+  }
+  return result;
 }
 
 function validateContract(contract, skeleton) {
@@ -370,10 +470,7 @@ function validateSkeleton(skeleton) {
     assert.equal(mount.y >= rule.y[0] && mount.y <= rule.y[1], true, `U005 ${name}.y left the approved range`);
   }
 
-  assert.deepEqual(skeleton.orientations, {
-    player: { direction: -1, scaleX: -1 },
-    enemy: { direction: 1, scaleX: 1 },
-  }, 'U005 orientations changed');
+  assert.deepEqual(skeleton.orientations, EXPECTED_ORIENTATION, 'U005 orientations must keep player-right / enemy-left mapping');
 
   assertExactKeys(skeleton.stateMap, REQUIRED_ACTIONS, 'U005 stateMap');
   assertExactKeys(skeleton.animations, REQUIRED_ACTIONS, 'U005 animations');
@@ -480,32 +577,30 @@ function validatePngAssets(contract, skeleton) {
   const cutoutImage = parsePng(cutoutPath);
   assert.deepEqual({ width: poseImage.width, height: poseImage.height }, contract.resources.poseSheet.size, 'U005 pose PNG dimensions changed');
   assert.deepEqual({ width: cutoutImage.width, height: cutoutImage.height }, contract.resources.cutoutSheet.size, 'U005 cutout PNG dimensions changed');
+  assert.equal(poseImage.colorType, 6, 'U005 pose sheet must keep RGBA transparency');
+  assert.equal(cutoutImage.colorType, 6, 'U005 cutout sheet must keep RGBA transparency');
 
-  for (const panel of skeleton.atlases.poseSheet.statePanels) {
-    const metrics = cropMetrics(poseImage, panel.rect, `U005 pose panel ${panel.state}`);
-    assert.equal(metrics.alphaPixels > 20000, true, `U005 ${panel.state} panel must contain substantial visible art`);
-    assert.equal(metrics.visibleBounds.height > 240, true, `U005 ${panel.state} panel must retain a readable vertical silhouette`);
-    if (panel.state === 'Death') {
-      assert.equal(metrics.visibleBounds.width > metrics.visibleBounds.height / 2, true, 'U005 Death panel must read as a fallen sideways silhouette');
-    }
-  }
+  validatePosePanels(poseImage, skeleton.atlases.poseSheet.statePanels);
+  validateCutoutSlices(cutoutImage, skeleton.atlases.cutoutSheet.slices);
 
-  for (const slice of skeleton.atlases.cutoutSheet.slices) {
-    const metrics = cropMetrics(cutoutImage, slice.rect, `U005 cutout slice ${slice.name}`);
-    assert.equal(metrics.alphaPixels > 15000, true, `U005 ${slice.name} slice must contain real visible pixels`);
-    assert.equal(metrics.visibleBounds.width > 100, true, `U005 ${slice.name} slice is too narrow to be a real production reference`);
-    assert.equal(metrics.visibleBounds.height > 120, true, `U005 ${slice.name} slice is too short to be a real production reference`);
-  }
-
-  const afterimageMetrics = cropMetrics(cutoutImage, EXPECTED_SLICES.afterimageTrail, 'U005 afterimageTrail slice');
-  assert.equal(afterimageMetrics.visibleBounds.width >= 260, true, 'U005 afterimageTrail must preserve a wide residual-motion silhouette');
-  assert.equal(afterimageMetrics.alphaCoverage >= 0.3, true, 'U005 afterimageTrail must retain substantial visible afterimage content');
+  const sourceImage = parsePng(sourceArtPath);
+  const fakePoseImage = buildEdgeTransparentCardSheet(sourceImage, skeleton.atlases.poseSheet.statePanels, skeleton.atlases.poseSheet.size);
+  assert.throws(() => validatePosePanels(fakePoseImage, skeleton.atlases.poseSheet.statePanels), /card-background crop|pseudo-transparent card slice/, 'border-transparent full-card pose projections must fail');
+  const fakeCutoutImage = buildEdgeTransparentCardSheet(sourceImage, skeleton.atlases.cutoutSheet.slices, skeleton.atlases.cutoutSheet.size);
+  assert.throws(() => validateCutoutSlices(fakeCutoutImage, skeleton.atlases.cutoutSheet.slices), /card-background crop|pseudo-transparent card slice/, 'border-transparent full-card cutout slices must fail');
 }
 
 function expectFailure(label, mutate, pattern) {
   const candidate = clone(readJson(skeletonPath));
   mutate(candidate);
   assert.throws(() => validateSkeleton(candidate), pattern, label);
+}
+
+function expectContractFailure(label, mutate, pattern) {
+  const candidate = clone(readJson(contractPath));
+  mutate(candidate);
+  const skeleton = readJson(skeletonPath);
+  assert.throws(() => validateContract(candidate, skeleton), pattern, label);
 }
 
 const skeleton = readJson(skeletonPath);
@@ -524,6 +619,20 @@ expectFailure('missing Death state', (candidate) => {
 expectFailure('attackOrigin out of range', (candidate) => {
   candidate.mountPoints.find((mount) => mount.name === 'attackOrigin').x = 999;
 }, /attackOrigin/);
+
+expectFailure('reversed player/enemy orientation', (candidate) => {
+  candidate.orientations = {
+    player: { direction: -1, scaleX: -1 },
+    enemy: { direction: 1, scaleX: 1 },
+  };
+}, /player-right \/ enemy-left mapping/);
+
+expectContractFailure('reversed runtime orientation pair', (candidate) => {
+  candidate.runtime.orientationPair = {
+    player: { direction: -1, scaleX: -1 },
+    enemy: { direction: 1, scaleX: 1 },
+  };
+}, /orientation pair mismatch|player-right \/ enemy-left mapping/);
 
 expectFailure('pose sheet path escape', (candidate) => {
   candidate.atlases.poseSheet.path = 'cocos-client/assets/resources/art/battle/units/U004/U004-POSE-SHEET.png';

@@ -72,7 +72,7 @@
         "width": 1800,
         "height": 640
       },
-      "sha256": "7e23ca17e7e33863ed77954cce6d4d3757dba21ab9630c95bc86cbf24744831b",
+      "sha256": "d477c209363a0ec983591d21f6a9d69f971d137394d09324e69ffc206ebc1a15",
       "statePanels": [
         {
           "index": 0,
@@ -133,7 +133,7 @@
         "width": 1536,
         "height": 1024
       },
-      "sha256": "5d842a8400e047ef1b22183cd9e4b7a20640ee207fb1af7c070e81e97436837c",
+      "sha256": "47b0fc64562e1d8f464ac111471c74052a363a075efb6222736945ba76e36a0c",
       "slices": [
         {
           "name": "fullBody",
@@ -333,12 +333,12 @@
   ],
   "orientations": {
     "player": {
-      "direction": -1,
-      "scaleX": -1
-    },
-    "enemy": {
       "direction": 1,
       "scaleX": 1
+    },
+    "enemy": {
+      "direction": -1,
+      "scaleX": -1
     }
   },
   "stateMap": {
