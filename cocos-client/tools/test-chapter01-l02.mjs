@@ -152,5 +152,10 @@ expectFailure(
   (candidate) => { delete candidate.chapterLevels[0].failureConditions; },
   'config/levels.chapterLevels[0].failureConditions',
 );
+expectFailure(
+  'empty failure conditions',
+  (candidate) => { candidate.chapterLevels[0].failureConditions = []; },
+  'config/levels.chapterLevels[0].failureConditions',
+);
 
-console.log('Chapter 01 L02: real file and shared contract PASS; frontline/ranged references, story reward, invalid prerequisite, unknown deck, invalid ID, and missing failure conditions covered');
+console.log('Chapter 01 L02: real file and shared contract PASS; frontline/ranged references, story reward, invalid prerequisite, unknown deck, invalid ID, and missing/empty failure conditions covered');
