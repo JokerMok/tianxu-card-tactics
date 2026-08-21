@@ -1,0 +1,87 @@
+{
+  "schema": "battle-unit-production-contract/v1",
+  "contractVersion": "2.2",
+  "productionTask": "T279",
+  "approvedAt": "2026-08-21",
+  "unitId": "U002",
+  "displayName": "折锋枪兵",
+  "resourceRoot": "assets/resources/art/battle/units/U002",
+  "combatIdentity": {
+    "race": "人族",
+    "politicalFaction": "朔垣军府",
+    "role": "STRIKER",
+    "offenseType": "PIERCE",
+    "defenseType": "LIGHT",
+    "element": "METAL",
+    "visualArchetype": "HUMANOID_INFANTRY",
+    "abilityHint": "对快速单位增伤",
+    "combatPurpose": "中速反制",
+    "stats": {
+      "prepare": 2,
+      "maxHp": 5,
+      "attack": 3,
+      "armor": 1,
+      "move": 1,
+      "range": 1,
+      "copyLimit": 4,
+      "rarity": 4
+    },
+    "tags": ["unit", "striker"]
+  },
+  "designIntent": {
+    "silhouette": "长枪、窄盾",
+    "readabilityPx": 120,
+    "readabilityRequirement": "枪尖和腿部推进动作在 120 像素下清晰",
+    "animationFocus": ["枪尖刺击", "腿部推进", "近战突击", "受击回撤", "死亡退场"]
+  },
+  "resources": {
+    "poseSheet": {
+      "file": "U002-ANIMATION-POSES.png",
+      "metaFile": "U002-ANIMATION-POSES.png.meta",
+      "resourcePath": "art/battle/units/U002/U002-ANIMATION-POSES/spriteFrame",
+      "kind": "production-frozen-pose-sheet",
+      "referencePath": "../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
+      "sha256": "9507ca351922a5fe6302cbcdaeab4c9711869e40ec1950afd4959caa14f7f81f",
+      "size": { "width": 1983, "height": 793 },
+      "poseGrid": [
+        { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 409, "height": 793 } },
+        { "index": 1, "state": "Move", "rect": { "x": 409, "y": 0, "width": 384, "height": 793 } },
+        { "index": 2, "state": "Attack", "rect": { "x": 793, "y": 0, "width": 398, "height": 793 } },
+        { "index": 3, "state": "Hit", "rect": { "x": 1191, "y": 0, "width": 383, "height": 793 } },
+        { "index": 4, "state": "Death", "rect": { "x": 1574, "y": 0, "width": 409, "height": 793 } }
+      ]
+    },
+    "cutoutSheet": {
+      "file": "U002-CUTOUT-SHEET.png",
+      "metaFile": "U002-CUTOUT-SHEET.png.meta",
+      "resourcePath": "art/battle/units/U002/U002-CUTOUT-SHEET/spriteFrame",
+      "kind": "production-frozen-cutout-sheet",
+      "referencePath": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
+      "sha256": "99e057143f1edbdb95235f0ac39057fe5efc3ea2ef3c872b1d3c509e09c7535b",
+      "size": { "width": 1536, "height": 1024 }
+    }
+  },
+  "runtime": {
+    "skeletonFile": "skeleton.json",
+    "requiredActions": ["Idle", "Move", "Attack", "Hit", "Death"],
+    "requiredMountPoints": ["attackOrigin", "effect", "healthBar", "shadow", "cardAnchor"],
+    "orientationPair": {
+      "player": { "direction": -1, "scaleX": -1 },
+      "enemy": { "direction": 1, "scaleX": 1 }
+    },
+    "requiredEvents": {
+      "Move": ["footstep"],
+      "Attack": ["windup", "impact"],
+      "Hit": ["hit"],
+      "Death": ["despawn"]
+    }
+  },
+  "provenance": {
+    "sourceSkeleton": "assets/resources/art/battle/units/U002/skeleton.json",
+    "designEvidence": [
+      "第一批卡牌设计表.md",
+      "角色兵种体系-v1.1.md",
+      "首批美术素材清单-v2.2.md"
+    ]
+  }
+}
