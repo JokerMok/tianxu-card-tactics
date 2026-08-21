@@ -396,8 +396,14 @@ function containsTransformedScenePatch(image, patch) {
     if (tileWidth > image.width || tileHeight > image.height) continue;
     for (let y = 0; y <= image.height - tileHeight; y += 4) {
       for (let x = 0; x <= image.width - tileWidth; x += 4) {
-        const candidate = luminanceSignature(image.rgba, image.width, image.height, x, y, tileWidth, tileHeight);
-        if (signatureCorrelation(sourceSignature, candidate) >= 0.985) return true;
+        const coarseCandidate = luminanceSignature(image.rgba, image.width, image.height, x, y, tileWidth, tileHeight);
+        if (signatureCorrelation(sourceSignature, coarseCandidate) < 0.75) continue;
+        for (let offsetY = 0; offsetY < 4 && y + offsetY <= image.height - tileHeight; offsetY += 1) {
+          for (let offsetX = 0; offsetX < 4 && x + offsetX <= image.width - tileWidth; offsetX += 1) {
+            const candidate = luminanceSignature(image.rgba, image.width, image.height, x + offsetX, y + offsetY, tileWidth, tileHeight);
+            if (signatureCorrelation(sourceSignature, candidate) >= 0.985) return true;
+          }
+        }
       }
     }
   }
@@ -769,9 +775,9 @@ function validatePngAssets(contract, skeleton) {
   assert.throws(() => assertNoSceneResidual(fakePoseSceneResidual, sourceImage, 'fake U005 pose sheet'), /scene residual/, 'opaque ground/reflection pixels inside a valid pose must fail');
   const fakeCutoutSceneResidual = injectScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 160, y: 180, width: 24, height: 24 });
   assert.throws(() => assertNoSceneResidual(fakeCutoutSceneResidual, sourceImage, 'fake U005 cutout sheet'), /scene residual/, 'opaque city pixels inside a valid cutout must fail');
-  const fakeScaledPoseSceneResidual = injectTransformedScenePatch(poseImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 260, y: 220 }, 2, [0.72, 0.86, 1.08, 18]);
+  const fakeScaledPoseSceneResidual = injectTransformedScenePatch(poseImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 261, y: 221 }, 2, [0.72, 0.86, 1.08, 18]);
   assert.throws(() => assertNoSceneResidual(fakeScaledPoseSceneResidual, sourceImage, 'fake scaled U005 pose sheet'), /scaled or color-transformed .* scene residual/, 'scaled and color-transformed city pixels inside a valid pose must fail');
-  const fakeTintedCutoutSceneResidual = injectTransformedScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[2], { x: 180, y: 240 }, 1.5, [1.08, 0.78, 0.64, 12]);
+  const fakeTintedCutoutSceneResidual = injectTransformedScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[2], { x: 181, y: 241 }, 1.5, [1.08, 0.78, 0.64, 12]);
   assert.throws(() => assertNoSceneResidual(fakeTintedCutoutSceneResidual, sourceImage, 'fake tinted U005 cutout sheet'), /scaled or color-transformed .* scene residual/, 'tinted ground pixels inside a valid cutout must fail');
 }
 
