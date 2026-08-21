@@ -1,0 +1,166 @@
+{
+  "schema": "battle-unit-skeleton/v1",
+  "contractVersion": "2.2",
+  "productionTask": "T280",
+  "unitId": "U003",
+  "assetStage": "formal-runtime-unit",
+  "runtimeMode": "pose-sheet-unit-skeleton",
+  "framePolicy": "five-approved-pose-columns; transform-assisted-motion; no-fabricated-frames",
+  "configBinding": {
+    "unitName": "晨誓医师",
+    "cardId": "U003",
+    "unitId": "U003",
+    "prepare": 4,
+    "rarity": 3,
+    "copyLimit": 3,
+    "tags": ["unit", "healer"],
+    "race": "人族",
+    "politicalFaction": "朔垣军府",
+    "role": "HEALER",
+    "attackChannel": "SPELL",
+    "offenseType": "SPELL",
+    "defenseType": "LIGHT",
+    "element": "WOOD",
+    "range": 2,
+    "maxHp": 5,
+    "attack": 1,
+    "armor": 0,
+    "move": 1,
+    "abilityIds": ["A003"],
+    "visualArchetype": "HUMANOID_SUPPORT"
+  },
+  "visualContract": {
+    "silhouetteTags": ["medicineStaff", "longCoat", "satchel"],
+    "battleProjectionHeightPx": [120, 180],
+    "mustReadAs": ["rearline-healer", "human-support", "shuoyuan-field-medic"],
+    "guardrails": [
+      "treatment silhouette must remain distinct from attack casting",
+      "attack pose must read as ranged spell release, not melee staff swing",
+      "side-view silhouette must preserve medicine staff and long-coat profile"
+    ]
+  },
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "pivot": { "x": 0.5, "y": 0.11 }
+  },
+  "sources": {
+    "poseSheet": {
+      "id": "U003-ANIMATION-POSES",
+      "path": "assets/resources/art/battle/units/U003/U003-ANIMATION-POSES.png",
+      "referencePath": "assets/resources/art/battle/units/U003/U003-ANIMATION-POSES.png",
+      "kind": "approved-runtime-pose-sheet",
+      "status": "production-approved",
+      "size": { "width": 1980, "height": 792 },
+      "sha256": "b99c38e175b61e09bd89ca19feff980997850f23a33537cc268d8b9743b51b79",
+      "poseGrid": [
+        { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 396, "height": 792 } },
+        { "index": 1, "state": "Move", "rect": { "x": 396, "y": 0, "width": 396, "height": 792 } },
+        { "index": 2, "state": "Attack", "rect": { "x": 792, "y": 0, "width": 396, "height": 792 } },
+        { "index": 3, "state": "Hit", "rect": { "x": 1188, "y": 0, "width": 396, "height": 792 } },
+        { "index": 4, "state": "Death", "rect": { "x": 1584, "y": 0, "width": 396, "height": 792 } }
+      ]
+    },
+    "cutoutSheet": {
+      "id": "U003-CUTOUT-SHEET",
+      "path": "assets/resources/art/battle/units/U003/U003-CUTOUT-SHEET.png",
+      "referencePath": "assets/resources/art/battle/units/U003/U003-CUTOUT-SHEET.png",
+      "kind": "approved-runtime-cutout-sheet",
+      "status": "production-approved",
+      "size": { "width": 1536, "height": 1024 },
+      "sha256": "ca869537ed4e4793b83aaad1b32b4c93a16ee2ed3cc258641363cfd0fe4a78cd"
+    }
+  },
+  "bones": [
+    { "name": "root", "x": 0, "y": 0 },
+    { "name": "torso", "parent": "root", "x": 0, "y": 106 },
+    { "name": "head", "parent": "torso", "x": 0, "y": 142 },
+    { "name": "armLeft", "parent": "torso", "x": -46, "y": 74 },
+    { "name": "armRight", "parent": "torso", "x": 50, "y": 72 },
+    { "name": "staff", "parent": "armRight", "x": 58, "y": 14 },
+    { "name": "focus", "parent": "staff", "x": 86, "y": 0 },
+    { "name": "satchel", "parent": "torso", "x": -60, "y": 24 }
+  ],
+  "attachments": [
+    { "name": "frontPose", "bone": "root", "source": "cutoutSheet", "sourceRect": { "x": 0, "y": 0, "width": 384, "height": 512 }, "width": 384, "height": 512 },
+    { "name": "sidePose", "bone": "torso", "source": "cutoutSheet", "sourceRect": { "x": 384, "y": 0, "width": 384, "height": 512 }, "width": 384, "height": 512 },
+    { "name": "rearPose", "bone": "root", "source": "cutoutSheet", "sourceRect": { "x": 768, "y": 0, "width": 384, "height": 512 }, "width": 384, "height": 512 },
+    { "name": "rigPose", "bone": "torso", "source": "cutoutSheet", "sourceRect": { "x": 384, "y": 512, "width": 384, "height": 512 }, "width": 384, "height": 512 }
+  ],
+  "mountPoints": [
+    { "name": "attackOrigin", "bone": "focus", "x": 96, "y": 4 },
+    { "name": "effect", "bone": "torso", "x": 18, "y": 84 },
+    { "name": "healthBar", "bone": "root", "x": 0, "y": 236 },
+    { "name": "shadow", "bone": "root", "x": 0, "y": -6 },
+    { "name": "cardAnchor", "bone": "root", "x": 0, "y": 108 }
+  ],
+  "orientations": {
+    "player": { "direction": -1, "scaleX": -1 },
+    "enemy": { "direction": 1, "scaleX": 1 }
+  },
+  "stateMap": {
+    "Idle": { "source": "poseSheet", "poseIndex": 0 },
+    "Move": { "source": "poseSheet", "poseIndex": 1 },
+    "Attack": { "source": "poseSheet", "poseIndex": 2 },
+    "Hit": { "source": "poseSheet", "poseIndex": 3 },
+    "Death": { "source": "poseSheet", "poseIndex": 4 }
+  },
+  "animations": {
+    "Idle": {
+      "duration": 1.18,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 0 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 0 }],
+      "tracks": [
+        { "bone": "torso", "property": "scaleY", "frames": [{ "time": 0, "value": 1 }, { "time": 0.59, "value": 1.03 }, { "time": 1.18, "value": 1 }] },
+        { "bone": "focus", "property": "rotate", "frames": [{ "time": 0, "value": -4 }, { "time": 0.59, "value": 5 }, { "time": 1.18, "value": -4 }] }
+      ],
+      "events": []
+    },
+    "Move": {
+      "duration": 0.82,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 1 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 1 }],
+      "tracks": [
+        { "bone": "torso", "property": "translateY", "frames": [{ "time": 0, "value": 0 }, { "time": 0.41, "value": -12 }, { "time": 0.82, "value": 0 }] },
+        { "bone": "satchel", "property": "rotate", "frames": [{ "time": 0, "value": -10 }, { "time": 0.41, "value": 12 }, { "time": 0.82, "value": -10 }] }
+      ],
+      "events": [{ "name": "footstep", "time": 0.2 }, { "name": "footstep", "time": 0.61 }]
+    },
+    "Attack": {
+      "duration": 0.74,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 2 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 2 }],
+      "tracks": [
+        { "bone": "staff", "property": "rotate", "frames": [{ "time": 0, "value": -8 }, { "time": 0.22, "value": 18 }, { "time": 0.48, "value": 42 }, { "time": 0.74, "value": -8 }] },
+        { "bone": "focus", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.22, "value": 8 }, { "time": 0.48, "value": 18 }, { "time": 0.74, "value": 0 }] },
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.28, "value": 10 }, { "time": 0.74, "value": 0 }] }
+      ],
+      "events": [{ "name": "windup", "time": 0.18 }, { "name": "impact", "time": 0.48 }]
+    },
+    "Hit": {
+      "duration": 0.36,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 3 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 3 }],
+      "tracks": [
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.1, "value": -14 }, { "time": 0.36, "value": 0 }] },
+        { "bone": "head", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.14, "value": -10 }, { "time": 0.36, "value": 0 }] }
+      ],
+      "events": [{ "name": "hit", "time": 0.1 }]
+    },
+    "Death": {
+      "duration": 0.84,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 4 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 4 }],
+      "tracks": [
+        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.44, "value": -32 }, { "time": 0.84, "value": -86 }] },
+        { "bone": "root", "property": "opacity", "frames": [{ "time": 0, "value": 1 }, { "time": 0.58, "value": 1 }, { "time": 0.84, "value": 0 }] }
+      ],
+      "events": [{ "name": "despawn", "time": 0.84 }]
+    }
+  }
+}
