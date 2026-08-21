@@ -194,6 +194,26 @@ assert.deepEqual(service.snapshot().refreshLedger, [
 ]);
 assert.equal(service.snapshot().refreshCount, 2);
 
+const numericRefreshSaves = [];
+const numericRefreshes = new TowerShopService({
+  cycleKey: '2026-11-09',
+  towerCoins: 20,
+  persist: (serialized) => numericRefreshSaves.push(serialized),
+});
+assert.equal(numericRefreshes.refresh('2').code, 'APPLIED');
+assert.equal(numericRefreshes.refresh('1').code, 'APPLIED');
+assert.deepEqual(numericRefreshes.snapshot().refreshLedger, [
+  { sequence: 1, refreshId: '2' },
+  { sequence: 2, refreshId: '1' },
+]);
+assert.equal(numericRefreshSaves.length, 2, 'numeric refresh ids must commit in reverse numeric order');
+const numericRestored = restoreTowerShop(numericRefreshes.save());
+assert.deepEqual(numericRestored.refreshLedger, [
+  { sequence: 1, refreshId: '2' },
+  { sequence: 2, refreshId: '1' },
+]);
+assert.deepEqual(numericRestored.processedRefreshes, { '1': 'refresh', '2': 'refresh' });
+
 const saved = service.save();
 const savedState = JSON.parse(saved);
 const deletedWholePurchase = JSON.parse(saved);

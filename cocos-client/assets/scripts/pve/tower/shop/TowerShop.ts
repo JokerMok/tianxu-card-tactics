@@ -284,11 +284,18 @@ function assertRefreshLedger(
     ledgerRefreshIds.push(entry.refreshId);
   }
 
-  const processedRefreshIds = Object.keys(processedRefreshes);
-  if (
-    processedRefreshIds.length !== ledgerRefreshIds.length
-    || processedRefreshIds.some((refreshId, index) => refreshId !== ledgerRefreshIds[index])
-  ) {
+  for (const refreshId of ledgerRefreshIds) {
+    if (!hasOwn(processedRefreshes, refreshId) || processedRefreshes[refreshId] !== 'refresh') {
+      fail('INVALID_STATE', 'state.processedRefreshes must match the refresh ledger keys and order');
+    }
+  }
+
+  // Serialization keeps normal-key insertion order but normalizes integer-index keys,
+  // so numeric refresh ids remain valid while non-numeric reordering is rejected.
+  const expectedProcessedRefreshes = Object.fromEntries(
+    ledgerRefreshIds.map((refreshId) => [refreshId, 'refresh']),
+  );
+  if (JSON.stringify(processedRefreshes) !== JSON.stringify(expectedProcessedRefreshes)) {
     fail('INVALID_STATE', 'state.processedRefreshes must match the refresh ledger keys and order');
   }
 }
