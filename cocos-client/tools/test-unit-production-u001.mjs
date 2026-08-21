@@ -348,7 +348,7 @@ function validateSkeleton(skeleton, context) {
     validatePoseReference(`${actionName} stateMap`, state, actionName, poseGrid);
     assert.equal(isRecord(animation), true, `${actionName} must define an animation`);
     assert.equal(isFiniteNumber(animation.duration) && animation.duration > 0 && animation.duration <= 3, true, `${actionName} duration must stay within 0–3 seconds`);
-    assert.equal(typeof animation.loop, 'boolean', `${actionName} must declare loop behavior`);
+    assert.equal(typeof animation.loop === 'boolean', true, `${actionName} must declare loop behavior`);
     assert.deepEqual(animation.sourcePose, state, `${actionName} sourcePose must agree with stateMap`);
     validatePoseReference(`${actionName} sourcePose`, animation.sourcePose, actionName, poseGrid);
     assert.equal(Array.isArray(animation.sourceFrames) && animation.sourceFrames.length === 1, true, `${actionName} must reference exactly one real source frame`);
