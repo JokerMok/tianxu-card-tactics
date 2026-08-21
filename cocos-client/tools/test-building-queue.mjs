@@ -149,6 +149,27 @@ function checkSpeedupAndSerialization() {
   assert.deepEqual(exactCompletion.state.queue, []);
   assert.equal(exactCompletion.state.buildingLevels.castle, 2);
 
+  let multiQueueState = createInitialBuildingQueueState(config, resources(), 0);
+  const firstQueued = enqueueBuildingUpgrade(multiQueueState, config, 'castle', 0);
+  multiQueueState = firstQueued.state;
+  const secondQueued = enqueueBuildingUpgrade(multiQueueState, config, 'alchemy', 0);
+  multiQueueState = secondQueued.state;
+  const thirdQueued = enqueueBuildingUpgrade(multiQueueState, config, 'forge', 0);
+  multiQueueState = thirdQueued.state;
+  const exactHeadCompletion = applyBuildingSpeedup(multiQueueState, config, firstQueued.entry.id, 29000, 1000);
+  assert.equal(exactHeadCompletion.accepted, true);
+  assert.deepEqual(exactHeadCompletion.completedEntryIds, [firstQueued.entry.id]);
+  assert.deepEqual(exactHeadCompletion.state.queue.map(({ id, startAtMs, finishAtMs }) => ({ id, startAtMs, finishAtMs })), [
+    { id: secondQueued.entry.id, startAtMs: 1000, finishAtMs: 26000 },
+    { id: thirdQueued.entry.id, startAtMs: 26000, finishAtMs: 51000 },
+  ], 'exact head completion must rebase every following queue entry contiguously');
+  const settledSecond = settleBuildingQueue(exactHeadCompletion.state, config, 26000);
+  assert.deepEqual(settledSecond.completedEntryIds, [secondQueued.entry.id]);
+  assert.equal(settledSecond.state.queue[0].startAtMs, 26000);
+  const settledAll = settleBuildingQueue(exactHeadCompletion.state, config, 51000);
+  assert.deepEqual(settledAll.completedEntryIds, [secondQueued.entry.id, thirdQueued.entry.id]);
+  assert.deepEqual(settledAll.state.queue, []);
+
   const serialized = serializeBuildingQueueState(boosted.state, config);
   assert.deepEqual(deserializeBuildingQueueState(serialized, config), boosted.state, 'queue state round-trips through JSON');
   assert.equal(serialized, serializeBuildingQueueState(deserializeBuildingQueueState(serialized, config), config), 'serialization is canonical');

@@ -130,6 +130,19 @@ function shiftFollowingEntries(queue: BuildingQueueEntry[], fromIndex: number): 
   }
 }
 
+function rebaseFollowingEntries(queue: BuildingQueueEntry[], fromIndex: number, previousFinishAtMs: number): void {
+  for (let index = fromIndex; index < queue.length; index += 1) {
+    const current = queue[index];
+    const startAtMs = previousFinishAtMs;
+    queue[index] = {
+      ...current,
+      startAtMs,
+      finishAtMs: startAtMs + current.durationMs,
+    };
+    previousFinishAtMs = queue[index].finishAtMs;
+  }
+}
+
 function settleMutable(state: BuildingQueueState, atMs: number): string[] {
   const mutable = state as { buildingLevels: Record<string, number>; queue: BuildingQueueEntry[]; lastUpdatedAtMs: number };
   const completedEntryIds: string[] = [];
@@ -270,13 +283,15 @@ export function applyBuildingSpeedup(
   const appliedMs = Math.min(amountMs, Math.max(0, current.finishAtMs - earliestFinish));
   if (appliedMs === 0) return reject(settled.state, 'INVALID_BOOST', '该队列项已无可加速时长');
   next.queue[index] = { ...current, finishAtMs: current.finishAtMs - appliedMs };
-  shiftFollowingEntries(next.queue, index + 1);
   const completedEntryIds = [...settled.completedEntryIds];
   if (next.queue[index].finishAtMs <= atMs) {
     const [completed] = next.queue.splice(index, 1);
     next.buildingLevels[completed.buildingId] = completed.targetLevel;
     completedEntryIds.push(completed.id);
-    if (index > 0) shiftFollowingEntries(next.queue, index);
+    const previousFinishAtMs = index > 0 ? next.queue[index - 1].finishAtMs : completed.finishAtMs;
+    rebaseFollowingEntries(next.queue, index, previousFinishAtMs);
+  } else {
+    shiftFollowingEntries(next.queue, index + 1);
   }
   assertBuildingQueueState(next, config);
   return { accepted: true, code: 'BOOST_APPLIED', state: next, completedEntryIds, appliedMs };
