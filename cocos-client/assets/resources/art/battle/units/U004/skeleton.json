@@ -1,0 +1,176 @@
+{
+  "schema": "battle-unit-production/v1",
+  "contractVersion": "2.2",
+  "unitId": "U004",
+  "assetStage": "A2-derived-battle-reference",
+  "runtimeMode": "pose-sheet-skeleton",
+  "derivationPolicy": "derived-from-approved-card-art; no-synthetic-anatomy-outside-source-silhouette",
+  "sourceArt": {
+    "id": "U004-CARD",
+    "path": "美术素材/标准版/单位卡面/U004-CARD.png",
+    "kind": "approved-card-art",
+    "status": "approved",
+    "size": { "width": 1024, "height": 1536 },
+    "sha256": "570e835357a503ce3c76e835883d63fe3587b85a9978d8ca7af5d3eb7683fa04"
+  },
+  "designTruth": {
+    "name": "岚羽游射手",
+    "race": "羽民",
+    "politicalFaction": "山海诸庭",
+    "battleRole": "远射",
+    "coreAbility": "射程三",
+    "visualArchetype": "WINGED_HUMANOID"
+  },
+  "combatProfile": {
+    "maxHp": 4,
+    "attack": 3,
+    "armor": 0,
+    "spellResist": 0,
+    "move": 1,
+    "range": 3,
+    "attackChannel": "PHYSICAL",
+    "offenseType": "PIERCE",
+    "defenseType": "LIGHT",
+    "element": "WOOD",
+    "role": "RANGED",
+    "prepare": 3,
+    "copyLimit": 4,
+    "abilityId": "A004"
+  },
+  "artConstraints": {
+    "weaponType": "LONG_BOW",
+    "wingRootVisible": true,
+    "shotLaneClear": true,
+    "forbiddenLook": [
+      "ANGELIC_WHITE_WINGS",
+      "WING_BLOCKS_SHOT_VECTOR",
+      "MELEE_FORWARD_SILHOUETTE"
+    ],
+    "requiredNotes": [
+      "长弓",
+      "翼根",
+      "翼片不得遮挡射击方向"
+    ]
+  },
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "pivot": { "x": 0.5, "y": 0.1 }
+  },
+  "atlases": {
+    "poseSheet": {
+      "path": "cocos-client/assets/resources/art/battle/units/U004/U004-POSE-SHEET.png",
+      "kind": "derived-state-atlas",
+      "size": { "width": 1800, "height": 640 },
+      "sha256": "77a6d3d338199ea9b7c60aa7b0078470bcecac71e3bee14fbe5f374718e50b5a",
+      "statePanels": [
+        { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 360, "height": 640 } },
+        { "index": 1, "state": "Move", "rect": { "x": 360, "y": 0, "width": 360, "height": 640 } },
+        { "index": 2, "state": "Attack", "rect": { "x": 720, "y": 0, "width": 360, "height": 640 } },
+        { "index": 3, "state": "Hit", "rect": { "x": 1080, "y": 0, "width": 360, "height": 640 } },
+        { "index": 4, "state": "Death", "rect": { "x": 1440, "y": 0, "width": 360, "height": 640 } }
+      ]
+    },
+    "cutoutSheet": {
+      "path": "cocos-client/assets/resources/art/battle/units/U004/U004-CUTOUT-SHEET.png",
+      "kind": "derived-reference-atlas",
+      "size": { "width": 1536, "height": 1024 },
+      "sha256": "f13d59b0a7687f814623d0c2cf4e00d00a874f79db866f551ecaf93d4565d254",
+      "slices": [
+        { "name": "fullBody", "rect": { "x": 0, "y": 0, "width": 470, "height": 560 } },
+        { "name": "wingArc", "rect": { "x": 470, "y": 0, "width": 420, "height": 520 } },
+        { "name": "upperBodyBow", "rect": { "x": 890, "y": 0, "width": 500, "height": 430 } },
+        { "name": "lowerFeathers", "rect": { "x": 0, "y": 560, "width": 420, "height": 464 } },
+        { "name": "rigSilhouette", "rect": { "x": 420, "y": 264, "width": 520, "height": 760 } }
+      ]
+    }
+  },
+  "bones": [
+    { "name": "root", "x": 0, "y": 0 },
+    { "name": "torso", "parent": "root", "x": 0, "y": 104 },
+    { "name": "head", "parent": "torso", "x": -20, "y": 142 },
+    { "name": "wing", "parent": "torso", "x": -132, "y": 116 },
+    { "name": "drawArm", "parent": "torso", "x": -34, "y": 92 },
+    { "name": "bowArm", "parent": "torso", "x": 92, "y": 82 },
+    { "name": "bow", "parent": "bowArm", "x": 154, "y": 52 },
+    { "name": "skirt", "parent": "root", "x": -8, "y": -18 }
+  ],
+  "attachments": [
+    { "name": "fullBody", "bone": "root", "source": "cutoutSheet", "sourceRect": { "x": 0, "y": 0, "width": 470, "height": 560 }, "width": 470, "height": 560 },
+    { "name": "wingArc", "bone": "wing", "source": "cutoutSheet", "sourceRect": { "x": 470, "y": 0, "width": 420, "height": 520 }, "width": 420, "height": 520 },
+    { "name": "upperBodyBow", "bone": "bowArm", "source": "cutoutSheet", "sourceRect": { "x": 890, "y": 0, "width": 500, "height": 430 }, "width": 500, "height": 430 },
+    { "name": "lowerFeathers", "bone": "skirt", "source": "cutoutSheet", "sourceRect": { "x": 0, "y": 560, "width": 420, "height": 464 }, "width": 420, "height": 464 },
+    { "name": "rigSilhouette", "bone": "torso", "source": "cutoutSheet", "sourceRect": { "x": 420, "y": 264, "width": 520, "height": 760 }, "width": 520, "height": 760 }
+  ],
+  "mountPoints": [
+    { "name": "attackOrigin", "bone": "bow", "x": 194, "y": 12 },
+    { "name": "effect", "bone": "torso", "x": 18, "y": 88 },
+    { "name": "healthBar", "bone": "root", "x": 0, "y": 232 },
+    { "name": "shadow", "bone": "root", "x": 0, "y": -10 },
+    { "name": "cardAnchor", "bone": "root", "x": 0, "y": 110 }
+  ],
+  "orientations": {
+    "player": { "direction": -1, "scaleX": -1 },
+    "enemy": { "direction": 1, "scaleX": 1 }
+  },
+  "stateMap": {
+    "Idle": { "source": "poseSheet", "panelIndex": 0 },
+    "Move": { "source": "poseSheet", "panelIndex": 1 },
+    "Attack": { "source": "poseSheet", "panelIndex": 2 },
+    "Hit": { "source": "poseSheet", "panelIndex": 3 },
+    "Death": { "source": "poseSheet", "panelIndex": 4 }
+  },
+  "animations": {
+    "Idle": {
+      "duration": 1.16,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "panelIndex": 0 },
+      "tracks": [
+        { "bone": "torso", "property": "scaleY", "frames": [{ "time": 0, "value": 1 }, { "time": 0.58, "value": 1.03 }, { "time": 1.16, "value": 1 }] },
+        { "bone": "wing", "property": "rotate", "frames": [{ "time": 0, "value": -2 }, { "time": 0.58, "value": 3 }, { "time": 1.16, "value": -2 }] }
+      ],
+      "events": []
+    },
+    "Move": {
+      "duration": 0.76,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "panelIndex": 1 },
+      "tracks": [
+        { "bone": "torso", "property": "translateY", "frames": [{ "time": 0, "value": 0 }, { "time": 0.38, "value": -11 }, { "time": 0.76, "value": 0 }] },
+        { "bone": "skirt", "property": "rotate", "frames": [{ "time": 0, "value": -4 }, { "time": 0.38, "value": 8 }, { "time": 0.76, "value": -4 }] }
+      ],
+      "events": [{ "name": "footstep", "time": 0.19 }, { "name": "footstep", "time": 0.57 }]
+    },
+    "Attack": {
+      "duration": 0.72,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "panelIndex": 2 },
+      "tracks": [
+        { "bone": "bow", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.22, "value": -18 }, { "time": 0.48, "value": 22 }, { "time": 0.72, "value": 0 }] },
+        { "bone": "drawArm", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.24, "value": -12 }, { "time": 0.48, "value": 10 }, { "time": 0.72, "value": 0 }] },
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.34, "value": 14 }, { "time": 0.72, "value": 0 }] }
+      ],
+      "events": [{ "name": "windup", "time": 0.18 }, { "name": "impact", "time": 0.48 }]
+    },
+    "Hit": {
+      "duration": 0.36,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "panelIndex": 3 },
+      "tracks": [
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.08, "value": -16 }, { "time": 0.36, "value": 0 }] },
+        { "bone": "head", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.12, "value": -9 }, { "time": 0.36, "value": 0 }] }
+      ],
+      "events": [{ "name": "hit", "time": 0.08 }]
+    },
+    "Death": {
+      "duration": 0.88,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "panelIndex": 4 },
+      "tracks": [
+        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.44, "value": 26 }, { "time": 0.88, "value": 84 }] },
+        { "bone": "root", "property": "opacity", "frames": [{ "time": 0, "value": 1 }, { "time": 0.62, "value": 1 }, { "time": 0.88, "value": 0 }] }
+      ],
+      "events": [{ "name": "despawn", "time": 0.88 }]
+    }
+  }
+}
