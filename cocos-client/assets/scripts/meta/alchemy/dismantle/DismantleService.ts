@@ -109,6 +109,8 @@ const DEFAULT_MATERIAL_YIELDS = Object.freeze({
   5: Object.freeze({ [DEFAULT_DISMANTLE_MATERIAL_ID]: 8 }),
   6: Object.freeze({ [DEFAULT_DISMANTLE_MATERIAL_ID]: 13 }),
 });
+const DECIMAL_INTEGER_KEY_PATTERN = /^(?:0|[1-9]\d*)$/;
+const CARD_QUALITY_KEYS = new Set(CARD_QUALITIES.map(String));
 
 interface CardAuthority {
   readonly copyLimit: number;
@@ -279,6 +281,9 @@ function normalizeRequestId(value: unknown): string {
 function normalizeYields(value: unknown): ReadonlyMap<CardQuality, MaterialMap> {
   const input = value === undefined ? DEFAULT_MATERIAL_YIELDS : value;
   if (!isRecord(input)) fail('INVALID_CONFIG');
+  if (Object.keys(input).some((key) => !DECIMAL_INTEGER_KEY_PATTERN.test(key) || !CARD_QUALITY_KEYS.has(key))) {
+    fail('INVALID_CONFIG');
+  }
   const result = new Map<CardQuality, MaterialMap>();
   for (const quality of CARD_QUALITIES) {
     const row = input[String(quality)];
@@ -286,7 +291,6 @@ function normalizeYields(value: unknown): ReadonlyMap<CardQuality, MaterialMap> 
     if ([...materials.values()].some((quantity) => !positiveInteger(quantity))) fail('INVALID_CONFIG');
     result.set(quality, materials);
   }
-  if (Object.keys(input).some((key) => !CARD_QUALITIES.includes(Number(key) as CardQuality))) fail('INVALID_CONFIG');
   return result;
 }
 

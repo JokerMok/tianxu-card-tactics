@@ -56,6 +56,13 @@ function expectCode(label, action, code) {
   }, label);
 }
 
+for (const invalidKey of ['01', '1.0', '1e0', ' 1', '1 ', '+1']) {
+  expectCode(`invalid material-yield key ${JSON.stringify(invalidKey)}`, () => new DismantleService({
+    metadata: cardsTable,
+    materialYields: { ...materialYields, [invalidKey]: { [DEFAULT_DISMANTLE_MATERIAL_ID]: 99 } },
+  }), 'INVALID_CONFIG');
+}
+
 const saved = [];
 const service = new DismantleService({
   metadata: cardsTable,
