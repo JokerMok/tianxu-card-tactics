@@ -361,6 +361,22 @@ assert(Object.isFrozen(restored.snapshot().ledger[0]));
 assert(Object.isFrozen(restored.snapshot().receipts[0].result));
 assert.throws(() => { restored.snapshot().slots[0].recipeId = 'R1'; }, TypeError);
 
+const tamperedMaterialBalance = JSON.parse(saved);
+tamperedMaterialBalance.materials = [{ materialId: 'CARD_DUST', quantity: 999 }];
+expectCode('tampered material balance', () => restoreCardRefiningService(JSON.stringify(tamperedMaterialBalance), {
+  recipes: [recipe], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
+const tamperedCardBalance = JSON.parse(saved);
+tamperedCardBalance.cards = [{ cardId: 'U001', quality: 2, quantity: 999 }];
+expectCode('tampered card balance', () => restoreCardRefiningService(JSON.stringify(tamperedCardBalance), {
+  recipes: [recipe], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
+const tamperedInitialBalance = JSON.parse(saved);
+tamperedInitialBalance.initialMaterials = [{ materialId: 'CARD_DUST', quantity: 999 }];
+expectCode('tampered initial inventory anchor', () => restoreCardRefiningService(JSON.stringify(tamperedInitialBalance), {
+  recipes: [recipe], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
+
 const semanticSaved = timedService.save();
 const semanticRestoreOptions = { recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0 };
 const tamperedSlotRecipe = JSON.parse(semanticSaved);
@@ -398,6 +414,34 @@ reorderedReceipts.receipts.reverse();
 reorderedReceipts.receipts[0].result.refreshCount = 0;
 reorderedReceipts.receipts[1].result.refreshCount = 1;
 expectCode('reordered receipts with coordinated refresh counts', () => restoreCardRefiningService(JSON.stringify(reorderedReceipts), { recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0 }), 'INVALID_STATE');
+
+const coordinatedEventRewrite = JSON.parse(orderedEventsService.save());
+coordinatedEventRewrite.ledger.reverse();
+coordinatedEventRewrite.receipts.reverse();
+coordinatedEventRewrite.ledger.forEach((entry, index) => { entry.sequence = index + 1; });
+coordinatedEventRewrite.receipts.forEach((entry, index) => {
+  entry.result.ledgerSequence = index + 1;
+  entry.result.refreshCount = index;
+});
+expectCode('coordinated ledger receipt sequence rewrite', () => restoreCardRefiningService(JSON.stringify(coordinatedEventRewrite), {
+  recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
+
+const forgedAutoRequestId = JSON.parse(automaticRefreshSaved);
+forgedAutoRequestId.ledger[0].requestId = 'AUTO_REFRESH-0';
+forgedAutoRequestId.receipts[0].requestId = 'AUTO_REFRESH-0';
+forgedAutoRequestId.receipts[0].result.requestId = 'AUTO_REFRESH-0';
+expectCode('forged automatic refresh request ID', () => restoreCardRefiningService(JSON.stringify(forgedAutoRequestId), {
+  recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
+
+const forgedUserAutoRequestId = JSON.parse(saved);
+forgedUserAutoRequestId.ledger[0].requestId = `AUTO_REFRESH-${forgedUserAutoRequestId.ledger[0].at}`;
+forgedUserAutoRequestId.receipts[0].requestId = forgedUserAutoRequestId.ledger[0].requestId;
+forgedUserAutoRequestId.receipts[0].result.requestId = forgedUserAutoRequestId.ledger[0].requestId;
+expectCode('automatic request ID on user event', () => restoreCardRefiningService(JSON.stringify(forgedUserAutoRequestId), {
+  recipes: [recipe], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0,
+}), 'INVALID_STATE');
 
 const corrupted = JSON.parse(saved);
 corrupted.receipts = [];

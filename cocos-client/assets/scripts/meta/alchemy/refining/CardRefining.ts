@@ -1,6 +1,6 @@
 import { CARD_QUALITY_CATALOG_DATA } from '../../cards/quality/index.ts';
 
-export const CARD_REFINING_SCHEMA_VERSION = 1 as const;
+export const CARD_REFINING_SCHEMA_VERSION = 2 as const;
 export const REFINING_SCHEMA_VERSION = CARD_REFINING_SCHEMA_VERSION;
 export const DEFAULT_REFINING_SLOT_COUNT = 3;
 export const DEFAULT_REFINING_REFRESH_TICKET_ID = 'REFINING_REFRESH_TICKET' as const;
@@ -80,6 +80,8 @@ export interface CardRefiningState {
   readonly schemaVersion: typeof CARD_REFINING_SCHEMA_VERSION;
   readonly materials: readonly RefiningMaterial[];
   readonly cards: readonly RefiningCard[];
+  readonly initialMaterials: readonly RefiningMaterial[];
+  readonly initialCards: readonly RefiningCard[];
   readonly initialRefreshTickets: number;
   readonly initialLastObservedAt: number;
   readonly refreshTickets: number;
@@ -90,6 +92,7 @@ export interface CardRefiningState {
   readonly lastObservedAt: number;
   readonly ledger: readonly CardRefiningLedgerEntry[];
   readonly receipts: readonly CardRefiningReceipt[];
+  readonly chainDigest: string;
 }
 
 export interface CardRefiningClock {
@@ -161,9 +164,9 @@ const MATERIAL_KEYS = new Set(['materialId', 'quantity']);
 const CARD_KEYS = new Set(['cardId', 'quality', 'quantity']);
 const SLOT_KEYS = new Set(['slotId', 'recipeId']);
 const STATE_KEYS = new Set([
-  'schemaVersion', 'materials', 'cards', 'initialRefreshTickets', 'initialLastObservedAt',
+  'schemaVersion', 'materials', 'cards', 'initialMaterials', 'initialCards', 'initialRefreshTickets', 'initialLastObservedAt',
   'refreshTickets', 'slots', 'refreshCount', 'lastRefreshAt', 'nextRefreshAt',
-  'lastObservedAt', 'ledger', 'receipts',
+  'lastObservedAt', 'ledger', 'receipts', 'chainDigest',
 ]);
 const LEDGER_KEYS = new Set([
   'sequence', 'operation', 'requestId', 'at', 'slotId', 'recipeId', 'success', 'probability',
@@ -484,11 +487,13 @@ function freezeState(value: CardRefiningState): CardRefiningState {
   return Object.freeze({
     schemaVersion: CARD_REFINING_SCHEMA_VERSION,
     materials: copyMaterials(value.materials), cards: copyCards(value.cards),
+    initialMaterials: copyMaterials(value.initialMaterials), initialCards: copyCards(value.initialCards),
     initialRefreshTickets: value.initialRefreshTickets, initialLastObservedAt: value.initialLastObservedAt,
     refreshTickets: value.refreshTickets, slots: copySlots(value.slots), refreshCount: value.refreshCount,
     lastRefreshAt: value.lastRefreshAt, nextRefreshAt: value.nextRefreshAt, lastObservedAt: value.lastObservedAt,
     ledger: Object.freeze(value.ledger.map(cloneLedger)),
     receipts: Object.freeze(value.receipts.map((entry) => Object.freeze({ requestId: entry.requestId, fingerprint: entry.fingerprint, result: cloneResult(entry.result) }))),
+    chainDigest: value.chainDigest,
   });
 }
 
@@ -545,6 +550,120 @@ function autoRefreshRequestId(at: number): string {
   return `${AUTO_REFRESH_REQUEST_PREFIX}${at}`;
 }
 
+function assertEventRequestId(operation: CardRefiningLedgerOperation, requestId: string, at: number, label: string): void {
+  if (operation === 'AUTO_REFRESH') {
+    if (requestId !== autoRefreshRequestId(at)) fail('INVALID_STATE', `${label}.requestId is not derived from its scheduled event`);
+  } else {
+    assertUserRequestId(requestId, `${label}.requestId`, 'INVALID_STATE');
+  }
+}
+
+// The serialized state is untrusted. This key makes the chain digest a tamper
+// evidence boundary for ordinary save-file edits; state reachability remains
+// checked independently below.
+const REFINING_CHAIN_KEY = 'card-refining-chain-v2:7d8b0c2e-4a3f-4f7e-bd4c-91a3d5e8c6b2';
+const SHA256_K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+];
+
+function stableSerialize(value: unknown): string {
+  if (value === null || typeof value === 'boolean' || typeof value === 'number' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(',')}]`;
+  if (isRecord(value)) {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableSerialize(value[key])}`).join(',')}}`;
+  }
+  fail('INVALID_STATE', 'refining chain contains an unsupported value');
+}
+
+function utf8Bytes(value: string): number[] {
+  const bytes: number[] = [];
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code < 0x80) bytes.push(code);
+    else if (code < 0x800) bytes.push(0xc0 | (code >> 6), 0x80 | (code & 0x3f));
+    else if (code >= 0xd800 && code <= 0xdbff && index + 1 < value.length) {
+      const low = value.charCodeAt(index + 1);
+      if (low >= 0xdc00 && low <= 0xdfff) {
+        const codePoint = 0x10000 + ((code - 0xd800) << 10) + (low - 0xdc00);
+        bytes.push(0xf0 | (codePoint >> 18), 0x80 | ((codePoint >> 12) & 0x3f), 0x80 | ((codePoint >> 6) & 0x3f), 0x80 | (codePoint & 0x3f));
+        index += 1;
+      } else bytes.push(0xef, 0xbf, 0xbd);
+    } else if (code >= 0xdc00 && code <= 0xdfff) bytes.push(0xef, 0xbf, 0xbd);
+    else bytes.push(0xe0 | (code >> 12), 0x80 | ((code >> 6) & 0x3f), 0x80 | (code & 0x3f));
+  }
+  return bytes;
+}
+
+function sha256Hex(value: string): string {
+  const bytes = utf8Bytes(value);
+  const bitLength = bytes.length * 8;
+  bytes.push(0x80);
+  while ((bytes.length + 8) % 64 !== 0) bytes.push(0);
+  for (let shift = 56; shift >= 0; shift -= 8) bytes.push((bitLength / 2 ** shift) & 0xff);
+  let h0 = 0x6a09e667; let h1 = 0xbb67ae85; let h2 = 0x3c6ef372; let h3 = 0xa54ff53a;
+  let h4 = 0x510e527f; let h5 = 0x9b05688c; let h6 = 0x1f83d9ab; let h7 = 0x5be0cd19;
+  const rightRotate = (word: number, bits: number) => (word >>> bits) | (word << (32 - bits));
+  for (let offset = 0; offset < bytes.length; offset += 64) {
+    const words = new Array<number>(64).fill(0);
+    for (let index = 0; index < 16; index += 1) {
+      const position = offset + index * 4;
+      words[index] = (bytes[position] << 24) | (bytes[position + 1] << 16) | (bytes[position + 2] << 8) | bytes[position + 3];
+    }
+    for (let index = 16; index < 64; index += 1) {
+      const s0 = rightRotate(words[index - 15], 7) ^ rightRotate(words[index - 15], 18) ^ (words[index - 15] >>> 3);
+      const s1 = rightRotate(words[index - 2], 17) ^ rightRotate(words[index - 2], 19) ^ (words[index - 2] >>> 10);
+      words[index] = (words[index - 16] + s0 + words[index - 7] + s1) | 0;
+    }
+    let a = h0; let b = h1; let c = h2; let d = h3; let e = h4; let f = h5; let g = h6; let h = h7;
+    for (let index = 0; index < 64; index += 1) {
+      const sum1 = rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25);
+      const choice = (e & f) ^ (~e & g);
+      const temp1 = (h + sum1 + choice + SHA256_K[index] + words[index]) | 0;
+      const sum0 = rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22);
+      const majority = (a & b) ^ (a & c) ^ (b & c);
+      const temp2 = (sum0 + majority) | 0;
+      h = g; g = f; f = e; e = (d + temp1) | 0; d = c; c = b; b = a; a = (temp1 + temp2) | 0;
+    }
+    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0; h5 = (h5 + f) | 0; h6 = (h6 + g) | 0; h7 = (h7 + h) | 0;
+  }
+  return [h0, h1, h2, h3, h4, h5, h6, h7].map((word) => (word >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
+function keyedDigest(value: unknown): string {
+  return sha256Hex(`${REFINING_CHAIN_KEY}\u0000${stableSerialize(value)}`);
+}
+
+function calculateChainDigest(
+  recipeMap: ReadonlyMap<string, CardRefiningRecipe>,
+  slotCount: number,
+  initialMaterials: readonly RefiningMaterial[],
+  initialCards: readonly RefiningCard[],
+  initialRefreshTickets: number,
+  initialLastObservedAt: number,
+  ledger: readonly CardRefiningLedgerEntry[],
+  receipts: readonly CardRefiningReceipt[],
+): string {
+  let digest = keyedDigest({
+    type: 'GENESIS', schemaVersion: CARD_REFINING_SCHEMA_VERSION,
+    initialMaterials, initialCards, initialRefreshTickets, initialLastObservedAt,
+    initialSlots: selectSlots([...recipeMap.keys()], slotCount, 0),
+  });
+  for (let index = 0; index < ledger.length; index += 1) {
+    digest = keyedDigest({ type: 'EVENT', previous: digest, sequence: index + 1, ledger: ledger[index], receipt: receipts[index] });
+  }
+  return digest;
+}
+
 function normalizeRequest(value: unknown): { requestId: string; slotId: number | null; recipeId: string | null; materials?: readonly RefiningMaterial[]; at?: number } {
   if (!isRecord(value)) fail('INVALID_REQUEST', 'refining request must be an object');
   assertOnlyKeys(value, REQUEST_KEYS, 'refining request', 'INVALID_REQUEST');
@@ -576,11 +695,13 @@ function normalizeState(
   if (!isRecord(parsed)) fail('INVALID_STATE', 'refining state must be an object');
   assertOnlyKeys(parsed, STATE_KEYS, 'refining state', 'INVALID_STATE');
   if (parsed.schemaVersion !== CARD_REFINING_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported refining state schema');
-  for (const key of ['materials', 'cards', 'refreshTickets', 'slots', 'refreshCount', 'lastRefreshAt', 'nextRefreshAt', 'ledger', 'receipts']) {
+  for (const key of ['materials', 'cards', 'initialMaterials', 'initialCards', 'initialRefreshTickets', 'initialLastObservedAt', 'refreshTickets', 'slots', 'refreshCount', 'lastRefreshAt', 'nextRefreshAt', 'ledger', 'receipts', 'chainDigest']) {
     if (!hasOwn(parsed, key)) fail('INVALID_STATE', `refining state.${key} is required`);
   }
   const materials = normalizeMaterials(parsed.materials, 'refining state.materials', 'INVALID_STATE', true);
   const cards = normalizeCards(parsed.cards, 'refining state.cards', 'INVALID_STATE');
+  const initialMaterials = normalizeMaterials(parsed.initialMaterials, 'refining state.initialMaterials', 'INVALID_STATE', true);
+  const initialCards = normalizeCards(parsed.initialCards, 'refining state.initialCards', 'INVALID_STATE');
   if (!hasOwn(parsed, 'initialRefreshTickets') || !hasOwn(parsed, 'initialLastObservedAt')) {
     fail('INVALID_STATE', 'refining state initial refresh anchors are required');
   }
@@ -594,6 +715,7 @@ function normalizeState(
   const lastObservedAt = parsed.lastObservedAt === undefined ? parsed.lastRefreshAt : parsed.lastObservedAt;
   assertTimestamp(lastObservedAt, 'refining state.lastObservedAt', 'INVALID_STATE');
   if (lastObservedAt < parsed.lastRefreshAt || lastObservedAt >= parsed.nextRefreshAt) fail('INVALID_STATE', 'refining state.lastObservedAt is outside the current refresh window');
+  if (typeof parsed.chainDigest !== 'string' || !/^[0-9a-f]{64}$/.test(parsed.chainDigest)) fail('INVALID_STATE', 'refining state.chainDigest is invalid');
 
   if (!Array.isArray(parsed.slots) || parsed.slots.length !== slotCount) fail('INVALID_STATE', 'refining state.slots has the wrong count');
   const slots = parsed.slots.map((entry, index) => {
@@ -637,6 +759,10 @@ function normalizeState(
       fail('INVALID_STATE', `refining receipt and ledger do not match: ${entry.requestId}`);
     }
   }
+  const expectedChainDigest = calculateChainDigest(
+    recipeMap, slotCount, initialMaterials, initialCards, parsed.initialRefreshTickets, parsed.initialLastObservedAt, ledger, receipts,
+  );
+  if (parsed.chainDigest !== expectedChainDigest) fail('INVALID_STATE', 'refining event chain digest is invalid');
 
   const initialBoundaries = initialRefreshBoundary(parsed.initialLastObservedAt, timezone, refreshHour, refreshMinute);
   let replayLastRefreshAt = initialBoundaries.last;
@@ -645,6 +771,8 @@ function normalizeState(
   let replayRefreshTickets = parsed.initialRefreshTickets;
   let replaySlots = selectSlots([...recipeMap.keys()], slotCount, 0);
   let replayObservedAt = parsed.initialLastObservedAt;
+  const replayMaterials = toMaterialMap(initialMaterials);
+  const replayCards = toCardMap(initialCards);
   for (let index = 0; index < ledger.length; index += 1) {
     const entry = ledger[index];
     const receipt = receipts[index];
@@ -671,6 +799,25 @@ function normalizeState(
         if (entry.slotId === null || entry.slotId >= slotCount || replaySlots[entry.slotId]?.recipeId !== entry.recipeId) {
           fail('INVALID_STATE', `refining ledger[${index}] is not reachable from the slot state at its sequence`);
         }
+        for (const material of entry.debited) {
+          const currentQuantity = replayMaterials.get(material.materialId) ?? 0;
+          if (currentQuantity < material.quantity) fail('INVALID_STATE', `refining ledger[${index}] overspends ${material.materialId}`);
+          const nextQuantity = currentQuantity - material.quantity;
+          if (nextQuantity === 0) replayMaterials.delete(material.materialId);
+          else replayMaterials.set(material.materialId, nextQuantity);
+        }
+        for (const material of entry.returned) {
+          const currentQuantity = replayMaterials.get(material.materialId) ?? 0;
+          if (currentQuantity > Number.MAX_SAFE_INTEGER - material.quantity) fail('INVALID_STATE', `refining ledger[${index}] overflows ${material.materialId}`);
+          replayMaterials.set(material.materialId, currentQuantity + material.quantity);
+        }
+        for (const card of entry.credited) {
+          const key = cardKey(card);
+          const currentCard = replayCards.get(key);
+          const currentQuantity = currentCard?.quantity ?? 0;
+          if (currentQuantity > Number.MAX_SAFE_INTEGER - card.quantity) fail('INVALID_STATE', `refining ledger[${index}] overflows ${key}`);
+          replayCards.set(key, { ...card, quantity: currentQuantity + card.quantity });
+        }
       }
     }
     if (receipt.result.refreshCount !== replayRefreshCount || receipt.result.refreshedCycles !== expectedRefreshedCycles) {
@@ -685,11 +832,14 @@ function normalizeState(
     || !sameSlots(replaySlots, slots)) {
     fail('INVALID_STATE', 'refining state is not reachable from its initial state and event history');
   }
+  if (!sameMaterials(materialList(replayMaterials), materials) || !sameCards(cardList(replayCards), cards)) {
+    fail('INVALID_STATE', 'refining inventory is not reachable from its initial state and event history');
+  }
   return freezeState({
-    schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, refreshTickets: parsed.refreshTickets,
+    schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, initialMaterials, initialCards, refreshTickets: parsed.refreshTickets,
     initialRefreshTickets: parsed.initialRefreshTickets, initialLastObservedAt: parsed.initialLastObservedAt,
     slots, refreshCount: parsed.refreshCount, lastRefreshAt: parsed.lastRefreshAt,
-    nextRefreshAt: parsed.nextRefreshAt, lastObservedAt, ledger, receipts,
+    nextRefreshAt: parsed.nextRefreshAt, lastObservedAt, ledger, receipts, chainDigest: parsed.chainDigest,
   });
 }
 
@@ -704,6 +854,7 @@ function normalizeLedger(value: unknown, index: number, recipeMap: ReadonlyMap<s
   if (value.operation !== 'REFINE' && value.operation !== 'REFRESH' && value.operation !== 'AUTO_REFRESH') fail('INVALID_STATE', `${label}.operation is invalid`);
   assertText(value.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
   assertTimestamp(value.at, `${label}.at`, 'INVALID_STATE');
+  assertEventRequestId(value.operation, value.requestId, value.at, label);
   if (value.operation === 'REFINE') {
     assertSafeInteger(value.slotId, `${label}.slotId`, 'INVALID_STATE', 0);
     assertRecipeId(value.recipeId, `${label}.recipeId`, 'INVALID_STATE');
@@ -714,8 +865,7 @@ function normalizeLedger(value: unknown, index: number, recipeMap: ReadonlyMap<s
   } else if (value.operation === 'REFRESH') {
     if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) fail('INVALID_STATE', `${label} refresh fields are invalid`);
   } else {
-    if (value.requestId !== autoRefreshRequestId(value.at)
-      || value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
+    if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
       fail('INVALID_STATE', `${label} scheduled refresh fields are invalid`);
     }
   }
@@ -758,6 +908,7 @@ function normalizeResult(value: unknown, label: string, recipeMap: ReadonlyMap<s
   assertText(value.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
   if (value.applied !== true || value.idempotent !== false) fail('INVALID_STATE', `${label} must be an applied first result`);
   assertTimestamp(value.at, `${label}.at`, 'INVALID_STATE');
+  assertEventRequestId(value.operation, value.requestId, value.at, label);
   if (value.operation === 'REFINE') {
     assertSafeInteger(value.slotId, `${label}.slotId`, 'INVALID_STATE', 0);
     assertRecipeId(value.recipeId, `${label}.recipeId`, 'INVALID_STATE');
@@ -768,8 +919,7 @@ function normalizeResult(value: unknown, label: string, recipeMap: ReadonlyMap<s
     if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
       fail('INVALID_STATE', `${label} refresh fields are invalid`);
     }
-  } else if (value.requestId !== autoRefreshRequestId(value.at)
-    || value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
+  } else if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
     fail('INVALID_STATE', `${label} refresh fields are invalid`);
   }
   assertSafeInteger(value.refreshedCycles, `${label}.refreshedCycles`, 'INVALID_STATE');
@@ -833,13 +983,16 @@ export const REFINING_RECIPES = CARD_REFINING_RECIPES;
 
 function defaultState(recipeMap: ReadonlyMap<string, CardRefiningRecipe>, slotCount: number, now: number, timezone: string, refreshHour: number, refreshMinute: number, refreshTickets: number, materials: readonly RefiningMaterial[], cards: readonly RefiningCard[]): CardRefiningState {
   const boundaries = initialRefreshBoundary(now, timezone, refreshHour, refreshMinute);
-  return freezeState({
-    schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, refreshTickets,
+  const initial = {
+    schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, initialMaterials: materials, initialCards: cards, refreshTickets,
     initialRefreshTickets: refreshTickets, initialLastObservedAt: now,
     slots: selectSlots([...recipeMap.keys()], slotCount, 0), refreshCount: 0,
     lastRefreshAt: boundaries.last, nextRefreshAt: boundaries.next, lastObservedAt: now,
     ledger: [], receipts: [],
-  });
+  };
+  return freezeState({ ...initial, chainDigest: calculateChainDigest(
+    recipeMap, slotCount, materials, cards, refreshTickets, now, initial.ledger, initial.receipts,
+  ) });
 }
 
 function cloneRecipe(value: CardRefiningRecipe): CardRefiningRecipe {
@@ -968,7 +1121,12 @@ export class CardRefiningService {
     if (!Number.isSafeInteger(sequence)) fail('QUANTITY_EXCEEDED', 'refining ledger sequence exceeds the safe integer limit');
     const ledger = cloneLedger({ sequence, operation: 'REFINE', requestId: request.requestId, at, slotId, recipeId, success, probability: recipe.probability, roll, debited: copyMaterials(recipe.materials), returned, credited, spentRefreshTickets: 0 });
     const result = cloneResult({ operation: 'REFINE', requestId: request.requestId, applied: true, idempotent: false, at, slotId, recipeId, success, probability: recipe.probability, roll, debited: copyMaterials(recipe.materials), returned, credited, spentRefreshTickets: 0, refreshedCycles: 0, refreshCount: prepared.state.refreshCount, ledgerSequence: sequence });
-    const next = freezeState({ ...prepared.state, materials: materialList(nextMaterials), cards: cardList(nextCards), ledger: [...prepared.state.ledger, ledger], receipts: [...prepared.state.receipts, { requestId: request.requestId, fingerprint, result }] });
+    const nextLedger = [...prepared.state.ledger, ledger];
+    const nextReceipts = [...prepared.state.receipts, { requestId: request.requestId, fingerprint, result }];
+    const next = freezeState({ ...prepared.state, materials: materialList(nextMaterials), cards: cardList(nextCards), ledger: nextLedger, receipts: nextReceipts, chainDigest: calculateChainDigest(
+      this.recipes, this.slotCount, prepared.state.initialMaterials, prepared.state.initialCards,
+      prepared.state.initialRefreshTickets, prepared.state.initialLastObservedAt, nextLedger, nextReceipts,
+    ) });
     this.commit(next);
     return cloneResult(result);
   }
@@ -1007,7 +1165,12 @@ export class CardRefiningService {
     if (!Number.isSafeInteger(sequence)) fail('QUANTITY_EXCEEDED', 'refining ledger sequence exceeds the safe integer limit');
     const ledger = cloneLedger({ sequence, operation: 'REFRESH', requestId, at: atValue, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 1 });
     const result = cloneResult({ operation: 'REFRESH', requestId, applied: true, idempotent: false, at: atValue, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 1, refreshedCycles: 1, refreshCount, ledgerSequence: sequence });
-    const next = freezeState({ ...prepared.state, refreshTickets: prepared.state.refreshTickets - 1, slots, refreshCount, ledger: [...prepared.state.ledger, ledger], receipts: [...prepared.state.receipts, { requestId, fingerprint, result }] });
+    const nextLedger = [...prepared.state.ledger, ledger];
+    const nextReceipts = [...prepared.state.receipts, { requestId, fingerprint, result }];
+    const next = freezeState({ ...prepared.state, refreshTickets: prepared.state.refreshTickets - 1, slots, refreshCount, ledger: nextLedger, receipts: nextReceipts, chainDigest: calculateChainDigest(
+      this.recipes, this.slotCount, prepared.state.initialMaterials, prepared.state.initialCards,
+      prepared.state.initialRefreshTickets, prepared.state.initialLastObservedAt, nextLedger, nextReceipts,
+    ) });
     this.commit(next);
     return cloneResult(result);
   }
@@ -1045,7 +1208,10 @@ export class CardRefiningService {
       nextRefreshAt = refreshBoundaryAfter(eventAt, this.timezone, this.refreshHour, this.refreshMinute);
     }
     const slots = refreshedCycles === 0 ? this.current.slots : selectSlots([...this.recipes.keys()], this.slotCount, refreshCount);
-    const state = freezeState({ ...this.current, slots, refreshCount, lastRefreshAt, nextRefreshAt, lastObservedAt: at, ledger, receipts });
+    const state = freezeState({ ...this.current, slots, refreshCount, lastRefreshAt, nextRefreshAt, lastObservedAt: at, ledger, receipts, chainDigest: calculateChainDigest(
+      this.recipes, this.slotCount, this.current.initialMaterials, this.current.initialCards,
+      this.current.initialRefreshTickets, this.current.initialLastObservedAt, ledger, receipts,
+    ) });
     return { state, refreshedCycles };
   }
 
