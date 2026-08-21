@@ -320,12 +320,15 @@ function validateContract(contract) {
   }
   if (!Array.isArray(contract.samples) || contract.samples.length !== REQUIRED_CATEGORIES.length) fail('contract.samples must contain one executable sample per category');
   const sampleIds = new Set();
+  const sampleCategories = new Set();
   for (let index = 0; index < contract.samples.length; index += 1) {
     const sample = requireRecord(contract.samples[index], `samples[${index}]`);
     const sampleId = requireString(sample.id, `samples[${index}].id`);
     if (!/^SAMPLE-[A-Z0-9]+(?:-[A-Z0-9]+)+$/.test(sampleId) || sampleIds.has(sampleId)) fail(`samples[${index}].id is invalid or duplicated`);
     sampleIds.add(sampleId);
     const category = requireOneOf(sample.category, REQUIRED_CATEGORIES, `samples[${index}].category`);
+    if (sampleCategories.has(category)) fail(`duplicate sample category: ${category}`);
+    sampleCategories.add(category);
     if (sample.trigger !== EVENT_BY_CATEGORY[category]) fail(`samples[${index}].trigger does not match category event`);
     requireString(sample.target, `samples[${index}].target`);
     const categoryAssets = byCategory.get(category);
@@ -333,6 +336,9 @@ function validateContract(contract) {
     const audio = categoryAssets.find((asset) => asset.kind === 'audio');
     if (sample.effectId !== effect.id || sample.audioId !== audio.id) fail(`samples[${index}] does not reference the category's effect and audio`);
     if (effect.event.type !== sample.trigger || audio.event.type !== sample.trigger) fail(`samples[${index}] event references are inconsistent`);
+  }
+  for (const category of REQUIRED_CATEGORIES) {
+    if (!sampleCategories.has(category)) fail(`missing executable sample category: ${category}`);
   }
   return { assetCount: contract.assets.length, sampleCount: contract.samples.length };
 }
@@ -379,5 +385,13 @@ expectFailure('event outside duration', (candidate) => {
 expectFailure('hash mismatch', (candidate) => {
   candidate.assets.find((asset) => asset.category === 'button' && asset.kind === 'audio').sha256 = '0'.repeat(64);
 }, /sha256 does not match/);
+expectFailure('duplicate executable sample category', (candidate) => {
+  const sample = candidate.samples.find((entry) => entry.category === 'settlement');
+  sample.category = 'attack';
+  sample.trigger = EVENT_BY_CATEGORY.attack;
+  sample.target = 'unit.hitPoint';
+  sample.effectId = 'VFX-BATTLE-ATTACK-SLASH';
+  sample.audioId = 'SFX-BATTLE-ATTACK-IMPACT';
+}, /exactly one executable sample per category|duplicate sample category/);
 
-console.log('Battle effects/audio contract negatives: missing, path, format, duration, event and hash rejection PASS');
+console.log('Battle effects/audio contract negatives: missing, path, format, duration, event, hash and sample-category rejection PASS');
