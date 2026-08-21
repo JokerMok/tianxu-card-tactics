@@ -183,6 +183,11 @@ expectFailure(
   'config/levels/chapter01/L04.chapterLevels[0].failureConditions',
 );
 expectFailure(
+  'empty failure conditions',
+  (fixture) => { fixture.chapterLevels[0].failureConditions = []; },
+  'config/levels/chapter01/L04.chapterLevels[0].failureConditions',
+);
+expectFailure(
   'invalid reward ID',
   (fixture) => { fixture.chapterLevels[0].rewards[0].id = 'U_005'; },
   'config/levels/chapter01/L04.chapterLevels[0].rewards[0].id',
