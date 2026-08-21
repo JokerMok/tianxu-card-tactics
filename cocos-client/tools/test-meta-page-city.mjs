@@ -78,6 +78,14 @@ const invalidLiveExpeditionState = {
   ...realState,
   expedition: { active: true, endsAt: 0, reward: 0 },
 };
+expectFailure('null expedition rejected during recovery', () => createDefaultCityPageData({
+  ...realState,
+  expedition: null,
+}), 'INVALID_DATA');
+expectFailure('undefined expedition rejected during recovery', () => createDefaultCityPageData({
+  ...realState,
+  expedition: undefined,
+}), 'INVALID_DATA');
 expectFailure('invalid active expedition state rejected at construction', () => new CityPageService({ state: invalidLiveExpeditionState }), 'INVALID_DATA');
 expectFailure('invalid active expedition state rejected during recovery', () => createDefaultCityPageData(invalidLiveExpeditionState), 'INVALID_DATA');
 assert.equal(createDefaultCityPageData({
@@ -201,6 +209,6 @@ const stateBeforeFailure = JSON.stringify(persistenceState);
 expectFailure('state persistence failure rolls back', () => failingStatePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
 assert.equal(JSON.stringify(persistenceState), stateBeforeFailure);
 assert.equal(failingStatePage.state.buildings.forge, 2);
-assert.equal(negativeCaseCount, 20, 'missing, invalid, out-of-range and atomicity cases must execute');
+assert.equal(negativeCaseCount, 22, 'missing, invalid, out-of-range and atomicity cases must execute');
 
 console.log(`T312 city page PASS: real-buildings=${realData.buildings.length}, components=${normal.components.length}, negative-cases=${negativeCaseCount}, normal/empty/insufficient/active/claimable`);

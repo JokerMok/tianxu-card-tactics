@@ -166,19 +166,23 @@ export const CITY_EXPEDITION_STAMINA_COST = 10 as const;
 export const CITY_EXPEDITION_DURATION_MS = 60_000 as const;
 export const CITY_EXPEDITION_REWARD_SILVER = 1_600 as const;
 
-function assertValidGameStateExpedition(expedition: GameState['expedition']): void {
-  if (typeof expedition.active !== 'boolean'
-    || !Number.isSafeInteger(expedition.endsAt)
-    || !Number.isSafeInteger(expedition.reward)
-    || expedition.endsAt < 0
-    || expedition.endsAt >= Number.MAX_SAFE_INTEGER
-    || expedition.reward < 0) {
+function assertValidGameStateExpedition(expedition: unknown): void {
+  if (expedition === null || typeof expedition !== 'object' || Array.isArray(expedition)) {
     throw new CityPageError('INVALID_DATA', 'game state expedition values are invalid');
   }
-  if (expedition.active && (expedition.endsAt === 0 || expedition.reward === 0)) {
+  const candidate = expedition as { active: unknown; endsAt: unknown; reward: unknown };
+  if (typeof candidate.active !== 'boolean'
+    || !Number.isSafeInteger(candidate.endsAt)
+    || !Number.isSafeInteger(candidate.reward)
+    || candidate.endsAt < 0
+    || candidate.endsAt >= Number.MAX_SAFE_INTEGER
+    || candidate.reward < 0) {
+    throw new CityPageError('INVALID_DATA', 'game state expedition values are invalid');
+  }
+  if (candidate.active && (candidate.endsAt === 0 || candidate.reward === 0)) {
     throw new CityPageError('INVALID_DATA', 'active expedition must have a positive endsAt and reward');
   }
-  if (!expedition.active && (expedition.endsAt !== 0 || expedition.reward !== 0)) {
+  if (!candidate.active && (candidate.endsAt !== 0 || candidate.reward !== 0)) {
     throw new CityPageError('INVALID_DATA', 'inactive expedition must have endsAt and reward 0');
   }
 }
