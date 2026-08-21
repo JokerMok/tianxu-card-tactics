@@ -35,6 +35,54 @@ const MOUNT_CONTRACTS = Object.freeze({
     })
   })
 });
+const UNIT_RUNTIME_CONTRACTS = Object.freeze({
+  U002: Object.freeze({
+    assetStage: 'formal-runtime-unit',
+    assetStageLabel: 'a formal runtime unit',
+    runtimeMode: 'pose-sheet-unit-skeleton',
+    runtimeModeLabel: 'a pose-sheet runtime skeleton',
+    framePolicy: 'five-approved-pose-columns; transform-assisted-motion; no-fabricated-frames',
+    sources: Object.freeze({
+      poseSheet: Object.freeze({
+        path: 'assets/resources/art/battle/units/U002/U002-ANIMATION-POSES.png',
+        referencePath: 'assets/resources/art/battle/units/U002/U002-ANIMATION-POSES.png',
+        upstreamReferencePath: '../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png',
+        kind: 'approved-runtime-pose-sheet',
+        status: 'production-approved',
+        pngColorType: 6
+      }),
+      cutoutSheet: Object.freeze({
+        path: 'assets/resources/art/battle/units/U002/U002-CUTOUT-SHEET.png',
+        referencePath: 'assets/resources/art/battle/units/U002/U002-CUTOUT-SHEET.png',
+        upstreamReferencePath: '../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png',
+        kind: 'approved-runtime-cutout-sheet',
+        status: 'production-approved',
+        pngColorType: 6
+      })
+    })
+  }),
+  U008: Object.freeze({
+    assetStage: 'A0-reference',
+    assetStageLabel: 'an A0 reference sample',
+    runtimeMode: 'reference-pose-skeleton',
+    runtimeModeLabel: 'a reference-pose skeleton',
+    framePolicy: 'one-approved-key-pose-per-state; no-fabricated-frames',
+    sources: Object.freeze({
+      poseSheet: Object.freeze({
+        path: 'assets/resources/a0/units/U008-ANIMATION-POSES.png',
+        referencePath: '../美术素材/A0/动画关键姿势/U008-ANIMATION-POSES.png',
+        kind: 'key-pose-sheet',
+        status: 'reference-approved'
+      }),
+      cutoutSheet: Object.freeze({
+        path: '../美术素材/A0/单位切片参考/U008-CUTOUT-SHEET.png',
+        referencePath: '../美术素材/A0/单位切片参考/U008-CUTOUT-SHEET.png',
+        kind: 'cutout-and-rig-reference',
+        status: 'reference-approved'
+      })
+    })
+  })
+});
 
 function isFiniteNumber(value) {
   return typeof value === 'number' && Number.isFinite(value);
@@ -46,6 +94,12 @@ function isRecord(value) {
 
 function assertExactKeys(record, expectedKeys, label) {
   assert.deepEqual(Object.keys(record).sort(), [...expectedKeys].sort(), `${label} keys must match the approved set`);
+}
+
+function runtimeContract(unitId) {
+  const contract = UNIT_RUNTIME_CONTRACTS[unitId];
+  assert.equal(Boolean(contract), true, `${unitId} must have a frozen runtime contract`);
+  return contract;
 }
 
 function sourceFile(unitId, sourceName, source, field) {
@@ -63,18 +117,32 @@ function sha256(file) {
 }
 
 function validatePngSource(unitId, sourceName, source) {
+  const contract = runtimeContract(unitId).sources[sourceName];
+  assert.equal(Boolean(contract), true, `${unitId} ${sourceName} must have a frozen source contract`);
+  assert.equal(source.path, contract.path, `${unitId} ${sourceName} path must stay frozen to the approved asset`);
+  assert.equal(source.referencePath, contract.referencePath, `${unitId} ${sourceName} referencePath must stay frozen to the approved source trace`);
+  assert.equal(source.kind, contract.kind, `${unitId} ${sourceName} kind must stay frozen`);
+  assert.equal(source.status, contract.status, `${unitId} ${sourceName} status must stay frozen`);
   const file = sourceFile(unitId, sourceName, source, 'path');
   const reference = sourceFile(unitId, sourceName, source, 'referencePath');
+  if ('upstreamReferencePath' in contract) {
+    assert.equal(source.upstreamReferencePath, contract.upstreamReferencePath, `${unitId} ${sourceName} must preserve upstreamReferencePath provenance`);
+    sourceFile(unitId, sourceName, source, 'upstreamReferencePath');
+  } else {
+    assert.equal(Object.hasOwn(source, 'upstreamReferencePath'), false, `${unitId} ${sourceName} must not declare upstreamReferencePath`);
+  }
   const bytes = readFileSync(file);
   assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${unitId} ${sourceName} source must be PNG`);
   assert.equal(bytes.toString('ascii', 12, 16), 'IHDR', `${unitId} ${sourceName} PNG must contain IHDR`);
+  if ('pngColorType' in contract) {
+    assert.equal(bytes[25], contract.pngColorType, `${unitId} ${sourceName} PNG must preserve RGBA alpha data`);
+  }
   assert.equal(Number.isSafeInteger(source.size?.width) && source.size.width > 0, true, `${unitId} ${sourceName} width must be a positive integer`);
   assert.equal(Number.isSafeInteger(source.size?.height) && source.size.height > 0, true, `${unitId} ${sourceName} height must be a positive integer`);
   const actualSize = { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
   assert.deepEqual(actualSize, source.size, `${unitId} ${sourceName} source dimensions changed`);
   assert.equal(sha256(file), source.sha256, `${unitId} ${sourceName} source hash does not match its manifest`);
   assert.equal(sha256(reference), source.sha256, `${unitId} ${sourceName} reference hash does not match its manifest`);
-  assert.equal(source.status, 'reference-approved', `${unitId} ${sourceName} must be reference-approved`);
   return actualSize;
 }
 
@@ -186,12 +254,13 @@ function validateMountContract(unitId, skeleton) {
 }
 
 function validateSkeleton(unitId, skeleton) {
+  const contract = runtimeContract(unitId);
   assert.equal(skeleton.schema, 'battle-unit-skeleton/v1', `${unitId} must use the battle-unit-skeleton/v1 contract`);
   assert.equal(skeleton.contractVersion, '2.2', `${unitId} must declare the frozen v2.2 contract`);
   assert.equal(skeleton.unitId, unitId, `${unitId} skeleton unitId must match its directory`);
-  assert.equal(skeleton.assetStage, 'A0-reference', `${unitId} must remain an A0 reference sample`);
-  assert.equal(skeleton.runtimeMode, 'reference-pose-skeleton', `${unitId} must remain a reference-pose skeleton`);
-  assert.equal(skeleton.framePolicy, 'one-approved-key-pose-per-state; no-fabricated-frames', `${unitId} must reject fabricated frame claims`);
+  assert.equal(skeleton.assetStage, contract.assetStage, `${unitId} must remain ${contract.assetStageLabel}`);
+  assert.equal(skeleton.runtimeMode, contract.runtimeMode, `${unitId} must remain ${contract.runtimeModeLabel}`);
+  assert.equal(skeleton.framePolicy, contract.framePolicy, `${unitId} must retain its approved frame policy`);
   assert.equal(Number.isSafeInteger(skeleton.canvas?.width) && skeleton.canvas.width > 0, true, `${unitId} must declare a positive canvas width`);
   assert.equal(Number.isSafeInteger(skeleton.canvas?.height) && skeleton.canvas.height > 0, true, `${unitId} must declare a positive canvas height`);
   assert.equal(isFiniteNumber(skeleton.canvas?.pivot?.x) && isFiniteNumber(skeleton.canvas?.pivot?.y), true, `${unitId} must declare a finite canvas pivot`);
@@ -323,11 +392,23 @@ assert.throws(() => validateSkeleton('U008', invalidFrameIndex), /Move source fr
 
 const wrongAssetStage = structuredClone(samples[0].skeleton);
 wrongAssetStage.assetStage = 'preview';
-assert.throws(() => validateSkeleton('U002', wrongAssetStage), /must remain an A0 reference sample/);
+assert.throws(() => validateSkeleton('U002', wrongAssetStage), /must remain a formal runtime unit/);
 
 const wrongRuntimeMode = structuredClone(samples[1].skeleton);
 wrongRuntimeMode.runtimeMode = 'runtime-atlas';
 assert.throws(() => validateSkeleton('U008', wrongRuntimeMode), /must remain a reference-pose skeleton/);
+
+const wrongFormalPath = structuredClone(samples[0].skeleton);
+wrongFormalPath.sources.poseSheet.path = 'assets/resources/a0/units/U002-ANIMATION-POSES.png';
+assert.throws(() => validateSkeleton('U002', wrongFormalPath), /poseSheet path must stay frozen to the approved asset/);
+
+const missingUpstreamReferencePath = structuredClone(samples[0].skeleton);
+delete missingUpstreamReferencePath.sources.cutoutSheet.upstreamReferencePath;
+assert.throws(() => validateSkeleton('U002', missingUpstreamReferencePath), /must preserve upstreamReferencePath provenance/);
+
+const unexpectedReferenceProvenance = structuredClone(samples[1].skeleton);
+unexpectedReferenceProvenance.sources.poseSheet.upstreamReferencePath = '../美术素材/A0/动画关键姿势/U008-ANIMATION-POSES.png';
+assert.throws(() => validateSkeleton('U008', unexpectedReferenceProvenance), /must not declare upstreamReferencePath/);
 
 const invalidKeyframe = structuredClone(samples[0].skeleton);
 invalidKeyframe.animations.Death.tracks[0].frames[1].time = 1.5;
@@ -349,4 +430,4 @@ movingRoot.animations.Move.tracks.push({
 });
 assert.throws(() => validateSkeleton('U008', movingRoot), /Move must leave root translation to battle logic/);
 
-console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 16 contract counterexamples rejected`);
+console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 19 contract counterexamples rejected`);
