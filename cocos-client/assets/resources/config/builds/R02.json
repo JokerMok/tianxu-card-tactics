@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "table": "builds",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
+  "buildTarget": "R02",
+  "contractDeckId": "D001",
+  "builds": [
+    {
+      "id": "R02-B01",
+      "profession": "P002",
+      "race": "羽民",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U004", "count": 4 },
+        { "slot": 2, "cardId": "U005", "count": 3 },
+        { "slot": 3, "cardId": "U006", "count": 2 },
+        { "slot": 4, "cardId": "U014", "count": 2 },
+        { "slot": 5, "cardId": "U001", "count": 4 },
+        { "slot": 6, "cardId": "U002", "count": 4 },
+        { "slot": 7, "cardId": "U003", "count": 3 },
+        { "slot": 8, "cardId": "U013", "count": 3 },
+        { "slot": 9, "cardId": "U027", "count": 2 },
+        { "slot": 10, "cardId": "S001", "count": 1 },
+        { "slot": 11, "cardId": "S002", "count": 1 },
+        { "slot": 12, "cardId": "S003", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["羽民机动", "术法压制"]
+    },
+    {
+      "id": "R02-B02",
+      "profession": "P003",
+      "race": "羽民",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U004", "count": 4 },
+        { "slot": 2, "cardId": "U005", "count": 3 },
+        { "slot": 3, "cardId": "U006", "count": 2 },
+        { "slot": 4, "cardId": "U014", "count": 2 },
+        { "slot": 5, "cardId": "U007", "count": 3 },
+        { "slot": 6, "cardId": "U008", "count": 1 },
+        { "slot": 7, "cardId": "U015", "count": 3 },
+        { "slot": 8, "cardId": "U016", "count": 3 },
+        { "slot": 9, "cardId": "U017", "count": 2 },
+        { "slot": 10, "cardId": "U018", "count": 2 },
+        { "slot": 11, "cardId": "U027", "count": 1 },
+        { "slot": 12, "cardId": "S007", "count": 1 },
+        { "slot": 13, "cardId": "S008", "count": 1 },
+        { "slot": 14, "cardId": "S015", "count": 1 },
+        { "slot": 15, "cardId": "S016", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["羽民机动", "契约反击"]
+    }
+  ]
+}
