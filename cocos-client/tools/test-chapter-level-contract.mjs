@@ -167,6 +167,15 @@ expectFailureWithReferences(
   { ...references, chapterLevelIds: selfReferentialRegistry },
   'config/levels.references.chapterLevelIds[0]',
 );
+const mutuallyReferentialRegistryA = new Set();
+const mutuallyReferentialRegistryB = new Set([mutuallyReferentialRegistryA]);
+mutuallyReferentialRegistryA.add(mutuallyReferentialRegistryB);
+expectFailureWithReferences(
+  'mutually referential chapter level registry',
+  valid,
+  { ...references, chapterLevelIds: mutuallyReferentialRegistryA },
+  'config/levels.references.chapterLevelIds[0][0]',
+);
 const invalidStepIterator = { next: () => ({ value: 'L01' }) };
 expectFailureWithReferences(
   'invalid nested registry Iterator step',
