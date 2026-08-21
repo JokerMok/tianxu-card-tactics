@@ -173,5 +173,25 @@ expectFailure(
   (fixture) => { delete fixture.chapterLevels[0].failureConditions; },
   'config/levels/chapter01/L03.json.chapterLevels[0].failureConditions',
 );
+expectFailure(
+  'invalid environment',
+  (fixture) => { fixture.chapterLevels[0].environmentElement = 'VOID'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].environmentElement',
+);
+expectFailure(
+  'unknown objective target',
+  (fixture) => { fixture.chapterLevels[0].objectives[1].targetId = 'C404'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].objectives[1].targetId',
+);
+expectFailure(
+  'unknown reward card',
+  (fixture) => { fixture.chapterLevels[0].rewards[0].id = 'U999'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].rewards[0].id',
+);
+expectFailure(
+  'invalid failure type',
+  (fixture) => { fixture.chapterLevels[0].failureConditions[0].type = 'UNSUPPORTED'; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].failureConditions[0].type',
+);
 
 console.log('Chapter 01 L03: real config, L02 prerequisite, D001 deck, C002 protection target, U004 x4 reward, and failure conditions PASS; illegal prerequisite, unknown deck, invalid ID, and missing failure conditions FAIL as expected');
