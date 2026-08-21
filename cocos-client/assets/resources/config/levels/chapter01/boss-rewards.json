@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "bosses": [
+    {
+      "config": {
+        "id": "BOSS-T225-IRON-ROOT",
+        "maxHp": 100,
+        "flags": ["sealBroken"],
+        "summons": [
+          { "id": "rootling", "unitId": "U-ROOTLING", "maxHp": 12, "maxActive": 1 }
+        ],
+        "skills": [
+          { "id": "seal-break", "effect": { "type": "SET_FLAG", "flag": "sealBroken", "value": true } }
+        ],
+        "phases": [
+          { "id": "P1", "hpPercentAtMost": 100, "skillIds": ["seal-break"], "onEnterSummonIds": [] }
+        ],
+        "outcome": {
+          "priority": "LOSE",
+          "win": {
+            "mode": "ALL",
+            "rules": [
+              { "type": "BOSS_HP_AT_MOST", "value": 0 },
+              { "type": "FLAG_SET", "flag": "sealBroken" }
+            ]
+          },
+          "lose": {
+            "mode": "ANY",
+            "rules": [
+              { "type": "PLAYER_HERO_HP_AT_MOST", "value": 0 },
+              { "type": "ROUND_AT_LEAST", "value": 5 }
+            ]
+          }
+        }
+      },
+      "rewards": [{ "id": "boss-mark", "quantity": 1 }]
+    }
+  ]
+}
