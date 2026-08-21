@@ -1,0 +1,134 @@
+{
+  "schema": "battle-unit-skeleton/v1",
+  "contractVersion": "2.2",
+  "unitId": "U001",
+  "assetStage": "A0-reference",
+  "runtimeMode": "reference-pose-skeleton",
+  "framePolicy": "one-approved-key-pose-per-state; no-fabricated-frames",
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "pivot": { "x": 0.5, "y": 0.12 }
+  },
+  "sources": {
+    "poseSheet": {
+      "id": "U001-ANIMATION-POSES",
+      "path": "assets/resources/art/battle/units/U001/U001-ANIMATION-POSES.png",
+      "referencePath": "assets/resources/art/battle/units/U001/U001-ANIMATION-POSES.png",
+      "kind": "key-pose-sheet",
+      "status": "reference-approved",
+      "size": { "width": 2000, "height": 800 },
+      "sha256": "af901a19646f02532e855133c9e8f1b492c5eb73b5b426d7b58ed53ad7d96fea",
+      "poseGrid": [
+        { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 400, "height": 800 } },
+        { "index": 1, "state": "Move", "rect": { "x": 400, "y": 0, "width": 400, "height": 800 } },
+        { "index": 2, "state": "Attack", "rect": { "x": 800, "y": 0, "width": 400, "height": 800 } },
+        { "index": 3, "state": "Hit", "rect": { "x": 1200, "y": 0, "width": 400, "height": 800 } },
+        { "index": 4, "state": "Death", "rect": { "x": 1600, "y": 0, "width": 400, "height": 800 } }
+      ]
+    },
+    "cutoutSheet": {
+      "id": "U001-CUTOUT-SHEET",
+      "path": "assets/resources/art/battle/units/U001/U001-CUTOUT-SHEET.png",
+      "referencePath": "assets/resources/art/battle/units/U001/U001-CUTOUT-SHEET.png",
+      "kind": "cutout-and-rig-reference",
+      "status": "reference-approved",
+      "size": { "width": 1536, "height": 1024 },
+      "sha256": "35d0b6b232caf1e06633d5d0f772603810a4aa8936b3ccb7a86aa8a9d812717e"
+    }
+  },
+  "bones": [
+    { "name": "root", "x": 0, "y": 0 },
+    { "name": "torso", "parent": "root", "x": 0, "y": 120 },
+    { "name": "head", "parent": "torso", "x": 10, "y": 182 },
+    { "name": "shieldArm", "parent": "torso", "x": -54, "y": 122 },
+    { "name": "bladeArm", "parent": "torso", "x": 46, "y": 116 },
+    { "name": "shield", "parent": "shieldArm", "x": -92, "y": 8 },
+    { "name": "blade", "parent": "bladeArm", "x": 86, "y": 0 },
+    { "name": "frontLeg", "parent": "root", "x": 24, "y": 28 },
+    { "name": "rearLeg", "parent": "root", "x": -22, "y": 24 }
+  ],
+  "attachments": [
+    { "name": "frontPose", "bone": "root", "source": "cutoutSheet", "sourceRect": { "x": 0, "y": 0, "width": 384, "height": 512 }, "width": 384, "height": 512 },
+    { "name": "sidePose", "bone": "torso", "source": "cutoutSheet", "sourceRect": { "x": 384, "y": 0, "width": 768, "height": 512 }, "width": 768, "height": 512 },
+    { "name": "rearPose", "bone": "root", "source": "cutoutSheet", "sourceRect": { "x": 1152, "y": 0, "width": 384, "height": 512 }, "width": 384, "height": 512 },
+    { "name": "rigPose", "bone": "torso", "source": "cutoutSheet", "sourceRect": { "x": 384, "y": 512, "width": 768, "height": 512 }, "width": 768, "height": 512 }
+  ],
+  "mountPoints": [
+    { "name": "attackOrigin", "bone": "blade", "x": 96, "y": 0 },
+    { "name": "effect", "bone": "torso", "x": 0, "y": 72 },
+    { "name": "healthBar", "bone": "root", "x": 0, "y": 236 },
+    { "name": "shadow", "bone": "root", "x": 0, "y": -8 },
+    { "name": "cardAnchor", "bone": "root", "x": 0, "y": 120 }
+  ],
+  "orientations": {
+    "player": { "direction": -1, "scaleX": -1 },
+    "enemy": { "direction": 1, "scaleX": 1 }
+  },
+  "stateMap": {
+    "Idle": { "source": "poseSheet", "poseIndex": 0 },
+    "Move": { "source": "poseSheet", "poseIndex": 1 },
+    "Attack": { "source": "poseSheet", "poseIndex": 2 },
+    "Hit": { "source": "poseSheet", "poseIndex": 3 },
+    "Death": { "source": "poseSheet", "poseIndex": 4 }
+  },
+  "animations": {
+    "Idle": {
+      "duration": 1.24,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 0 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 0 }],
+      "tracks": [
+        { "bone": "torso", "property": "scaleY", "frames": [{ "time": 0, "value": 1 }, { "time": 0.62, "value": 1.03 }, { "time": 1.24, "value": 1 }] },
+        { "bone": "shield", "property": "rotate", "frames": [{ "time": 0, "value": -2 }, { "time": 0.62, "value": 3 }, { "time": 1.24, "value": -2 }] }
+      ],
+      "events": []
+    },
+    "Move": {
+      "duration": 0.78,
+      "loop": true,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 1 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 1 }],
+      "tracks": [
+        { "bone": "frontLeg", "property": "rotate", "frames": [{ "time": 0, "value": -18 }, { "time": 0.39, "value": 18 }, { "time": 0.78, "value": -18 }] },
+        { "bone": "rearLeg", "property": "rotate", "frames": [{ "time": 0, "value": 18 }, { "time": 0.39, "value": -18 }, { "time": 0.78, "value": 18 }] },
+        { "bone": "torso", "property": "translateY", "frames": [{ "time": 0, "value": 0 }, { "time": 0.39, "value": -10 }, { "time": 0.78, "value": 0 }] }
+      ],
+      "events": [{ "name": "footstep", "time": 0.2 }, { "name": "footstep", "time": 0.58 }]
+    },
+    "Attack": {
+      "duration": 0.72,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 2 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 2 }],
+      "tracks": [
+        { "bone": "bladeArm", "property": "rotate", "frames": [{ "time": 0, "value": -6 }, { "time": 0.22, "value": -24 }, { "time": 0.44, "value": 22 }, { "time": 0.72, "value": -6 }] },
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.3, "value": 14 }, { "time": 0.72, "value": 0 }] },
+        { "bone": "shield", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.3, "value": -10 }, { "time": 0.72, "value": 0 }] }
+      ],
+      "events": [{ "name": "windup", "time": 0.16 }, { "name": "impact", "time": 0.44 }]
+    },
+    "Hit": {
+      "duration": 0.36,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 3 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 3 }],
+      "tracks": [
+        { "bone": "torso", "property": "translateX", "frames": [{ "time": 0, "value": 0 }, { "time": 0.1, "value": -16 }, { "time": 0.36, "value": 0 }] },
+        { "bone": "head", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.12, "value": -10 }, { "time": 0.36, "value": 0 }] }
+      ],
+      "events": [{ "name": "hit", "time": 0.1 }]
+    },
+    "Death": {
+      "duration": 0.92,
+      "loop": false,
+      "sourcePose": { "source": "poseSheet", "poseIndex": 4 },
+      "sourceFrames": [{ "time": 0, "source": "poseSheet", "poseIndex": 4 }],
+      "tracks": [
+        { "bone": "root", "property": "rotate", "frames": [{ "time": 0, "value": 0 }, { "time": 0.48, "value": 24 }, { "time": 0.92, "value": 84 }] },
+        { "bone": "root", "property": "opacity", "frames": [{ "time": 0, "value": 1 }, { "time": 0.66, "value": 1 }, { "time": 0.92, "value": 0 }] }
+      ],
+      "events": [{ "name": "despawn", "time": 0.92 }]
+    }
+  }
+}
