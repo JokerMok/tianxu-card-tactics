@@ -368,6 +368,14 @@ const wrongAlphaBoundary = structuredClone(samples[1].skeleton);
 wrongAlphaBoundary.source.alphaBounds.width -= 1;
 assert.throws(() => validateSkeleton('C009', wrongAlphaBoundary, samples[1].directory), /alpha bounds must be recorded/);
 
+const wrongAspectRatio = structuredClone(samples[0].skeleton);
+wrongAspectRatio.source.aspectRatio += 0.01;
+assert.throws(() => validateSkeleton('C001', wrongAspectRatio, samples[0].directory), /raw source aspect ratio changed/);
+
+const wrongSourceHash = structuredClone(samples[1].skeleton);
+wrongSourceHash.source.sha256 = '0'.repeat(64);
+assert.throws(() => validateSkeleton('C009', wrongSourceHash, samples[1].directory), /source SHA-256 is stale/);
+
 const wrongDirection = structuredClone(samples[1].skeleton);
 wrongDirection.orientations.enemy.scaleY = -1;
 assert.throws(() => validateSkeleton('C009', wrongDirection, samples[1].directory), /deterministic player\/enemy mirroring/);
@@ -420,4 +428,4 @@ const persistentDefeat = structuredClone(samples[1].skeleton);
 persistentDefeat.animations.Defeat.tracks.find((track) => track.property === 'opacity').frames.at(-1).value = 1;
 assert.throws(() => validateSkeleton('C009', persistentDefeat, samples[1].directory), /Defeat must animate opacity|Defeat must end transparent/);
 
-console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 17 contract counterexamples rejected`);
+console.log(`hero skeleton samples validated: ${samples.map(({ heroId }) => heroId).join(', ')}; 20 contract counterexamples rejected`);
