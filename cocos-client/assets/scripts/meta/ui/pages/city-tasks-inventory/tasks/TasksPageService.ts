@@ -27,6 +27,7 @@ export type TasksPageErrorCode =
   | 'DUPLICATE_ID'
   | 'TASK_NOT_FOUND'
   | 'TASK_LOCKED'
+  | 'TASK_NOT_READY'
   | 'TASK_ALREADY_COMPLETE'
   | 'STATE_NOT_AVAILABLE'
   | 'INVALID_STATE'
@@ -84,6 +85,16 @@ function nonEmptyString(value: unknown, label: string): asserts value is string 
   if (typeof value !== 'string' || value.trim().length === 0) fail('INVALID_DATA', `${label} must be a non-empty string`);
 }
 
+const DANGEROUS_TASK_IDS = new Set([
+  ...Object.getOwnPropertyNames(Object.prototype),
+  'prototype',
+]);
+
+function safeTaskId(value: unknown, label: string): asserts value is string {
+  nonEmptyString(value, label);
+  if (DANGEROUS_TASK_IDS.has(value)) fail('INVALID_ID', `${label} is a reserved object key`);
+}
+
 function safeInteger(value: unknown, label: string, positive = false): asserts value is number {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || (positive ? value <= 0 : value < 0)) {
     fail('INVALID_DATA', `${label} must be ${positive ? 'a positive' : 'a non-negative'} safe integer`);
@@ -134,7 +145,7 @@ function normalizeTask(value: unknown, index: number): TasksTaskData {
   const unknown = Object.keys(source).find((key) => !allowed.includes(key));
   if (unknown !== undefined) fail('INVALID_DATA', `tasks[${index}] contains unsupported field: ${unknown}`);
   for (const key of allowed) if (!Object.prototype.hasOwnProperty.call(source, key)) fail('MISSING_FIELD', `tasks[${index}] is missing ${key}`);
-  nonEmptyString(source.id, `tasks[${index}].id`);
+  safeTaskId(source.id, `tasks[${index}].id`);
   nonEmptyString(source.title, `tasks[${index}].title`);
   safeInteger(source.target, `tasks[${index}].target`, true);
   const trigger = normalizeTrigger(source.trigger, `tasks[${index}].trigger`);
@@ -162,27 +173,35 @@ function normalizeDefinitions(input: readonly unknown[]): readonly TasksTaskData
   return tasks;
 }
 
-function definitionToPageTask(definition: MainlineTaskDefinition): TasksTaskData {
+function definitionToPageTask(value: unknown, index: number): TasksTaskData {
+  assertRecord(value, `taskDefinitions[${index}]`);
+  assertAllowedKeys(value, ['id', 'title', 'target', 'trigger', 'unlocks', 'rewardPoolId'], `taskDefinitions[${index}]`);
   return {
-    id: definition.id,
-    title: definition.title ?? definition.id,
-    target: definition.target,
-    trigger: { ...definition.trigger },
-    unlocks: [...definition.unlocks],
-    rewardPoolId: definition.rewardPoolId ?? null,
+    id: value.id as string,
+    title: value.title === undefined ? value.id as string : value.title as string,
+    target: value.target as number,
+    trigger: value.trigger as MainlineTaskDefinition['trigger'],
+    unlocks: value.unlocks as readonly string[],
+    rewardPoolId: value.rewardPoolId === undefined ? null : value.rewardPoolId as string | null,
   };
 }
 
-function inputRows(options: TasksPageDataFactoryOptions): readonly unknown[] {
-  if (options.tasks !== undefined && options.taskDefinitions !== undefined) fail('INVALID_ARGUMENT', 'tasks and taskDefinitions cannot both be provided');
-  return options.tasks ?? options.taskDefinitions ?? MAINLINE_TASK_DEFINITIONS;
+function inputRows(options: TasksPageDataFactoryOptions): { readonly rows: readonly unknown[]; readonly fromDefinitions: boolean } {
+  assertRecord(options, 'tasks page data options');
+  const hasTasks = Object.prototype.hasOwnProperty.call(options, 'tasks');
+  const hasDefinitions = Object.prototype.hasOwnProperty.call(options, 'taskDefinitions');
+  if (hasTasks && hasDefinitions) fail('INVALID_ARGUMENT', 'tasks and taskDefinitions cannot both be provided');
+  if (!hasTasks && !hasDefinitions) return { rows: MAINLINE_TASK_DEFINITIONS, fromDefinitions: true };
+  const rows = hasTasks ? options.tasks : options.taskDefinitions;
+  if (!Array.isArray(rows)) fail('INVALID_ARGUMENT', `${hasTasks ? 'tasks' : 'taskDefinitions'} must be an array`);
+  return { rows, fromDefinitions: hasDefinitions };
 }
 
 export function createTasksPageData(options: TasksPageDataFactoryOptions = {}): TasksPageData {
-  const rows = inputRows(options);
-  const tasks = options.tasks === undefined
-    ? rows.map((raw) => definitionToPageTask(raw as MainlineTaskDefinition))
-    : normalizeDefinitions(rows);
+  const input = inputRows(options);
+  const tasks = input.fromDefinitions
+    ? normalizeDefinitions(input.rows.map((raw, index) => definitionToPageTask(raw, index)))
+    : normalizeDefinitions(input.rows);
   return deepFreeze({
     schemaVersion: TASKS_PAGE_SCHEMA_VERSION,
     title: options.title ?? '任务与活跃',
@@ -356,12 +375,14 @@ export class TasksPageService {
     if (status === 'locked') fail('TASK_LOCKED', `task is locked: ${task.id}`);
     if (status === 'completed' || status === 'claimed') fail('TASK_ALREADY_COMPLETE', `task is already complete: ${task.id}`);
     const taskEvent = event ?? task.trigger;
+    let advanceResult: ReturnType<MainlineTaskService['advance']>;
     try {
-      this.stateService!.advance(taskEvent);
+      advanceResult = this.stateService!.advance(taskEvent);
     } catch (error) {
       mapDomainError(error);
     }
     const progress = this.state!.tasks[task.id].progress;
+    if (!advanceResult!.applied) return result(false, false, 'duplicate', task.id, progress);
     return result(true, true, progress >= task.target ? 'completed' : 'progressed', task.id, progress);
   }
 

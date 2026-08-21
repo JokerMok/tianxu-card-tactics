@@ -87,6 +87,7 @@ export type TasksInteraction =
 export type TasksInteractionReason =
   | 'selected'
   | 'same'
+  | 'duplicate'
   | 'progressed'
   | 'completed'
   | 'claimed'

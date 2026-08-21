@@ -117,6 +117,32 @@ assert.deepEqual(page.claimTask('M4-10-L01'), { accepted: false, changed: false,
 assert.deepEqual(page.advanceTask('M4-10-L02'), { accepted: true, changed: true, reason: 'completed', taskId: 'M4-10-L02', progress: 1 });
 assert.deepEqual(page.claimTask('M4-10-L02'), { accepted: true, changed: true, reason: 'claimed', taskId: 'M4-10-L02', progress: 1 });
 
+// Duplicate domain events are valid no-ops and must not be reported as changes.
+const repeatable = new TasksPageService({ data: createTasksPageData({ tasks: [{
+  id: 'repeatable',
+  title: '重复事件探针',
+  target: 2,
+  trigger: { type: 'DECK_UPDATED' },
+  unlocks: [],
+  rewardPoolId: null,
+}] }) });
+assert.deepEqual(repeatable.advanceTask(undefined, { type: 'DECK_UPDATED', key: 'same-event' }), {
+  accepted: true,
+  changed: true,
+  reason: 'progressed',
+  taskId: 'repeatable',
+  progress: 1,
+});
+const beforeDuplicate = repeatable.serialize();
+assert.deepEqual(repeatable.advanceTask(undefined, { type: 'DECK_UPDATED', key: 'same-event' }), {
+  accepted: false,
+  changed: false,
+  reason: 'duplicate',
+  taskId: 'repeatable',
+  progress: 1,
+});
+assert.equal(repeatable.serialize(), beforeDuplicate, 'duplicate event must preserve the serialized state');
+
 // Empty state has no fake domain state and rejects stateful operations explicitly.
 const empty = new TasksPageService(createEmptyTasksPageData());
 const emptySnapshot = empty.snapshot();
@@ -128,11 +154,19 @@ expectPageFailure('empty serialize', () => empty.serialize(), 'STATE_NOT_AVAILAB
 expectPageFailure('empty page persistence', () => new TasksPageService({ data: createEmptyTasksPageData(), persist: () => {} }), 'STATE_NOT_AVAILABLE');
 
 // Missing, illegal and out-of-range inputs must reach real validation paths.
+expectPageFailure('null task input', () => createTasksPageData({ tasks: null }), 'INVALID_ARGUMENT');
+expectPageFailure('non-array task input', () => createTasksPageData({ tasks: {} }), 'INVALID_ARGUMENT');
+expectPageFailure('null task definition input', () => createTasksPageData({ taskDefinitions: null }), 'INVALID_ARGUMENT');
 const missingTask = { ...realData.tasks[0] };
 delete missingTask.title;
 expectPageFailure('missing task title', () => new TasksPageService({ data: { ...realData, tasks: [missingTask, ...realData.tasks.slice(1)] } }), 'MISSING_FIELD');
 expectPageFailure('invalid target', () => new TasksPageService({ data: { ...realData, tasks: [{ ...realData.tasks[0], target: 0 }, ...realData.tasks.slice(1)] } }), 'INVALID_DATA');
 expectPageFailure('duplicate task id', () => new TasksPageService({ data: { ...realData, tasks: [realData.tasks[0], realData.tasks[0]] } }), 'DUPLICATE_ID');
+expectPageFailure('reserved task id', () => new TasksPageService({ data: { ...realData, tasks: [{ ...realData.tasks[0], id: '__proto__' }, ...realData.tasks.slice(1)] } }), 'INVALID_ID');
+expectPageFailure('prototype-chain task id', () => new TasksPageService({ data: { ...realData, tasks: [{ ...realData.tasks[0], id: 'constructor' }, ...realData.tasks.slice(1)] } }), 'INVALID_ID');
+const taskWithPrototypeField = { ...realData.tasks[0] };
+Object.defineProperty(taskWithPrototypeField, '__proto__', { value: 'polluted', enumerable: true });
+expectPageFailure('prototype-chain task field', () => new TasksPageService({ data: { ...realData, tasks: [taskWithPrototypeField, ...realData.tasks.slice(1)] } }), 'INVALID_DATA');
 expectPageFailure('unknown task id', () => page.selectTask('M4-10-NOPE'), 'TASK_NOT_FOUND');
 expectPageFailure('empty task id', () => page.selectTask(''), 'INVALID_ID');
 expectPageFailure('invalid event', () => page.advanceTask('M4-10-L03', { type: 'DECK_UPDATED' }), 'TASK_NOT_READY');
@@ -149,6 +183,6 @@ const beforeFailure = failing.serialize();
 expectPageFailure('persistence failure', () => failing.advanceTask(), 'PERSISTENCE_FAILED');
 assert.equal(failing.serialize(), beforeFailure);
 
-assert.equal(negativeCaseCount, 14, 'all negative cases must execute');
+assert.equal(negativeCaseCount, 20, 'all negative cases must execute');
 assert(saves.length >= 4, 'real transitions must invoke persistence');
 console.log(`T313 tasks page PASS: real-levels=${realLevels.length}, real-tasks=${realData.tasks.length}, components=${initial.components.length}, empty-components=${emptySnapshot.components.length}, saves=${saves.length}, negative-cases=${negativeCaseCount}`);
