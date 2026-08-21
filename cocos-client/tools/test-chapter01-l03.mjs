@@ -174,6 +174,11 @@ expectFailure(
   'config/levels/chapter01/L03.json.chapterLevels[0].failureConditions',
 );
 expectFailure(
+  'empty failure conditions',
+  (fixture) => { fixture.chapterLevels[0].failureConditions = []; },
+  'config/levels/chapter01/L03.json.chapterLevels[0].failureConditions',
+);
+expectFailure(
   'invalid environment',
   (fixture) => { fixture.chapterLevels[0].environmentElement = 'VOID'; },
   'config/levels/chapter01/L03.json.chapterLevels[0].environmentElement',
