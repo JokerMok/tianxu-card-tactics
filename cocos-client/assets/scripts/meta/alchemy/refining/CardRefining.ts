@@ -32,7 +32,7 @@ export interface RefiningSlot {
   readonly recipeId: string;
 }
 
-export type CardRefiningLedgerOperation = 'REFINE' | 'REFRESH';
+export type CardRefiningLedgerOperation = 'REFINE' | 'REFRESH' | 'AUTO_REFRESH';
 
 export interface CardRefiningLedgerEntry {
   readonly sequence: number;
@@ -152,7 +152,10 @@ export class CardRefiningError extends Error {
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]*$/;
 const RESOURCE_ID_PATTERN = /^[A-Z][A-Z0-9_.:-]*$/;
 const CARD_ID_PATTERN = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$/;
-const RESERVED_RECIPE_IDS = new Set(['__proto__', ...Object.getOwnPropertyNames(Object.prototype)]);
+const AUTO_REFRESH_REQUEST_PREFIX = 'AUTO_REFRESH-';
+const RESERVED_RECIPE_IDS = new Set([
+  '__proto__', 'prototype', 'Object.prototype', ...Object.getOwnPropertyNames(Object.prototype),
+]);
 const RECIPE_KEYS = new Set(['id', 'materials', 'inputs', 'output', 'probability', 'baseProbability', 'successRate', 'failureRefund']);
 const MATERIAL_KEYS = new Set(['materialId', 'quantity']);
 const CARD_KEYS = new Set(['cardId', 'quality', 'quantity']);
@@ -201,6 +204,10 @@ function assertText(value: unknown, label: string, pattern: RegExp, code: CardRe
 function assertRecipeId(value: unknown, label: string, code: CardRefiningErrorCode): asserts value is string {
   assertText(value, label, ID_PATTERN, code);
   if (RESERVED_RECIPE_IDS.has(value)) fail(code, `${label} is reserved`);
+}
+
+function assertUserRequestId(value: string, label: string, code: CardRefiningErrorCode): void {
+  if (value.startsWith(AUTO_REFRESH_REQUEST_PREFIX)) fail(code, `${label} is reserved`);
 }
 
 function assertSafeInteger(value: unknown, label: string, code: CardRefiningErrorCode, minimum = 0): asserts value is number {
@@ -373,18 +380,32 @@ function localParts(at: number, timezone: string): LocalParts {
   }
 }
 
-function dateAtLocalBoundary(year: number, month: number, day: number, hour: number, minute: number, timezone: string): number {
+function dateAtLocalBoundary(year: number, month: number, day: number, hour: number, minute: number, timezone: string): number | null {
   const targetAsUtc = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
-  let guess = targetAsUtc;
-  for (let index = 0; index < 4; index += 1) {
+  const guesses = [
+    targetAsUtc,
+    targetAsUtc - 2 * 60 * 60 * 1000,
+    targetAsUtc + 2 * 60 * 60 * 1000,
+    targetAsUtc - 6 * 60 * 60 * 1000,
+    targetAsUtc + 6 * 60 * 60 * 1000,
+    targetAsUtc - 24 * 60 * 60 * 1000,
+    targetAsUtc + 24 * 60 * 60 * 1000,
+  ];
+  const candidates = new Set<number>();
+  for (const guess of guesses) {
     const parts = localParts(guess, timezone);
     const actualAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second, 0);
-    const next = guess + targetAsUtc - actualAsUtc;
-    if (next === guess) break;
-    guess = next;
+    const candidate = guess + targetAsUtc - actualAsUtc;
+    const resolved = localParts(candidate, timezone);
+    if (resolved.year === year && resolved.month === month && resolved.day === day
+      && resolved.hour === hour && resolved.minute === minute && resolved.second === 0) {
+      candidates.add(candidate);
+    }
   }
-  assertTimestamp(guess, 'refresh boundary');
-  return guess;
+  if (candidates.size === 0) return null;
+  const boundary = Math.min(...candidates);
+  assertTimestamp(boundary, 'refresh boundary');
+  return boundary;
 }
 
 function nextLocalDate(year: number, month: number, day: number): { year: number; month: number; day: number } {
@@ -399,22 +420,24 @@ function previousLocalDate(year: number, month: number, day: number): { year: nu
 
 function refreshBoundaryAfter(at: number, timezone: string, hour: number, minute: number): number {
   const parts = localParts(at, timezone);
-  let boundary = dateAtLocalBoundary(parts.year, parts.month, parts.day, hour, minute, timezone);
-  if (boundary <= at) {
-    const date = nextLocalDate(parts.year, parts.month, parts.day);
-    boundary = dateAtLocalBoundary(date.year, date.month, date.day, hour, minute, timezone);
+  let date = { year: parts.year, month: parts.month, day: parts.day };
+  for (let index = 0; index < 370; index += 1) {
+    const boundary = dateAtLocalBoundary(date.year, date.month, date.day, hour, minute, timezone);
+    if (boundary !== null && boundary > at) return boundary;
+    date = nextLocalDate(date.year, date.month, date.day);
   }
-  return boundary;
+  fail('INVALID_TIME', 'no valid refresh boundary was found after the timestamp');
 }
 
 function refreshBoundaryBefore(at: number, timezone: string, hour: number, minute: number): number {
   const parts = localParts(at, timezone);
-  let boundary = dateAtLocalBoundary(parts.year, parts.month, parts.day, hour, minute, timezone);
-  if (boundary >= at) {
-    const date = previousLocalDate(parts.year, parts.month, parts.day);
-    boundary = dateAtLocalBoundary(date.year, date.month, date.day, hour, minute, timezone);
+  let date = { year: parts.year, month: parts.month, day: parts.day };
+  for (let index = 0; index < 370; index += 1) {
+    const boundary = dateAtLocalBoundary(date.year, date.month, date.day, hour, minute, timezone);
+    if (boundary !== null && boundary < at) return boundary;
+    date = previousLocalDate(date.year, date.month, date.day);
   }
-  return boundary;
+  fail('INVALID_TIME', 'no valid refresh boundary was found before the timestamp');
 }
 
 function initialRefreshBoundary(at: number, timezone: string, hour: number, minute: number): { last: number; next: number } {
@@ -514,28 +537,12 @@ function selectSlots(recipes: readonly string[], slotCount: number, refreshCount
   })));
 }
 
-function advanceRefreshWindow(
-  lastRefreshAt: number,
-  nextRefreshAt: number,
-  through: number,
-  timezone: string,
-  refreshHour: number,
-  refreshMinute: number,
-): { readonly lastRefreshAt: number; readonly nextRefreshAt: number; readonly refreshedCycles: number } {
-  let last = lastRefreshAt;
-  let next = nextRefreshAt;
-  let refreshedCycles = 0;
-  while (through >= next) {
-    last = next;
-    next = refreshBoundaryAfter(next, timezone, refreshHour, refreshMinute);
-    refreshedCycles += 1;
-    if (refreshedCycles > 100000) fail('INVALID_STATE', 'refining state contains too many scheduled refresh cycles');
-  }
-  return { lastRefreshAt: last, nextRefreshAt: next, refreshedCycles };
-}
-
 function requestFingerprint(value: { operation: CardRefiningLedgerOperation; slotId: number | null; recipeId: string | null; materials: readonly RefiningMaterial[] }): string {
   return JSON.stringify({ operation: value.operation, slotId: value.slotId, recipeId: value.recipeId, materials: value.materials });
+}
+
+function autoRefreshRequestId(at: number): string {
+  return `${AUTO_REFRESH_REQUEST_PREFIX}${at}`;
 }
 
 function normalizeRequest(value: unknown): { requestId: string; slotId: number | null; recipeId: string | null; materials?: readonly RefiningMaterial[]; at?: number } {
@@ -543,6 +550,7 @@ function normalizeRequest(value: unknown): { requestId: string; slotId: number |
   assertOnlyKeys(value, REQUEST_KEYS, 'refining request', 'INVALID_REQUEST');
   if (!hasOwn(value, 'requestId')) fail('INVALID_REQUEST', 'requestId is required');
   assertText(value.requestId, 'requestId', ID_PATTERN, 'INVALID_REQUEST_ID');
+  assertUserRequestId(value.requestId, 'requestId', 'INVALID_REQUEST_ID');
   const slotKeys = ['slotId', 'slot', 'slotIndex'].filter((key) => hasOwn(value, key));
   if (slotKeys.length > 1) fail('INVALID_REQUEST', 'only one slot field may be supplied');
   const slotValue = slotKeys.length === 0 ? null : value[slotKeys[0]];
@@ -563,7 +571,6 @@ function normalizeState(
   timezone: string,
   refreshHour: number,
   refreshMinute: number,
-  allowUnprovenScheduledState = false,
 ): CardRefiningState {
   const parsed = parseState(value);
   if (!isRecord(parsed)) fail('INVALID_STATE', 'refining state must be an object');
@@ -619,12 +626,6 @@ function normalizeState(
   if (new Set(ledger.map((entry) => entry.requestId)).size !== ledger.length) fail('INVALID_STATE', 'refining ledger request IDs are duplicated');
   if (new Set(receipts.map((entry) => entry.requestId)).size !== receipts.length) fail('INVALID_STATE', 'refining receipts are duplicated');
   if (ledger.length !== receipts.length) fail('INVALID_STATE', 'refining ledger and receipts must have the same length');
-  if (ledger.length === 0) {
-    if (!allowUnprovenScheduledState && (parsed.refreshCount !== 0 || !sameSlots(slots, selectSlots([...recipeMap.keys()], slotCount, 0))
-      || parsed.refreshTickets !== parsed.initialRefreshTickets)) {
-      fail('INVALID_STATE', 'refining state has refresh progress without a proving event history');
-    }
-  }
   for (let index = 0; index < ledger.length; index += 1) {
     const entry = ledger[index];
     const receipt = receipts[index];
@@ -648,33 +649,37 @@ function normalizeState(
     const entry = ledger[index];
     const receipt = receipts[index];
     if (entry.at < replayObservedAt) fail('INVALID_STATE', 'refining ledger timestamps are not monotonic or precede the initial state');
-    const advanced = advanceRefreshWindow(replayLastRefreshAt, replayNextRefreshAt, entry.at, timezone, refreshHour, refreshMinute);
-    replayLastRefreshAt = advanced.lastRefreshAt;
-    replayNextRefreshAt = advanced.nextRefreshAt;
-    replayRefreshCount += advanced.refreshedCycles;
-    if (advanced.refreshedCycles > 0) replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
-    if (entry.operation === 'REFRESH') {
-      if (replayRefreshTickets < 1) fail('INVALID_STATE', 'refining ledger spends more refresh tickets than the initial state provides');
-      replayRefreshTickets -= 1;
+    let expectedRefreshedCycles = 0;
+    if (entry.operation === 'AUTO_REFRESH') {
+      if (entry.at !== replayNextRefreshAt || entry.requestId !== autoRefreshRequestId(entry.at)) {
+        fail('INVALID_STATE', `refining ledger[${index}] is not a valid scheduled refresh event`);
+      }
+      replayLastRefreshAt = replayNextRefreshAt;
+      replayNextRefreshAt = refreshBoundaryAfter(replayNextRefreshAt, timezone, refreshHour, refreshMinute);
       replayRefreshCount += 1;
       replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+      expectedRefreshedCycles = 1;
     } else {
-      if (entry.slotId === null || entry.slotId >= slotCount || replaySlots[entry.slotId]?.recipeId !== entry.recipeId) {
-        fail('INVALID_STATE', `refining ledger[${index}] is not reachable from the slot state at its sequence`);
+      if (entry.at >= replayNextRefreshAt) fail('INVALID_STATE', `refining ledger[${index}] is missing scheduled refresh events`);
+      if (entry.operation === 'REFRESH') {
+        if (replayRefreshTickets < 1) fail('INVALID_STATE', 'refining ledger spends more refresh tickets than the initial state provides');
+        replayRefreshTickets -= 1;
+        replayRefreshCount += 1;
+        replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+        expectedRefreshedCycles = 1;
+      } else {
+        if (entry.slotId === null || entry.slotId >= slotCount || replaySlots[entry.slotId]?.recipeId !== entry.recipeId) {
+          fail('INVALID_STATE', `refining ledger[${index}] is not reachable from the slot state at its sequence`);
+        }
       }
     }
-    const expectedRefreshedCycles = advanced.refreshedCycles + (entry.operation === 'REFRESH' ? 1 : 0);
     if (receipt.result.refreshCount !== replayRefreshCount || receipt.result.refreshedCycles !== expectedRefreshedCycles) {
       fail('INVALID_STATE', `refining receipt[${index}].result refresh fields are not reachable from its event`);
     }
     replayObservedAt = entry.at;
   }
   if (lastObservedAt < replayObservedAt) fail('INVALID_STATE', 'refining state.lastObservedAt precedes the event history');
-  const finalAdvanced = advanceRefreshWindow(replayLastRefreshAt, replayNextRefreshAt, lastObservedAt, timezone, refreshHour, refreshMinute);
-  replayLastRefreshAt = finalAdvanced.lastRefreshAt;
-  replayNextRefreshAt = finalAdvanced.nextRefreshAt;
-  replayRefreshCount += finalAdvanced.refreshedCycles;
-  if (finalAdvanced.refreshedCycles > 0) replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+  if (lastObservedAt >= replayNextRefreshAt) fail('INVALID_STATE', 'refining state is missing scheduled refresh events');
   if (replayRefreshCount !== parsed.refreshCount || replayRefreshTickets !== parsed.refreshTickets
     || replayLastRefreshAt !== parsed.lastRefreshAt || replayNextRefreshAt !== parsed.nextRefreshAt
     || !sameSlots(replaySlots, slots)) {
@@ -696,7 +701,7 @@ function normalizeLedger(value: unknown, index: number, recipeMap: ReadonlyMap<s
     if (!hasOwn(value, key)) fail('INVALID_STATE', `${label}.${key} is required`);
   }
   assertPositiveInteger(value.sequence, `${label}.sequence`, 'INVALID_STATE');
-  if (value.operation !== 'REFINE' && value.operation !== 'REFRESH') fail('INVALID_STATE', `${label}.operation is invalid`);
+  if (value.operation !== 'REFINE' && value.operation !== 'REFRESH' && value.operation !== 'AUTO_REFRESH') fail('INVALID_STATE', `${label}.operation is invalid`);
   assertText(value.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
   assertTimestamp(value.at, `${label}.at`, 'INVALID_STATE');
   if (value.operation === 'REFINE') {
@@ -706,8 +711,13 @@ function normalizeLedger(value: unknown, index: number, recipeMap: ReadonlyMap<s
     if (typeof value.success !== 'boolean') fail('INVALID_STATE', `${label}.success is invalid`);
     assertProbability(value.probability, `${label}.probability`, 'INVALID_STATE');
     if (value.roll !== null && (typeof value.roll !== 'number' || !Number.isFinite(value.roll) || value.roll < 0 || value.roll >= 1)) fail('INVALID_STATE', `${label}.roll is invalid`);
-  } else {
+  } else if (value.operation === 'REFRESH') {
     if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) fail('INVALID_STATE', `${label} refresh fields are invalid`);
+  } else {
+    if (value.requestId !== autoRefreshRequestId(value.at)
+      || value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
+      fail('INVALID_STATE', `${label} scheduled refresh fields are invalid`);
+    }
   }
   const debited = normalizeMaterials(value.debited, `${label}.debited`, 'INVALID_STATE', true);
   const returned = normalizeMaterials(value.returned, `${label}.returned`, 'INVALID_STATE', true);
@@ -716,6 +726,10 @@ function normalizeLedger(value: unknown, index: number, recipeMap: ReadonlyMap<s
   if (value.operation === 'REFRESH') {
     if (value.spentRefreshTickets !== 1 || debited.length !== 0 || returned.length !== 0 || credited.length !== 0) {
       fail('INVALID_STATE', `${label} refresh accounting is invalid`);
+    }
+  } else if (value.operation === 'AUTO_REFRESH') {
+    if (value.spentRefreshTickets !== 0 || debited.length !== 0 || returned.length !== 0 || credited.length !== 0) {
+      fail('INVALID_STATE', `${label} scheduled refresh accounting is invalid`);
     }
   } else {
     const recipe = recipeMap.get(value.recipeId as string)!;
@@ -740,7 +754,7 @@ function normalizeResult(value: unknown, label: string, recipeMap: ReadonlyMap<s
   for (const key of ['operation', 'requestId', 'applied', 'idempotent', 'at', 'slotId', 'recipeId', 'success', 'probability', 'roll', 'debited', 'returned', 'credited', 'spentRefreshTickets', 'refreshedCycles', 'refreshCount', 'ledgerSequence']) {
     if (!hasOwn(value, key)) fail('INVALID_STATE', `${label}.${key} is required`);
   }
-  if (value.operation !== 'REFINE' && value.operation !== 'REFRESH') fail('INVALID_STATE', `${label}.operation is invalid`);
+  if (value.operation !== 'REFINE' && value.operation !== 'REFRESH' && value.operation !== 'AUTO_REFRESH') fail('INVALID_STATE', `${label}.operation is invalid`);
   assertText(value.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
   if (value.applied !== true || value.idempotent !== false) fail('INVALID_STATE', `${label} must be an applied first result`);
   assertTimestamp(value.at, `${label}.at`, 'INVALID_STATE');
@@ -750,7 +764,12 @@ function normalizeResult(value: unknown, label: string, recipeMap: ReadonlyMap<s
     if (!recipeMap.has(value.recipeId) || typeof value.success !== 'boolean') fail('INVALID_STATE', `${label} refine fields are invalid`);
     assertProbability(value.probability, `${label}.probability`, 'INVALID_STATE');
     if (value.roll !== null && (typeof value.roll !== 'number' || !Number.isFinite(value.roll) || value.roll < 0 || value.roll >= 1)) fail('INVALID_STATE', `${label}.roll is invalid`);
-  } else if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
+  } else if (value.operation === 'REFRESH') {
+    if (value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
+      fail('INVALID_STATE', `${label} refresh fields are invalid`);
+    }
+  } else if (value.requestId !== autoRefreshRequestId(value.at)
+    || value.slotId !== null || value.recipeId !== null || value.success !== null || value.probability !== null || value.roll !== null) {
     fail('INVALID_STATE', `${label} refresh fields are invalid`);
   }
   assertSafeInteger(value.refreshedCycles, `${label}.refreshedCycles`, 'INVALID_STATE');
@@ -762,6 +781,8 @@ function normalizeResult(value: unknown, label: string, recipeMap: ReadonlyMap<s
   const credited = normalizeCards(value.credited, `${label}.credited`, 'INVALID_STATE');
   if (value.operation === 'REFRESH') {
     if (value.spentRefreshTickets !== 1 || debited.length !== 0 || returned.length !== 0 || credited.length !== 0) fail('INVALID_STATE', `${label} refresh accounting is invalid`);
+  } else if (value.operation === 'AUTO_REFRESH') {
+    if (value.spentRefreshTickets !== 0 || debited.length !== 0 || returned.length !== 0 || credited.length !== 0) fail('INVALID_STATE', `${label} scheduled refresh accounting is invalid`);
   } else {
     const recipe = recipeMap.get(value.recipeId as string)!;
     const expectedReturned = value.success ? [] : recipe.failureRefund;
@@ -946,7 +967,7 @@ export class CardRefiningService {
     const sequence = prepared.state.ledger.length + 1;
     if (!Number.isSafeInteger(sequence)) fail('QUANTITY_EXCEEDED', 'refining ledger sequence exceeds the safe integer limit');
     const ledger = cloneLedger({ sequence, operation: 'REFINE', requestId: request.requestId, at, slotId, recipeId, success, probability: recipe.probability, roll, debited: copyMaterials(recipe.materials), returned, credited, spentRefreshTickets: 0 });
-    const result = cloneResult({ operation: 'REFINE', requestId: request.requestId, applied: true, idempotent: false, at, slotId, recipeId, success, probability: recipe.probability, roll, debited: copyMaterials(recipe.materials), returned, credited, spentRefreshTickets: 0, refreshedCycles: prepared.refreshedCycles, refreshCount: prepared.state.refreshCount, ledgerSequence: sequence });
+    const result = cloneResult({ operation: 'REFINE', requestId: request.requestId, applied: true, idempotent: false, at, slotId, recipeId, success, probability: recipe.probability, roll, debited: copyMaterials(recipe.materials), returned, credited, spentRefreshTickets: 0, refreshedCycles: 0, refreshCount: prepared.state.refreshCount, ledgerSequence: sequence });
     const next = freezeState({ ...prepared.state, materials: materialList(nextMaterials), cards: cardList(nextCards), ledger: [...prepared.state.ledger, ledger], receipts: [...prepared.state.receipts, { requestId: request.requestId, fingerprint, result }] });
     this.commit(next);
     return cloneResult(result);
@@ -968,6 +989,7 @@ export class CardRefiningService {
     const requestId = typeof input === 'string' ? input : normalized?.requestId;
     const requestedAt = typeof input === 'string' ? explicitAt : (normalized?.at ?? explicitAt);
     assertText(requestId, 'requestId', ID_PATTERN, 'INVALID_REQUEST_ID');
+    assertUserRequestId(requestId, 'requestId', 'INVALID_REQUEST_ID');
     if (requestedAt !== undefined) assertTimestamp(requestedAt, 'refresh.at');
     const fingerprint = requestFingerprint({ operation: 'REFRESH', slotId: null, recipeId: null, materials: [] });
     const existing = this.current.receipts.find((entry) => entry.requestId === requestId);
@@ -984,7 +1006,7 @@ export class CardRefiningService {
     const sequence = prepared.state.ledger.length + 1;
     if (!Number.isSafeInteger(sequence)) fail('QUANTITY_EXCEEDED', 'refining ledger sequence exceeds the safe integer limit');
     const ledger = cloneLedger({ sequence, operation: 'REFRESH', requestId, at: atValue, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 1 });
-    const result = cloneResult({ operation: 'REFRESH', requestId, applied: true, idempotent: false, at: atValue, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 1, refreshedCycles: prepared.refreshedCycles + 1, refreshCount, ledgerSequence: sequence });
+    const result = cloneResult({ operation: 'REFRESH', requestId, applied: true, idempotent: false, at: atValue, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 1, refreshedCycles: 1, refreshCount, ledgerSequence: sequence });
     const next = freezeState({ ...prepared.state, refreshTickets: prepared.state.refreshTickets - 1, slots, refreshCount, ledger: [...prepared.state.ledger, ledger], receipts: [...prepared.state.receipts, { requestId, fingerprint, result }] });
     this.commit(next);
     return cloneResult(result);
@@ -1003,16 +1025,27 @@ export class CardRefiningService {
     let lastRefreshAt = this.current.lastRefreshAt;
     let refreshCount = this.current.refreshCount;
     let refreshedCycles = 0;
+    const ledger = [...this.current.ledger];
+    const receipts = [...this.current.receipts];
     while (at >= nextRefreshAt) {
       if (refreshCount === Number.MAX_SAFE_INTEGER) fail('QUANTITY_EXCEEDED', 'refresh count exceeds the safe integer limit');
-      lastRefreshAt = nextRefreshAt;
-      nextRefreshAt = refreshBoundaryAfter(nextRefreshAt, this.timezone, this.refreshHour, this.refreshMinute);
+      const eventAt = nextRefreshAt;
       refreshCount += 1;
       refreshedCycles += 1;
       if (refreshedCycles > 100000) fail('INVALID_TIME', 'too many scheduled refresh cycles to catch up');
+      const sequence = ledger.length + 1;
+      if (!Number.isSafeInteger(sequence)) fail('QUANTITY_EXCEEDED', 'refining ledger sequence exceeds the safe integer limit');
+      const requestId = autoRefreshRequestId(eventAt);
+      const fingerprint = requestFingerprint({ operation: 'AUTO_REFRESH', slotId: null, recipeId: null, materials: [] });
+      const ledgerEntry = cloneLedger({ sequence, operation: 'AUTO_REFRESH', requestId, at: eventAt, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 0 });
+      const result = cloneResult({ operation: 'AUTO_REFRESH', requestId, applied: true, idempotent: false, at: eventAt, slotId: null, recipeId: null, success: null, probability: null, roll: null, debited: [], returned: [], credited: [], spentRefreshTickets: 0, refreshedCycles: 1, refreshCount, ledgerSequence: sequence });
+      ledger.push(ledgerEntry);
+      receipts.push({ requestId, fingerprint, result });
+      lastRefreshAt = eventAt;
+      nextRefreshAt = refreshBoundaryAfter(eventAt, this.timezone, this.refreshHour, this.refreshMinute);
     }
     const slots = refreshedCycles === 0 ? this.current.slots : selectSlots([...this.recipes.keys()], this.slotCount, refreshCount);
-    const state = freezeState({ ...this.current, slots, refreshCount, lastRefreshAt, nextRefreshAt, lastObservedAt: at });
+    const state = freezeState({ ...this.current, slots, refreshCount, lastRefreshAt, nextRefreshAt, lastObservedAt: at, ledger, receipts });
     return { state, refreshedCycles };
   }
 
@@ -1021,7 +1054,7 @@ export class CardRefiningService {
   }
 
   private commit(next: CardRefiningState): void {
-    const checked = normalizeState(next, this.recipes, this.slotCount, this.timezone, this.refreshHour, this.refreshMinute, true);
+    const checked = normalizeState(next, this.recipes, this.slotCount, this.timezone, this.refreshHour, this.refreshMinute);
     if (this.committing) fail('REENTRANT', 'refining persistence cannot re-enter');
     this.committing = true;
     try {

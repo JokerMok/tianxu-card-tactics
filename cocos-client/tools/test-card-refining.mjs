@@ -153,10 +153,52 @@ assert.equal(atBoundary.refreshedCycles, 1, 'refresh must happen at the exact lo
 assert.notDeepEqual(atBoundary.state.slots, timedSlots);
 assert.equal(atBoundary.state.lastRefreshAt, SHANGHAI_MIDNIGHT);
 assert.equal(atBoundary.state.nextRefreshAt, Date.parse('2026-08-21T16:00:00.000Z'));
+assert.equal(atBoundary.state.ledger.length, 1, 'automatic refresh must persist a ledger event');
+assert.equal(atBoundary.state.receipts.length, 1, 'automatic refresh must persist a receipt');
+assert.equal(atBoundary.state.ledger[0].operation, 'AUTO_REFRESH');
+assert.equal(atBoundary.state.receipts[0].result.operation, 'AUTO_REFRESH');
+const automaticRefreshSaved = timedService.save();
+const restoredAutomaticRefresh = restoreCardRefiningService(automaticRefreshSaved, {
+  recipes: [recipe, recipe2],
+  slotCount: 1,
+  timezone: 'Asia/Shanghai',
+  rng: () => 0,
+});
+assert.deepEqual(restoredAutomaticRefresh.snapshot(), timedService.snapshot(), 'automatic refresh save must restore ledger, receipt and slot reachability');
+assert.equal(restoredAutomaticRefresh.save(), automaticRefreshSaved, 'automatic refresh restore must remain deterministic');
+const missingAutomaticReceipt = JSON.parse(automaticRefreshSaved);
+missingAutomaticReceipt.receipts = [];
+expectCode('automatic refresh ledger without receipt', () => restoreCardRefiningService(JSON.stringify(missingAutomaticReceipt), {
+  recipes: [recipe, recipe2],
+  slotCount: 1,
+  timezone: 'Asia/Shanghai',
+  rng: () => 0,
+}), 'INVALID_STATE');
 expectCode('time cannot move backwards', () => timedService.synchronize(SHANGHAI_MIDNIGHT - 2), 'TIME_REVERSED');
 expectCode('invalid timezone', () => makeService({ timezone: 'Not/A-Timezone' }), 'INVALID_CONFIG');
 expectCode('invalid refresh hour', () => makeService({ refreshHour: 24 }), 'INVALID_CONFIG');
 expectCode('invalid timestamp', () => timedService.synchronize(Number.MAX_SAFE_INTEGER), 'INVALID_TIME');
+
+const dstSpringService = makeService({
+  timezone: 'America/New_York',
+  refreshHour: 2,
+  refreshMinute: 30,
+  clock: { now: () => Date.parse('2026-03-07T12:00:00.000Z') },
+});
+const dstSkippedBoundary = Date.parse('2026-03-09T06:30:00.000Z');
+assert.equal(dstSpringService.snapshot().nextRefreshAt, dstSkippedBoundary, 'DST spring-gap 02:30 must skip to the next valid local boundary');
+assert.notEqual(dstSpringService.snapshot().nextRefreshAt, Date.parse('2026-03-08T05:30:00.000Z'), 'DST spring-gap must not silently resolve 02:30 to 01:30');
+assert.equal(dstSpringService.synchronize(Date.parse('2026-03-08T07:00:00.000Z')).refreshedCycles, 0, 'a skipped DST boundary must not refresh early');
+assert.equal(dstSpringService.synchronize(dstSkippedBoundary).refreshedCycles, 1, 'the next valid DST boundary must refresh exactly once');
+const dstSaved = dstSpringService.save();
+assert.deepEqual(restoreCardRefiningService(dstSaved, {
+  recipes: [recipe],
+  slotCount: 1,
+  timezone: 'America/New_York',
+  refreshHour: 2,
+  refreshMinute: 30,
+  rng: () => 0,
+}).snapshot(), dstSpringService.snapshot(), 'DST automatic refresh must restore deterministically');
 
 const REFRESH_HOUR_PROBE = Date.parse('2026-08-20T16:30:00.000Z');
 for (let refreshHour = 0; refreshHour <= 23; refreshHour += 1) {
@@ -251,7 +293,7 @@ for (const [label, invalidRecipes] of [
 ]) {
   expectCode(label, () => createCardRefiningService({ recipes: invalidRecipes }), 'INVALID_CONFIG');
 }
-for (const dangerousRecipeId of new Set(['__proto__', ...Object.getOwnPropertyNames(Object.prototype)])) {
+for (const dangerousRecipeId of new Set(['__proto__', 'prototype', 'Object.prototype', ...Object.getOwnPropertyNames(Object.prototype)])) {
   expectCode(`dangerous recipe key ${dangerousRecipeId}`, () => createCardRefiningService({ recipes: [{ ...recipe, id: dangerousRecipeId }] }), 'INVALID_CONFIG');
 }
 expectCode('prototype material key', () => createCardRefiningService({ recipes: [{ ...recipe, materials: [{ materialId: '__proto__', quantity: 1 }] }] }), 'INVALID_CONFIG');
