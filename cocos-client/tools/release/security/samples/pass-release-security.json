@@ -1,0 +1,34 @@
+{
+  "kind": "release-security-pass-sample",
+  "evidenceClass": "contract-rehearsal-fixture",
+  "scenario": "real-release-contract-and-save-recovery",
+  "save": {
+    "schemaVersion": 1,
+    "playerId": "T328-PASS",
+    "updatedAt": 1700000000000,
+    "deck": {
+      "cardIds": ["U001"]
+    },
+    "progress": {
+      "unlockedNodes": ["N001"],
+      "clearedNodes": []
+    },
+    "resources": {
+      "gold": 100,
+      "essence": 4
+    }
+  },
+  "expected": {
+    "declaredResourceFiles": 9,
+    "sourceBoundaryAssertions": 16,
+    "primaryRecoveryReason": "primary"
+  },
+  "targetSha256": {
+    "a0Manifest": "2e3c8803f31cb030a4f5945ec682e5cab0eebdea375884f308152dcd48d14fba",
+    "configManifest": "99a1d3784ccc6afcc615ac7290c78707fe4f47c1a044991ee334e67ccf5d88be",
+    "configLoader": "357a4a07805ea18580faa06b06006a8f0ea8872adca3b78b068424dacc0a6b53",
+    "configValidator": "fce110afc9aa18a9449b6432513c4c162c8d1044aef1e8efd3d4b8b9bd84fe99",
+    "saveSchema": "ecc5f67a361291db09c4926eae1e873d387afc67c6881ffc30617ba070424072",
+    "rewardIsolation": "409ef775ef60265230cfa91d57cc3b166dae3fa93b74933425e115810c16451d"
+  }
+}

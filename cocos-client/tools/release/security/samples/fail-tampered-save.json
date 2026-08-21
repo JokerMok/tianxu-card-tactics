@@ -1,0 +1,25 @@
+{
+  "kind": "release-security-failure-sample",
+  "evidenceClass": "tampered-input",
+  "scenario": "unknown-top-level-save-field",
+  "expectedRejection": "unknown save field",
+  "save": {
+    "schemaVersion": 1,
+    "playerId": "T328-TAMPERED",
+    "updatedAt": 1700000000000,
+    "deck": {
+      "cardIds": []
+    },
+    "progress": {
+      "unlockedNodes": ["N001"],
+      "clearedNodes": []
+    },
+    "resources": {
+      "gold": 0,
+      "essence": 0
+    },
+    "__proto__": {
+      "polluted": true
+    }
+  }
+}
