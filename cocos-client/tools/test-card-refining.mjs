@@ -213,20 +213,26 @@ moduloState.slots = [
   { slotId: 1, recipeId: 'R19' },
   { slotId: 2, recipeId: 'R20' },
 ];
-const restoredModuloService = restoreCardRefiningService(JSON.stringify(moduloState), {
+moduloState.refreshTickets = 999;
+expectCode('unproven max refresh state', () => restoreCardRefiningService(JSON.stringify(moduloState), {
   recipes: moduloRecipes,
   slotCount: 3,
   timezone: 'Asia/Shanghai',
   clock: { now: () => SHANGHAI_BEFORE_MIDNIGHT },
   rng: () => 0,
-});
-const moduloRefresh = restoredModuloService.refresh({ requestId: 'safe-modulo-refresh' });
-assert.equal(moduloRefresh.refreshCount, Number.MAX_SAFE_INTEGER, 'refresh count must remain a safe integer at the boundary');
-assert.deepEqual(restoredModuloService.snapshot().slots, [
-  { slotId: 0, recipeId: 'R21' },
-  { slotId: 1, recipeId: 'R22' },
-  { slotId: 2, recipeId: 'R23' },
-], 'slot selection must use exact modular arithmetic for large refresh counts');
+}), 'INVALID_STATE');
+
+const initialRefreshState = JSON.parse(makeService({ refreshTickets: 1 }).save());
+initialRefreshState.refreshCount = 1;
+initialRefreshState.slots = [{ slotId: 0, recipeId: 'R2' }];
+initialRefreshState.refreshTickets = 999;
+expectCode('coordinated empty-history refresh tamper', () => restoreCardRefiningService(JSON.stringify(initialRefreshState), {
+  recipes: [recipe, recipe2],
+  slotCount: 1,
+  timezone: 'Asia/Shanghai',
+  refreshTickets: 1,
+  rng: () => 0,
+}), 'INVALID_STATE');
 
 const slotMismatch = makeService({ rng: () => 0 });
 const slotSave = slotMismatch.save();
@@ -259,6 +265,8 @@ const saturated = makeService({ materials: [{ materialId: 'CARD_DUST', quantity:
 const saturatedBefore = saturated.save();
 expectCode('card output overflow', () => saturated.refine({ requestId: 'overflow-1', slotId: 0, recipeId: 'R1' }), 'QUANTITY_EXCEEDED');
 assert.equal(saturated.save(), saturatedBefore, 'output overflow must not debit inputs');
+const maxSafeTicketService = makeService({ refreshTickets: Number.MAX_SAFE_INTEGER });
+assert.equal(maxSafeTicketService.snapshot().refreshTickets, Number.MAX_SAFE_INTEGER, 'MAX_SAFE_INTEGER refresh tickets must remain representable');
 expectCode('refresh ticket unsafe integer', () => makeService({ refreshTickets: Number.MAX_SAFE_INTEGER + 1 }), 'INVALID_CONFIG');
 
 let failPersistence = true;
@@ -332,6 +340,22 @@ expectCode('coordinated unreachable refresh state', () => restoreCardRefiningSer
 const tamperedReceiptRefreshCount = JSON.parse(saved);
 tamperedReceiptRefreshCount.receipts[0].result.refreshCount = 1;
 expectCode('tampered receipt refresh count', () => restoreCardRefiningService(JSON.stringify(tamperedReceiptRefreshCount), { recipes: [recipe], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0 }), 'INVALID_STATE');
+
+const scheduledReceiptService = makeService({ recipes: [recipe, recipe2], refreshTickets: 1 });
+scheduledReceiptService.refine({ requestId: 'scheduled-refine-1', slotId: 0, recipeId: 'R2', at: SHANGHAI_MIDNIGHT });
+const tamperedReceiptCycles = JSON.parse(scheduledReceiptService.save());
+tamperedReceiptCycles.receipts[0].result.refreshedCycles = 999;
+tamperedReceiptCycles.receipts[0].result.refreshCount = 999;
+expectCode('tampered receipt refreshed cycles and count', () => restoreCardRefiningService(JSON.stringify(tamperedReceiptCycles), { recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0 }), 'INVALID_STATE');
+
+const orderedEventsService = makeService({ recipes: [recipe, recipe2], refreshTickets: 2 });
+orderedEventsService.refine({ requestId: 'ordered-refine-1', slotId: 0, recipeId: 'R1' });
+orderedEventsService.refresh({ requestId: 'ordered-refresh-1', at: SHANGHAI_BEFORE_MIDNIGHT });
+const reorderedReceipts = JSON.parse(orderedEventsService.save());
+reorderedReceipts.receipts.reverse();
+reorderedReceipts.receipts[0].result.refreshCount = 0;
+reorderedReceipts.receipts[1].result.refreshCount = 1;
+expectCode('reordered receipts with coordinated refresh counts', () => restoreCardRefiningService(JSON.stringify(reorderedReceipts), { recipes: [recipe, recipe2], slotCount: 1, timezone: 'Asia/Shanghai', rng: () => 0 }), 'INVALID_STATE');
 
 const corrupted = JSON.parse(saved);
 corrupted.receipts = [];

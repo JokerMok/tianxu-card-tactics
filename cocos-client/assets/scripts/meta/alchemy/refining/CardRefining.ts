@@ -80,6 +80,8 @@ export interface CardRefiningState {
   readonly schemaVersion: typeof CARD_REFINING_SCHEMA_VERSION;
   readonly materials: readonly RefiningMaterial[];
   readonly cards: readonly RefiningCard[];
+  readonly initialRefreshTickets: number;
+  readonly initialLastObservedAt: number;
   readonly refreshTickets: number;
   readonly slots: readonly RefiningSlot[];
   readonly refreshCount: number;
@@ -156,8 +158,9 @@ const MATERIAL_KEYS = new Set(['materialId', 'quantity']);
 const CARD_KEYS = new Set(['cardId', 'quality', 'quantity']);
 const SLOT_KEYS = new Set(['slotId', 'recipeId']);
 const STATE_KEYS = new Set([
-  'schemaVersion', 'materials', 'cards', 'refreshTickets', 'slots', 'refreshCount',
-  'lastRefreshAt', 'nextRefreshAt', 'lastObservedAt', 'ledger', 'receipts',
+  'schemaVersion', 'materials', 'cards', 'initialRefreshTickets', 'initialLastObservedAt',
+  'refreshTickets', 'slots', 'refreshCount', 'lastRefreshAt', 'nextRefreshAt',
+  'lastObservedAt', 'ledger', 'receipts',
 ]);
 const LEDGER_KEYS = new Set([
   'sequence', 'operation', 'requestId', 'at', 'slotId', 'recipeId', 'success', 'probability',
@@ -414,18 +417,6 @@ function refreshBoundaryBefore(at: number, timezone: string, hour: number, minut
   return boundary;
 }
 
-function countRefreshBoundariesAfter(at: number, through: number, timezone: string, hour: number, minute: number): number {
-  if (through <= at) return 0;
-  let count = 0;
-  let boundary = refreshBoundaryAfter(at, timezone, hour, minute);
-  while (boundary <= through) {
-    count += 1;
-    if (count > 100000) fail('INVALID_STATE', 'refining state contains too many scheduled refresh cycles');
-    boundary = refreshBoundaryAfter(boundary, timezone, hour, minute);
-  }
-  return count;
-}
-
 function initialRefreshBoundary(at: number, timezone: string, hour: number, minute: number): { last: number; next: number } {
   const next = refreshBoundaryAfter(at, timezone, hour, minute);
   const last = refreshBoundaryBefore(next, timezone, hour, minute);
@@ -470,6 +461,7 @@ function freezeState(value: CardRefiningState): CardRefiningState {
   return Object.freeze({
     schemaVersion: CARD_REFINING_SCHEMA_VERSION,
     materials: copyMaterials(value.materials), cards: copyCards(value.cards),
+    initialRefreshTickets: value.initialRefreshTickets, initialLastObservedAt: value.initialLastObservedAt,
     refreshTickets: value.refreshTickets, slots: copySlots(value.slots), refreshCount: value.refreshCount,
     lastRefreshAt: value.lastRefreshAt, nextRefreshAt: value.nextRefreshAt, lastObservedAt: value.lastObservedAt,
     ledger: Object.freeze(value.ledger.map(cloneLedger)),
@@ -522,6 +514,26 @@ function selectSlots(recipes: readonly string[], slotCount: number, refreshCount
   })));
 }
 
+function advanceRefreshWindow(
+  lastRefreshAt: number,
+  nextRefreshAt: number,
+  through: number,
+  timezone: string,
+  refreshHour: number,
+  refreshMinute: number,
+): { readonly lastRefreshAt: number; readonly nextRefreshAt: number; readonly refreshedCycles: number } {
+  let last = lastRefreshAt;
+  let next = nextRefreshAt;
+  let refreshedCycles = 0;
+  while (through >= next) {
+    last = next;
+    next = refreshBoundaryAfter(next, timezone, refreshHour, refreshMinute);
+    refreshedCycles += 1;
+    if (refreshedCycles > 100000) fail('INVALID_STATE', 'refining state contains too many scheduled refresh cycles');
+  }
+  return { lastRefreshAt: last, nextRefreshAt: next, refreshedCycles };
+}
+
 function requestFingerprint(value: { operation: CardRefiningLedgerOperation; slotId: number | null; recipeId: string | null; materials: readonly RefiningMaterial[] }): string {
   return JSON.stringify({ operation: value.operation, slotId: value.slotId, recipeId: value.recipeId, materials: value.materials });
 }
@@ -544,7 +556,15 @@ function normalizeRequest(value: unknown): { requestId: string; slotId: number |
   return { requestId: value.requestId, slotId: slotValue as number | null, recipeId: recipeId as string | null, ...(materials === undefined ? {} : { materials }), ...(atValue === undefined ? {} : { at: atValue }) };
 }
 
-function normalizeState(value: unknown, recipeMap: ReadonlyMap<string, CardRefiningRecipe>, slotCount: number, timezone: string, refreshHour: number, refreshMinute: number): CardRefiningState {
+function normalizeState(
+  value: unknown,
+  recipeMap: ReadonlyMap<string, CardRefiningRecipe>,
+  slotCount: number,
+  timezone: string,
+  refreshHour: number,
+  refreshMinute: number,
+  allowUnprovenScheduledState = false,
+): CardRefiningState {
   const parsed = parseState(value);
   if (!isRecord(parsed)) fail('INVALID_STATE', 'refining state must be an object');
   assertOnlyKeys(parsed, STATE_KEYS, 'refining state', 'INVALID_STATE');
@@ -554,6 +574,11 @@ function normalizeState(value: unknown, recipeMap: ReadonlyMap<string, CardRefin
   }
   const materials = normalizeMaterials(parsed.materials, 'refining state.materials', 'INVALID_STATE', true);
   const cards = normalizeCards(parsed.cards, 'refining state.cards', 'INVALID_STATE');
+  if (!hasOwn(parsed, 'initialRefreshTickets') || !hasOwn(parsed, 'initialLastObservedAt')) {
+    fail('INVALID_STATE', 'refining state initial refresh anchors are required');
+  }
+  assertSafeInteger(parsed.initialRefreshTickets, 'refining state.initialRefreshTickets', 'INVALID_STATE');
+  assertTimestamp(parsed.initialLastObservedAt, 'refining state.initialLastObservedAt', 'INVALID_STATE');
   assertSafeInteger(parsed.refreshTickets, 'refining state.refreshTickets', 'INVALID_STATE');
   assertSafeInteger(parsed.refreshCount, 'refining state.refreshCount', 'INVALID_STATE');
   assertTimestamp(parsed.lastRefreshAt, 'refining state.lastRefreshAt', 'INVALID_STATE');
@@ -594,10 +619,16 @@ function normalizeState(value: unknown, recipeMap: ReadonlyMap<string, CardRefin
   if (new Set(ledger.map((entry) => entry.requestId)).size !== ledger.length) fail('INVALID_STATE', 'refining ledger request IDs are duplicated');
   if (new Set(receipts.map((entry) => entry.requestId)).size !== receipts.length) fail('INVALID_STATE', 'refining receipts are duplicated');
   if (ledger.length !== receipts.length) fail('INVALID_STATE', 'refining ledger and receipts must have the same length');
-  const receiptsById = new Map(receipts.map((entry) => [entry.requestId, entry]));
-  for (const entry of ledger) {
-    const receipt = receiptsById.get(entry.requestId);
-    if (!receipt || receipt.result.ledgerSequence !== entry.sequence || receipt.result.operation !== entry.operation
+  if (ledger.length === 0) {
+    if (!allowUnprovenScheduledState && (parsed.refreshCount !== 0 || !sameSlots(slots, selectSlots([...recipeMap.keys()], slotCount, 0))
+      || parsed.refreshTickets !== parsed.initialRefreshTickets)) {
+      fail('INVALID_STATE', 'refining state has refresh progress without a proving event history');
+    }
+  }
+  for (let index = 0; index < ledger.length; index += 1) {
+    const entry = ledger[index];
+    const receipt = receipts[index];
+    if (!receipt || receipt.requestId !== entry.requestId || receipt.result.ledgerSequence !== entry.sequence || receipt.result.operation !== entry.operation
       || receipt.result.at !== entry.at || receipt.result.slotId !== entry.slotId || receipt.result.recipeId !== entry.recipeId
       || receipt.result.success !== entry.success || receipt.result.probability !== entry.probability || receipt.result.roll !== entry.roll
       || !sameMaterials(receipt.result.debited, entry.debited) || !sameMaterials(receipt.result.returned, entry.returned)
@@ -605,26 +636,53 @@ function normalizeState(value: unknown, recipeMap: ReadonlyMap<string, CardRefin
       fail('INVALID_STATE', `refining receipt and ledger do not match: ${entry.requestId}`);
     }
   }
-  let previousAt: number | null = null;
-  for (const [index, entry] of ledger.entries()) {
-    if (previousAt !== null && entry.at < previousAt) fail('INVALID_STATE', 'refining ledger timestamps are not monotonic');
-    if (entry.at > lastObservedAt) fail('INVALID_STATE', `refining ledger[${index}] is ahead of lastObservedAt`);
-    previousAt = entry.at;
-  }
-  for (let index = 0; index < receipts.length; index += 1) {
+
+  const initialBoundaries = initialRefreshBoundary(parsed.initialLastObservedAt, timezone, refreshHour, refreshMinute);
+  let replayLastRefreshAt = initialBoundaries.last;
+  let replayNextRefreshAt = initialBoundaries.next;
+  let replayRefreshCount = 0;
+  let replayRefreshTickets = parsed.initialRefreshTickets;
+  let replaySlots = selectSlots([...recipeMap.keys()], slotCount, 0);
+  let replayObservedAt = parsed.initialLastObservedAt;
+  for (let index = 0; index < ledger.length; index += 1) {
+    const entry = ledger[index];
     const receipt = receipts[index];
-    let futureManualRefreshes = 0;
-    for (let futureIndex = index + 1; futureIndex < ledger.length; futureIndex += 1) {
-      if (ledger[futureIndex].operation === 'REFRESH') futureManualRefreshes += 1;
+    if (entry.at < replayObservedAt) fail('INVALID_STATE', 'refining ledger timestamps are not monotonic or precede the initial state');
+    const advanced = advanceRefreshWindow(replayLastRefreshAt, replayNextRefreshAt, entry.at, timezone, refreshHour, refreshMinute);
+    replayLastRefreshAt = advanced.lastRefreshAt;
+    replayNextRefreshAt = advanced.nextRefreshAt;
+    replayRefreshCount += advanced.refreshedCycles;
+    if (advanced.refreshedCycles > 0) replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+    if (entry.operation === 'REFRESH') {
+      if (replayRefreshTickets < 1) fail('INVALID_STATE', 'refining ledger spends more refresh tickets than the initial state provides');
+      replayRefreshTickets -= 1;
+      replayRefreshCount += 1;
+      replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+    } else {
+      if (entry.slotId === null || entry.slotId >= slotCount || replaySlots[entry.slotId]?.recipeId !== entry.recipeId) {
+        fail('INVALID_STATE', `refining ledger[${index}] is not reachable from the slot state at its sequence`);
+      }
     }
-    const futureScheduledRefreshes = countRefreshBoundariesAfter(receipt.result.at, lastObservedAt, timezone, refreshHour, refreshMinute);
-    const expectedRefreshCount = parsed.refreshCount - futureScheduledRefreshes - futureManualRefreshes;
-    if (expectedRefreshCount < 0 || receipt.result.refreshCount !== expectedRefreshCount) {
-      fail('INVALID_STATE', `refining receipt[${index}].result.refreshCount is not reachable from the current state`);
+    const expectedRefreshedCycles = advanced.refreshedCycles + (entry.operation === 'REFRESH' ? 1 : 0);
+    if (receipt.result.refreshCount !== replayRefreshCount || receipt.result.refreshedCycles !== expectedRefreshedCycles) {
+      fail('INVALID_STATE', `refining receipt[${index}].result refresh fields are not reachable from its event`);
     }
+    replayObservedAt = entry.at;
+  }
+  if (lastObservedAt < replayObservedAt) fail('INVALID_STATE', 'refining state.lastObservedAt precedes the event history');
+  const finalAdvanced = advanceRefreshWindow(replayLastRefreshAt, replayNextRefreshAt, lastObservedAt, timezone, refreshHour, refreshMinute);
+  replayLastRefreshAt = finalAdvanced.lastRefreshAt;
+  replayNextRefreshAt = finalAdvanced.nextRefreshAt;
+  replayRefreshCount += finalAdvanced.refreshedCycles;
+  if (finalAdvanced.refreshedCycles > 0) replaySlots = selectSlots([...recipeMap.keys()], slotCount, replayRefreshCount);
+  if (replayRefreshCount !== parsed.refreshCount || replayRefreshTickets !== parsed.refreshTickets
+    || replayLastRefreshAt !== parsed.lastRefreshAt || replayNextRefreshAt !== parsed.nextRefreshAt
+    || !sameSlots(replaySlots, slots)) {
+    fail('INVALID_STATE', 'refining state is not reachable from its initial state and event history');
   }
   return freezeState({
     schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, refreshTickets: parsed.refreshTickets,
+    initialRefreshTickets: parsed.initialRefreshTickets, initialLastObservedAt: parsed.initialLastObservedAt,
     slots, refreshCount: parsed.refreshCount, lastRefreshAt: parsed.lastRefreshAt,
     nextRefreshAt: parsed.nextRefreshAt, lastObservedAt, ledger, receipts,
   });
@@ -756,6 +814,7 @@ function defaultState(recipeMap: ReadonlyMap<string, CardRefiningRecipe>, slotCo
   const boundaries = initialRefreshBoundary(now, timezone, refreshHour, refreshMinute);
   return freezeState({
     schemaVersion: CARD_REFINING_SCHEMA_VERSION, materials, cards, refreshTickets,
+    initialRefreshTickets: refreshTickets, initialLastObservedAt: now,
     slots: selectSlots([...recipeMap.keys()], slotCount, 0), refreshCount: 0,
     lastRefreshAt: boundaries.last, nextRefreshAt: boundaries.next, lastObservedAt: now,
     ledger: [], receipts: [],
@@ -962,7 +1021,7 @@ export class CardRefiningService {
   }
 
   private commit(next: CardRefiningState): void {
-    const checked = normalizeState(next, this.recipes, this.slotCount, this.timezone, this.refreshHour, this.refreshMinute);
+    const checked = normalizeState(next, this.recipes, this.slotCount, this.timezone, this.refreshHour, this.refreshMinute, true);
     if (this.committing) fail('REENTRANT', 'refining persistence cannot re-enter');
     this.committing = true;
     try {
