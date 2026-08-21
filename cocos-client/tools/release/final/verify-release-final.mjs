@@ -200,7 +200,7 @@ function printChildEvidence(result) {
 }
 
 function printRollback() {
-  console.log('\nT265 rollback: stop release; preserve this verifier, final report, child outputs, and failure evidence; run git revert <T265 commit SHA>; rerun the specified T265 command; only after a real GREEN result may the coordinator update the shared ledger. If worktree restoration is required and there are no parallel changes, use git restore --source=<T265 commit SHA>^ -- cocos-client/tools/release/final documentation/release/final.');
+  console.log('\nT265 rollback: stop release; preserve this verifier, final report, child outputs, and failure evidence; run git revert 481537838742d225246702c71132f8b81515e0fc; rerun the specified T265 command; only after a real GREEN result may the coordinator update the shared ledger. If worktree restoration is required and there are no parallel changes, use git restore --source=<T265 commit SHA>^ -- cocos-client/tools/release/final documentation/release/final.');
 }
 
 function main() {
