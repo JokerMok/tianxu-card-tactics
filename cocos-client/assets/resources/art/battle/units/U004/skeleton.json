@@ -115,17 +115,17 @@
   },
   "directionContract": {
     "canonicalFacing": "player-right",
-    "runtimeMirrorMode": "validated-horizontal-mirror",
+    "runtimeMirrorMode": "validated-horizontal-mirror-with-independent-enemy-correction",
     "playerFacing": "RIGHT",
     "enemyFacing": "LEFT",
     "safeMirrorJustification": [
-      "source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror",
-      "the draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror",
-      "wing root stays visible behind the torso and the wing arc stays clear of the arrow lane in both approved previews"
+      "canonical player-right source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror",
+      "the base draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror",
+      "the independent enemy control sigil stays in its declared wing region outside the shot lane while wing root visibility remains intact"
     ],
     "failureCounterexamples": [
-      "single-side insignia, text, or prop would invalidate horizontal mirroring",
-      "if draw hand crosses beyond bow grip, mirrored attack would read back-handed and violate the shot lane",
+      "single-side insignia, text, or prop in the canonical source would invalidate the base horizontal relationship",
+      "if the enemy correction enters the shot lane or the draw hand crosses beyond bow grip, the left-facing attack is rejected",
       "if wing root disappears or wing arc overlaps the arrow lane, mirrored enemy facing is rejected"
     ],
     "previewEvidence": {
@@ -133,6 +133,8 @@
         "path": "cocos-client/assets/resources/art/battle/units/U004/U004-PLAYER-RIGHT-PREVIEW.png",
         "size": { "width": 1024, "height": 1536 },
         "sha256": "570e835357a503ce3c76e835883d63fe3587b85a9978d8ca7af5d3eb7683fa04",
+        "pngColorType": 2,
+        "hasAlpha": false,
         "landmarks": {
           "wingTip": { "x": 32, "y": 92 },
           "wingRoot": { "x": 196, "y": 420 },
@@ -144,9 +146,20 @@
       "enemyLeft": {
         "path": "cocos-client/assets/resources/art/battle/units/U004/U004-ENEMY-LEFT-PREVIEW.png",
         "size": { "width": 1024, "height": 1536 },
-        "sha256": "b665062136325db6e95252bc0343cf0f12a389fe6a8b81d935451b24ed3c30e6",
+        "sha256": "9fab044cb08fdd53a7b4272954f3952c5352a3a955ed50e7dd23692008c2a105",
+        "pngColorType": 2,
+        "hasAlpha": false,
         "derivedFrom": "playerRight",
-        "transform": "horizontal-flip",
+        "transform": "horizontal-flip-plus-independent-correction",
+        "sourceRelationship": "playerRight-reference-with-independent-enemy-correction",
+        "nonMirrorCorrection": {
+          "kind": "enemy-control-sigil",
+          "purpose": "distinguish-enemy-left-control-state-without-changing-shot-lane",
+          "region": { "x": 840, "y": 250, "width": 128, "height": 128 },
+          "minimumChangedPixels": 1000,
+          "verification": "decoded-rgba-difference-from-exact-horizontal-flip",
+          "mustPreserve": ["player-right/enemy-left semantics", "wing root visibility", "clear shot lane"]
+        },
         "landmarks": {
           "wingTip": { "x": 991, "y": 92 },
           "wingRoot": { "x": 827, "y": 420 },

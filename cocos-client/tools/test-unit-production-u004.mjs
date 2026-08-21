@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { inflateSync } from 'node:zlib';
 import { resolve } from 'node:path';
 
 const projectRoot = resolve(process.cwd());
@@ -22,14 +23,102 @@ function sha256(file) {
   return createHash('sha256').update(readFileSync(file)).digest('hex');
 }
 
-function pngSize(file) {
+function readPng(file) {
   const bytes = readFileSync(file);
   assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${file} must be a PNG`);
-  assert.equal(bytes.toString('ascii', 12, 16), 'IHDR', `${file} must expose an IHDR chunk`);
+  let cursor = 8;
+  let header;
+  let hasTransparencyChunk = false;
+  const imageData = [];
+  while (cursor < bytes.length) {
+    assert.equal(cursor + 12 <= bytes.length, true, `${file} has a truncated PNG chunk`);
+    const length = bytes.readUInt32BE(cursor);
+    const type = bytes.toString('ascii', cursor + 4, cursor + 8);
+    const dataStart = cursor + 8;
+    const dataEnd = dataStart + length;
+    assert.equal(dataEnd + 4 <= bytes.length, true, `${file} has a truncated ${type} chunk`);
+    const data = bytes.subarray(dataStart, dataEnd);
+    if (type === 'IHDR') {
+      header = {
+        width: data.readUInt32BE(0),
+        height: data.readUInt32BE(4),
+        bitDepth: data[8],
+        colorType: data[9],
+        interlaceMethod: data[12]
+      };
+    } else if (type === 'IDAT') {
+      imageData.push(data);
+    } else if (type === 'tRNS') {
+      hasTransparencyChunk = true;
+    }
+    cursor = dataEnd + 4;
+  }
+
+  assert.equal(isRecord(header), true, `${file} must expose an IHDR chunk`);
+  assert.equal(header.bitDepth, 8, `${file} must use 8-bit PNG channels`);
+  assert.equal(header.interlaceMethod, 0, `${file} must use a non-interlaced PNG`);
+  assert.equal([2, 6].includes(header.colorType), true, `${file} must use RGB or RGBA color data`);
+  assert.equal(imageData.length > 0, true, `${file} must contain IDAT data`);
+
+  const channels = header.colorType === 6 ? 4 : 3;
+  const rowBytes = header.width * channels;
+  const decoded = inflateSync(Buffer.concat(imageData));
+  assert.equal(decoded.length, header.height * (rowBytes + 1), `${file} decoded pixel data length changed unexpectedly`);
+  const pixels = Buffer.alloc(header.width * header.height * 4);
+  let decodedOffset = 0;
+  let previousRow = Buffer.alloc(rowBytes);
+  const paeth = (left, above, upperLeft) => {
+    const estimate = left + above - upperLeft;
+    const leftDistance = Math.abs(estimate - left);
+    const aboveDistance = Math.abs(estimate - above);
+    const upperLeftDistance = Math.abs(estimate - upperLeft);
+    if (leftDistance <= aboveDistance && leftDistance <= upperLeftDistance) return left;
+    if (aboveDistance <= upperLeftDistance) return above;
+    return upperLeft;
+  };
+
+  for (let y = 0; y < header.height; y += 1) {
+    const filter = decoded[decodedOffset++];
+    const row = Buffer.from(decoded.subarray(decodedOffset, decodedOffset + rowBytes));
+    decodedOffset += rowBytes;
+    for (let index = 0; index < row.length; index += 1) {
+      const left = index >= channels ? row[index - channels] : 0;
+      const above = previousRow[index] ?? 0;
+      const upperLeft = index >= channels ? previousRow[index - channels] ?? 0 : 0;
+      if (filter === 1) row[index] = (row[index] + left) & 0xff;
+      else if (filter === 2) row[index] = (row[index] + above) & 0xff;
+      else if (filter === 3) row[index] = (row[index] + Math.floor((left + above) / 2)) & 0xff;
+      else if (filter === 4) row[index] = (row[index] + paeth(left, above, upperLeft)) & 0xff;
+      else assert.equal(filter, 0, `${file} uses an unsupported PNG filter`);
+    }
+    for (let x = 0; x < header.width; x += 1) {
+      const sourceOffset = x * channels;
+      const targetOffset = (y * header.width + x) * 4;
+      pixels[targetOffset] = row[sourceOffset];
+      pixels[targetOffset + 1] = row[sourceOffset + 1];
+      pixels[targetOffset + 2] = row[sourceOffset + 2];
+      pixels[targetOffset + 3] = header.colorType === 6 ? row[sourceOffset + 3] : 0xff;
+    }
+    previousRow = row;
+  }
+
+  let alphaMin = 0xff;
+  let alphaMax = 0;
+  let transparentPixels = 0;
+  for (let offset = 3; offset < pixels.length; offset += 4) {
+    const alpha = pixels[offset];
+    alphaMin = Math.min(alphaMin, alpha);
+    alphaMax = Math.max(alphaMax, alpha);
+    if (alpha === 0) transparentPixels += 1;
+  }
   return {
-    width: bytes.readUInt32BE(16),
-    height: bytes.readUInt32BE(20),
-    byteLength: bytes.length
+    width: header.width,
+    height: header.height,
+    byteLength: bytes.length,
+    colorType: header.colorType,
+    hasAlpha: header.colorType === 6 || hasTransparencyChunk,
+    alpha: { min: alphaMin, max: alphaMax, transparentPixels },
+    pixels
   };
 }
 
@@ -58,15 +147,133 @@ function assertPoint(point, bounds, label) {
   assert.equal(point.y >= 0 && point.y < bounds.height, true, `${label}.y must stay inside the preview`);
 }
 
+function validateCocosImageMeta(file, png, meta) {
+  const label = file.split('/').at(-1);
+  const extension = `.${label.split('.').at(-1)}`;
+  const displayName = label.slice(0, -extension.length);
+  assert.equal(meta.ver, '1.0.27', `${label}.meta must use the Cocos image importer version`);
+  assert.equal(meta.importer, 'image', `${label}.meta must use the image importer`);
+  assert.equal(meta.imported, true, `${label}.meta must be imported`);
+  assert.match(meta.uuid ?? '', /^[0-9a-f-]{36}$/, `${label}.meta must declare a UUID`);
+  assert.deepEqual(meta.files, ['.json', extension], `${label}.meta must declare texture and sprite-frame sub-assets`);
+  assertSameKeys(meta.subMetas, ['6c48a', 'f9941'], `${label}.meta subMetas`);
+
+  const texture = meta.subMetas['6c48a'];
+  const spriteFrame = meta.subMetas['f9941'];
+  assert.deepEqual(
+    { importer: texture.importer, id: texture.id, name: texture.name },
+    { importer: 'texture', id: '6c48a', name: 'texture' },
+    `${label}.meta texture subMeta is incomplete`
+  );
+  assert.deepEqual(
+    { importer: spriteFrame.importer, id: spriteFrame.id, name: spriteFrame.name },
+    { importer: 'sprite-frame', id: 'f9941', name: 'spriteFrame' },
+    `${label}.meta sprite-frame subMeta is incomplete`
+  );
+  assert.equal(texture.uuid, `${meta.uuid}@6c48a`, `${label}.meta texture UUID must derive from the image UUID`);
+  assert.equal(spriteFrame.uuid, `${meta.uuid}@f9941`, `${label}.meta sprite-frame UUID must derive from the image UUID`);
+  assert.equal(texture.displayName, displayName, `${label}.meta texture displayName drifted`);
+  assert.equal(spriteFrame.displayName, displayName, `${label}.meta sprite-frame displayName drifted`);
+  assert.equal(texture.userData.imageUuidOrDatabaseUri, meta.uuid, `${label}.meta texture must reference its image UUID`);
+  assert.equal(spriteFrame.userData.imageUuidOrDatabaseUri, `${meta.uuid}@6c48a`, `${label}.meta sprite-frame must reference its texture UUID`);
+  assert.equal(spriteFrame.userData.rawWidth, png.width, `${label}.meta rawWidth must match decoded PNG`);
+  assert.equal(spriteFrame.userData.rawHeight, png.height, `${label}.meta rawHeight must match decoded PNG`);
+  assert.equal(spriteFrame.userData.width, png.width, `${label}.meta width must match decoded PNG`);
+  assert.equal(spriteFrame.userData.height, png.height, `${label}.meta height must match decoded PNG`);
+  assert.equal(spriteFrame.userData.trimX, 0, `${label}.meta trimX must remain zero for a full-image preview/atlas`);
+  assert.equal(spriteFrame.userData.trimY, 0, `${label}.meta trimY must remain zero for a full-image preview/atlas`);
+  assert.equal(spriteFrame.userData.trimType, 'auto', `${label}.meta trimType must remain auto`);
+  assert.equal(meta.userData.type, 'sprite-frame', `${label}.meta userData.type must be sprite-frame`);
+  assert.equal(meta.userData.fixAlphaTransparencyArtifacts, false, `${label}.meta alpha artifact policy drifted`);
+  assert.equal(meta.userData.hasAlpha, png.hasAlpha, `${label}.meta hasAlpha must match decoded PNG alpha channels`);
+  assert.equal(meta.userData.redirect, `${meta.uuid}@6c48a`, `${label}.meta redirect must target the texture sub-asset`);
+}
+
+function validateU004PngMetaContracts() {
+  const pngNames = [
+    'U004-CUTOUT-SHEET.png',
+    'U004-ENEMY-LEFT-PREVIEW.png',
+    'U004-PLAYER-RIGHT-PREVIEW.png',
+    'U004-POSE-SHEET.png'
+  ];
+  const assetRoot = resolve(projectRoot, 'assets/resources/art/battle/units/U004');
+  assert.deepEqual(
+    readdirSync(assetRoot).filter((name) => name.endsWith('.png')).sort(),
+    [...pngNames].sort(),
+    'every U004 PNG must be enumerated by the meta contract'
+  );
+  const pngAssets = new Map();
+  for (const pngName of pngNames) {
+    const pngPath = resolve(assetRoot, pngName);
+    const png = readPng(pngPath);
+    const meta = readJson(`${pngPath}.meta`);
+    validateCocosImageMeta(pngPath, png, meta);
+    pngAssets.set(pngName, { path: pngPath, png, meta });
+  }
+  return pngAssets;
+}
+
+function compareHorizontalMirror(playerPng, enemyPng, correctionRegion) {
+  assert.deepEqual(
+    { width: enemyPng.width, height: enemyPng.height },
+    { width: playerPng.width, height: playerPng.height },
+    'player-right and enemy-left previews must share a canvas'
+  );
+  let changedPixels = 0;
+  let outsideCorrection = 0;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < enemyPng.height; y += 1) {
+    for (let x = 0; x < enemyPng.width; x += 1) {
+      const enemyOffset = (y * enemyPng.width + x) * 4;
+      const playerOffset = (y * playerPng.width + (playerPng.width - 1 - x)) * 4;
+      let changed = false;
+      for (let channel = 0; channel < 4; channel += 1) {
+        if (enemyPng.pixels[enemyOffset + channel] !== playerPng.pixels[playerOffset + channel]) {
+          changed = true;
+          break;
+        }
+      }
+      if (!changed) continue;
+      changedPixels += 1;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+      if (
+        x < correctionRegion.x ||
+        y < correctionRegion.y ||
+        x >= correctionRegion.x + correctionRegion.width ||
+        y >= correctionRegion.y + correctionRegion.height
+      ) {
+        outsideCorrection += 1;
+      }
+    }
+  }
+  return {
+    changedPixels,
+    outsideCorrection,
+    bounds: changedPixels === 0
+      ? null
+      : { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
+  };
+}
+
 function validatePreviewSemantics(label, preview, facing) {
   assert.equal(isRecord(preview), true, `${label} preview contract must be an object`);
   assert.equal(typeof preview.path, 'string', `${label} preview path must be a string`);
   assert.equal(preview.path.startsWith('cocos-client/assets/resources/art/battle/units/U004/'), true, `${label} preview path escaped the approved U004 directory`);
   const previewPath = resolve(repoRoot, preview.path);
-  const previewSize = pngSize(previewPath);
-  assert.deepEqual({ width: previewSize.width, height: previewSize.height }, preview.size, `${label} preview dimensions changed unexpectedly`);
+  const approvedPreviewRoot = resolve(repoRoot, 'cocos-client/assets/resources/art/battle/units/U004');
+  assert.equal(previewPath.startsWith(`${approvedPreviewRoot}/`), true, `${label} preview path resolved outside the approved U004 directory`);
+  const previewPng = readPng(previewPath);
+  assert.deepEqual({ width: previewPng.width, height: previewPng.height }, preview.size, `${label} preview dimensions changed unexpectedly`);
   assert.equal(sha256(previewPath), preview.sha256, `${label} preview hash changed unexpectedly`);
-  assert.equal(previewSize.byteLength > 500000, true, `${label} preview is too small to count as review evidence`);
+  assert.equal(previewPng.byteLength > 500000, true, `${label} preview is too small to count as review evidence`);
+  assert.equal(preview.pngColorType, previewPng.colorType, `${label} preview PNG color type changed unexpectedly`);
+  assert.equal(preview.hasAlpha, previewPng.hasAlpha, `${label} preview alpha contract changed unexpectedly`);
   assert.equal(isRecord(preview.landmarks), true, `${label} landmarks must be an object`);
   assertSameKeys(preview.landmarks, requiredLandmarks, `${label} landmarks`);
   for (const landmark of requiredLandmarks) {
@@ -86,6 +293,7 @@ function validatePreviewSemantics(label, preview, facing) {
     assert.equal(drawHand.x > bowGrip.x, true, `${label} draw hand must stay behind the bow grip after mirroring`);
     assert.equal(bowGrip.x > arrowHead.x, true, `${label} bow grip must stay behind the arrow head after mirroring`);
   }
+  return previewPng;
 }
 
 function validateDirectionContract(skeleton) {
@@ -95,27 +303,44 @@ function validateDirectionContract(skeleton) {
   }, 'U004 must lock the player-right/enemy-left runtime facing contract');
   assert.equal(isRecord(skeleton.directionContract), true, 'U004 must declare a directionContract');
   assert.equal(skeleton.directionContract.canonicalFacing, 'player-right', 'U004 canonicalFacing must remain player-right');
-  assert.equal(skeleton.directionContract.runtimeMirrorMode, 'validated-horizontal-mirror', 'U004 runtimeMirrorMode must remain validated-horizontal-mirror');
+  assert.equal(
+    skeleton.directionContract.runtimeMirrorMode,
+    'validated-horizontal-mirror-with-independent-enemy-correction',
+    'U004 runtimeMirrorMode must preserve the independent enemy correction'
+  );
   assert.equal(skeleton.directionContract.playerFacing, 'RIGHT', 'U004 playerFacing must remain RIGHT');
   assert.equal(skeleton.directionContract.enemyFacing, 'LEFT', 'U004 enemyFacing must remain LEFT');
   assert.deepEqual(skeleton.directionContract.safeMirrorJustification, [
-    'source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror',
-    'the draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror',
-    'wing root stays visible behind the torso and the wing arc stays clear of the arrow lane in both approved previews'
+    'canonical player-right source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror',
+    'the base draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror',
+    'the independent enemy control sigil stays in its declared wing region outside the shot lane while wing root visibility remains intact'
   ], 'U004 safeMirrorJustification drifted from the approved mirror rationale');
   assert.deepEqual(skeleton.directionContract.failureCounterexamples, [
-    'single-side insignia, text, or prop would invalidate horizontal mirroring',
-    'if draw hand crosses beyond bow grip, mirrored attack would read back-handed and violate the shot lane',
+    'single-side insignia, text, or prop in the canonical source would invalidate the base horizontal relationship',
+    'if the enemy correction enters the shot lane or the draw hand crosses beyond bow grip, the left-facing attack is rejected',
     'if wing root disappears or wing arc overlaps the arrow lane, mirrored enemy facing is rejected'
   ], 'U004 failureCounterexamples drifted from the approved mirror guardrails');
   assert.equal(isRecord(skeleton.directionContract.previewEvidence), true, 'U004 previewEvidence must be an object');
   assertSameKeys(skeleton.directionContract.previewEvidence, ['enemyLeft', 'playerRight'], 'U004 previewEvidence');
   const playerRight = skeleton.directionContract.previewEvidence.playerRight;
   const enemyLeft = skeleton.directionContract.previewEvidence.enemyLeft;
-  validatePreviewSemantics('playerRight', playerRight, 'RIGHT');
-  validatePreviewSemantics('enemyLeft', enemyLeft, 'LEFT');
+  const playerPng = validatePreviewSemantics('playerRight', playerRight, 'RIGHT');
+  const enemyPng = validatePreviewSemantics('enemyLeft', enemyLeft, 'LEFT');
   assert.equal(enemyLeft.derivedFrom, 'playerRight', 'enemyLeft preview must declare playerRight as its source');
-  assert.equal(enemyLeft.transform, 'horizontal-flip', 'enemyLeft preview must declare a horizontal-flip transform');
+  assert.equal(enemyLeft.transform, 'horizontal-flip-plus-independent-correction', 'enemyLeft preview must declare a horizontal-flip plus independent correction');
+  assert.equal(enemyLeft.sourceRelationship, 'playerRight-reference-with-independent-enemy-correction', 'enemyLeft preview must declare its independent source relationship');
+  assert.equal(isRecord(enemyLeft.nonMirrorCorrection), true, 'enemyLeft preview must declare a non-mirror correction');
+  assert.equal(enemyLeft.nonMirrorCorrection.kind, 'enemy-control-sigil', 'enemyLeft correction must identify the enemy control sigil');
+  assert.equal(enemyLeft.nonMirrorCorrection.purpose, 'distinguish-enemy-left-control-state-without-changing-shot-lane', 'enemyLeft correction purpose drifted');
+  assertRect(enemyLeft.nonMirrorCorrection.region, enemyLeft.size, 'enemyLeft nonMirrorCorrection.region');
+  assert.equal(Number.isInteger(enemyLeft.nonMirrorCorrection.minimumChangedPixels), true, 'enemyLeft correction pixel floor must be an integer');
+  assert.equal(enemyLeft.nonMirrorCorrection.minimumChangedPixels > 0, true, 'enemyLeft correction pixel floor must be positive');
+  assert.equal(enemyLeft.nonMirrorCorrection.verification, 'decoded-rgba-difference-from-exact-horizontal-flip', 'enemyLeft correction must require decoded pixel verification');
+  assert.deepEqual(enemyLeft.nonMirrorCorrection.mustPreserve, ['player-right/enemy-left semantics', 'wing root visibility', 'clear shot lane'], 'enemyLeft correction guardrails drifted');
+  const mirrorDifference = compareHorizontalMirror(playerPng, enemyPng, enemyLeft.nonMirrorCorrection.region);
+  assert.equal(mirrorDifference.changedPixels >= enemyLeft.nonMirrorCorrection.minimumChangedPixels, true, 'enemy-left preview must contain a measurable non-mirror correction');
+  assert.equal(mirrorDifference.outsideCorrection, 0, 'enemy-left preview non-mirror correction must stay inside its declared region');
+  assert.deepEqual(mirrorDifference.bounds, enemyLeft.nonMirrorCorrection.region, 'enemy-left preview correction bounds must match the declared region');
   assert.deepEqual(enemyLeft.size, playerRight.size, 'enemyLeft preview must keep the same canvas size as playerRight');
   for (const landmark of requiredLandmarks) {
     assert.equal(
@@ -328,17 +553,17 @@ function validateFileBackedAssets(skeleton) {
   const poseSheetPath = resolve(repoRoot, skeleton.atlases.poseSheet.path);
   const cutoutSheetPath = resolve(repoRoot, skeleton.atlases.cutoutSheet.path);
 
-  const sourceSize = pngSize(sourceArtPath);
+  const sourceSize = readPng(sourceArtPath);
   assert.deepEqual({ width: sourceSize.width, height: sourceSize.height }, skeleton.sourceArt.size, 'U004 source art dimensions changed unexpectedly');
   assert.equal(sha256(sourceArtPath), skeleton.sourceArt.sha256, 'U004 source art hash changed unexpectedly');
   assert.equal(sourceSize.byteLength > 500000, true, 'U004 source art looks too small to be the approved card art');
 
-  const poseSize = pngSize(poseSheetPath);
+  const poseSize = readPng(poseSheetPath);
   assert.deepEqual({ width: poseSize.width, height: poseSize.height }, skeleton.atlases.poseSheet.size, 'U004 pose-sheet dimensions changed unexpectedly');
   assert.equal(sha256(poseSheetPath), skeleton.atlases.poseSheet.sha256, 'U004 pose-sheet hash changed unexpectedly');
   assert.equal(poseSize.byteLength > 500000, true, 'U004 pose-sheet must be a real derived atlas, not a placeholder');
 
-  const cutoutSize = pngSize(cutoutSheetPath);
+  const cutoutSize = readPng(cutoutSheetPath);
   assert.deepEqual({ width: cutoutSize.width, height: cutoutSize.height }, skeleton.atlases.cutoutSheet.size, 'U004 cutout-sheet dimensions changed unexpectedly');
   assert.equal(sha256(cutoutSheetPath), skeleton.atlases.cutoutSheet.sha256, 'U004 cutout-sheet hash changed unexpectedly');
   assert.equal(cutoutSize.byteLength > 600000, true, 'U004 cutout-sheet must be a real derived atlas, not a placeholder');
@@ -357,6 +582,8 @@ function expectFailure(label, fn, pattern) {
 const skeletonPath = resolve(projectRoot, 'assets/resources/art/battle/units/U004/skeleton.json');
 const skeleton = readJson(skeletonPath);
 
+const pngAssets = validateU004PngMetaContracts();
+assert.equal(pngAssets.size, 4, 'U004 must validate every PNG in its approved asset directory');
 validateFileBackedAssets(skeleton);
 validateSkeleton(skeleton);
 validateAgainstConfigAndDocs(skeleton);
@@ -413,6 +640,27 @@ expectFailure('missing enemy-left preview evidence', () => validateSkeleton({
     }
   }
 }), /ENOENT|enemyLeft preview/);
+
+expectFailure('enemy-left exact horizontal mirror', () => {
+  const exactMirror = structuredClone(skeleton);
+  exactMirror.directionContract.previewEvidence.enemyLeft.path = exactMirror.directionContract.previewEvidence.playerRight.path;
+  exactMirror.directionContract.previewEvidence.enemyLeft.sha256 = exactMirror.directionContract.previewEvidence.playerRight.sha256;
+  validateSkeleton(exactMirror);
+}, /correction|outside|measurable|bounds/);
+
+expectFailure('incomplete Cocos image meta', () => {
+  const image = pngAssets.get('U004-PLAYER-RIGHT-PREVIEW.png');
+  const incompleteMeta = structuredClone(image.meta);
+  delete incompleteMeta.subMetas['f9941'];
+  validateCocosImageMeta(image.path, image.png, incompleteMeta);
+}, /subMetas/);
+
+expectFailure('PNG alpha metadata drift', () => {
+  const image = pngAssets.get('U004-CUTOUT-SHEET.png');
+  const driftedMeta = structuredClone(image.meta);
+  driftedMeta.userData.hasAlpha = false;
+  validateCocosImageMeta(image.path, image.png, driftedMeta);
+}, /hasAlpha/);
 
 expectFailure('mirrored shot-lane semantics drift', () => validateSkeleton({
   ...skeleton,
