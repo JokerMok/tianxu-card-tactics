@@ -59,6 +59,8 @@ export interface CardCollectionState {
   readonly cards: readonly CardCollectionEntry[];
   readonly claimedRewards: readonly string[];
   readonly processedRequests: readonly CardCollectionProcessedRequest[];
+  readonly initialCards?: readonly CardCollectionEntry[];
+  readonly initialClaimedRewards?: readonly string[];
 }
 
 export interface CardCollectionOptions {
@@ -97,7 +99,7 @@ const RESULT_KEYS = new Set([
   'requestId', 'applied', 'idempotent', 'firstAcquisition', 'qualityUpgraded', 'entry', 'progress', 'rewards',
 ]);
 const PROCESSED_REQUEST_KEYS = new Set(['requestId', 'fingerprint', 'result']);
-const STATE_KEYS = new Set(['schemaVersion', 'cards', 'claimedRewards', 'processedRequests']);
+const STATE_KEYS = new Set(['schemaVersion', 'cards', 'claimedRewards', 'processedRequests', 'initialCards', 'initialClaimedRewards']);
 const TRIGGERS = new Set<CardCollectionRewardTrigger>([
   'FIRST_ACQUISITION', 'QUALITY_REACHED', 'COLLECTION_COUNT',
 ]);
@@ -144,7 +146,7 @@ function normalizeRequestId(value: unknown): string {
 
 function metadataRows(input: readonly unknown[] | { readonly cards: readonly unknown[] }): readonly unknown[] {
   if (Array.isArray(input)) return input;
-  if (isRecord(input) && Array.isArray(input.cards)) return input.cards;
+  if (isRecord(input) && hasOwn(input, 'cards') && Array.isArray(input.cards)) return input.cards;
   fail('INVALID_CONFIG', 'card metadata must be an array or a cards table');
 }
 
@@ -152,8 +154,8 @@ function normalizeMetadata(input: readonly unknown[] | { readonly cards: readonl
   const result = new Map<string, CardAuthority>();
   for (const [index, raw] of metadataRows(input).entries()) {
     if (!isRecord(raw)) fail('INVALID_CONFIG', `card metadata row ${index} must be an object`);
-    if (raw.enabled === false) continue;
-    if (typeof raw.id !== 'string' || !CARD_ID_PATTERN.test(raw.id) || result.has(raw.id)) {
+    if (hasOwn(raw, 'enabled') && raw.enabled === false) continue;
+    if (!hasOwn(raw, 'id') || typeof raw.id !== 'string' || !CARD_ID_PATTERN.test(raw.id) || result.has(raw.id)) {
       fail('INVALID_CONFIG', `card metadata row ${index} has an invalid or duplicate ID`);
     }
     result.set(raw.id, { id: raw.id });
@@ -195,19 +197,29 @@ function normalizeQualityAuthority(value: unknown, metadata: ReadonlyMap<string,
   }
 
   let source = value;
-  if (source !== null && typeof source === 'object' && typeof (source as { snapshot?: unknown }).snapshot === 'function') {
+  if (source !== null && typeof source === 'object') {
+    const sourceObject = source as Record<string, unknown>;
+    const prototype = Object.getPrototypeOf(sourceObject);
+    const snapshot = hasOwn(sourceObject, 'snapshot')
+      ? sourceObject.snapshot
+      : prototype !== null && prototype !== Object.prototype && hasOwn(prototype, 'snapshot')
+        ? prototype.snapshot
+        : undefined;
+    if (typeof snapshot === 'function') {
     try {
-      source = (source as { snapshot: () => unknown }).snapshot();
+        source = snapshot.call(sourceObject);
     } catch (error) {
       fail('INVALID_CONFIG', `quality catalog snapshot failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
     }
   }
   const entries = Array.isArray(source)
     ? source
-    : isRecord(source) && Array.isArray(source.entries) ? source.entries : undefined;
+    : isRecord(source) && hasOwn(source, 'entries') && Array.isArray(source.entries) ? source.entries : undefined;
   if (!entries) fail('INVALID_CONFIG', 'quality catalog must expose an entries array');
   for (const [index, raw] of entries.entries()) {
-    if (!isRecord(raw) || typeof raw.cardId !== 'string' || !metadata.has(raw.cardId) || !validQuality(raw.quality)) {
+    if (!isRecord(raw) || !hasOwn(raw, 'cardId') || !hasOwn(raw, 'quality')
+      || typeof raw.cardId !== 'string' || !metadata.has(raw.cardId) || !validQuality(raw.quality)) {
       fail('INVALID_CONFIG', `quality catalog entry ${index} is invalid`);
     }
     const key = `${raw.cardId}:${raw.quality}`;
@@ -225,37 +237,39 @@ function normalizeQualityAuthority(value: unknown, metadata: ReadonlyMap<string,
 function normalizeReward(raw: unknown, metadata: ReadonlyMap<string, CardAuthority>, qualityKeys: ReadonlySet<string>, index: number): CardCollectionRewardDefinition {
   if (!isRecord(raw)) fail('INVALID_CONFIG', `rewards[${index}] must be an object`);
   assertOnlyKeys(raw, REWARD_KEYS, `rewards[${index}]`, 'INVALID_CONFIG');
-  if (typeof raw.id !== 'string' || !REWARD_ID_PATTERN.test(raw.id)) fail('INVALID_CONFIG', `rewards[${index}].id is invalid`);
-  if (typeof raw.trigger !== 'string' || !TRIGGERS.has(raw.trigger as CardCollectionRewardTrigger)) {
+  if (!hasOwn(raw, 'id') || typeof raw.id !== 'string' || !REWARD_ID_PATTERN.test(raw.id)) fail('INVALID_CONFIG', `rewards[${index}].id is invalid`);
+  if (!hasOwn(raw, 'trigger') || typeof raw.trigger !== 'string' || !TRIGGERS.has(raw.trigger as CardCollectionRewardTrigger)) {
     fail('INVALID_CONFIG', `rewards[${index}].trigger is invalid`);
   }
   if (!hasOwn(raw, 'reward')) fail('INVALID_CONFIG', `rewards[${index}].reward is required`);
   const trigger = raw.trigger as CardCollectionRewardTrigger;
-  const cardId = raw.cardId;
+  const cardId = hasOwn(raw, 'cardId') ? raw.cardId : undefined;
+  const quality = hasOwn(raw, 'quality') ? raw.quality : undefined;
+  const count = hasOwn(raw, 'count') ? raw.count : undefined;
   if (cardId !== undefined && (typeof cardId !== 'string' || !CARD_ID_PATTERN.test(cardId) || !metadata.has(cardId))) {
     fail('INVALID_CONFIG', `rewards[${index}].cardId is unknown`);
   }
   if (trigger === 'FIRST_ACQUISITION' && cardId === undefined) fail('INVALID_CONFIG', `rewards[${index}] first reward needs cardId`);
-  if (trigger === 'COLLECTION_COUNT' && !positiveInteger(raw.count)) fail('INVALID_CONFIG', `rewards[${index}].count is invalid`);
-  if (trigger === 'QUALITY_REACHED' && raw.quality === undefined) fail('INVALID_CONFIG', `rewards[${index}] quality reward needs quality`);
-  if (trigger === 'FIRST_ACQUISITION' && (raw.count !== undefined || raw.quality !== undefined)) {
+  if (trigger === 'COLLECTION_COUNT' && !positiveInteger(count)) fail('INVALID_CONFIG', `rewards[${index}].count is invalid`);
+  if (trigger === 'QUALITY_REACHED' && quality === undefined) fail('INVALID_CONFIG', `rewards[${index}] quality reward needs quality`);
+  if (trigger === 'FIRST_ACQUISITION' && (count !== undefined || quality !== undefined)) {
     fail('INVALID_CONFIG', `rewards[${index}] first reward cannot use count or quality`);
   }
-  if (trigger === 'QUALITY_REACHED' && raw.count !== undefined) fail('INVALID_CONFIG', `rewards[${index}] quality reward cannot use count`);
-  if (trigger === 'COLLECTION_COUNT' && (raw.cardId !== undefined || raw.quality !== undefined)) {
+  if (trigger === 'QUALITY_REACHED' && count !== undefined) fail('INVALID_CONFIG', `rewards[${index}] quality reward cannot use count`);
+  if (trigger === 'COLLECTION_COUNT' && (cardId !== undefined || quality !== undefined)) {
     fail('INVALID_CONFIG', `rewards[${index}] collection reward cannot target a card or quality`);
   }
-  if (raw.quality !== undefined) {
-    if (!validQuality(raw.quality)) fail('INVALID_CONFIG', `rewards[${index}].quality is invalid`);
-    if (cardId !== undefined && !qualityKeys.has(`${cardId}:${raw.quality}`)) fail('INVALID_CONFIG', `rewards[${index}] quality is not configured for card`);
+  if (quality !== undefined) {
+    if (!validQuality(quality)) fail('INVALID_CONFIG', `rewards[${index}].quality is invalid`);
+    if (cardId !== undefined && !qualityKeys.has(`${cardId}:${quality}`)) fail('INVALID_CONFIG', `rewards[${index}] quality is not configured for card`);
   }
-  if (trigger === 'FIRST_ACQUISITION' && raw.quality !== undefined) fail('INVALID_CONFIG', `rewards[${index}] first reward cannot use quality`);
+  if (trigger === 'FIRST_ACQUISITION' && quality !== undefined) fail('INVALID_CONFIG', `rewards[${index}] first reward cannot use quality`);
   return Object.freeze({
     id: raw.id,
     trigger,
     ...(cardId === undefined ? {} : { cardId }),
-    ...(raw.quality === undefined ? {} : { quality: raw.quality }),
-    ...(raw.count === undefined ? {} : { count: raw.count }),
+    ...(quality === undefined ? {} : { quality }),
+    ...(count === undefined ? {} : { count }),
     reward: cloneJson(raw.reward, 'INVALID_CONFIG'),
   });
 }
@@ -285,22 +299,53 @@ function normalizeCard(raw: unknown, metadata: ReadonlyMap<string, CardAuthority
   return { cardId: raw.cardId, quantity: raw.quantity, highestQuality: raw.highestQuality };
 }
 
+function normalizeCards(value: unknown, metadata: ReadonlyMap<string, CardAuthority>, qualityKeys: ReadonlySet<string>, code: CardCollectionErrorCode): CardCollectionEntry[] {
+  if (!Array.isArray(value)) fail(code, 'collection cards must be an array');
+  const cards = value.map((card) => normalizeCard(card, metadata, qualityKeys, code));
+  const cardIds = new Set<string>();
+  for (const card of cards) {
+    if (cardIds.has(card.cardId)) fail(code, `duplicate collection card: ${card.cardId}`);
+    cardIds.add(card.cardId);
+  }
+  return cards.sort((left, right) => left.cardId.localeCompare(right.cardId));
+}
+
+function normalizeClaimedRewards(value: unknown, rewardsById: ReadonlyMap<string, CardCollectionRewardDefinition>): string[] {
+  if (!Array.isArray(value)) fail('INVALID_STATE', 'claimed rewards must be an array');
+  const claimed: string[] = [];
+  const seen = new Set<string>();
+  for (const rewardId of value) {
+    if (typeof rewardId !== 'string' || !rewardsById.has(rewardId) || seen.has(rewardId)) {
+      fail('INVALID_STATE', 'claimed rewards contain an invalid or duplicate ID');
+    }
+    seen.add(rewardId);
+    claimed.push(rewardId);
+  }
+  return claimed;
+}
+
 function normalizeProgress(value: unknown, metadataCount: number, code: CardCollectionErrorCode): CardCollectionProgress {
   if (!isRecord(value)) fail(code, 'collection progress must be an object');
   const keys = new Set(['collectedCount', 'totalCount', 'percentage']);
   assertOnlyKeys(value, keys, 'collection progress', code);
-  if (!Number.isSafeInteger(value.collectedCount) || value.collectedCount < 0
-    || value.collectedCount > metadataCount || value.totalCount !== metadataCount
-    || typeof value.percentage !== 'number' || value.percentage !== (metadataCount === 0 ? 0 : value.collectedCount / metadataCount)) {
+  if (!hasOwn(value, 'collectedCount') || !hasOwn(value, 'totalCount') || !hasOwn(value, 'percentage')) {
+    fail(code, 'collection progress is incomplete');
+  }
+  const collectedCount = value.collectedCount;
+  const totalCount = value.totalCount;
+  const percentage = value.percentage;
+  if (!Number.isSafeInteger(collectedCount) || collectedCount < 0
+    || collectedCount > metadataCount || totalCount !== metadataCount
+    || typeof percentage !== 'number' || percentage !== (metadataCount === 0 ? 0 : collectedCount / metadataCount)) {
     fail(code, 'collection progress is inconsistent');
   }
-  return { collectedCount: value.collectedCount, totalCount: value.totalCount, percentage: value.percentage };
+  return { collectedCount, totalCount, percentage };
 }
 
 function normalizeGrant(value: unknown, rewardsById: ReadonlyMap<string, CardCollectionRewardDefinition>, code: CardCollectionErrorCode): CardCollectionRewardGrant {
   if (!isRecord(value)) fail(code, 'collection reward grant must be an object');
   assertOnlyKeys(value, GRANT_KEYS, 'collection reward grant', code);
-  if (typeof value.id !== 'string') fail(code, 'collection reward grant ID is invalid');
+  if (!hasOwn(value, 'id') || !hasOwn(value, 'trigger') || typeof value.id !== 'string') fail(code, 'collection reward grant identity is invalid');
   const definition = rewardsById.get(value.id);
   if (!definition || value.trigger !== definition.trigger) fail(code, `unknown collection reward: ${String(value.id)}`);
   if (!hasOwn(value, 'reward')) fail(code, 'collection reward grant payload is required');
@@ -475,6 +520,8 @@ function seedQualityForCard(
 function normalizeResult(value: unknown, metadataCount: number, metadata: ReadonlyMap<string, CardAuthority>, qualityKeys: ReadonlySet<string>, rewardsById: ReadonlyMap<string, CardCollectionRewardDefinition>, code: CardCollectionErrorCode): CardCollectionAcquireResult {
   if (!isRecord(value)) fail(code, 'processed request result must be an object');
   assertOnlyKeys(value, RESULT_KEYS, 'processed request result', code);
+  const resultFields = ['requestId', 'applied', 'idempotent', 'firstAcquisition', 'qualityUpgraded', 'entry', 'progress', 'rewards'];
+  if (resultFields.some((key) => !hasOwn(value, key))) fail(code, 'processed request result is incomplete');
   if (typeof value.requestId !== 'string' || !REQUEST_ID_PATTERN.test(value.requestId)
     || value.applied !== true || value.idempotent !== false
     || typeof value.firstAcquisition !== 'boolean' || typeof value.qualityUpgraded !== 'boolean') {
@@ -509,17 +556,17 @@ function normalizeState(value: unknown, metadata: ReadonlyMap<string, CardAuthor
   }
   if (!isRecord(parsed)) fail('INVALID_STATE', 'saved collection state must be an object');
   assertOnlyKeys(parsed, STATE_KEYS, 'saved collection state', 'INVALID_STATE');
+  for (const key of ['schemaVersion', 'cards', 'claimedRewards', 'processedRequests']) {
+    if (!hasOwn(parsed, key)) fail('INVALID_STATE', `saved collection state.${key} is required`);
+  }
+  const hasInitialCards = hasOwn(parsed, 'initialCards');
+  const hasInitialClaimedRewards = hasOwn(parsed, 'initialClaimedRewards');
+  if (hasInitialCards !== hasInitialClaimedRewards) fail('INVALID_STATE', 'saved collection initial baseline is incomplete');
   if (parsed.schemaVersion !== CARD_COLLECTION_SCHEMA_VERSION || !Array.isArray(parsed.cards)
     || !Array.isArray(parsed.claimedRewards) || !Array.isArray(parsed.processedRequests)) {
     fail('INVALID_STATE', 'saved collection state is incomplete or unsupported');
   }
-  const cards = parsed.cards.map((card) => normalizeCard(card, metadata, qualityKeys, 'INVALID_STATE'));
-  const cardIds = new Set<string>();
-  for (const card of cards) {
-    if (cardIds.has(card.cardId)) fail('INVALID_STATE', `duplicate collection card: ${card.cardId}`);
-    cardIds.add(card.cardId);
-  }
-  cards.sort((left, right) => left.cardId.localeCompare(right.cardId));
+  const cards = normalizeCards(parsed.cards, metadata, qualityKeys, 'INVALID_STATE');
 
   const rewardsById = new Map(rewards.map((reward) => [reward.id, reward]));
   const claimedRewards: string[] = [];
@@ -537,7 +584,8 @@ function normalizeState(value: unknown, metadata: ReadonlyMap<string, CardAuthor
   const processedRequests = parsed.processedRequests.map((raw): NormalizedProcessedRequest => {
     if (!isRecord(raw)) fail('INVALID_STATE', 'processed request must be an object');
     assertOnlyKeys(raw, PROCESSED_REQUEST_KEYS, 'processed request', 'INVALID_STATE');
-    if (typeof raw.requestId !== 'string' || !REQUEST_ID_PATTERN.test(raw.requestId) || typeof raw.fingerprint !== 'string') {
+    if (!hasOwn(raw, 'requestId') || !hasOwn(raw, 'fingerprint') || !hasOwn(raw, 'result')
+      || typeof raw.requestId !== 'string' || !REQUEST_ID_PATTERN.test(raw.requestId) || typeof raw.fingerprint !== 'string') {
       fail('INVALID_STATE', 'processed request identity is invalid');
     }
     const normalizedFingerprint = normalizeProcessedFingerprint(raw.fingerprint, metadata, qualityKeys);
@@ -552,6 +600,20 @@ function normalizeState(value: unknown, metadata: ReadonlyMap<string, CardAuthor
   for (const request of processedRequests) {
     if (requestIds.has(request.requestId)) fail('INVALID_STATE', `duplicate processed request: ${request.requestId}`);
     requestIds.add(request.requestId);
+  }
+
+  const initialCards = hasInitialCards ? normalizeCards(parsed.initialCards, metadata, qualityKeys, 'INVALID_STATE') : undefined;
+  const initialClaimedRewards = hasInitialClaimedRewards ? normalizeClaimedRewards(parsed.initialClaimedRewards, rewardsById) : undefined;
+  if (initialCards !== undefined) {
+    const initialProgress = progressFor(initialCards, metadata.size);
+    for (const rewardId of initialClaimedRewards!) {
+      if (!isRewardEligible(rewardsById.get(rewardId)!, initialCards, initialProgress.collectedCount)) {
+        fail('INVALID_STATE', `initial claimed reward is not eligible: ${rewardId}`);
+      }
+    }
+    if (processedRequests.length === 0 && (!sameCardList(initialCards, cards) || !sameIdSet(new Set(initialClaimedRewards!), claimed))) {
+      fail('INVALID_STATE', 'initial baseline must match a state without processed requests');
+    }
   }
 
   if (processedRequests.length > 0) {
@@ -569,23 +631,29 @@ function normalizeState(value: unknown, metadata: ReadonlyMap<string, CardAuthor
       if (!cardsById.has(cardId)) fail('INVALID_STATE', `processed request card is missing from collection: ${cardId}`);
     }
 
-    const baselineCards: CardCollectionEntry[] = [];
-    for (const card of cards) {
-      const requestsForCard = requestsByCard.get(card.cardId);
-      if (!requestsForCard) {
-        baselineCards.push(card);
-        continue;
+    let baselineCards: CardCollectionEntry[];
+    let baselineClaimed: ReadonlySet<string>;
+    if (initialCards !== undefined) {
+      baselineCards = initialCards.map((card) => ({ ...card }));
+      baselineClaimed = new Set(initialClaimedRewards!);
+    } else {
+      baselineCards = [];
+      for (const card of cards) {
+        const requestsForCard = requestsByCard.get(card.cardId);
+        if (!requestsForCard) {
+          baselineCards.push(card);
+          continue;
+        }
+        const totalRequested = requestQuantityByCard.get(card.cardId)!;
+        if (card.quantity < totalRequested) fail('INVALID_STATE', `processed request quantities exceed card: ${card.cardId}`);
+        const baselineQuantity = card.quantity - totalRequested;
+        const baselineQuality = seedQualityForCard(card, requestsForCard, baselineQuantity);
+        if (baselineQuality !== undefined) baselineCards.push({ cardId: card.cardId, quantity: baselineQuantity, highestQuality: baselineQuality });
       }
-      const totalRequested = requestQuantityByCard.get(card.cardId)!;
-      if (card.quantity < totalRequested) fail('INVALID_STATE', `processed request quantities exceed card: ${card.cardId}`);
-      const baselineQuantity = card.quantity - totalRequested;
-      const baselineQuality = seedQualityForCard(card, requestsForCard, baselineQuantity);
-      if (baselineQuality !== undefined) baselineCards.push({ cardId: card.cardId, quantity: baselineQuantity, highestQuality: baselineQuality });
+      const grantedRewardIds = new Set<string>();
+      for (const request of processedRequests) for (const reward of request.result.rewards) grantedRewardIds.add(reward.id);
+      baselineClaimed = new Set(claimedRewards.filter((rewardId) => !grantedRewardIds.has(rewardId)));
     }
-
-    const grantedRewardIds = new Set<string>();
-    for (const request of processedRequests) for (const reward of request.result.rewards) grantedRewardIds.add(reward.id);
-    const baselineClaimed = new Set(claimedRewards.filter((rewardId) => !grantedRewardIds.has(rewardId)));
     const baselineProgress = progressFor(baselineCards, metadata.size);
     for (const rewardId of baselineClaimed) {
       if (!isRewardEligible(rewardsById.get(rewardId)!, baselineCards, baselineProgress.collectedCount)) {
@@ -610,6 +678,7 @@ function normalizeState(value: unknown, metadata: ReadonlyMap<string, CardAuthor
     cards,
     claimedRewards,
     processedRequests: processedRequests.map(({ requestId, fingerprint, result }) => ({ requestId, fingerprint, result })),
+    ...(initialCards === undefined ? {} : { initialCards, initialClaimedRewards }),
   });
 }
 
@@ -627,6 +696,9 @@ function isRewardEligible(definition: CardCollectionRewardDefinition, cards: rea
 
 function freezeState(state: CardCollectionState): CardCollectionState {
   const cards = Object.freeze(state.cards.map((card) => Object.freeze({ ...card })));
+  const initialCards = state.initialCards === undefined
+    ? undefined
+    : Object.freeze(state.initialCards.map((card) => Object.freeze({ ...card })));
   const processedRequests = Object.freeze(state.processedRequests.map((request) => Object.freeze({
     requestId: request.requestId,
     fingerprint: request.fingerprint,
@@ -637,6 +709,10 @@ function freezeState(state: CardCollectionState): CardCollectionState {
     cards,
     claimedRewards: Object.freeze([...state.claimedRewards].sort()),
     processedRequests,
+    ...(initialCards === undefined ? {} : {
+      initialCards,
+      initialClaimedRewards: Object.freeze([...(state.initialClaimedRewards ?? [])].sort()),
+    }),
   });
 }
 
@@ -715,15 +791,18 @@ export class CardCollectionService {
 
   constructor(options: CardCollectionOptions) {
     if (!isRecord(options)) fail('INVALID_CONFIG', 'collection options must be an object');
-    if (options.persist !== undefined && options.onSave !== undefined) fail('INVALID_CONFIG', 'persist and onSave cannot both be provided');
-    if (options.persist !== undefined && typeof options.persist !== 'function') fail('INVALID_CONFIG', 'persist must be a function');
-    if (options.onSave !== undefined && typeof options.onSave !== 'function') fail('INVALID_CONFIG', 'onSave must be a function');
+    if (!hasOwn(options, 'metadata')) fail('INVALID_CONFIG', 'collection metadata is required');
+    const persist = hasOwn(options, 'persist') ? options.persist : undefined;
+    const onSave = hasOwn(options, 'onSave') ? options.onSave : undefined;
+    if (persist !== undefined && onSave !== undefined) fail('INVALID_CONFIG', 'persist and onSave cannot both be provided');
+    if (persist !== undefined && typeof persist !== 'function') fail('INVALID_CONFIG', 'persist must be a function');
+    if (onSave !== undefined && typeof onSave !== 'function') fail('INVALID_CONFIG', 'onSave must be a function');
     this.metadata = normalizeMetadata(options.metadata);
-    this.qualityKeys = normalizeQualityAuthority(options.qualityCatalog, this.metadata);
-    this.rewards = normalizeRewards(options.rewards, this.metadata, this.qualityKeys);
+    this.qualityKeys = normalizeQualityAuthority(hasOwn(options, 'qualityCatalog') ? options.qualityCatalog : undefined, this.metadata);
+    this.rewards = normalizeRewards(hasOwn(options, 'rewards') ? options.rewards : undefined, this.metadata, this.qualityKeys);
     this.rewardsById = new Map(this.rewards.map((reward) => [reward.id, reward]));
-    this.persist = options.persist ?? options.onSave ?? (() => {});
-    this.current = normalizeState(options.state ?? {
+    this.persist = persist ?? onSave ?? (() => {});
+    this.current = normalizeState(hasOwn(options, 'state') ? options.state : {
       schemaVersion: CARD_COLLECTION_SCHEMA_VERSION, cards: [], claimedRewards: [], processedRequests: [],
     }, this.metadata, this.qualityKeys, this.rewards);
   }
@@ -770,7 +849,9 @@ export class CardCollectionService {
     inputValue?: CardCollectionAcquireInput,
   ): CardCollectionAcquireResult {
     if (this.committing) fail('PERSISTENCE_REENTRANT', 'collection persistence was re-entered');
-    const requestId = normalizeRequestId(typeof requestIdOrInput === 'string' ? requestIdOrInput : requestIdOrInput.requestId);
+    const requestId = normalizeRequestId(typeof requestIdOrInput === 'string'
+      ? requestIdOrInput
+      : (isRecord(requestIdOrInput) && hasOwn(requestIdOrInput, 'requestId') ? requestIdOrInput.requestId : undefined));
     const rawInput = typeof requestIdOrInput === 'string' ? inputValue : requestIdOrInput;
     if (!isRecord(rawInput)) fail('INVALID_REQUEST', 'collection acquisition input must be an object');
     assertOnlyKeys(
@@ -779,7 +860,7 @@ export class CardCollectionService {
       'collection acquisition input',
       'INVALID_REQUEST',
     );
-    if (rawInput.cardId === undefined || rawInput.quality === undefined || rawInput.quantity === undefined) {
+    if (!hasOwn(rawInput, 'cardId') || !hasOwn(rawInput, 'quality') || !hasOwn(rawInput, 'quantity')) {
       fail('INVALID_REQUEST', 'collection acquisition requires cardId, quality and quantity');
     }
     const cardId = rawInput.cardId;
@@ -801,6 +882,8 @@ export class CardCollectionService {
       cards: transition.nextCards,
       claimedRewards: [...transition.nextClaimedRewards],
       processedRequests: [...this.current.processedRequests, { requestId, fingerprint: requestFingerprint, result: transition.result }],
+      initialCards: this.current.initialCards ?? this.current.cards,
+      initialClaimedRewards: this.current.initialClaimedRewards ?? this.current.claimedRewards,
     }, this.metadata, this.qualityKeys, this.rewards);
     this.commit(next);
     return cloneResult(transition.result);

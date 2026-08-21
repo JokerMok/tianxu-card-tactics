@@ -110,6 +110,17 @@ exactBoundary.acquire('boundary-ok', { cardId: 'U003', quality: 1, quantity: 1 }
 assert.equal(exactBoundary.getCard('U003').quantity, Number.MAX_SAFE_INTEGER);
 expectCode('quantity overflow', () => exactBoundary.acquire('boundary-overflow', { cardId: 'U003', quality: 1, quantity: 1 }), 'QUANTITY_EXCEEDED');
 
+const legacyInitial = CardCollectionService.restore(cardsTable, JSON.stringify({
+  schemaVersion: 1,
+  cards: [{ cardId: 'U005', quantity: 2, highestQuality: 4 }],
+  claimedRewards: [],
+  processedRequests: [],
+}), { qualityCatalog, rewards });
+const legacyIncrement = legacyInitial.acquire('legacy-increment', { cardId: 'U005', quality: 2, quantity: 1 });
+assert.equal(legacyIncrement.firstAcquisition, false, 'initial card save must keep first-acquisition semantics');
+assert.equal(legacyIncrement.qualityUpgraded, false, 'initial card save must keep highest-quality semantics');
+assert.equal(CardCollectionService.restore(cardsTable, legacyInitial.save(), { qualityCatalog, rewards }).getCard('U005').quantity, 3, 'initial card save must remain restorable after increment');
+
 let failPersist = true;
 const rollback = new CardCollectionService({
   metadata: cardsTable,
@@ -153,6 +164,48 @@ expectCode('processed entry does not match cards', () => CardCollectionService.r
 const mismatchedFingerprintSave = JSON.parse(serialized);
 mismatchedFingerprintSave.processedRequests[0].fingerprint = JSON.stringify({ cardId: 'U001', quality: 2, quantity: 1 });
 expectCode('processed fingerprint does not match result', () => CardCollectionService.restore(cardsTable, JSON.stringify(mismatchedFingerprintSave), { qualityCatalog, rewards }), 'INVALID_STATE');
+
+const coordinatedQuantitySave = JSON.parse(serialized);
+coordinatedQuantitySave.cards.find(({ cardId }) => cardId === 'U001').quantity += 1;
+for (const request of coordinatedQuantitySave.processedRequests) {
+  if (request.result.entry.cardId === 'U001') request.result.entry.quantity += 1;
+}
+expectCode('coordinated quantity tamper', () => CardCollectionService.restore(cardsTable, JSON.stringify(coordinatedQuantitySave), { qualityCatalog, rewards }), 'INVALID_STATE');
+
+const coordinatedEntrySave = JSON.parse(serialized);
+coordinatedEntrySave.cards.find(({ cardId }) => cardId === 'U002').highestQuality = 5;
+coordinatedEntrySave.processedRequests.find(({ result }) => result.entry.cardId === 'U002').result.entry.highestQuality = 5;
+expectCode('coordinated entry/card field tamper', () => CardCollectionService.restore(cardsTable, JSON.stringify(coordinatedEntrySave), { qualityCatalog, rewards }), 'INVALID_STATE');
+
+const pollutedPrototypeKeys = ['id', 'enabled', 'cardId', 'quality', 'entries', 'snapshot'];
+const pollutedPrototype = new Map();
+for (const key of pollutedPrototypeKeys) {
+  if (Object.prototype.hasOwnProperty.call(Object.prototype, key)) pollutedPrototype.set(key, Object.getOwnPropertyDescriptor(Object.prototype, key));
+}
+try {
+  Object.defineProperty(Object.prototype, 'id', { value: 'U001', configurable: true });
+  Object.defineProperty(Object.prototype, 'enabled', { value: false, configurable: true });
+  expectCode('inherited metadata fields', () => new CardCollectionService({ metadata: [{}] }), 'INVALID_CONFIG');
+
+  Object.defineProperty(Object.prototype, 'cardId', { value: 'U001', configurable: true });
+  Object.defineProperty(Object.prototype, 'quality', { value: 1, configurable: true });
+  expectCode('inherited quality fields', () => new CardCollectionService({
+    metadata: cardsTable,
+    qualityCatalog: { entries: [{}] },
+  }), 'INVALID_CONFIG');
+
+  Object.defineProperty(Object.prototype, 'entries', { value: [{ cardId: 'U001', quality: 1 }], configurable: true });
+  expectCode('inherited quality entries', () => new CardCollectionService({ metadata: cardsTable, qualityCatalog: {} }), 'INVALID_CONFIG');
+
+  Object.defineProperty(Object.prototype, 'snapshot', { value: () => ({ entries: [] }), configurable: true });
+  expectCode('inherited quality authority method', () => new CardCollectionService({ metadata: cardsTable, qualityCatalog: {} }), 'INVALID_CONFIG');
+} finally {
+  for (const key of pollutedPrototypeKeys) {
+    const previous = pollutedPrototype.get(key);
+    if (previous === undefined) delete Object.prototype[key];
+    else Object.defineProperty(Object.prototype, key, previous);
+  }
+}
 
 assert.equal(saves.length >= 5, true, 'successful acquisitions must persist');
 console.log(`T230 card collection PASS: real-cards=${cards.length}, quality-definitions=${qualityCatalog.snapshot().entries.length}, saves=${saves.length}, idempotent, rollback, isolation`);
