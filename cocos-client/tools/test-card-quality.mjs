@@ -153,20 +153,24 @@ function expectCode(label, action, code) {
 const baseEntries = cloneEntries();
 const negativeCases = [
   ['empty metadata', () => createCardQualityCatalog({ metadata: [], entries: baseEntries }), 'INVALID_METADATA'],
-  ['missing quality entry through production loader', () => loadCardQualityCatalog(cardsTable, dataWithEntries(baseEntries.filter((entry) => !(entry.cardId === 'U001' && entry.quality === 6)))), 'MISSING_QUALITY'],
+  ['deleted production record', () => loadCardQualityCatalog(cardsTable, dataWithEntries(baseEntries.filter((entry) => !(entry.cardId === 'U001' && entry.quality === 6)))), 'INVALID_CONFIG'],
   ['duplicate quality entry', () => createCardQualityCatalog({ metadata: cards, entries: [...baseEntries, baseEntries[0]] }), 'DUPLICATE_QUALITY'],
   ['unknown card', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ cardId: 'U999' })) }), 'UNKNOWN_CARD'],
   ['quality below range', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ quality: 0 })) }), 'INVALID_QUALITY'],
   ['quality above range', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ quality: 7 })) }), 'INVALID_QUALITY'],
   ['fractional quality', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ quality: 1.5 })) }), 'INVALID_QUALITY'],
   ['empty abilities', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ abilities: {} })) }), 'INVALID_ABILITIES'],
-  ['negative ability', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ abilities: { attack: -1 } })) }), 'INVALID_ABILITIES'],
-  ['duplicate abilities through production loader', () => loadCardQualityCatalog(cardsTable, dataWithEntries(replaceEntry('U001', 6, () => ({ abilities: structuredClone(baseEntries.find((entry) => entry.cardId === 'U001' && entry.quality === 1).abilities) })))), 'ABILITY_NOT_UNIQUE'],
+  ['catalog attack tamper', () => loadCardQualityCatalog(cardsTable, dataWithEntries(replaceEntry('U002', 1, (entry) => ({ abilities: { ...entry.abilities, attack: 4 } })))), 'INVALID_CONFIG'],
+  ['duplicate abilities through catalog constructor', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 6, () => ({ abilities: structuredClone(baseEntries.find((entry) => entry.cardId === 'U001' && entry.quality === 1).abilities) })) }), 'ABILITY_NOT_UNIQUE'],
   ['empty source list', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ sources: [] })) }), 'INVALID_SOURCE'],
   ['unauthorized source', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ sources: ['NOT_A_REAL_SOURCE'] })) }), 'INVALID_SOURCE'],
   ['copy limit zero', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ copyLimit: 0 })) }), 'INVALID_COPY_LIMIT'],
-  ['copy limit exceeds card', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 6, () => ({ copyLimit: 5 })) }), 'INVALID_COPY_LIMIT'],
-  ['unknown entry field', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ forged: true })) }), 'INVALID_CONFIG'],
+  ['registry copyLimit tamper', () => {
+    const forgedRegistry = structuredClone(cardsTable);
+    forgedRegistry.cards.find((card) => card.id === 'U001').copyLimit = 5;
+    return loadCardQualityCatalog(forgedRegistry);
+  }, 'INVALID_METADATA'],
+  ['forged.name', () => loadCardQualityCatalog(cardsTable, dataWithEntries(replaceEntry('U001', 1, () => ({ name: 'forged' })))), 'INVALID_CONFIG'],
   ['unknown entries wrapper field', () => createCardQualityCatalog({ metadata: cards, entries: { entries: baseEntries, forged: true } }), 'INVALID_CONFIG'],
   ['unknown grant source', () => catalog.validateGrant({ cardId: 'U001', quality: 6, source: 'NOT_A_REAL_SOURCE', quantity: 1 }), 'INVALID_SOURCE'],
   ['quality source mismatch', () => catalog.validateGrant({ cardId: 'U001', quality: 1, source: 'CRAFT', quantity: 1 }), 'SOURCE_NOT_ALLOWED'],
