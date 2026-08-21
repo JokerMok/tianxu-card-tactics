@@ -162,11 +162,13 @@ const negativeCases = [
   ['quality above range', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ quality: 7 })) }), 'INVALID_QUALITY'],
   ['fractional quality', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ quality: 1.5 })) }), 'INVALID_QUALITY'],
   ['empty abilities', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ abilities: {} })) }), 'INVALID_ABILITIES'],
+  ['negative ability', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ abilities: { attack: -1 } })) }), 'INVALID_ABILITIES'],
   ['catalog attack tamper', () => loadCardQualityCatalog(cardsTable, dataWithEntries(replaceEntry('U002', 1, (entry) => ({ abilities: { ...entry.abilities, attack: 4 } })))), 'INVALID_CONFIG'],
   ['duplicate abilities through catalog constructor', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 6, () => ({ abilities: structuredClone(baseEntries.find((entry) => entry.cardId === 'U001' && entry.quality === 1).abilities) })) }), 'ABILITY_NOT_UNIQUE'],
   ['empty source list', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ sources: [] })) }), 'INVALID_SOURCE'],
   ['unauthorized source', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ sources: ['NOT_A_REAL_SOURCE'] })) }), 'INVALID_SOURCE'],
   ['copy limit zero', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ copyLimit: 0 })) }), 'INVALID_COPY_LIMIT'],
+  ['copy limit exceeds card', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 6, () => ({ copyLimit: 5 })) }), 'INVALID_COPY_LIMIT'],
   ['registry copyLimit tamper', () => {
     const forgedRegistry = structuredClone(cardsTable);
     forgedRegistry.cards.find((card) => card.id === 'U001').copyLimit = 5;
@@ -177,6 +179,7 @@ const negativeCases = [
     forgedRegistry.cards.find((card) => card.id === 'U001').name = 'forged';
     return loadCardQualityCatalog(forgedRegistry);
   }, 'INVALID_METADATA'],
+  ['unknown entry field', () => createCardQualityCatalog({ metadata: cards, entries: replaceEntry('U001', 1, () => ({ forged: true })) }), 'INVALID_CONFIG'],
   ['unknown entries wrapper field', () => createCardQualityCatalog({ metadata: cards, entries: { entries: baseEntries, forged: true } }), 'INVALID_CONFIG'],
   ['unknown grant source', () => catalog.validateGrant({ cardId: 'U001', quality: 6, source: 'NOT_A_REAL_SOURCE', quantity: 1 }), 'INVALID_SOURCE'],
   ['quality source mismatch', () => catalog.validateGrant({ cardId: 'U001', quality: 1, source: 'CRAFT', quantity: 1 }), 'SOURCE_NOT_ALLOWED'],
@@ -187,7 +190,7 @@ const negativeCases = [
   ['invalid quality lookup', () => catalog.get('U001', 7), 'INVALID_QUALITY'],
 ];
 for (const [label, action, code] of negativeCases) expectCode(label, action, code);
-assert.equal(negativeCases.length, 23, 'negative-case coverage must retain all configured cases');
+assert.equal(negativeCases.length, 26, 'negative-case coverage must retain all configured cases');
 
 const serialized = serializeCardQualityCatalog(catalog);
 const restored = restoreCardQualityCatalog(cards, serialized);
