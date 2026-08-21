@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   PveRewardIsolationError,
   PveRewardIsolationService,
   createPveRewardIsolationState,
   restorePveRewardIsolationState,
   serializePveRewardIsolationState,
-} from '../assets/scripts/tests/pve/reward-isolation/index.ts';
+} from '../assets/scripts/services/reward/isolation/PveRewardIsolationService.ts';
+import { loadPveRewardIsolationConfig } from '../assets/scripts/services/reward/isolation/PveRewardIsolationConfig.ts';
+import { createDefaultSave, encodeSave, recoverSave, validateSave } from '../assets/scripts/services/SaveSchema.ts';
 import {
   BattleResultTransactionService,
   createBattleResultState,
@@ -27,6 +31,26 @@ import {
   createBossState,
   setBossFlag,
 } from '../assets/scripts/core/boss/index.ts';
+
+const root = path.resolve(import.meta.dirname, '..');
+const configRoot = path.join(root, 'assets/resources/config');
+const readJson = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const levelIndex = readJson(path.join(configRoot, 'levels/chapter01/index.json'));
+const levelConfigs = levelIndex.levels.map(({ id }) => {
+  const document = readJson(path.join(configRoot, `levels/chapter01/${id}.json`));
+  assert.equal(document.chapterLevels.length, 1, `${id} must contain one real level config`);
+  assert.equal(document.chapterLevels[0].id, id, `${id} config must match the real index`);
+  return document.chapterLevels[0];
+});
+const bossRewardDocument = readJson(path.join(configRoot, 'levels/chapter01/boss-rewards.json'));
+const isolationConfig = loadPveRewardIsolationConfig({
+  schemaVersion: 1,
+  mainlineRewards: Object.fromEntries(levelConfigs.map((level) => [
+    level.id,
+    level.rewards.map(({ id, quantity }) => ({ id, quantity })),
+  ])),
+  bosses: bossRewardDocument.bosses,
+});
 
 function result(service, request, expectedCode) {
   const outcome = service.settle(request);
@@ -54,7 +78,7 @@ function assertInvalidRestore(label, serialized) {
 }
 
 const serviceSaves = [];
-const service = new PveRewardIsolationService(undefined, (serialized) => serviceSaves.push(serialized));
+const service = new PveRewardIsolationService(undefined, (serialized) => serviceSaves.push(serialized), isolationConfig);
 assert.deepEqual(service.snapshot(), createPveRewardIsolationState(), 'default state must contain four independent empty shards');
 assert.equal(service.snapshot().mainline.levels[0].levelId, 'L01');
 assert.equal(service.snapshot().mainline.levels[0].unlocked, true);
@@ -68,7 +92,7 @@ assert.deepEqual(service.snapshot().boss.encounters, []);
 
 // The mainline request is produced by the existing battle-result transaction contract.
 const mainlineBattle = new BattleResultTransactionService(
-  createBattleResultState({ gold: 0, essence: 0 }, { clearedNodes: [], unlockedNodes: ['L01'] }),
+  createBattleResultState({ U001: 0 }, { clearedNodes: [], unlockedNodes: ['L01'] }),
   () => {},
 );
 const mainlineBattleResult = mainlineBattle.settle({
@@ -76,7 +100,7 @@ const mainlineBattleResult = mainlineBattle.settle({
   nodeId: 'L01',
   cost: {},
   outcome: { kind: 'victory' },
-  reward: { gold: 5 },
+  reward: { U001: isolationConfig.mainlineRewards.L01[0].quantity },
   progress: { clearedNodes: ['L01'], unlockedNodes: ['L02'] },
 });
 assert.equal(mainlineBattleResult.code, 'APPLIED');
@@ -86,12 +110,12 @@ result(service, {
   settlementKey: 'mainline:L01:1',
   levelId: 'L01',
   outcome: 'CLEARED',
-  rewards: [{ id: 'gold', quantity: 5 }],
+  rewards: [...isolationConfig.mainlineRewards.L01],
 }, 'APPLIED');
 assertOnlyModeChanged(beforeMainline, snapshotWithoutSchema(service.snapshot()), 'mainline', 'mainline clear');
 assert.equal(service.snapshot().mainline.levels[0].clearCount, 1);
 assert.equal(service.snapshot().mainline.levels[1].unlocked, true);
-assert.deepEqual(service.snapshot().mainline.rewards, { gold: 5 });
+assert.deepEqual(service.snapshot().mainline.rewards, { U001: 4 });
 
 // Dungeon settlement uses the real three-stage difficulty service and its configured first-clear reward.
 const dungeonRuntime = new DungeonDifficultyService({ config: DEFAULT_DUNGEON_DIFFICULTY_CONFIG });
@@ -138,21 +162,40 @@ assert.equal(service.snapshot().tower.progress.bestFloor, 5);
 assert.equal(service.snapshot().tower.progress.currentFloor, 6);
 assert.equal(service.snapshot().tower.rewards['tower-coin'], 20, 'floor 5 must use the configured 20-coin boundary drop');
 assert.equal(service.snapshot().dungeon.difficulties[1].clearCount, 0);
+const towerLostStart = towerRuntime.startChallenge(towerNow);
+assert.equal(towerLostStart.activeAttempt.floor, 6);
+const towerLost = towerRuntime.completeBattle({ outcome: 'lost', attemptId: towerLostStart.activeAttempt.attemptId }, towerNow);
+assert.equal(towerLost.status, 'failed');
+const beforeTowerLoss = snapshotWithoutSchema(service.snapshot());
+result(service, {
+  mode: 'TOWER',
+  settlementKey: 'tower:6:6',
+  floor: 6,
+  outcome: 'LOST',
+  rewards: [],
+}, 'APPLIED');
+assertOnlyModeChanged(beforeTowerLoss, snapshotWithoutSchema(service.snapshot()), 'tower', 'tower loss');
+assert.equal(service.snapshot().tower.progress.currentFloor, 6);
+assert.equal(service.snapshot().tower.progress.bestFloor, 5);
+const towerRetryStart = towerRuntime.continueChallenge(towerNow);
+assert.equal(towerRetryStart.activeAttempt.floor, 6);
+const towerRetry = towerRuntime.completeBattle({ outcome: 'won', attemptId: towerRetryStart.activeAttempt.attemptId }, towerNow);
+assert.equal(towerRetry.bestFloor, 6);
+result(service, {
+  mode: 'TOWER',
+  settlementKey: 'tower:6:7',
+  floor: 6,
+  outcome: 'WON',
+  rewards: [],
+}, 'APPLIED');
+assert.equal(service.snapshot().tower.progress.currentFloor, 7, 'a won retry must advance from the lost floor');
+assert.equal(service.snapshot().tower.progress.bestFloor, 6);
 
-// Boss settlement is driven by the existing phase/outcome runtime; a lost attempt cannot grant its mark.
-const bossConfig = {
-  id: 'BOSS-T225-IRON-ROOT',
-  maxHp: 100,
-  flags: ['sealBroken'],
-  summons: [{ id: 'rootling', unitId: 'U-ROOTLING', maxHp: 12, maxActive: 1 }],
-  skills: [{ id: 'seal-break', effect: { type: 'SET_FLAG', flag: 'sealBroken', value: true } }],
-  phases: [{ id: 'P1', hpPercentAtMost: 100, skillIds: ['seal-break'], onEnterSummonIds: [] }],
-  outcome: {
-    priority: 'LOSE',
-    win: { mode: 'ALL', rules: [{ type: 'BOSS_HP_AT_MOST', value: 0 }, { type: 'FLAG_SET', flag: 'sealBroken' }] },
-    lose: { mode: 'ANY', rules: [{ type: 'PLAYER_HERO_HP_AT_MOST', value: 0 }, { type: 'ROUND_AT_LEAST', value: 5 }] },
-  },
-};
+// Boss settlement is driven by the existing phase/outcome runtime and the real resource config.
+const bossDefinition = isolationConfig.bosses.find(({ config }) => config.id === 'BOSS-T225-IRON-ROOT');
+assert.ok(bossDefinition, 'T225 boss must come from the production resource config');
+const bossConfig = bossDefinition.config;
+const bossRewards = [...bossDefinition.rewards];
 const lostBoss = createBossState(bossConfig, { playerHeroHp: 0 });
 assert.equal(lostBoss.status, 'lost');
 const beforeBossLoss = snapshotWithoutSchema(service.snapshot());
@@ -177,7 +220,7 @@ result(service, {
   settlementKey: 'boss:BOSS-T225-IRON-ROOT:2',
   bossId: 'BOSS-T225-IRON-ROOT',
   outcome: 'WON',
-  rewards: [{ id: 'boss-mark', quantity: 1 }],
+  rewards: bossRewards,
 }, 'APPLIED');
 assert.equal(service.snapshot().boss.encounters[0].defeated, true);
 assert.equal(service.snapshot().boss.rewards['boss-mark'], 1);
@@ -228,7 +271,7 @@ const duplicateRequest = {
   settlementKey: 'mainline:L01:1',
   levelId: 'L01',
   outcome: 'CLEARED',
-  rewards: [{ id: 'gold', quantity: 5 }],
+  rewards: [...isolationConfig.mainlineRewards.L01],
 };
 const savesBeforeDuplicate = serviceSaves.length;
 assert.equal(service.settle(duplicateRequest).code, 'DUPLICATE');
@@ -248,11 +291,18 @@ assert.equal(service.settle({
 const saved = service.save();
 assert.equal(saved, serializePveRewardIsolationState(service.snapshot()));
 assert.deepEqual(restorePveRewardIsolationState(saved), service.snapshot());
+const saveWithPveShard = { ...createDefaultSave('PVE-T225', 200), pveRewardIsolation: service.snapshot() };
+const encodedSave = encodeSave(saveWithPveShard);
+assert.deepEqual(validateSave(JSON.parse(encodedSave)).pveRewardIsolation, service.snapshot(), 'SaveSchema must persist and restore all four PVE shards');
+assert.deepEqual(recoverSave(JSON.parse(encodedSave), null, 'PVE-T225').data.pveRewardIsolation, service.snapshot(), 'SaveSchema recovery must restore all four PVE shards');
+const legacySave = { ...createDefaultSave('LEGACY-T225', 201) };
+delete legacySave.pveRewardIsolation;
+assert.deepEqual(validateSave(legacySave).pveRewardIsolation, createPveRewardIsolationState(), 'v1 saves without PVE shards must migrate to isolated defaults');
 const reloadedSaves = [];
-const reloaded = new PveRewardIsolationService(saved, (serialized) => reloadedSaves.push(serialized));
+const reloaded = new PveRewardIsolationService(saved, (serialized) => reloadedSaves.push(serialized), isolationConfig);
 assert.equal(reloaded.settle(duplicateRequest).code, 'DUPLICATE');
 assert.equal(reloadedSaves.length, 0);
-assert.equal(reloaded.snapshot().tower.progress.bestFloor, 5);
+assert.equal(reloaded.snapshot().tower.progress.bestFloor, 6);
 
 const malformedSave = JSON.parse(saved);
 malformedSave.dungeon.difficulties[1].unlocked = false;
@@ -273,14 +323,14 @@ let persistAttempts = 0;
 const rollback = new PveRewardIsolationService(undefined, () => {
   persistAttempts += 1;
   if (failPersistence) throw new Error('disk full');
-});
+}, isolationConfig);
 const rollbackBefore = rollback.snapshot();
 assert.equal(rollback.settle({
   mode: 'MAINLINE',
   settlementKey: 'mainline:L01:1',
   levelId: 'L01',
   outcome: 'CLEARED',
-  rewards: [{ id: 'gold', quantity: 1 }],
+  rewards: [...isolationConfig.mainlineRewards.L01],
 }).code, 'PERSIST_FAILED');
 assert.equal(persistAttempts, 1);
 assert.deepEqual(rollback.snapshot(), rollbackBefore, 'failed persistence must not mutate the in-memory shard');
@@ -290,7 +340,7 @@ assert.equal(rollback.settle({
   settlementKey: 'mainline:L01:1',
   levelId: 'L01',
   outcome: 'CLEARED',
-  rewards: [{ id: 'gold', quantity: 1 }],
+  rewards: [...isolationConfig.mainlineRewards.L01],
 }).code, 'APPLIED');
 
 let reentrantService;
@@ -301,18 +351,18 @@ reentrantService = new PveRewardIsolationService(undefined, () => {
     settlementKey: 'mainline:L01:2',
     levelId: 'L01',
     outcome: 'CLEARED',
-    rewards: [{ id: 'gold', quantity: 2 }],
+    rewards: [...isolationConfig.mainlineRewards.L01],
   });
-});
+}, isolationConfig);
 assert.equal(reentrantService.settle({
   mode: 'MAINLINE',
   settlementKey: 'mainline:L01:1',
   levelId: 'L01',
   outcome: 'CLEARED',
-  rewards: [{ id: 'gold', quantity: 1 }],
+  rewards: [...isolationConfig.mainlineRewards.L01],
 }).code, 'APPLIED');
 assert.equal(reentrantResult.code, 'PERSISTENCE_REENTRANT');
 assert.equal(reentrantService.snapshot().mainline.levels[0].clearCount, 1);
-assert.equal(reentrantService.snapshot().mainline.rewards.gold, 1);
+assert.equal(reentrantService.snapshot().mainline.rewards.U001, 4);
 
 console.log('T225 M5-10 reward isolation PASS: real mainline/dungeon/tower/boss rules, failure boundaries, save restore, idempotency and atomic persistence');

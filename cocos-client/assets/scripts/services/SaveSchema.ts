@@ -1,3 +1,9 @@
+import {
+  createPveRewardIsolationState,
+  restorePveRewardIsolationState,
+  type PveRewardIsolationState,
+} from './reward/isolation/PveRewardIsolationService.ts';
+
 export const CURRENT_SAVE_VERSION = 1;
 
 export interface SaveData {
@@ -7,6 +13,7 @@ export interface SaveData {
   deck: { cardIds: string[] };
   progress: { unlockedNodes: string[]; clearedNodes: string[] };
   resources: { gold: number; essence: number };
+  pveRewardIsolation: PveRewardIsolationState;
 }
 
 export interface SaveRecoveryResult {
@@ -24,6 +31,7 @@ export function createDefaultSave(playerId: string, now = Date.now()): SaveData 
     deck: { cardIds: [] },
     progress: { unlockedNodes: ['N001'], clearedNodes: [] },
     resources: { gold: 0, essence: 0 },
+    pveRewardIsolation: createPveRewardIsolationState(),
   };
 }
 
@@ -56,13 +64,25 @@ export function validateSave(value: unknown): SaveData {
   const deck = requiredRecord(value, 'deck');
   const progress = requiredRecord(value, 'progress');
   const resources = requiredRecord(value, 'resources');
+  const hasPveRewardIsolation = Object.prototype.hasOwnProperty.call(value, 'pveRewardIsolation');
   assertKeys(deck, ['cardIds'], 'deck');
   assertKeys(progress, ['unlockedNodes', 'clearedNodes'], 'progress');
   assertKeys(resources, ['gold', 'essence'], 'resources');
   const gold = resources.gold;
   const essence = resources.essence;
   if (![gold, essence].every((n) => typeof n === 'number' && Number.isSafeInteger(n) && n >= 0)) throw new Error('resources are invalid');
-  if (Object.keys(value).some((key) => !['schemaVersion', 'playerId', 'updatedAt', 'deck', 'progress', 'resources'].includes(key))) throw new Error('unknown save field');
+  let pveRewardIsolation: PveRewardIsolationState;
+  if (!hasPveRewardIsolation) {
+    // Version 1 saves predate the isolated PVE shards; migrate them in-memory without changing the schema version.
+    pveRewardIsolation = createPveRewardIsolationState();
+  } else {
+    try {
+      pveRewardIsolation = restorePveRewardIsolationState(JSON.stringify(value.pveRewardIsolation));
+    } catch (error) {
+      throw new Error(`pveRewardIsolation is invalid: ${String(error)}`);
+    }
+  }
+  if (Object.keys(value).some((key) => !['schemaVersion', 'playerId', 'updatedAt', 'deck', 'progress', 'resources', 'pveRewardIsolation'].includes(key))) throw new Error('unknown save field');
   return {
     schemaVersion: CURRENT_SAVE_VERSION,
     playerId: value.playerId,
@@ -73,6 +93,7 @@ export function validateSave(value: unknown): SaveData {
       clearedNodes: stringArray(progress.clearedNodes, 'progress.clearedNodes'),
     },
     resources: { gold, essence },
+    pveRewardIsolation,
   };
 }
 
