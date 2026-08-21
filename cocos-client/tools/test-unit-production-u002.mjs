@@ -9,6 +9,7 @@ const projectRoot = path.resolve(clientRoot, '..');
 const unitRoot = path.join(clientRoot, 'assets/resources/art/battle/units/U002');
 const contractPath = path.join(unitRoot, 'production-contract.json');
 const skeletonPath = path.join(unitRoot, 'skeleton.json');
+const skeletonMetaPath = path.join(unitRoot, 'skeleton.json.meta');
 const unitsConfigPath = path.join(clientRoot, 'assets/resources/config/units.json');
 const cardsConfigPath = path.join(clientRoot, 'assets/resources/config/cards.json');
 
@@ -127,6 +128,51 @@ function assertExactKeys(value, keys, label) {
   assert.deepEqual(Object.keys(value).sort(), [...keys].sort(), `${label} keys must match the frozen contract`);
 }
 
+function assertUuid(value, label) {
+  assert.equal(typeof value, 'string', `${label} must be a UUID string`);
+  assert.match(value, /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/, `${label} must be a valid UUID`);
+}
+
+function validateJsonMeta(meta, label) {
+  assertRecord(meta, label);
+  assertExactKeys(meta, ['files', 'imported', 'importer', 'subMetas', 'userData', 'uuid', 'ver'], label);
+  assert.equal(meta.ver, '2.0.1', `${label}.ver must be Cocos JSON metadata version 2.0.1`);
+  assert.equal(meta.importer, 'json', `${label}.importer must be json`);
+  assert.equal(meta.imported, true, `${label}.imported must be true`);
+  assertUuid(meta.uuid, `${label}.uuid`);
+  assert.deepEqual(meta.files, ['.json'], `${label}.files must include the imported JSON asset`);
+  assert.deepEqual(meta.subMetas, {}, `${label}.subMetas must be empty for a JSON asset`);
+  assertRecord(meta.userData, `${label}.userData`);
+  assertExactKeys(meta.userData, [], `${label}.userData`);
+}
+
+function validatePngMeta(meta, image, label) {
+  assertRecord(meta, label);
+  assertExactKeys(meta, ['files', 'imported', 'importer', 'subMetas', 'userData', 'uuid', 'ver'], label);
+  assert.equal(meta.ver, '1.0.27', `${label}.ver must be Cocos image metadata version 1.0.27`);
+  assert.equal(meta.importer, 'image', `${label}.importer must be image`);
+  assert.equal(meta.imported, true, `${label}.imported must be true`);
+  assertUuid(meta.uuid, `${label}.uuid`);
+  assert.deepEqual(meta.files, ['.json', '.png'], `${label}.files must include image importer outputs`);
+  assertRecord(meta.subMetas, `${label}.subMetas`);
+  assertExactKeys(meta.subMetas, ['6c48a', 'f9941'], `${label}.subMetas`);
+  for (const [id, subMeta] of Object.entries(meta.subMetas)) {
+    assertRecord(subMeta, `${label}.subMetas.${id}`);
+    assert.equal(subMeta.uuid, `${meta.uuid}@${id}`, `${label}.subMetas.${id}.uuid must link to the root UUID`);
+    assert.equal(subMeta.imported, true, `${label}.subMetas.${id}.imported must be true`);
+    assert.deepEqual(subMeta.files, ['.json'], `${label}.subMetas.${id}.files must include the imported sub-asset`);
+    assert.deepEqual(subMeta.subMetas, {}, `${label}.subMetas.${id}.subMetas must be empty`);
+  }
+  assert.equal(meta.subMetas['f9941'].importer, 'sprite-frame', `${label} sprite-frame sub-meta importer drifted`);
+  assertRecord(meta.userData, `${label}.userData`);
+  assertExactKeys(meta.userData, ['fixAlphaTransparencyArtifacts', 'hasAlpha', 'redirect', 'type'], `${label}.userData`);
+  assert.equal(meta.userData.type, 'sprite-frame', `${label}.userData.type must be sprite-frame`);
+  assert.equal(typeof meta.userData.hasAlpha, 'boolean', `${label}.userData.hasAlpha must be boolean`);
+  assert.equal(meta.userData.hasAlpha, image.hasAlpha, `${label}.userData.hasAlpha must match decoded RGBA alpha`);
+  assert.equal(meta.userData.hasAlpha, true, `${label}.userData.hasAlpha must be true for the formal RGBA asset`);
+  assert.equal(meta.userData.redirect, `${meta.uuid}@6c48a`, `${label}.userData.redirect must target the texture sub-meta`);
+}
+
 function assertLocalFile(rootDir, fileName, label) {
   assert.equal(typeof fileName, 'string', `${label} file must be a string`);
   assert.equal(fileName.includes('/'), false, `${label} file must stay in the U002 directory`);
@@ -223,9 +269,17 @@ function parsePng(filePath) {
   let maxX = -1;
   let maxY = -1;
   let opaquePixels = 0;
+  let minAlpha = 255;
+  let maxAlpha = 0;
+  let transparentPixels = 0;
+  let nonOpaquePixels = 0;
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const alpha = rgba[(y * width + x) * 4 + 3];
+      minAlpha = Math.min(minAlpha, alpha);
+      maxAlpha = Math.max(maxAlpha, alpha);
+      if (alpha === 0) transparentPixels += 1;
+      if (alpha < 255) nonOpaquePixels += 1;
       if (alpha > 0) {
         opaquePixels += 1;
         minX = Math.min(minX, x);
@@ -236,10 +290,16 @@ function parsePng(filePath) {
     }
   }
   assert.equal(opaquePixels > 0, true, `${filePath} must contain visible artwork`);
+  assert.equal(nonOpaquePixels > 0, true, `${filePath} decoded RGBA must contain transparent pixels`);
   return {
     width,
     height,
     rgba,
+    hasAlpha: nonOpaquePixels > 0,
+    minAlpha,
+    maxAlpha,
+    transparentPixels,
+    nonOpaquePixels,
     opaquePixels,
     alphaBounds: { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
   };
@@ -349,6 +409,7 @@ function assertPngAsset(contractResource, expectedResource, skeletonResource, ro
   assert.notEqual(sha256(localFile), sha256(upstreamFile), `${label} local PNG must differ from the A0 source bytes`);
 
   const image = parsePng(localFile);
+  validatePngMeta(readJson(metaFile), image, `${label} meta`);
   assert.deepEqual(
     { width: image.width, height: image.height, alphaBounds: image.alphaBounds, opaquePixels: image.opaquePixels },
     {
@@ -494,6 +555,9 @@ function validateConfigAlignment(contract, skeleton) {
 function validateUnit(contract, skeleton) {
   assertRecord(contract, 'production contract');
   assertRecord(skeleton, 'skeleton');
+  const skeletonMetaFile = assertLocalFile(unitRoot, path.basename(skeletonMetaPath), 'skeleton meta');
+  assert.equal(skeletonMetaFile, skeletonMetaPath, 'skeleton meta must sit beside skeleton.json');
+  validateJsonMeta(readJson(skeletonMetaFile), 'skeleton.json.meta');
   assert.equal(contract.schema, 'battle-unit-production-contract/v1', 'contract schema mismatch');
   assert.equal(contract.contractVersion, '2.2', 'contractVersion mismatch');
   assert.equal(contract.unitId, EXPECTED.unitId, 'unitId mismatch');
@@ -532,7 +596,47 @@ function runSkeletonProbe(name, mutate, pattern) {
   assert.throws(() => validateUnit(readJson(contractPath), skeleton), pattern, `${name} counterexample must fail`);
 }
 
+function runJsonMetaProbe(name, mutate, pattern) {
+  const meta = readJson(skeletonMetaPath);
+  mutate(meta);
+  assert.throws(() => validateJsonMeta(meta, 'skeleton.json.meta'), pattern, `${name} counterexample must fail`);
+}
+
+function runPngMetaProbe(name, resource, mutate, pattern) {
+  const metaPath = path.join(unitRoot, resource.metaFile);
+  const image = parsePng(path.join(unitRoot, resource.file));
+  const meta = readJson(metaPath);
+  mutate(meta);
+  assert.throws(() => validatePngMeta(meta, image, `${resource.file}.meta`), pattern, `${name} counterexample must fail`);
+}
+
 validateProductionContract(contractPath);
+
+runJsonMetaProbe(
+  'skeleton-meta-missing-importer',
+  (meta) => {
+    delete meta.importer;
+  },
+  /keys must match the frozen contract/
+);
+
+runPngMetaProbe(
+  'pose-meta-alpha-drift',
+  EXPECTED.poseSheet,
+  (meta) => {
+    meta.userData.hasAlpha = false;
+  },
+  /hasAlpha must match decoded RGBA alpha|hasAlpha must be true/
+);
+
+runPngMetaProbe(
+  'cutout-meta-alpha-drift',
+  EXPECTED.cutoutSheet,
+  (meta) => {
+    meta.userData.hasAlpha = false;
+  },
+  /hasAlpha must match decoded RGBA alpha|hasAlpha must be true/
+);
 
 runContractProbe(
   'preview-resource-path',
