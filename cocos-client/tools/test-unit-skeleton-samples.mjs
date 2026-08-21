@@ -189,6 +189,8 @@ function validateSkeleton(unitId, skeleton) {
   assert.equal(skeleton.schema, 'battle-unit-skeleton/v1', `${unitId} must use the battle-unit-skeleton/v1 contract`);
   assert.equal(skeleton.contractVersion, '2.2', `${unitId} must declare the frozen v2.2 contract`);
   assert.equal(skeleton.unitId, unitId, `${unitId} skeleton unitId must match its directory`);
+  assert.equal(skeleton.assetStage, 'A0-reference', `${unitId} must remain an A0 reference sample`);
+  assert.equal(skeleton.runtimeMode, 'reference-pose-skeleton', `${unitId} must remain a reference-pose skeleton`);
   assert.equal(skeleton.framePolicy, 'one-approved-key-pose-per-state; no-fabricated-frames', `${unitId} must reject fabricated frame claims`);
   assert.equal(Number.isSafeInteger(skeleton.canvas?.width) && skeleton.canvas.width > 0, true, `${unitId} must declare a positive canvas width`);
   assert.equal(Number.isSafeInteger(skeleton.canvas?.height) && skeleton.canvas.height > 0, true, `${unitId} must declare a positive canvas height`);
@@ -319,6 +321,14 @@ const invalidFrameIndex = structuredClone(samples[1].skeleton);
 invalidFrameIndex.animations.Move.sourceFrames[0].poseIndex = 5;
 assert.throws(() => validateSkeleton('U008', invalidFrameIndex), /Move source frame must be its mapped key pose/);
 
+const wrongAssetStage = structuredClone(samples[0].skeleton);
+wrongAssetStage.assetStage = 'preview';
+assert.throws(() => validateSkeleton('U002', wrongAssetStage), /must remain an A0 reference sample/);
+
+const wrongRuntimeMode = structuredClone(samples[1].skeleton);
+wrongRuntimeMode.runtimeMode = 'runtime-atlas';
+assert.throws(() => validateSkeleton('U008', wrongRuntimeMode), /must remain a reference-pose skeleton/);
+
 const invalidKeyframe = structuredClone(samples[0].skeleton);
 invalidKeyframe.animations.Death.tracks[0].frames[1].time = 1.5;
 assert.throws(() => validateSkeleton('U002', invalidKeyframe), /Death keyframe must stay inside its duration/);
@@ -339,4 +349,4 @@ movingRoot.animations.Move.tracks.push({
 });
 assert.throws(() => validateSkeleton('U008', movingRoot), /Move must leave root translation to battle logic/);
 
-console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 14 contract counterexamples rejected`);
+console.log(`unit skeleton samples validated: ${samples.map(({ unitId }) => unitId).join(', ')}; 16 contract counterexamples rejected`);
