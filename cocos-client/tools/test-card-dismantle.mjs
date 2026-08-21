@@ -63,6 +63,45 @@ for (const invalidKey of ['01', '1.0', '1e0', ' 1', '1 ', '+1']) {
   }), 'INVALID_CONFIG');
 }
 
+const prototypeInvalidKeyYields = Object.assign(
+  Object.create({ '1.0': { [DEFAULT_DISMANTLE_MATERIAL_ID]: 99 } }),
+  materialYields,
+);
+expectCode('material-yield prototype invalid key', () => new DismantleService({
+  metadata: cardsTable,
+  materialYields: prototypeInvalidKeyYields,
+}), 'INVALID_CONFIG');
+
+const prototypeCompletesMissingQualityYields = Object.assign(
+  Object.create({ 6: materialYields[6] }),
+  materialYields,
+);
+delete prototypeCompletesMissingQualityYields[6];
+expectCode('material-yield prototype completes missing quality 6', () => new DismantleService({
+  metadata: cardsTable,
+  materialYields: prototypeCompletesMissingQualityYields,
+}), 'INVALID_CONFIG');
+
+const nonEnumerableInvalidKeyYields = { ...materialYields };
+Object.defineProperty(nonEnumerableInvalidKeyYields, '1.0', {
+  configurable: true,
+  value: { [DEFAULT_DISMANTLE_MATERIAL_ID]: 99 },
+});
+expectCode('material-yield non-enumerable invalid key', () => new DismantleService({
+  metadata: cardsTable,
+  materialYields: nonEnumerableInvalidKeyYields,
+}), 'INVALID_CONFIG');
+
+const symbolInvalidKeyYields = { ...materialYields };
+Object.defineProperty(symbolInvalidKeyYields, Symbol('invalid-quality'), {
+  configurable: true,
+  value: { [DEFAULT_DISMANTLE_MATERIAL_ID]: 99 },
+});
+expectCode('material-yield Symbol key', () => new DismantleService({
+  metadata: cardsTable,
+  materialYields: symbolInvalidKeyYields,
+}), 'INVALID_CONFIG');
+
 const saved = [];
 const service = new DismantleService({
   metadata: cardsTable,

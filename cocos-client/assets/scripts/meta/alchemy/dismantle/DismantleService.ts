@@ -278,12 +278,23 @@ function normalizeRequestId(value: unknown): string {
   return value;
 }
 
+function isMaterialYieldObject(value: unknown): value is Record<string, unknown> {
+  if (!isRecord(value)) return false;
+  try {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== null && prototype !== Object.prototype) return false;
+    if (Object.getOwnPropertySymbols(value).length !== 0) return false;
+    const keys = Object.getOwnPropertyNames(value);
+    return keys.length === CARD_QUALITY_KEYS.size
+      && keys.every((key) => DECIMAL_INTEGER_KEY_PATTERN.test(key) && CARD_QUALITY_KEYS.has(key));
+  } catch {
+    return false;
+  }
+}
+
 function normalizeYields(value: unknown): ReadonlyMap<CardQuality, MaterialMap> {
   const input = value === undefined ? DEFAULT_MATERIAL_YIELDS : value;
-  if (!isRecord(input)) fail('INVALID_CONFIG');
-  if (Object.keys(input).some((key) => !DECIMAL_INTEGER_KEY_PATTERN.test(key) || !CARD_QUALITY_KEYS.has(key))) {
-    fail('INVALID_CONFIG');
-  }
+  if (!isMaterialYieldObject(input)) fail('INVALID_CONFIG');
   const result = new Map<CardQuality, MaterialMap>();
   for (const quality of CARD_QUALITIES) {
     const row = input[String(quality)];
