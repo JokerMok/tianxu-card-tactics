@@ -382,11 +382,38 @@ function normalizeState(value: unknown): CardSynthesisState {
     assertId(entry.requestId, `${label}.requestId`);
     if (typeof entry.fingerprint !== 'string' || entry.fingerprint.length === 0) fail('INVALID_STATE', `${label}.fingerprint is invalid`);
     const result = normalizeResult(entry.result, `${label}.result`);
-    if (result.requestId !== entry.requestId || result.ledgerSequence > ledger.length) fail('INVALID_STATE', `${label} result is inconsistent`);
+    if (result.requestId !== entry.requestId) fail('INVALID_STATE', `${label} result requestId is inconsistent`);
     return Object.freeze({ requestId: entry.requestId, fingerprint: entry.fingerprint, result });
   });
   if (new Set(ledger.map((entry) => entry.requestId)).size !== ledger.length) fail('INVALID_STATE', 'synthesis ledger request IDs must be unique');
   if (new Set(receipts.map((entry) => entry.requestId)).size !== receipts.length) fail('INVALID_STATE', 'synthesis receipts must be unique');
+  if (ledger.length !== receipts.length) fail('INVALID_STATE', 'synthesis ledger and receipts must have the same length');
+  const ledgerByRequestId = new Map(ledger.map((entry) => [entry.requestId, entry]));
+  const receiptByRequestId = new Map(receipts.map((entry) => [entry.requestId, entry]));
+  for (const entry of ledger) {
+    const receipt = receiptByRequestId.get(entry.requestId);
+    if (!receipt) fail('INVALID_STATE', `synthesis ledger entry has no receipt: ${entry.requestId}`);
+    const result = receipt.result;
+    if (
+      result.ledgerSequence !== entry.sequence
+      || result.requestId !== entry.requestId
+      || result.recipeId !== entry.recipeId
+      || result.outcome !== entry.outcome
+      || result.roll !== entry.roll
+      || result.probability !== entry.probability
+      || result.guaranteed !== entry.guaranteed
+      || result.pityBefore !== entry.pityBefore
+      || result.pityAfter !== entry.pityAfter
+      || !sameMaterials(result.debited, entry.debited)
+      || !sameMaterials(result.returned, entry.returned)
+      || !sameMaterials(result.credited, entry.credited)
+    ) {
+      fail('INVALID_STATE', `synthesis receipt and ledger do not match: ${entry.requestId}`);
+    }
+  }
+  for (const receipt of receipts) {
+    if (!ledgerByRequestId.has(receipt.requestId)) fail('INVALID_STATE', `synthesis receipt has no ledger entry: ${receipt.requestId}`);
+  }
   return freezeState({ schemaVersion: CARD_SYNTHESIS_SCHEMA_VERSION, materials, pity, ledger, receipts });
 }
 
@@ -429,6 +456,14 @@ function sameMaterials(left: readonly SynthesisMaterial[], right: readonly Synth
   });
 }
 
+function assertMaterialsMatch(
+  actual: readonly SynthesisMaterial[],
+  expected: readonly SynthesisMaterial[],
+  label: string,
+): void {
+  if (!sameMaterials(actual, expected)) fail('INVALID_STATE', `${label} does not match the synthesis transaction`);
+}
+
 function mapMaterials(materials: readonly SynthesisMaterial[]): Map<string, number> {
   return new Map(materials.map((material) => [materialKey(material), material.quantity]));
 }
@@ -441,6 +476,41 @@ function listMaterials(values: Map<string, number>): readonly SynthesisMaterial[
     result.push({ cardId: key.slice(0, separator), quality: Number(key.slice(separator + 1)) as CardQuality, quantity });
   }
   return Object.freeze(result.sort(compareMaterials).map(copyMaterial));
+}
+
+function adjustRestoredInventory(values: Map<string, number>, material: SynthesisMaterial, delta: number, label: string): void {
+  const key = materialKey(material);
+  const current = values.get(key) ?? 0;
+  const next = current + delta * material.quantity;
+  if (!Number.isSafeInteger(next) || next < 0) fail('INVALID_STATE', `${label} is not conserved for ${key}`);
+  if (next === 0) values.delete(key);
+  else values.set(key, next);
+}
+
+function assertInventoryLedgerConservation(
+  materials: readonly SynthesisMaterial[],
+  ledger: readonly CardSynthesisLedgerEntry[],
+): void {
+  // The initial inventory is not persisted. Reconstruct it by reversing the complete
+  // ledger, then replay the ledger and require the exact saved inventory as the result.
+  const initial = mapMaterials(materials);
+  for (let index = ledger.length - 1; index >= 0; index -= 1) {
+    const entry = ledger[index];
+    for (const material of entry.credited) adjustRestoredInventory(initial, material, -1, `ledger[${index}].credited`);
+    for (const material of entry.returned) adjustRestoredInventory(initial, material, -1, `ledger[${index}].returned`);
+    for (const material of entry.debited) adjustRestoredInventory(initial, material, 1, `ledger[${index}].debited`);
+  }
+
+  const replayed = new Map(initial);
+  for (let index = 0; index < ledger.length; index += 1) {
+    const entry = ledger[index];
+    for (const material of entry.debited) adjustRestoredInventory(replayed, material, -1, `ledger[${index}].debited`);
+    for (const material of entry.returned) adjustRestoredInventory(replayed, material, 1, `ledger[${index}].returned`);
+    for (const material of entry.credited) adjustRestoredInventory(replayed, material, 1, `ledger[${index}].credited`);
+  }
+
+  const expected = listMaterials(replayed);
+  if (!sameMaterials(expected, materials)) fail('INVALID_STATE', 'synthesis materials are not conserved by the ledger');
 }
 
 function addQuantity(values: Map<string, number>, material: SynthesisMaterial, amount: number): void {
@@ -633,17 +703,60 @@ export class CardSynthesisService {
   }
 
   private validateStateAgainstRecipes(): void {
+    const pityByRecipe = new Map<string, number>();
     for (const entry of this.state.pity) {
       const recipe = this.recipes.get(entry.recipeId);
       if (!recipe) fail('INVALID_STATE', `pity state references unknown recipe: ${entry.recipeId}`);
       if (entry.failures > recipe.pity.guaranteedAfterFailures) fail('INVALID_STATE', `pity state exceeds recipe threshold: ${entry.recipeId}`);
+      pityByRecipe.set(entry.recipeId, entry.failures);
     }
+
+    const replayedPity = new Map<string, number>();
+    const receiptsByRequestId = new Map(this.state.receipts.map((receipt) => [receipt.requestId, receipt]));
     for (const entry of this.state.ledger) {
-      if (!this.recipes.has(entry.recipeId)) fail('INVALID_STATE', `ledger references unknown recipe: ${entry.recipeId}`);
+      const recipe = this.recipes.get(entry.recipeId);
+      if (!recipe) fail('INVALID_STATE', `ledger references unknown recipe: ${entry.recipeId}`);
+      const receipt = receiptsByRequestId.get(entry.requestId);
+      if (!receipt) fail('INVALID_STATE', `ledger has no matching receipt: ${entry.requestId}`);
+
+      const pityBefore = replayedPity.get(recipe.id) ?? 0;
+      const guaranteed = pityBefore >= recipe.pity.guaranteedAfterFailures;
+      const probability = Math.min(1, recipe.baseProbability + pityBefore * recipe.pity.increment);
+      if (entry.pityBefore !== pityBefore) fail('INVALID_STATE', `ledger pityBefore is not derived from prior failures: ${entry.requestId}`);
+      if (entry.guaranteed !== guaranteed) fail('INVALID_STATE', `ledger guaranteed flag is inconsistent: ${entry.requestId}`);
+      if (entry.probability !== probability) fail('INVALID_STATE', `ledger probability is inconsistent: ${entry.requestId}`);
+      if (guaranteed) {
+        if (entry.roll !== null || entry.outcome !== 'SUCCESS') fail('INVALID_STATE', `guaranteed ledger entry is inconsistent: ${entry.requestId}`);
+      } else {
+        if (entry.roll === null) fail('INVALID_STATE', `non-guaranteed ledger entry must contain a roll: ${entry.requestId}`);
+        const expectedOutcome = entry.roll < probability ? 'SUCCESS' : 'FAILURE';
+        if (entry.outcome !== expectedOutcome) fail('INVALID_STATE', `ledger outcome does not match its roll: ${entry.requestId}`);
+      }
+
+      const expectedReturned = entry.outcome === 'FAILURE' ? (recipe.failureRefund ?? []) : [];
+      const expectedCredited = entry.outcome === 'SUCCESS' ? [recipe.output] : [];
+      assertMaterialsMatch(entry.debited, recipe.materials, `ledger ${entry.requestId} debited materials`);
+      assertMaterialsMatch(entry.returned, expectedReturned, `ledger ${entry.requestId} returned materials`);
+      assertMaterialsMatch(entry.credited, expectedCredited, `ledger ${entry.requestId} credited materials`);
+      const expectedPityAfter = entry.outcome === 'SUCCESS' ? 0 : pityBefore + 1;
+      if (!Number.isSafeInteger(expectedPityAfter) || entry.pityAfter !== expectedPityAfter) {
+        fail('INVALID_STATE', `ledger pityAfter is inconsistent: ${entry.requestId}`);
+      }
+
+      const expectedWithoutMaterials = requestFingerprint({ requestId: entry.requestId, recipeId: recipe.id });
+      const expectedWithMaterials = requestFingerprint({ requestId: entry.requestId, recipeId: recipe.id, materials: recipe.materials });
+      if (receipt.fingerprint !== expectedWithoutMaterials && receipt.fingerprint !== expectedWithMaterials) {
+        fail('INVALID_STATE', `receipt fingerprint is inconsistent: ${entry.requestId}`);
+      }
+
+      if (entry.outcome === 'SUCCESS') replayedPity.delete(recipe.id);
+      else replayedPity.set(recipe.id, expectedPityAfter);
     }
-    for (const receipt of this.state.receipts) {
-      if (!this.recipes.has(receipt.result.recipeId)) fail('INVALID_STATE', `receipt references unknown recipe: ${receipt.result.recipeId}`);
+
+    if (replayedPity.size !== pityByRecipe.size || [...replayedPity].some(([recipeId, failures]) => pityByRecipe.get(recipeId) !== failures)) {
+      fail('INVALID_STATE', 'synthesis pity is not conserved by the ledger');
     }
+    assertInventoryLedgerConservation(this.state.materials, this.state.ledger);
   }
 }
 

@@ -220,6 +220,19 @@ assert.equal(restored.save(), serialized, 'serialization must be deterministic a
 assert.deepEqual(restored.synthesize({ requestId: 'boundary-1', recipeId: recipe.id, materials: recipe.materials }), boundaryFailure, 'restored duplicate must replay the saved result');
 assert(Object.isFrozen(restored.snapshot()) && Object.isFrozen(restored.snapshot().ledger[0]), 'snapshots and ledger entries must be immutable');
 
+const validFailureSave = JSON.parse(serialized);
+const validSuccessSave = JSON.parse(afterFirst);
+for (const [label, corruptedState] of [
+  ['ledgerWithoutReceipt', { ...validFailureSave, receipts: [] }],
+  ['receiptLedgerRequestMismatch', {
+    ...validFailureSave,
+    ledger: [{ ...validFailureSave.ledger[0], requestId: 'boundary-ledger-mismatch' }],
+  }],
+  ['inventoryLedgerMismatch', { ...validSuccessSave, materials: [] }],
+]) {
+  expectCode(label, () => restoreCardSynthesisService(JSON.stringify(corruptedState), { recipes: [recipe] }), 'INVALID_STATE');
+}
+
 const net = new Map();
 for (const material of boundaryFailure.debited) net.set(`${material.cardId}:${material.quality}`, -(material.quantity));
 for (const material of boundaryFailure.returned) net.set(`${material.cardId}:${material.quality}`, (net.get(`${material.cardId}:${material.quality}`) ?? 0) + material.quantity);
