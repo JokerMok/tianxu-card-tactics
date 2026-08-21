@@ -39,9 +39,10 @@
       "file": "U002-ANIMATION-POSES.png",
       "metaFile": "U002-ANIMATION-POSES.png.meta",
       "resourcePath": "art/battle/units/U002/U002-ANIMATION-POSES/spriteFrame",
-      "kind": "production-frozen-pose-sheet",
-      "referencePath": "../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
-      "sha256": "9507ca351922a5fe6302cbcdaeab4c9711869e40ec1950afd4959caa14f7f81f",
+      "kind": "approved-runtime-pose-sheet",
+      "referencePath": "assets/resources/art/battle/units/U002/U002-ANIMATION-POSES.png",
+      "upstreamReferencePath": "../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
+      "sha256": "11520617fe6add46c8a22a012d1dfc0e6b839308c70d75a6b80e275203edb33e",
       "size": { "width": 1983, "height": 793 },
       "poseGrid": [
         { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 409, "height": 793 } },
@@ -55,9 +56,10 @@
       "file": "U002-CUTOUT-SHEET.png",
       "metaFile": "U002-CUTOUT-SHEET.png.meta",
       "resourcePath": "art/battle/units/U002/U002-CUTOUT-SHEET/spriteFrame",
-      "kind": "production-frozen-cutout-sheet",
-      "referencePath": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
-      "sha256": "99e057143f1edbdb95235f0ac39057fe5efc3ea2ef3c872b1d3c509e09c7535b",
+      "kind": "approved-runtime-cutout-sheet",
+      "referencePath": "assets/resources/art/battle/units/U002/U002-CUTOUT-SHEET.png",
+      "upstreamReferencePath": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
+      "sha256": "dc6b26dce75a65c8686ddb4666bdf38f3c860ef71b1c6e6b4ad93320b72a44a6",
       "size": { "width": 1536, "height": 1024 }
     }
   },

@@ -1,10 +1,11 @@
 {
   "schema": "battle-unit-skeleton/v1",
   "contractVersion": "2.2",
+  "productionTask": "T279",
   "unitId": "U002",
-  "assetStage": "A0-reference",
-  "runtimeMode": "reference-pose-skeleton",
-  "framePolicy": "one-approved-key-pose-per-state; no-fabricated-frames",
+  "assetStage": "formal-runtime-unit",
+  "runtimeMode": "pose-sheet-unit-skeleton",
+  "framePolicy": "five-approved-pose-columns; transform-assisted-motion; no-fabricated-frames",
   "canvas": {
     "width": 512,
     "height": 512,
@@ -13,12 +14,13 @@
   "sources": {
     "poseSheet": {
       "id": "U002-ANIMATION-POSES",
-      "path": "assets/resources/a0/units/U002-ANIMATION-POSES.png",
-      "referencePath": "../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
-      "kind": "key-pose-sheet",
-      "status": "reference-approved",
+      "path": "assets/resources/art/battle/units/U002/U002-ANIMATION-POSES.png",
+      "referencePath": "assets/resources/art/battle/units/U002/U002-ANIMATION-POSES.png",
+      "upstreamReferencePath": "../美术素材/A0/动画关键姿势/U002-ANIMATION-POSES.png",
+      "kind": "approved-runtime-pose-sheet",
+      "status": "production-approved",
       "size": { "width": 1983, "height": 793 },
-      "sha256": "9507ca351922a5fe6302cbcdaeab4c9711869e40ec1950afd4959caa14f7f81f",
+      "sha256": "11520617fe6add46c8a22a012d1dfc0e6b839308c70d75a6b80e275203edb33e",
       "poseGrid": [
         { "index": 0, "state": "Idle", "rect": { "x": 0, "y": 0, "width": 409, "height": 793 } },
         { "index": 1, "state": "Move", "rect": { "x": 409, "y": 0, "width": 384, "height": 793 } },
@@ -29,12 +31,13 @@
     },
     "cutoutSheet": {
       "id": "U002-CUTOUT-SHEET",
-      "path": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
-      "referencePath": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
-      "kind": "cutout-and-rig-reference",
-      "status": "reference-approved",
+      "path": "assets/resources/art/battle/units/U002/U002-CUTOUT-SHEET.png",
+      "referencePath": "assets/resources/art/battle/units/U002/U002-CUTOUT-SHEET.png",
+      "upstreamReferencePath": "../美术素材/A0/单位切片参考/U002-CUTOUT-SHEET.png",
+      "kind": "approved-runtime-cutout-sheet",
+      "status": "production-approved",
       "size": { "width": 1536, "height": 1024 },
-      "sha256": "99e057143f1edbdb95235f0ac39057fe5efc3ea2ef3c872b1d3c509e09c7535b"
+      "sha256": "dc6b26dce75a65c8686ddb4666bdf38f3c860ef71b1c6e6b4ad93320b72a44a6"
     }
   },
   "bones": [
