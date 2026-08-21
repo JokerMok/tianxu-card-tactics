@@ -105,9 +105,9 @@ function safeInteger(value: unknown, label: string): asserts value is number {
 
 function cloneFilter(filter: InventoryFilter): InventoryFilter {
   return {
-    ...(filter.slot === undefined ? {} : { slot: filter.slot }),
-    ...(filter.qualities === undefined ? {} : { qualities: [...filter.qualities] }),
-    ...(filter.locked === undefined ? {} : { locked: filter.locked }),
+    ...(!Object.prototype.hasOwnProperty.call(filter, 'slot') || filter.slot === undefined ? {} : { slot: filter.slot }),
+    ...(!Object.prototype.hasOwnProperty.call(filter, 'qualities') || filter.qualities === undefined ? {} : { qualities: [...filter.qualities] }),
+    ...(!Object.prototype.hasOwnProperty.call(filter, 'locked') || filter.locked === undefined ? {} : { locked: filter.locked }),
   };
 }
 
@@ -124,15 +124,21 @@ function validateData(input: InventoryPageData): InventoryPageData {
 function validateFilter(input: unknown, label = 'inventory filter'): InventoryFilter {
   assertRecord(input, label);
   const allowed = ['slot', 'qualities', 'locked'];
-  if (Object.keys(input).some((key) => !allowed.includes(key))) fail('INVALID_FILTER', `${label} contains an unsupported field`);
-  if (input.slot !== undefined && !EQUIPMENT_SLOTS.includes(input.slot as EquipmentSlot)) fail('INVALID_FILTER', `${label}.slot is invalid`);
-  if (input.qualities !== undefined) {
+  const ownKeys = Reflect.ownKeys(input);
+  if (ownKeys.some((key) => typeof key !== 'string' || !allowed.includes(key))) {
+    fail('INVALID_FILTER', `${label} contains an unsupported field`);
+  }
+  const hasSlot = Object.prototype.hasOwnProperty.call(input, 'slot');
+  const hasQualities = Object.prototype.hasOwnProperty.call(input, 'qualities');
+  const hasLocked = Object.prototype.hasOwnProperty.call(input, 'locked');
+  if (hasSlot && input.slot !== undefined && !EQUIPMENT_SLOTS.includes(input.slot as EquipmentSlot)) fail('INVALID_FILTER', `${label}.slot is invalid`);
+  if (hasQualities && input.qualities !== undefined) {
     if (!Array.isArray(input.qualities) || input.qualities.some((quality) => !EQUIPMENT_QUALITIES.includes(quality as EquipmentQuality))) {
       fail('INVALID_FILTER', `${label}.qualities is invalid`);
     }
     if (new Set(input.qualities).size !== input.qualities.length) fail('INVALID_FILTER', `${label}.qualities contains duplicates`);
   }
-  if (input.locked !== undefined && typeof input.locked !== 'boolean') fail('INVALID_FILTER', `${label}.locked is invalid`);
+  if (hasLocked && input.locked !== undefined && typeof input.locked !== 'boolean') fail('INVALID_FILTER', `${label}.locked is invalid`);
   return deepFreeze(cloneFilter(input as InventoryFilter));
 }
 
@@ -187,6 +193,7 @@ export class InventoryPageService {
   private selectedEquipmentId: string | null;
   private filter: InventoryFilter;
   private readonly persist?: (serialized: string) => void;
+  private persisting = false;
 
   constructor(input: InventoryPageData | InventoryPageServiceOptions = {}) {
     const options: InventoryPageServiceOptions = isRecord(input) && Object.prototype.hasOwnProperty.call(input, 'schemaVersion')
@@ -258,6 +265,7 @@ export class InventoryPageService {
   }
 
   interact(action: InventoryInteraction): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (!isRecord(action) || typeof action.type !== 'string') fail('INVALID_ARGUMENT', 'inventory interaction must contain a type');
     const interactionKeys: Record<string, readonly (readonly string[])[]> = {
       selectEquipment: [['type', 'equipmentId']],
@@ -296,6 +304,7 @@ export class InventoryPageService {
   }
 
   selectEquipment(equipmentId: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (this.ownedEquipmentIds().length === 0) return interactionResult(false, false, 'empty', null);
     this.assertEquipmentId(equipmentId);
@@ -311,6 +320,7 @@ export class InventoryPageService {
   }
 
   selectEquipmentAt(index: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (this.ownedEquipmentIds().length === 0) return interactionResult(false, false, 'empty', null);
     safeInteger(index, 'inventory equipment index');
@@ -320,6 +330,7 @@ export class InventoryPageService {
   }
 
   setFilter(filter: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     const next = validateFilter(filter);
     if (JSON.stringify(next) === JSON.stringify(this.filter)) return interactionResult(true, false, 'same', this.selectedEquipmentId);
@@ -333,6 +344,7 @@ export class InventoryPageService {
   clearFilter(): InventoryInteractionResult { return this.setFilter({}); }
 
   setSort(sort: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     return this.mutate(() => {
       const before = this.inventory!.save();
@@ -344,6 +356,7 @@ export class InventoryPageService {
   }
 
   toggleLock(equipmentId: unknown, locked?: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     this.assertEquipmentId(equipmentId);
     const item = this.getEquipment(equipmentId);
@@ -356,6 +369,7 @@ export class InventoryPageService {
   }
 
   equip(equipmentId?: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     const target = equipmentId ?? this.selectedEquipmentId;
     this.assertEquipmentId(target);
@@ -369,6 +383,7 @@ export class InventoryPageService {
   }
 
   unequip(slot: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (typeof slot !== 'string' || !EQUIPMENT_SLOTS.includes(slot as EquipmentSlot)) fail('INVALID_ARGUMENT', 'invalid equipment slot');
     const current = this.inventory.snapshot().equipped[slot as EquipmentSlot];
@@ -381,6 +396,7 @@ export class InventoryPageService {
   }
 
   sell(requestId: unknown, equipmentId?: unknown): InventoryInteractionResult {
+    this.assertNotPersisting();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (typeof requestId !== 'string' || requestId.trim().length === 0) fail('INVALID_REQUEST', 'request id must be non-empty');
     const target = equipmentId ?? this.selectedEquipmentId;
@@ -404,12 +420,14 @@ export class InventoryPageService {
   }
 
   save(): string {
+    this.assertNotPersisting();
     const serialized = this.serialize();
     this.persistSafely(serialized);
     return serialized;
   }
 
   restore(serialized: unknown): InventoryPageSnapshot {
+    this.assertNotPersisting();
     if (this.inventory === null) fail('STATE_NOT_AVAILABLE', 'empty inventory page has no state to restore');
     const parsed = parseSave(serialized);
     const before = this.serialize();
@@ -433,6 +451,7 @@ export class InventoryPageService {
   }
 
   private mutate<T>(action: () => T): T {
+    this.assertNotPersisting();
     if (this.inventory === null) return action();
     const before = this.serialize();
     try {
@@ -449,7 +468,20 @@ export class InventoryPageService {
 
   private persistSafely(serialized: string): void {
     if (!this.persist) return;
-    try { this.persist(serialized); } catch (error) { throw new InventoryPageError('PERSISTENCE_FAILED', 'inventory page state persistence failed', error); }
+    if (this.persisting) fail('PERSISTENCE_REENTRANT', 'inventory page persistence callback cannot re-enter the page');
+    this.persisting = true;
+    try {
+      this.persist(serialized);
+    } catch (error) {
+      if (error instanceof InventoryPageError && error.code === 'PERSISTENCE_REENTRANT') throw error;
+      throw new InventoryPageError('PERSISTENCE_FAILED', 'inventory page state persistence failed', error);
+    } finally {
+      this.persisting = false;
+    }
+  }
+
+  private assertNotPersisting(): void {
+    if (this.persisting) fail('PERSISTENCE_REENTRANT', 'inventory page persistence callback cannot re-enter the page');
   }
 
   private restoreInternal(serialized: string): void {

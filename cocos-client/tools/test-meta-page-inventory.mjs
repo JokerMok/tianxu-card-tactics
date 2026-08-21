@@ -75,21 +75,24 @@ function assertDeepFrozen(value, label = 'value', seen = new Set()) {
 }
 
 let negativeCaseCount = 0;
+const productionInventory = new EquipmentInventoryService({ capacity: 4 });
 const realEquipment = [
-  item('E-REAL-WEAPON', 'weapon', 4, 'attack', 12),
-  item('E-REAL-ARMOR', 'armor', 3, 'armor', 18, true),
-  item('E-REAL-CLOAK', 'cloak', 2, 'draw', 1),
+  productionInventory.add({ equipmentId: 'E-REAL-WEAPON', slot: 'weapon', quality: 4, primaryAttribute: 'attack', primaryValue: 12 }),
+  productionInventory.add({ equipmentId: 'E-REAL-ARMOR', slot: 'armor', quality: 3, primaryAttribute: 'armor', primaryValue: 18, locked: true }),
+  productionInventory.add({ equipmentId: 'E-REAL-CLOAK', slot: 'cloak', quality: 2, primaryAttribute: 'draw', primaryValue: 1 }),
 ];
-const initialState = inventoryState(4, realEquipment, {
-  weapon: null,
-  helmet: item('E-REAL-HELMET', 'helmet', 2, 'health', 20),
-  armor: null,
-  cloak: null,
-});
+productionInventory.add({ equipmentId: 'E-REAL-HELMET', slot: 'helmet', quality: 2, primaryAttribute: 'health', primaryValue: 20 });
+productionInventory.equip('E-REAL-HELMET');
+assert.equal(productionInventory.get('E-REAL-HELMET').equipmentId, 'E-REAL-HELMET');
+for (const equipment of realEquipment) assert.deepEqual(productionInventory.get(equipment.equipmentId), equipment);
+assert.deepEqual(productionInventory.snapshot().items.map(({ equipmentId }) => equipmentId), [
+  'E-REAL-WEAPON', 'E-REAL-ARMOR', 'E-REAL-CLOAK',
+]);
+const initialState = JSON.parse(productionInventory.save());
 const saves = [];
 const page = new InventoryPageService({
   data: createDefaultInventoryPageData({ title: '真实行囊', subtitle: '来自装备背包服务' }),
-  inventory: new EquipmentInventoryService({ state: initialState }),
+  inventory: productionInventory,
   persist: (serialized) => saves.push(serialized),
 });
 
@@ -103,6 +106,7 @@ assert.equal(initial.components.find((component) => component.id === 'equipped-s
 assert.equal(initial.components.find((component) => component.id === 'equipment-E-REAL-ARMOR')?.locked, true);
 assert.equal(initial.components.find((component) => component.id === 'detail')?.equipmentId, 'E-REAL-ARMOR');
 assert.equal(initial.components.find((component) => component.id === 'detail')?.location, 'bag');
+assert.equal(initial.state?.inventory, productionInventory.save(), 'page must bind to the T231 production inventory state');
 
 const frozen = page.snapshot();
 assertDeepFrozen(frozen, 'inventory snapshot');
@@ -193,6 +197,10 @@ expectPageFailure('out-of-range equipment index', () => page.selectEquipmentAt(9
 expectPageFailure('fractional equipment index', () => page.selectEquipmentAt(0.5), 'INVALID_NUMBER');
 expectPageFailure('invalid filter quality', () => page.setFilter({ qualities: [99] }), 'INVALID_FILTER');
 expectPageFailure('invalid filter field', () => page.setFilter({ source: 'SHOP' }), 'INVALID_FILTER');
+const hiddenFilterField = {};
+Object.defineProperty(hiddenFilterField, 'source', { value: 'SHOP', enumerable: false });
+expectPageFailure('non-enumerable invalid filter field', () => page.setFilter(hiddenFilterField), 'INVALID_FILTER');
+expectPageFailure('symbol invalid filter field', () => page.setFilter({ [Symbol('source')]: 'SHOP' }), 'INVALID_FILTER');
 expectPageFailure('invalid sort', () => page.setSort({ field: 'random', direction: 'asc' }), 'INVALID_SORT');
 expectPageFailure('unknown interaction', () => page.interact({ type: 'not-supported' }), 'INVALID_ARGUMENT');
 expectPageFailure('extra interaction field', () => page.interact({ type: 'clearFilter', unexpected: true }), 'INVALID_ARGUMENT');
@@ -210,6 +218,29 @@ const persistenceFailure = new InventoryPageService({
 const beforePersistenceFailure = persistenceFailure.serialize();
 expectPageFailure('page persistence failure is atomic', () => persistenceFailure.toggleLock('E-PERSIST', true), 'PERSISTENCE_FAILED');
 assert.equal(persistenceFailure.serialize(), beforePersistenceFailure);
+
+const reentrantSaves = [];
+let reentrantPage;
+let nestedFailure;
+reentrantPage = new InventoryPageService({
+  data: createDefaultInventoryPageData(),
+  inventory: new EquipmentInventoryService({ state: inventoryState(2, [item('E-REENTRANT', 'cloak', 1, 'draw', 1)]) }),
+  onSave: (serialized) => {
+    try {
+      reentrantPage.toggleLock('E-REENTRANT', true);
+    } catch (error) {
+      nestedFailure = error;
+    }
+    reentrantSaves.push(serialized);
+  },
+});
+const reentrantResult = reentrantPage.toggleLock('E-REENTRANT', true);
+assert.deepEqual(reentrantResult, { accepted: true, changed: true, reason: 'locked', equipmentId: 'E-REENTRANT' });
+assert(nestedFailure instanceof InventoryPageError);
+assert.equal(nestedFailure.code, 'PERSISTENCE_REENTRANT');
+assert.equal(reentrantSaves.length, 1, 'reentrant page mutation must not create a nested persistence record');
+assert.equal(reentrantSaves[0], reentrantPage.serialize(), 'persisted and committed page state must match');
+assert.equal(reentrantPage.snapshot().components.find((component) => component.id === 'equipment-E-REENTRANT')?.locked, true);
 
 assert.equal(negativeCaseCount >= 15, true, 'missing, invalid, out-of-range and atomicity cases must execute');
 assert(saves.length >= 6, 'real page transitions must invoke persistence');
