@@ -166,17 +166,33 @@ export const CITY_EXPEDITION_STAMINA_COST = 10 as const;
 export const CITY_EXPEDITION_DURATION_MS = 60_000 as const;
 export const CITY_EXPEDITION_REWARD_SILVER = 1_600 as const;
 
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function assertExactKeys(value: Record<string, unknown>, expected: readonly string[], label: string): void {
+  const actual = Object.keys(value).sort();
+  const allowed = [...expected].sort();
+  if (actual.length !== allowed.length || actual.some((key, index) => key !== allowed[index])) {
+    throw new CityPageError('INVALID_DATA', `${label} must contain exactly ${expected.join(', ')}`);
+  }
+}
+
 function assertValidGameStateExpedition(expedition: unknown): void {
-  if (expedition === null || typeof expedition !== 'object' || Array.isArray(expedition)) {
+  if (!isPlainRecord(expedition)) {
     throw new CityPageError('INVALID_DATA', 'game state expedition values are invalid');
   }
+  assertExactKeys(expedition, ['active', 'endsAt', 'reward'], 'game state expedition');
   const candidate = expedition as { active: unknown; endsAt: unknown; reward: unknown };
   if (typeof candidate.active !== 'boolean'
     || !Number.isSafeInteger(candidate.endsAt)
     || !Number.isSafeInteger(candidate.reward)
     || candidate.endsAt < 0
     || candidate.endsAt >= Number.MAX_SAFE_INTEGER
-    || candidate.reward < 0) {
+    || candidate.reward < 0
+    || candidate.reward >= Number.MAX_SAFE_INTEGER) {
     throw new CityPageError('INVALID_DATA', 'game state expedition values are invalid');
   }
   if (candidate.active && (candidate.endsAt === 0 || candidate.reward === 0)) {

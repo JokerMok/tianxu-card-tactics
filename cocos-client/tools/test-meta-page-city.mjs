@@ -74,24 +74,43 @@ assert.deepEqual(statePage.claimExpedition(61000), { accepted: true, changed: tr
 assert.equal(stateForService.expedition.active, false);
 assert.equal(stateForService.resources.silver, 11600);
 
+const malformedExpeditionValues = [
+  ['null', null],
+  ['undefined', undefined],
+  ['array', []],
+  ['string', 'invalid'],
+];
+for (const [label, expedition] of malformedExpeditionValues) {
+  const invalidState = { ...realState, expedition };
+  expectFailure(`${label} expedition rejected at state construction`, () => new CityPageService({ state: invalidState }), 'INVALID_DATA');
+  expectFailure(`${label} expedition rejected during recovery`, () => createDefaultCityPageData(invalidState), 'INVALID_DATA');
+  if (expedition !== null) {
+    expectFailure(`${label} expedition rejected during projection`, () => createCityPageComponents({ ...realData, expedition }), 'INVALID_DATA');
+  }
+}
+assert.equal(createCityPageComponents({ ...realData, expedition: null }).length, 5, 'projection must preserve the valid null expedition contract');
 const invalidLiveExpeditionState = {
   ...realState,
   expedition: { active: true, endsAt: 0, reward: 0 },
 };
-expectFailure('null expedition rejected during recovery', () => createDefaultCityPageData({
-  ...realState,
-  expedition: null,
-}), 'INVALID_DATA');
-expectFailure('undefined expedition rejected during recovery', () => createDefaultCityPageData({
-  ...realState,
-  expedition: undefined,
-}), 'INVALID_DATA');
 expectFailure('invalid active expedition state rejected at construction', () => new CityPageService({ state: invalidLiveExpeditionState }), 'INVALID_DATA');
 expectFailure('invalid active expedition state rejected during recovery', () => createDefaultCityPageData(invalidLiveExpeditionState), 'INVALID_DATA');
 assert.equal(createDefaultCityPageData({
   ...realState,
   expedition: { active: true, endsAt: 60000, reward: 777 },
 }).expedition?.rewardSilver, 777, 'active expedition reward must remain state-owned');
+const extraFieldExpeditionState = {
+  ...realState,
+  expedition: { ...realState.expedition, extra: true },
+};
+expectFailure('extra expedition field rejected during recovery', () => createDefaultCityPageData(extraFieldExpeditionState), 'INVALID_DATA');
+expectFailure('extra expedition field rejected at state construction', () => new CityPageService({ state: extraFieldExpeditionState }), 'INVALID_DATA');
+const unsafeRewardExpeditionState = {
+  ...realState,
+  expedition: { active: true, endsAt: 60000, reward: Number.MAX_SAFE_INTEGER },
+};
+expectFailure('unsafe expedition reward rejected during recovery', () => createDefaultCityPageData(unsafeRewardExpeditionState), 'INVALID_DATA');
+expectFailure('unsafe expedition reward rejected at state construction', () => new CityPageService({ state: unsafeRewardExpeditionState }), 'INVALID_DATA');
 expectFailure('invalid active expedition page data rejected at construction', () => new CityPageService({
   ...realData,
   expedition: { ...realData.expedition, active: true, endsAt: 0 },
@@ -209,6 +228,6 @@ const stateBeforeFailure = JSON.stringify(persistenceState);
 expectFailure('state persistence failure rolls back', () => failingStatePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
 assert.equal(JSON.stringify(persistenceState), stateBeforeFailure);
 assert.equal(failingStatePage.state.buildings.forge, 2);
-assert.equal(negativeCaseCount, 22, 'missing, invalid, out-of-range and atomicity cases must execute');
+assert.equal(negativeCaseCount, 35, 'missing, invalid, out-of-range and atomicity cases must execute');
 
 console.log(`T312 city page PASS: real-buildings=${realData.buildings.length}, components=${normal.components.length}, negative-cases=${negativeCaseCount}, normal/empty/insufficient/active/claimable`);

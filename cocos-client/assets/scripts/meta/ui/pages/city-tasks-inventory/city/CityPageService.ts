@@ -110,12 +110,13 @@ function validateGameState(input: unknown): GameState {
     assertSafeInteger(input.buildings[id], `game state buildings.${id}`);
     if (input.buildings[id] <= 0 || input.buildings[id] >= Number.MAX_SAFE_INTEGER) fail('INVALID_DATA', `game state buildings.${id} is out of range`);
   }
-  assertRecord(input.expedition, 'game state expedition');
+  if (!isPlainRecord(input.expedition)) fail('INVALID_DATA', 'game state expedition must be a plain object');
   assertExactKeys(input.expedition, ['active', 'endsAt', 'reward'], 'game state expedition');
   if (typeof input.expedition.active !== 'boolean') fail('INVALID_DATA', 'game state expedition.active must be boolean');
   assertSafeInteger(input.expedition.endsAt, 'game state expedition.endsAt');
   assertSafeInteger(input.expedition.reward, 'game state expedition.reward');
-  if (input.expedition.endsAt < 0 || input.expedition.endsAt >= Number.MAX_SAFE_INTEGER || input.expedition.reward < 0) {
+  if (input.expedition.endsAt < 0 || input.expedition.endsAt >= Number.MAX_SAFE_INTEGER
+    || input.expedition.reward < 0 || input.expedition.reward >= Number.MAX_SAFE_INTEGER) {
     fail('INVALID_DATA', 'game state expedition values are out of range');
   }
   if (input.expedition.active && (input.expedition.endsAt === 0 || input.expedition.reward === 0)) {
