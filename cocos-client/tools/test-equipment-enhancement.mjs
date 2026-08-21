@@ -41,6 +41,24 @@ initialInventory.add(item('E-REAL-WEAPON', 'weapon', 1, 'attack', 10));
 initialInventory.add(item('E-REAL-ARMOR', 'armor', 4, 'armor', 40, true));
 const inventoryBeforeEnhancement = initialInventory.save();
 const realWeapon = initialInventory.get('E-REAL-WEAPON');
+const realArmor = initialInventory.get('E-REAL-ARMOR');
+
+const orderedSet = new EquipmentEnhancementService({
+  equipment: [realWeapon, realArmor],
+  resources: { gold: 1000, materials: { [EQUIPMENT_ENHANCEMENT_MATERIAL_ID]: 10 } },
+});
+const reversedSet = new EquipmentEnhancementService({
+  equipment: [realArmor, realWeapon],
+  resources: { gold: 1000, materials: { [EQUIPMENT_ENHANCEMENT_MATERIAL_ID]: 10 } },
+});
+assert.equal(orderedSet.save(), reversedSet.save(), 'equipment input order must not change the canonical save');
+const reorderedState = JSON.parse(orderedSet.save());
+reorderedState.equipment.reverse();
+assert.equal(
+  restoreEquipmentEnhancement(JSON.stringify(reorderedState)).save(),
+  orderedSet.save(),
+  'restore must canonicalize equipment order',
+);
 
 const persisted = [];
 const service = new EquipmentEnhancementService({
@@ -208,6 +226,13 @@ const serialized = service.save();
 const restored = restoreEquipmentEnhancement(serialized);
 assert.equal(restored.save(), serialized, 'enhancement save must be deterministic');
 assert.deepEqual(restored.snapshot(), service.snapshot(), 'enhancement state must round-trip');
+const reorderedProcessedState = JSON.parse(serialized);
+reorderedProcessedState.processedRequests.reverse();
+assert.equal(
+  restoreEquipmentEnhancement(JSON.stringify(reorderedProcessedState)).save(),
+  serialized,
+  'restore must canonicalize processed request order',
+);
 const restoredReplay = restored.enhance('enhance-2', {
   equipmentId: 'E-REAL-WEAPON',
   materialId: EQUIPMENT_ENHANCEMENT_MATERIAL_ID,
@@ -219,6 +244,15 @@ assert.equal(restored.save(), serialized, 'serialized replay must not alter the 
 const tamperedSerialized = JSON.parse(serialized);
 tamperedSerialized.processedRequests[0].result.materialCost = {};
 expectCode('tampered processed result', () => restoreEquipmentEnhancement(JSON.stringify(tamperedSerialized)), 'INVALID_STATE');
+const tamperedFingerprintSerialized = JSON.parse(serialized);
+const tamperedFingerprint = JSON.parse(tamperedFingerprintSerialized.processedRequests[0].fingerprint);
+tamperedFingerprint.roll = 0.5;
+tamperedFingerprintSerialized.processedRequests[0].fingerprint = JSON.stringify(tamperedFingerprint);
+expectCode(
+  'tampered processed request fingerprint',
+  () => restoreEquipmentEnhancement(JSON.stringify(tamperedFingerprintSerialized)),
+  'INVALID_STATE',
+);
 
 const malformedBefore = service.save();
 expectCode('invalid equipment shape', () => service.add({ ...realWeapon, primaryValue: 0 }), 'INVALID_PRIMARY_VALUE');

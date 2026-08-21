@@ -201,6 +201,16 @@ const RESULT_KEYS = new Set([
   'resources',
 ]);
 const COST_KEYS = new Set(['gold', 'materials']);
+const FINGERPRINT_KEYS = new Set([
+  'equipmentId',
+  'materialsMode',
+  'submittedMaterials',
+  'materialId',
+  'materialQuantity',
+  'protectionMaterialId',
+  'protectionQuantity',
+  'roll',
+]);
 const REQUEST_KEYS = new Set([
   'equipmentId',
   'materials',
@@ -491,6 +501,78 @@ function requestFingerprint(request: NormalizedRequest): string {
   });
 }
 
+function compareText(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function compareEquipmentRecords(left: EquipmentEnhancementRecord, right: EquipmentEnhancementRecord): number {
+  return compareText(left.equipment.equipmentId, right.equipment.equipmentId);
+}
+
+function compareProcessedRequests(
+  left: EquipmentEnhancementProcessedRequest,
+  right: EquipmentEnhancementProcessedRequest,
+): number {
+  return compareText(left.requestId, right.requestId);
+}
+
+function sameMaterials(left: EquipmentEnhancementMaterials, right: EquipmentEnhancementMaterials): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function normalizeProcessedFingerprint(value: unknown): NormalizedRequest {
+  if (!isText(value)) fail('INVALID_STATE');
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch (error) {
+    fail('INVALID_STATE', error);
+  }
+  if (!isRecord(parsed)) fail('INVALID_STATE');
+  assertExactKeys(parsed, FINGERPRINT_KEYS, 'INVALID_STATE');
+  assertRequiredKeys(parsed, FINGERPRINT_KEYS, 'INVALID_STATE');
+
+  const materialQuantity = parsed.materialQuantity === null ? undefined : parsed.materialQuantity;
+  const requestValue: Record<string, unknown> = {
+    equipmentId: parsed.equipmentId,
+    roll: parsed.roll,
+  };
+  if (parsed.materialsMode === 'map') {
+    requestValue.materials = parsed.submittedMaterials;
+  } else if (parsed.materialsMode === 'fields') {
+    requestValue.materialId = parsed.materialId;
+    if (materialQuantity !== undefined) requestValue.materialQuantity = materialQuantity;
+    requestValue.protectionMaterialId = parsed.protectionMaterialId;
+    requestValue.protectionQuantity = parsed.protectionQuantity;
+  } else if (parsed.materialsMode !== 'default') {
+    fail('INVALID_STATE');
+  }
+
+  let normalized: NormalizedRequest;
+  try {
+    normalized = normalizeRequest(requestValue);
+  } catch (error) {
+    if (error instanceof EquipmentEnhancementError && error.code === 'INVALID_STATE') throw error;
+    fail('INVALID_STATE', error);
+  }
+  if (requestFingerprint(normalized) !== value) fail('INVALID_STATE');
+  return normalized;
+}
+
+function assertProcessedFingerprintMatchesResult(
+  request: NormalizedRequest,
+  result: EquipmentEnhancementResult,
+): void {
+  if (request.equipmentId !== result.equipmentId || request.roll !== result.roll) fail('INVALID_STATE');
+  let expectedMaterials: EquipmentEnhancementMaterials;
+  try {
+    expectedMaterials = canonicalMaterialsForAttempt(request, getEquipmentEnhancementCost(result.levelBefore));
+  } catch (error) {
+    fail('INVALID_STATE', error);
+  }
+  if (!sameMaterials(expectedMaterials, result.materialsSpent)) fail('INVALID_STATE');
+}
+
 function normalizeState(value: unknown): EquipmentEnhancementState {
   const parsed = typeof value === 'string'
     ? (() => {
@@ -506,13 +588,14 @@ function normalizeState(value: unknown): EquipmentEnhancementState {
   assertRequiredKeys(parsed, STATE_KEYS, 'INVALID_STATE');
   if (parsed.schemaVersion !== EQUIPMENT_ENHANCEMENT_SCHEMA_VERSION || !Array.isArray(parsed.equipment)
     || !Array.isArray(parsed.processedRequests)) fail('INVALID_STATE');
-  const equipment = parsed.equipment.map(normalizeRecord);
+  const equipment = parsed.equipment.map(normalizeRecord).sort(compareEquipmentRecords);
   const ids = new Set<string>();
   for (const record of equipment) {
     if (ids.has(record.equipment.equipmentId)) fail('INVALID_STATE');
     ids.add(record.equipment.equipmentId);
   }
-  const processedRequests = parsed.processedRequests.map((value) => normalizeProcessedRequest(value));
+  const processedRequests = parsed.processedRequests.map((value) => normalizeProcessedRequest(value))
+    .sort(compareProcessedRequests);
   const requestIds = new Set<string>();
   for (const request of processedRequests) {
     if (requestIds.has(request.requestId)) fail('INVALID_STATE');
@@ -530,10 +613,11 @@ function normalizeProcessedRequest(value: unknown): EquipmentEnhancementProcesse
   if (!isRecord(value)) fail('INVALID_STATE');
   assertExactKeys(value, PROCESSED_REQUEST_KEYS, 'INVALID_STATE');
   assertRequiredKeys(value, PROCESSED_REQUEST_KEYS, 'INVALID_STATE');
-  if (!isText(value.fingerprint)) fail('INVALID_STATE');
   const requestId = normalizeRequestId(value.requestId);
   const result = normalizeResult(value.result);
   if (result.requestId !== requestId) fail('INVALID_STATE');
+  const request = normalizeProcessedFingerprint(value.fingerprint);
+  assertProcessedFingerprintMatchesResult(request, result);
   return { requestId, fingerprint: value.fingerprint, result };
 }
 
@@ -639,11 +723,13 @@ function freezeResult(result: EquipmentEnhancementResult): EquipmentEnhancementR
 }
 
 function freezeState(value: MutableState): EquipmentEnhancementState {
+  const equipment = [...value.equipment].sort(compareEquipmentRecords);
+  const processedRequests = [...value.processedRequests].sort(compareProcessedRequests);
   return Object.freeze({
     schemaVersion: EQUIPMENT_ENHANCEMENT_SCHEMA_VERSION,
-    equipment: Object.freeze(value.equipment.map(freezeRecord)),
+    equipment: Object.freeze(equipment.map(freezeRecord)),
     resources: freezeResources(value.resources),
-    processedRequests: Object.freeze(value.processedRequests.map((request) => Object.freeze({
+    processedRequests: Object.freeze(processedRequests.map((request) => Object.freeze({
       requestId: request.requestId,
       fingerprint: request.fingerprint,
       result: freezeResult(request.result),
