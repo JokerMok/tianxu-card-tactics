@@ -85,7 +85,8 @@ function parseCards(rawCards: readonly unknown[]): ReadonlyMap<string, CardDefin
     const { id, cardType, profession, skillId, copyLimit } = rawCard;
     if (typeof id !== 'string' || id.length === 0 || (cardType !== 'UNIT' && cardType !== 'SKILL')
       || typeof profession !== 'string' || profession.length === 0 || !isPositiveInteger(copyLimit) || cards.has(id)
-      || (skillId !== undefined && (typeof skillId !== 'string' || skillId.length === 0))) {
+      || (skillId !== undefined && (typeof skillId !== 'string' || skillId.length === 0))
+      || (cardType === 'UNIT' && skillId !== undefined)) {
       throw new Error('hero profession cards config is invalid');
     }
     cards.set(id, {

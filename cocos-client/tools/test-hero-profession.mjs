@@ -153,6 +153,15 @@ assert.throws(
 );
 assert.throws(
   () => createHeroProfessionRules({
+    cards: cardsTable.cards.map((card) => card.id === 'U001' ? { ...card, skillId: 'S001' } : { ...card }),
+    decks: decksTable.decks,
+    professions: professionsTable.professions,
+  }),
+  /cards config/i,
+  'unit cards must not carry skill metadata',
+);
+assert.throws(
+  () => createHeroProfessionRules({
     cards: cardsTable.cards,
     decks: [{ ...configuredDeck, enabled: false }],
     professions: professionsTable.professions,
