@@ -46,7 +46,13 @@ function checkSkeletonAndDiff() {
   }
 
   const allowed = new Set(['cocos-client/assets/scripts/meta/buildings', 'cocos-client/tools/test-building-queue.mjs']);
-  const trackedChanges = execFileSync('git', ['diff', '--name-only', 'HEAD'], { cwd: resolve(projectRoot, '..'), encoding: 'utf8' })
+  const baselineCommit = process.env.T234_BASE_COMMIT ?? '25761f8';
+  const targetCommit = process.env.T234_TARGET_COMMIT ?? 'HEAD';
+  const trackedChanges = execFileSync(
+    'git',
+    ['diff', '--name-only', `${baselineCommit}..${targetCommit}`],
+    { cwd: resolve(projectRoot, '..'), encoding: 'utf8' },
+  )
     .split('\n').map((line) => line.trim()).filter(Boolean);
   for (const path of trackedChanges) assert.equal([...allowed].some((prefix) => path === prefix || path.startsWith(`${prefix}/`)), true, `out-of-scope tracked diff: ${path}`);
 }
@@ -86,6 +92,10 @@ function checkSuccessFailureAndBoundaries() {
   const duplicateBuilding = enqueueBuildingUpgrade(started.state, config, 'castle', 1000);
   failed(duplicateBuilding, 'BUILDING_BUSY');
   assert.deepEqual(duplicateBuilding.state.resources, started.state.resources, 'failed enqueue does not double-charge');
+
+  const atomicStarted = enqueueBuildingUpgrade(createInitialBuildingQueueState(config, resources(), 0), config, 'castle', 0);
+  const atomicFailure = failed(enqueueBuildingUpgrade(atomicStarted.state, config, 'castle', 1000), 'BUILDING_BUSY');
+  assert.deepEqual(atomicFailure.state, atomicStarted.state, 'failed enqueue rolls back settlement and lastUpdatedAtMs');
 
   const queued = enqueueBuildingUpgrade(started.state, config, 'alchemy', 1000);
   assert.equal(queued.code, 'ENQUEUED');
@@ -131,9 +141,25 @@ function checkSpeedupAndSerialization() {
   failed(applyBuildingSpeedup(boosted.state, config, started.entry.id, 0, 1000), 'INVALID_BOOST');
   failed(applyBuildingSpeedup(boosted.state, config, 'missing', 1000, 1000), 'ENTRY_NOT_FOUND');
 
+  const exactCompletion = applyBuildingSpeedup(started.state, config, started.entry.id, 29000, 1000);
+  assert.equal(exactCompletion.accepted, true, 'exact remaining duration is a valid completion');
+  assert.equal(exactCompletion.code, 'BOOST_APPLIED');
+  assert.equal(exactCompletion.appliedMs, 29000);
+  assert.deepEqual(exactCompletion.completedEntryIds, [started.entry.id]);
+  assert.deepEqual(exactCompletion.state.queue, []);
+  assert.equal(exactCompletion.state.buildingLevels.castle, 2);
+
   const serialized = serializeBuildingQueueState(boosted.state, config);
   assert.deepEqual(deserializeBuildingQueueState(serialized, config), boosted.state, 'queue state round-trips through JSON');
   assert.equal(serialized, serializeBuildingQueueState(deserializeBuildingQueueState(serialized, config), config), 'serialization is canonical');
+
+  const extraSnapshotKey = JSON.parse(serialized);
+  extraSnapshotKey.extra = true;
+  assert.throws(() => deserializeBuildingQueueState(JSON.stringify(extraSnapshotKey), config), /building queue state shape is invalid/);
+
+  const unsafeSnapshotInteger = JSON.parse(serialized);
+  unsafeSnapshotInteger.lastUpdatedAtMs = Number.MAX_SAFE_INTEGER + 1;
+  assert.throws(() => deserializeBuildingQueueState(JSON.stringify(unsafeSnapshotInteger), config), /building queue clock is invalid/);
 
   const run = () => {
     let state = createInitialBuildingQueueState(config, resources(), 0);
@@ -144,8 +170,19 @@ function checkSpeedupAndSerialization() {
   assert.equal(run(), run(), 'same inputs produce the same snapshot');
 }
 
+function checkInvalidStateIsFailClosed() {
+  const invalidNull = settleBuildingQueue(null, config, 0);
+  failed(invalidNull, 'INVALID_STATE');
+  assert.equal(invalidNull.state, null, 'invalid state has no trusted snapshot');
+
+  const invalidShape = settleBuildingQueue({ schemaVersion: 1 }, config, 0);
+  failed(invalidShape, 'INVALID_STATE');
+  assert.equal(invalidShape.state, null, 'malformed state has no trusted snapshot');
+}
+
 checkSkeletonAndDiff();
 checkConfigLoadingAndCrossTables();
 checkSuccessFailureAndBoundaries();
 checkSpeedupAndSerialization();
+checkInvalidStateIsFailClosed();
 console.log('T234 building queue: config load/cross-table, success/failure/boundary, speedup/offline completion, serialization, skeleton and diff checks PASS');

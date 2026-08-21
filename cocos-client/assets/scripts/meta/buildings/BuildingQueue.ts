@@ -42,7 +42,7 @@ export type BuildingQueueCode =
 export interface BuildingQueueResult {
   readonly accepted: boolean;
   readonly code: BuildingQueueCode;
-  readonly state: BuildingQueueState;
+  readonly state: BuildingQueueState | null;
   readonly completedEntryIds: readonly string[];
   readonly entry?: BuildingQueueEntry;
   readonly appliedMs?: number;
@@ -76,6 +76,12 @@ function cloneState(state: BuildingQueueState): BuildingQueueState {
   };
 }
 
+function exactKeys(value: Record<string, unknown>, expected: readonly string[], label: string): void {
+  if (Object.keys(value).length !== expected.length || expected.some((key) => !Object.prototype.hasOwnProperty.call(value, key))) {
+    throw new Error(`${label} shape is invalid`);
+  }
+}
+
 function validResourceMap(resources: unknown, config: BuildingConfig): resources is BuildingResources {
   if (!isRecord(resources)) return false;
   const expected = config.resources.map((resource) => resource.id);
@@ -91,16 +97,16 @@ function validCostMap(cost: unknown, config: BuildingConfig): cost is BuildingRe
   return Object.entries(cost).every(([resourceId, amount]) => resourceIds.has(resourceId) && isSafeInteger(amount, 1));
 }
 
-function stateError(state: BuildingQueueState): BuildingQueueResult {
-  return { accepted: false, code: 'INVALID_STATE', state: cloneState(state), completedEntryIds: [], message: '建筑队列状态无效' };
+function stateError(): BuildingQueueResult {
+  return { accepted: false, code: 'INVALID_STATE', state: null, completedEntryIds: [], message: '建筑队列状态无效' };
 }
 
 function timeError(state: BuildingQueueState, code: 'INVALID_TIME' | 'TIME_REWIND', message: string): BuildingQueueResult {
   return { accepted: false, code, state: cloneState(state), completedEntryIds: [], message };
 }
 
-function reject(settled: BuildingQueueResult, code: BuildingQueueCode, message: string): BuildingQueueResult {
-  return { accepted: false, code, state: settled.state, completedEntryIds: settled.completedEntryIds, message };
+function reject(state: BuildingQueueState, code: BuildingQueueCode, message: string): BuildingQueueResult {
+  return { accepted: false, code, state: cloneState(state), completedEntryIds: [], message };
 }
 
 function prerequisiteMet(levels: Readonly<Record<string, number>>, prerequisite: BuildingPrerequisite): boolean {
@@ -138,6 +144,7 @@ function settleMutable(state: BuildingQueueState, atMs: number): string[] {
 
 export function assertBuildingQueueState(state: unknown, config: BuildingConfig): asserts state is BuildingQueueState {
   if (!isRecord(state) || state.schemaVersion !== 1) throw new Error('building queue state schemaVersion is invalid');
+  exactKeys(state, ['schemaVersion', 'resources', 'buildingLevels', 'queue', 'nextSequence', 'lastUpdatedAtMs'], 'building queue state');
   if (!validResourceMap(state.resources, config)) throw new Error('building queue state resources are invalid');
   if (!isRecord(state.buildingLevels)) throw new Error('building queue state buildingLevels are invalid');
   const buildingIds = config.buildings.map((building) => building.id);
@@ -155,7 +162,7 @@ export function assertBuildingQueueState(state: unknown, config: BuildingConfig)
   state.queue.forEach((entry, index) => {
     if (!isRecord(entry)) throw new Error(`building queue entry ${index} is invalid`);
     const expectedKeys = ['id', 'buildingId', 'fromLevel', 'targetLevel', 'cost', 'durationMs', 'startAtMs', 'finishAtMs'];
-    if (Object.keys(entry).length !== expectedKeys.length || expectedKeys.some((key) => !Object.prototype.hasOwnProperty.call(entry, key))) throw new Error(`building queue entry ${index} shape is invalid`);
+    exactKeys(entry, expectedKeys, `building queue entry ${index}`);
     if (typeof entry.id !== 'string' || entry.id.length === 0 || entryIds.has(entry.id)) throw new Error(`building queue entry ${index} id is invalid`);
     const building = findBuilding(config, entry.buildingId as string);
     const upgrade = findUpgrade(config, entry.buildingId as string, entry.targetLevel as number);
@@ -191,7 +198,7 @@ export function createInitialBuildingQueueState(
 }
 
 export function settleBuildingQueue(state: BuildingQueueState, config: BuildingConfig, atMs: number): BuildingQueueResult {
-  try { assertBuildingQueueState(state, config); } catch { return stateError(state); }
+  try { assertBuildingQueueState(state, config); } catch { return stateError(); }
   if (!isSafeInteger(atMs)) return timeError(state, 'INVALID_TIME', '时间必须是非负安全整数');
   if (atMs < state.lastUpdatedAtMs) return timeError(state, 'TIME_REWIND', '时间不能倒退');
   const next = cloneState(state);
@@ -206,24 +213,27 @@ export function enqueueBuildingUpgrade(
   atMs: number,
 ): BuildingQueueResult {
   const settled = settleBuildingQueue(state, config, atMs);
-  if (!settled.accepted) return settled;
+  if (!settled.accepted || !settled.state) return settled;
+  const rollback = cloneState(state);
   const next = cloneState(settled.state);
   const building = findBuilding(config, buildingId);
-  if (!building) return reject(settled, 'UNKNOWN_BUILDING', `未知建筑: ${buildingId}`);
-  if (next.queue.length >= config.queue.maxEntries) return reject(settled, 'QUEUE_FULL', '建筑队列已满');
-  if (next.queue.some((entry) => entry.buildingId === buildingId)) return reject(settled, 'BUILDING_BUSY', '同一建筑不能重复排队');
+  if (!building) return reject(rollback, 'UNKNOWN_BUILDING', `未知建筑: ${buildingId}`);
+  if (next.queue.length >= config.queue.maxEntries) return reject(rollback, 'QUEUE_FULL', '建筑队列已满');
+  if (next.queue.some((entry) => entry.buildingId === buildingId)) return reject(rollback, 'BUILDING_BUSY', '同一建筑不能重复排队');
   const fromLevel = next.buildingLevels[buildingId];
   const targetLevel = fromLevel + 1;
-  if (targetLevel > building.maxLevel) return reject(settled, 'MAX_LEVEL', '建筑已达到最高等级');
+  if (targetLevel > building.maxLevel) return reject(rollback, 'MAX_LEVEL', '建筑已达到最高等级');
   const upgrade = findUpgrade(config, buildingId, targetLevel) as BuildingUpgradeDefinition | undefined;
-  if (!upgrade) return reject(settled, 'INVALID_STATE', '缺少目标等级配置');
-  if (!allPrerequisitesMet(next.buildingLevels, upgrade.prerequisites)) return reject(settled, 'PREREQUISITE_MISSING', '建筑前置未满足');
+  if (!upgrade) return reject(rollback, 'INVALID_STATE', '缺少目标等级配置');
+  if (!allPrerequisitesMet(next.buildingLevels, upgrade.prerequisites)) return reject(rollback, 'PREREQUISITE_MISSING', '建筑前置未满足');
   for (const [resourceId, amount] of Object.entries(upgrade.cost)) {
-    if (next.resources[resourceId] < amount) return reject(settled, 'INSUFFICIENT_RESOURCES', `资源不足: ${resourceId}`);
+    if (next.resources[resourceId] < amount) return reject(rollback, 'INSUFFICIENT_RESOURCES', `资源不足: ${resourceId}`);
   }
   const previous = next.queue[next.queue.length - 1];
   const startAtMs = Math.max(atMs, previous?.finishAtMs ?? atMs);
-  if (!Number.isSafeInteger(startAtMs + upgrade.durationMs)) return reject(settled, 'INVALID_TIME', '队列完成时间超出安全整数范围');
+  if (!Number.isSafeInteger(startAtMs + upgrade.durationMs) || !Number.isSafeInteger(next.nextSequence + 1)) {
+    return reject(rollback, 'INVALID_TIME', '队列完成时间超出安全整数范围');
+  }
   const entry: BuildingQueueEntry = {
     id: `${buildingId}:L${targetLevel}:Q${next.nextSequence}`,
     buildingId,
@@ -250,19 +260,26 @@ export function applyBuildingSpeedup(
   atMs: number,
 ): BuildingQueueResult {
   const settled = settleBuildingQueue(state, config, atMs);
-  if (!settled.accepted) return settled;
-  if (!isSafeInteger(amountMs, 1)) return reject(settled, 'INVALID_BOOST', '加速时长必须是正安全整数');
+  if (!settled.accepted || !settled.state) return settled;
+  if (!isSafeInteger(amountMs, 1)) return reject(settled.state, 'INVALID_BOOST', '加速时长必须是正安全整数');
   const index = settled.state.queue.findIndex((entry) => entry.id === entryId);
-  if (index < 0) return reject(settled, 'ENTRY_NOT_FOUND', '找不到建筑队列项');
+  if (index < 0) return reject(settled.state, 'ENTRY_NOT_FOUND', '找不到建筑队列项');
   const next = cloneState(settled.state);
   const current = next.queue[index];
   const earliestFinish = Math.max(current.startAtMs, atMs);
   const appliedMs = Math.min(amountMs, Math.max(0, current.finishAtMs - earliestFinish));
-  if (appliedMs === 0) return reject(settled, 'INVALID_BOOST', '该队列项已无可加速时长');
+  if (appliedMs === 0) return reject(settled.state, 'INVALID_BOOST', '该队列项已无可加速时长');
   next.queue[index] = { ...current, finishAtMs: current.finishAtMs - appliedMs };
   shiftFollowingEntries(next.queue, index + 1);
+  const completedEntryIds = [...settled.completedEntryIds];
+  if (next.queue[index].finishAtMs <= atMs) {
+    const [completed] = next.queue.splice(index, 1);
+    next.buildingLevels[completed.buildingId] = completed.targetLevel;
+    completedEntryIds.push(completed.id);
+    if (index > 0) shiftFollowingEntries(next.queue, index);
+  }
   assertBuildingQueueState(next, config);
-  return { accepted: true, code: 'BOOST_APPLIED', state: next, completedEntryIds: settled.completedEntryIds, appliedMs };
+  return { accepted: true, code: 'BOOST_APPLIED', state: next, completedEntryIds, appliedMs };
 }
 
 function canonicalize(value: unknown): unknown {
