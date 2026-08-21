@@ -115,8 +115,8 @@ function expectFailure(label, mutate, expectedPath) {
 }
 
 expectFailure(
-  'invalid prerequisite',
-  (invalidLevel) => { invalidLevel.prerequisiteLevelId = 'C01'; },
+  'unknown prerequisite',
+  (invalidLevel) => { invalidLevel.prerequisiteLevelId = 'L99'; },
   'config/levels/chapter01/L01.chapterLevels[0].prerequisiteLevelId',
 );
 expectFailure(
@@ -132,6 +132,11 @@ expectFailure(
 expectFailure(
   'missing failure conditions',
   (invalidLevel) => { delete invalidLevel.failureConditions; },
+  'config/levels/chapter01/L01.chapterLevels[0].failureConditions',
+);
+expectFailure(
+  'empty failure conditions',
+  (invalidLevel) => { invalidLevel.failureConditions = []; },
   'config/levels/chapter01/L01.chapterLevels[0].failureConditions',
 );
 expectFailure(
