@@ -51,7 +51,7 @@ T328 pass sample: PASS (SHA-256 baselines=6, evidence=contract-rehearsal-fixture
   negative PASS: resource resolver path traversal
 T328 counterexamples: PASS (missing file, invalid JSON, out-of-range integer, tampered save, config path traversal)
 T328 conclusion: release security rehearsal PASS; covered release gate is green.
-T328 rollback: stop release, preserve output, git revert <T328 commit SHA>, then rerun this command before updating the shared ledger.
+T328 rollback: stop release, save and confirm the pre-rollback verifier/report, git revert 6943b5207361dfd037a4147ec34cb5d7ee530f59, then rerun the verifier from the saved pre-rollback copy before updating the shared ledger.
 ```
 
 ## 5. 结论
@@ -68,7 +68,30 @@ T328 安全演练通过。真实配置清单、声明资源和安全相关源码
 
 ## 6. 回退步骤
 
-1. 停止发布，保留验证器输出和失败样本现场。
-2. 确认 T328 提交 SHA 后执行：`git revert <T328提交SHA>`。
-3. 回退完成后重新执行本文件的复验命令；退出码非 `0` 时不得更新共享台账或继续发布。
-4. 仅在复验重新通过并完成协调器复核后，恢复发布流程。
+1. 停止发布，保留验证器输出和失败样本现场。回退前建立副本，并确认验证器、报告和验证器依赖的样本均存在：
+
+   ```sh
+   rollback_copy="$(mktemp -d)"
+   rollback_evidence="$(mktemp -d)"
+   git worktree add --detach "$rollback_copy" 6943b5207361dfd037a4147ec34cb5d7ee530f59
+   test -s "$rollback_copy/cocos-client/tools/release/security/verify-security.mjs"
+   test -s "$rollback_copy/documentation/release/security/T328-security-rehearsal.md"
+   test -s "$rollback_copy/cocos-client/tools/release/security/samples/pass-release-security.json"
+   test -s "$rollback_copy/cocos-client/tools/release/security/samples/fail-tampered-save.json"
+   ```
+
+2. 在原工作树执行：`git revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59`。
+3. 回退后不要从原工作树运行已删除的 T328 验证器；从步骤 1 保存的副本重新执行，并把输出保存到副本之外：
+
+   ```sh
+   (
+     cd "$rollback_copy/cocos-client" &&
+     node --experimental-strip-types tools/release/security/verify-security.mjs
+   ) > "$rollback_evidence/T328-post-revert-verify.log"
+   verify_status=$?
+   cat "$rollback_evidence/T328-post-revert-verify.log"
+   test "$verify_status" -eq 0
+   ```
+
+   退出码非 `0` 时不得更新共享台账或继续发布。
+4. 仅在复验重新通过并完成协调器复核后，恢复发布流程；完成留证后清理临时副本：`git worktree remove "$rollback_copy"`。
