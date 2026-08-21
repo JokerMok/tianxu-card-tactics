@@ -8,6 +8,7 @@ const repoRoot = resolve(projectRoot, '..');
 const requiredStates = ['Idle', 'Move', 'Attack', 'Hit', 'Death'];
 const requiredMounts = ['attackOrigin', 'effect', 'healthBar', 'shadow', 'cardAnchor'];
 const allowedTrackProperties = new Set(['translateX', 'translateY', 'rotate', 'scaleX', 'scaleY', 'opacity']);
+const requiredLandmarks = ['wingTip', 'wingRoot', 'drawHand', 'bowGrip', 'arrowHead'];
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -44,6 +45,86 @@ function assertRect(rect, bounds, label) {
 
 function assertSameKeys(record, keys, label) {
   assert.deepEqual(Object.keys(record).sort(), [...keys].sort(), `${label} keys must match the approved set`);
+}
+
+function isRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function assertPoint(point, bounds, label) {
+  assert.equal(Number.isInteger(point?.x), true, `${label}.x must be an integer`);
+  assert.equal(Number.isInteger(point?.y), true, `${label}.y must be an integer`);
+  assert.equal(point.x >= 0 && point.x < bounds.width, true, `${label}.x must stay inside the preview`);
+  assert.equal(point.y >= 0 && point.y < bounds.height, true, `${label}.y must stay inside the preview`);
+}
+
+function validatePreviewSemantics(label, preview, facing) {
+  assert.equal(isRecord(preview), true, `${label} preview contract must be an object`);
+  assert.equal(typeof preview.path, 'string', `${label} preview path must be a string`);
+  assert.equal(preview.path.startsWith('cocos-client/assets/resources/art/battle/units/U004/'), true, `${label} preview path escaped the approved U004 directory`);
+  const previewPath = resolve(repoRoot, preview.path);
+  const previewSize = pngSize(previewPath);
+  assert.deepEqual({ width: previewSize.width, height: previewSize.height }, preview.size, `${label} preview dimensions changed unexpectedly`);
+  assert.equal(sha256(previewPath), preview.sha256, `${label} preview hash changed unexpectedly`);
+  assert.equal(previewSize.byteLength > 500000, true, `${label} preview is too small to count as review evidence`);
+  assert.equal(isRecord(preview.landmarks), true, `${label} landmarks must be an object`);
+  assertSameKeys(preview.landmarks, requiredLandmarks, `${label} landmarks`);
+  for (const landmark of requiredLandmarks) {
+    assertPoint(preview.landmarks[landmark], preview.size, `${label}.${landmark}`);
+  }
+  const { wingTip, wingRoot, drawHand, bowGrip, arrowHead } = preview.landmarks;
+  assert.equal(Math.abs(drawHand.y - bowGrip.y) <= 32, true, `${label} drawHand and bowGrip must stay on the same shot lane`);
+  assert.equal(Math.abs(arrowHead.y - bowGrip.y) <= 32, true, `${label} arrowHead must stay aligned with the bow grip`);
+  if (facing === 'RIGHT') {
+    assert.equal(wingTip.x < wingRoot.x, true, `${label} wing tip must remain behind the wing root`);
+    assert.equal(wingRoot.x < drawHand.x, true, `${label} wing root must stay behind the draw hand`);
+    assert.equal(drawHand.x < bowGrip.x, true, `${label} draw hand must stay behind the bow grip`);
+    assert.equal(bowGrip.x < arrowHead.x, true, `${label} bow grip must stay behind the arrow head`);
+  } else {
+    assert.equal(wingTip.x > wingRoot.x, true, `${label} wing tip must remain behind the wing root after mirroring`);
+    assert.equal(wingRoot.x > drawHand.x, true, `${label} wing root must stay behind the draw hand after mirroring`);
+    assert.equal(drawHand.x > bowGrip.x, true, `${label} draw hand must stay behind the bow grip after mirroring`);
+    assert.equal(bowGrip.x > arrowHead.x, true, `${label} bow grip must stay behind the arrow head after mirroring`);
+  }
+}
+
+function validateDirectionContract(skeleton) {
+  assert.deepEqual(skeleton.orientations, {
+    player: { direction: 1, scaleX: 1 },
+    enemy: { direction: -1, scaleX: -1 }
+  }, 'U004 must lock the player-right/enemy-left runtime facing contract');
+  assert.equal(isRecord(skeleton.directionContract), true, 'U004 must declare a directionContract');
+  assert.equal(skeleton.directionContract.canonicalFacing, 'player-right', 'U004 canonicalFacing must remain player-right');
+  assert.equal(skeleton.directionContract.runtimeMirrorMode, 'validated-horizontal-mirror', 'U004 runtimeMirrorMode must remain validated-horizontal-mirror');
+  assert.equal(skeleton.directionContract.playerFacing, 'RIGHT', 'U004 playerFacing must remain RIGHT');
+  assert.equal(skeleton.directionContract.enemyFacing, 'LEFT', 'U004 enemyFacing must remain LEFT');
+  assert.deepEqual(skeleton.directionContract.safeMirrorJustification, [
+    'source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror',
+    'the draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror',
+    'wing root stays visible behind the torso and the wing arc stays clear of the arrow lane in both approved previews'
+  ], 'U004 safeMirrorJustification drifted from the approved mirror rationale');
+  assert.deepEqual(skeleton.directionContract.failureCounterexamples, [
+    'single-side insignia, text, or prop would invalidate horizontal mirroring',
+    'if draw hand crosses beyond bow grip, mirrored attack would read back-handed and violate the shot lane',
+    'if wing root disappears or wing arc overlaps the arrow lane, mirrored enemy facing is rejected'
+  ], 'U004 failureCounterexamples drifted from the approved mirror guardrails');
+  assert.equal(isRecord(skeleton.directionContract.previewEvidence), true, 'U004 previewEvidence must be an object');
+  assertSameKeys(skeleton.directionContract.previewEvidence, ['enemyLeft', 'playerRight'], 'U004 previewEvidence');
+  const playerRight = skeleton.directionContract.previewEvidence.playerRight;
+  const enemyLeft = skeleton.directionContract.previewEvidence.enemyLeft;
+  validatePreviewSemantics('playerRight', playerRight, 'RIGHT');
+  validatePreviewSemantics('enemyLeft', enemyLeft, 'LEFT');
+  assert.equal(enemyLeft.derivedFrom, 'playerRight', 'enemyLeft preview must declare playerRight as its source');
+  assert.equal(enemyLeft.transform, 'horizontal-flip', 'enemyLeft preview must declare a horizontal-flip transform');
+  assert.deepEqual(enemyLeft.size, playerRight.size, 'enemyLeft preview must keep the same canvas size as playerRight');
+  for (const landmark of requiredLandmarks) {
+    assert.equal(
+      enemyLeft.landmarks[landmark].x,
+      playerRight.size.width - 1 - playerRight.landmarks[landmark].x,
+      `${landmark} x must stay horizontally mirrored`
+    );
+    assert.equal(enemyLeft.landmarks[landmark].y, playerRight.landmarks[landmark].y, `${landmark} y must stay vertically aligned`);
+  }
 }
 
 function validateSkeleton(skeleton) {
@@ -152,10 +233,7 @@ function validateSkeleton(skeleton) {
   assert.equal(mounts.get('shadow').y >= -32 && mounts.get('shadow').y <= 8, true, 'U004 shadow must remain close to ground contact');
   assert.equal(mounts.get('cardAnchor').bone, 'root', 'U004 cardAnchor must stay on root');
 
-  assert.deepEqual(skeleton.orientations, {
-    player: { direction: -1, scaleX: -1 },
-    enemy: { direction: 1, scaleX: 1 }
-  }, 'U004 must support mirrored player/enemy facings');
+  validateDirectionContract(skeleton);
 
   assertSameKeys(skeleton.stateMap, requiredStates, 'U004 stateMap');
   for (const [index, state] of requiredStates.entries()) {
@@ -265,7 +343,11 @@ function validateFileBackedAssets(skeleton) {
   assert.equal(sha256(cutoutSheetPath), skeleton.atlases.cutoutSheet.sha256, 'U004 cutout-sheet hash changed unexpectedly');
   assert.equal(cutoutSize.byteLength > 600000, true, 'U004 cutout-sheet must be a real derived atlas, not a placeholder');
 
-  assert.equal(statSync(resolve(projectRoot, 'assets/resources/art/battle/units/U004/skeleton.json')).size > 5000, true, 'U004 skeleton contract is suspiciously small');
+  const playerPreviewPath = resolve(repoRoot, skeleton.directionContract.previewEvidence.playerRight.path);
+  const enemyPreviewPath = resolve(repoRoot, skeleton.directionContract.previewEvidence.enemyLeft.path);
+  assert.equal(statSync(playerPreviewPath).size > 500000, true, 'U004 player-right preview must be a real review artifact');
+  assert.equal(statSync(enemyPreviewPath).size > 500000, true, 'U004 enemy-left preview must be a real review artifact');
+  assert.equal(statSync(resolve(projectRoot, 'assets/resources/art/battle/units/U004/skeleton.json')).size > 7000, true, 'U004 skeleton contract is suspiciously small');
 }
 
 function expectFailure(label, fn, pattern) {
@@ -310,4 +392,43 @@ expectFailure('pose panel overflow', () => validateSkeleton({
   }
 }), /pose panel Death|full width/);
 
-console.log('T281 U004: real source art, derived pose/cutout atlases, combat+faction+doc alignment, actions, mounts, dual facings, and failure counterexamples PASS');
+expectFailure('reversed player/enemy mapping', () => validateSkeleton({
+  ...skeleton,
+  orientations: {
+    player: { direction: -1, scaleX: -1 },
+    enemy: { direction: 1, scaleX: 1 }
+  }
+}), /player-right\/enemy-left/);
+
+expectFailure('missing enemy-left preview evidence', () => validateSkeleton({
+  ...skeleton,
+  directionContract: {
+    ...skeleton.directionContract,
+    previewEvidence: {
+      ...skeleton.directionContract.previewEvidence,
+      enemyLeft: {
+        ...skeleton.directionContract.previewEvidence.enemyLeft,
+        path: 'cocos-client/assets/resources/art/battle/units/U004/U004-ENEMY-LEFT-MISSING.png'
+      }
+    }
+  }
+}), /ENOENT|enemyLeft preview/);
+
+expectFailure('mirrored shot-lane semantics drift', () => validateSkeleton({
+  ...skeleton,
+  directionContract: {
+    ...skeleton.directionContract,
+    previewEvidence: {
+      ...skeleton.directionContract.previewEvidence,
+      enemyLeft: {
+        ...skeleton.directionContract.previewEvidence.enemyLeft,
+        landmarks: {
+          ...skeleton.directionContract.previewEvidence.enemyLeft.landmarks,
+          bowGrip: { ...skeleton.directionContract.previewEvidence.enemyLeft.landmarks.bowGrip, x: 736 }
+        }
+      }
+    }
+  }
+}), /bow grip|horizontally mirrored/);
+
+console.log('T281 U004: player-right/enemy-left contract, preview-backed mirror evidence, combat+faction+doc alignment, actions, mounts, and failure counterexamples PASS');

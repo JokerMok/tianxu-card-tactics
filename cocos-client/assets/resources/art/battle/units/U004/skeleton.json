@@ -110,8 +110,52 @@
     { "name": "cardAnchor", "bone": "root", "x": 0, "y": 110 }
   ],
   "orientations": {
-    "player": { "direction": -1, "scaleX": -1 },
-    "enemy": { "direction": 1, "scaleX": 1 }
+    "player": { "direction": 1, "scaleX": 1 },
+    "enemy": { "direction": -1, "scaleX": -1 }
+  },
+  "directionContract": {
+    "canonicalFacing": "player-right",
+    "runtimeMirrorMode": "validated-horizontal-mirror",
+    "playerFacing": "RIGHT",
+    "enemyFacing": "LEFT",
+    "safeMirrorJustification": [
+      "source art has no text, heraldry, or single-side props that would invert gameplay meaning after horizontal mirror",
+      "the draw-hand, bow grip, and arrow head remain ordered along the shot lane after horizontal mirror",
+      "wing root stays visible behind the torso and the wing arc stays clear of the arrow lane in both approved previews"
+    ],
+    "failureCounterexamples": [
+      "single-side insignia, text, or prop would invalidate horizontal mirroring",
+      "if draw hand crosses beyond bow grip, mirrored attack would read back-handed and violate the shot lane",
+      "if wing root disappears or wing arc overlaps the arrow lane, mirrored enemy facing is rejected"
+    ],
+    "previewEvidence": {
+      "playerRight": {
+        "path": "cocos-client/assets/resources/art/battle/units/U004/U004-PLAYER-RIGHT-PREVIEW.png",
+        "size": { "width": 1024, "height": 1536 },
+        "sha256": "570e835357a503ce3c76e835883d63fe3587b85a9978d8ca7af5d3eb7683fa04",
+        "landmarks": {
+          "wingTip": { "x": 32, "y": 92 },
+          "wingRoot": { "x": 196, "y": 420 },
+          "drawHand": { "x": 315, "y": 492 },
+          "bowGrip": { "x": 565, "y": 492 },
+          "arrowHead": { "x": 810, "y": 488 }
+        }
+      },
+      "enemyLeft": {
+        "path": "cocos-client/assets/resources/art/battle/units/U004/U004-ENEMY-LEFT-PREVIEW.png",
+        "size": { "width": 1024, "height": 1536 },
+        "sha256": "b665062136325db6e95252bc0343cf0f12a389fe6a8b81d935451b24ed3c30e6",
+        "derivedFrom": "playerRight",
+        "transform": "horizontal-flip",
+        "landmarks": {
+          "wingTip": { "x": 991, "y": 92 },
+          "wingRoot": { "x": 827, "y": 420 },
+          "drawHand": { "x": 708, "y": 492 },
+          "bowGrip": { "x": 458, "y": 492 },
+          "arrowHead": { "x": 213, "y": 488 }
+        }
+      }
+    }
   },
   "stateMap": {
     "Idle": { "source": "poseSheet", "panelIndex": 0 },
