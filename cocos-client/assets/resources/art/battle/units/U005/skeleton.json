@@ -1,0 +1,657 @@
+{
+  "schema": "battle-unit-production/v1",
+  "contractVersion": "2.2",
+  "unitId": "U005",
+  "assetStage": "A2-derived-battle-reference",
+  "runtimeMode": "pose-sheet-skeleton",
+  "derivationPolicy": "derived-from-approved-card-art; low-altitude-stride-read; no-full-mount-silhouette",
+  "sourceArt": {
+    "id": "U005-CARD",
+    "path": "美术素材/标准版/单位卡面/U005-CARD.png",
+    "kind": "approved-card-art",
+    "status": "approved",
+    "size": {
+      "width": 1024,
+      "height": 1536
+    },
+    "sha256": "4493474a79f30ac4fe38f2a4e620409d1a531b009457d92fc5a2ba1cdc47f61f"
+  },
+  "designTruth": {
+    "name": "流光驭手",
+    "race": "羽民",
+    "politicalFaction": "山海诸庭",
+    "battleRole": "快速",
+    "coreAbility": "移动力二",
+    "visualArchetype": "WINGED_RIDER"
+  },
+  "combatProfile": {
+    "maxHp": 4,
+    "attack": 2,
+    "armor": 0,
+    "spellResist": 0,
+    "move": 2,
+    "range": 1,
+    "attackChannel": "PHYSICAL",
+    "offenseType": "SLASH",
+    "defenseType": "LIGHT",
+    "element": "METAL",
+    "role": "FAST",
+    "prepare": 2,
+    "copyLimit": 3,
+    "abilityId": "A005"
+  },
+  "artConstraints": {
+    "weaponType": "SHORT_SPEAR",
+    "riderGearVisible": true,
+    "strideRead": true,
+    "afterimageRead": true,
+    "forbiddenLook": [
+      "FULL_MOUNT",
+      "LARGE_WINGS_BLOCKING_SILHOUETTE",
+      "STATIC_REARLINE_POSTURE"
+    ],
+    "requiredNotes": [
+      "骑具",
+      "短矛",
+      "两格移动通过残影和步幅表达"
+    ]
+  },
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "pivot": {
+      "x": 0.5,
+      "y": 0.1
+    }
+  },
+  "atlases": {
+    "poseSheet": {
+      "path": "cocos-client/assets/resources/art/battle/units/U005/U005-POSE-SHEET.png",
+      "kind": "derived-state-atlas",
+      "size": {
+        "width": 1800,
+        "height": 640
+      },
+      "sha256": "7e23ca17e7e33863ed77954cce6d4d3757dba21ab9630c95bc86cbf24744831b",
+      "statePanels": [
+        {
+          "index": 0,
+          "state": "Idle",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 1,
+          "state": "Move",
+          "rect": {
+            "x": 360,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 2,
+          "state": "Attack",
+          "rect": {
+            "x": 720,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 3,
+          "state": "Hit",
+          "rect": {
+            "x": 1080,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 4,
+          "state": "Death",
+          "rect": {
+            "x": 1440,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        }
+      ]
+    },
+    "cutoutSheet": {
+      "path": "cocos-client/assets/resources/art/battle/units/U005/U005-CUTOUT-SHEET.png",
+      "kind": "derived-reference-atlas",
+      "size": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "5d842a8400e047ef1b22183cd9e4b7a20640ee207fb1af7c070e81e97436837c",
+      "slices": [
+        {
+          "name": "fullBody",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 460,
+            "height": 560
+          }
+        },
+        {
+          "name": "spearThrust",
+          "rect": {
+            "x": 460,
+            "y": 0,
+            "width": 500,
+            "height": 420
+          }
+        },
+        {
+          "name": "afterimageTrail",
+          "rect": {
+            "x": 980,
+            "y": 0,
+            "width": 556,
+            "height": 430
+          }
+        },
+        {
+          "name": "lowerStride",
+          "rect": {
+            "x": 0,
+            "y": 560,
+            "width": 460,
+            "height": 464
+          }
+        },
+        {
+          "name": "rigSilhouette",
+          "rect": {
+            "x": 420,
+            "y": 264,
+            "width": 560,
+            "height": 760
+          }
+        }
+      ]
+    }
+  },
+  "bones": [
+    {
+      "name": "root",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "name": "torso",
+      "parent": "root",
+      "x": 0,
+      "y": 98
+    },
+    {
+      "name": "head",
+      "parent": "torso",
+      "x": -20,
+      "y": 146
+    },
+    {
+      "name": "spearArm",
+      "parent": "torso",
+      "x": 92,
+      "y": 78
+    },
+    {
+      "name": "offArm",
+      "parent": "torso",
+      "x": -60,
+      "y": 90
+    },
+    {
+      "name": "spear",
+      "parent": "spearArm",
+      "x": 168,
+      "y": 24
+    },
+    {
+      "name": "trail",
+      "parent": "torso",
+      "x": -136,
+      "y": 66
+    },
+    {
+      "name": "gear",
+      "parent": "root",
+      "x": -18,
+      "y": -10
+    }
+  ],
+  "attachments": [
+    {
+      "name": "fullBody",
+      "bone": "root",
+      "source": "cutoutSheet",
+      "sourceRect": {
+        "x": 0,
+        "y": 0,
+        "width": 460,
+        "height": 560
+      },
+      "width": 460,
+      "height": 560
+    },
+    {
+      "name": "spearThrust",
+      "bone": "spearArm",
+      "source": "cutoutSheet",
+      "sourceRect": {
+        "x": 460,
+        "y": 0,
+        "width": 500,
+        "height": 420
+      },
+      "width": 500,
+      "height": 420
+    },
+    {
+      "name": "afterimageTrail",
+      "bone": "trail",
+      "source": "cutoutSheet",
+      "sourceRect": {
+        "x": 980,
+        "y": 0,
+        "width": 556,
+        "height": 430
+      },
+      "width": 556,
+      "height": 430
+    },
+    {
+      "name": "lowerStride",
+      "bone": "root",
+      "source": "cutoutSheet",
+      "sourceRect": {
+        "x": 0,
+        "y": 560,
+        "width": 460,
+        "height": 464
+      },
+      "width": 460,
+      "height": 464
+    },
+    {
+      "name": "rigSilhouette",
+      "bone": "torso",
+      "source": "cutoutSheet",
+      "sourceRect": {
+        "x": 420,
+        "y": 264,
+        "width": 560,
+        "height": 760
+      },
+      "width": 560,
+      "height": 760
+    }
+  ],
+  "mountPoints": [
+    {
+      "name": "attackOrigin",
+      "bone": "spear",
+      "x": 214,
+      "y": 18
+    },
+    {
+      "name": "effect",
+      "bone": "torso",
+      "x": 42,
+      "y": 78
+    },
+    {
+      "name": "healthBar",
+      "bone": "root",
+      "x": 0,
+      "y": 224
+    },
+    {
+      "name": "shadow",
+      "bone": "root",
+      "x": 0,
+      "y": -12
+    },
+    {
+      "name": "cardAnchor",
+      "bone": "root",
+      "x": 0,
+      "y": 104
+    }
+  ],
+  "orientations": {
+    "player": {
+      "direction": -1,
+      "scaleX": -1
+    },
+    "enemy": {
+      "direction": 1,
+      "scaleX": 1
+    }
+  },
+  "stateMap": {
+    "Idle": {
+      "source": "poseSheet",
+      "panelIndex": 0
+    },
+    "Move": {
+      "source": "poseSheet",
+      "panelIndex": 1
+    },
+    "Attack": {
+      "source": "poseSheet",
+      "panelIndex": 2
+    },
+    "Hit": {
+      "source": "poseSheet",
+      "panelIndex": 3
+    },
+    "Death": {
+      "source": "poseSheet",
+      "panelIndex": 4
+    }
+  },
+  "animations": {
+    "Idle": {
+      "duration": 1.04,
+      "loop": true,
+      "sourcePose": {
+        "source": "poseSheet",
+        "panelIndex": 0
+      },
+      "tracks": [
+        {
+          "bone": "torso",
+          "property": "translateY",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.52,
+              "value": 6
+            },
+            {
+              "time": 1.04,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "bone": "trail",
+          "property": "opacity",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0.42
+            },
+            {
+              "time": 0.52,
+              "value": 0.62
+            },
+            {
+              "time": 1.04,
+              "value": 0.42
+            }
+          ]
+        }
+      ],
+      "events": []
+    },
+    "Move": {
+      "duration": 0.64,
+      "loop": true,
+      "sourcePose": {
+        "source": "poseSheet",
+        "panelIndex": 1
+      },
+      "tracks": [
+        {
+          "bone": "root",
+          "property": "translateX",
+          "frames": [
+            {
+              "time": 0,
+              "value": -8
+            },
+            {
+              "time": 0.32,
+              "value": 12
+            },
+            {
+              "time": 0.64,
+              "value": -8
+            }
+          ]
+        },
+        {
+          "bone": "gear",
+          "property": "rotate",
+          "frames": [
+            {
+              "time": 0,
+              "value": -5
+            },
+            {
+              "time": 0.32,
+              "value": 7
+            },
+            {
+              "time": 0.64,
+              "value": -5
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "footstep",
+          "time": 0.16
+        },
+        {
+          "name": "footstep",
+          "time": 0.48
+        }
+      ]
+    },
+    "Attack": {
+      "duration": 0.68,
+      "loop": false,
+      "sourcePose": {
+        "source": "poseSheet",
+        "panelIndex": 2
+      },
+      "tracks": [
+        {
+          "bone": "spear",
+          "property": "rotate",
+          "frames": [
+            {
+              "time": 0,
+              "value": -6
+            },
+            {
+              "time": 0.18,
+              "value": 12
+            },
+            {
+              "time": 0.44,
+              "value": 34
+            },
+            {
+              "time": 0.68,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "bone": "spearArm",
+          "property": "translateX",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.22,
+              "value": 10
+            },
+            {
+              "time": 0.44,
+              "value": 22
+            },
+            {
+              "time": 0.68,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "bone": "torso",
+          "property": "translateX",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.28,
+              "value": 12
+            },
+            {
+              "time": 0.68,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "windup",
+          "time": 0.16
+        },
+        {
+          "name": "impact",
+          "time": 0.44
+        }
+      ]
+    },
+    "Hit": {
+      "duration": 0.34,
+      "loop": false,
+      "sourcePose": {
+        "source": "poseSheet",
+        "panelIndex": 3
+      },
+      "tracks": [
+        {
+          "bone": "torso",
+          "property": "translateX",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.08,
+              "value": -18
+            },
+            {
+              "time": 0.34,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "bone": "head",
+          "property": "rotate",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.1,
+              "value": -10
+            },
+            {
+              "time": 0.34,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "hit",
+          "time": 0.08
+        }
+      ]
+    },
+    "Death": {
+      "duration": 0.86,
+      "loop": false,
+      "sourcePose": {
+        "source": "poseSheet",
+        "panelIndex": 4
+      },
+      "tracks": [
+        {
+          "bone": "root",
+          "property": "rotate",
+          "frames": [
+            {
+              "time": 0,
+              "value": 0
+            },
+            {
+              "time": 0.42,
+              "value": 26
+            },
+            {
+              "time": 0.86,
+              "value": 84
+            }
+          ]
+        },
+        {
+          "bone": "root",
+          "property": "opacity",
+          "frames": [
+            {
+              "time": 0,
+              "value": 1
+            },
+            {
+              "time": 0.58,
+              "value": 1
+            },
+            {
+              "time": 0.86,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "despawn",
+          "time": 0.86
+        }
+      ]
+    }
+  }
+}

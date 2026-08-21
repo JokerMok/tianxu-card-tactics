@@ -1,0 +1,229 @@
+{
+  "schema": "battle-unit-production-contract/v1",
+  "contractVersion": "2.2",
+  "productionTask": "T282",
+  "approvedAt": "2026-08-21",
+  "unitId": "U005",
+  "displayName": "流光驭手",
+  "resourceRoot": "assets/resources/art/battle/units/U005",
+  "sourceArt": {
+    "file": "美术素材/标准版/单位卡面/U005-CARD.png",
+    "sha256": "4493474a79f30ac4fe38f2a4e620409d1a531b009457d92fc5a2ba1cdc47f61f",
+    "size": {
+      "width": 1024,
+      "height": 1536
+    }
+  },
+  "combatIdentity": {
+    "race": "羽民",
+    "politicalFaction": "山海诸庭",
+    "role": "FAST",
+    "offenseType": "SLASH",
+    "defenseType": "LIGHT",
+    "element": "METAL",
+    "visualArchetype": "WINGED_RIDER",
+    "abilityHint": "急行",
+    "combatPurpose": "空线压力",
+    "stats": {
+      "prepare": 2,
+      "maxHp": 4,
+      "attack": 2,
+      "armor": 0,
+      "move": 2,
+      "range": 1,
+      "copyLimit": 3,
+      "rarity": 3
+    },
+    "tags": [
+      "unit",
+      "fast"
+    ]
+  },
+  "designIntent": {
+    "silhouette": "骑具、短矛",
+    "readabilityPx": 120,
+    "readabilityRequirement": "两格移动通过残影和步幅表达",
+    "animationFocus": [
+      "低空前倾",
+      "两格步幅",
+      "短矛切入",
+      "受击回撤",
+      "死亡退场"
+    ]
+  },
+  "resources": {
+    "poseSheet": {
+      "file": "U005-POSE-SHEET.png",
+      "metaFile": "U005-POSE-SHEET.png.meta",
+      "resourcePath": "art/battle/units/U005/U005-POSE-SHEET/spriteFrame",
+      "kind": "production-frozen-pose-sheet",
+      "referencePath": "美术素材/标准版/单位卡面/U005-CARD.png",
+      "sha256": "7e23ca17e7e33863ed77954cce6d4d3757dba21ab9630c95bc86cbf24744831b",
+      "size": {
+        "width": 1800,
+        "height": 640
+      },
+      "poseGrid": [
+        {
+          "index": 0,
+          "state": "Idle",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 1,
+          "state": "Move",
+          "rect": {
+            "x": 360,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 2,
+          "state": "Attack",
+          "rect": {
+            "x": 720,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 3,
+          "state": "Hit",
+          "rect": {
+            "x": 1080,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        },
+        {
+          "index": 4,
+          "state": "Death",
+          "rect": {
+            "x": 1440,
+            "y": 0,
+            "width": 360,
+            "height": 640
+          }
+        }
+      ]
+    },
+    "cutoutSheet": {
+      "file": "U005-CUTOUT-SHEET.png",
+      "metaFile": "U005-CUTOUT-SHEET.png.meta",
+      "resourcePath": "art/battle/units/U005/U005-CUTOUT-SHEET/spriteFrame",
+      "kind": "production-frozen-cutout-sheet",
+      "referencePath": "美术素材/标准版/单位卡面/U005-CARD.png",
+      "sha256": "5d842a8400e047ef1b22183cd9e4b7a20640ee207fb1af7c070e81e97436837c",
+      "size": {
+        "width": 1536,
+        "height": 1024
+      },
+      "slices": [
+        {
+          "name": "fullBody",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 460,
+            "height": 560
+          }
+        },
+        {
+          "name": "spearThrust",
+          "rect": {
+            "x": 460,
+            "y": 0,
+            "width": 500,
+            "height": 420
+          }
+        },
+        {
+          "name": "afterimageTrail",
+          "rect": {
+            "x": 980,
+            "y": 0,
+            "width": 556,
+            "height": 430
+          }
+        },
+        {
+          "name": "lowerStride",
+          "rect": {
+            "x": 0,
+            "y": 560,
+            "width": 460,
+            "height": 464
+          }
+        },
+        {
+          "name": "rigSilhouette",
+          "rect": {
+            "x": 420,
+            "y": 264,
+            "width": 560,
+            "height": 760
+          }
+        }
+      ]
+    }
+  },
+  "runtime": {
+    "skeletonFile": "skeleton.json",
+    "requiredActions": [
+      "Idle",
+      "Move",
+      "Attack",
+      "Hit",
+      "Death"
+    ],
+    "requiredMountPoints": [
+      "attackOrigin",
+      "effect",
+      "healthBar",
+      "shadow",
+      "cardAnchor"
+    ],
+    "orientationPair": {
+      "player": {
+        "direction": -1,
+        "scaleX": -1
+      },
+      "enemy": {
+        "direction": 1,
+        "scaleX": 1
+      }
+    },
+    "requiredEvents": {
+      "Move": [
+        "footstep"
+      ],
+      "Attack": [
+        "windup",
+        "impact"
+      ],
+      "Hit": [
+        "hit"
+      ],
+      "Death": [
+        "despawn"
+      ]
+    }
+  },
+  "provenance": {
+    "sourceSkeleton": "assets/resources/art/battle/units/U005/skeleton.json",
+    "designEvidence": [
+      "角色兵种体系-v1.1.md",
+      "第一批卡牌设计表.md",
+      "首批美术素材清单-v2.2.md"
+    ]
+  }
+}
