@@ -162,6 +162,20 @@ assert.throws(
 );
 assert.throws(
   () => createHeroProfessionRules({
+    cards: cardsTable.cards.map((card) => {
+      if (card.id !== 'S004') return { ...card };
+      const copy = { ...card };
+      delete copy.skillId;
+      return copy;
+    }),
+    decks: decksTable.decks,
+    professions: professionsTable.professions,
+  }),
+  /cards config/i,
+  'skill cards must carry an explicit skillId',
+);
+assert.throws(
+  () => createHeroProfessionRules({
     cards: cardsTable.cards,
     decks: [{ ...configuredDeck, enabled: false }],
     professions: professionsTable.professions,

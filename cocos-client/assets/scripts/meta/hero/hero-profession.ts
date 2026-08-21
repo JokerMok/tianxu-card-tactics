@@ -86,6 +86,7 @@ function parseCards(rawCards: readonly unknown[]): ReadonlyMap<string, CardDefin
     if (typeof id !== 'string' || id.length === 0 || (cardType !== 'UNIT' && cardType !== 'SKILL')
       || typeof profession !== 'string' || profession.length === 0 || !isPositiveInteger(copyLimit) || cards.has(id)
       || (skillId !== undefined && (typeof skillId !== 'string' || skillId.length === 0))
+      || (cardType === 'SKILL' && skillId === undefined)
       || (cardType === 'UNIT' && skillId !== undefined)) {
       throw new Error('hero profession cards config is invalid');
     }
@@ -145,7 +146,7 @@ function parseAuthority(authority: HeroProfessionAuthority): RulesAuthority {
   for (const profession of professionsById.values()) {
     for (const skillId of profession.skillIds) {
       const card = cardsById.get(skillId);
-      if (!card || card.cardType !== 'SKILL' || (card.skillId ?? card.id) !== skillId) {
+      if (!card || card.cardType !== 'SKILL' || card.skillId !== skillId) {
         throw new Error('hero profession skill references are invalid');
       }
     }
@@ -221,7 +222,9 @@ export function createHeroProfessionRules(authority: HeroProfessionAuthority): H
       if (card.cardType === 'SKILL') {
         skillCards += entry.count;
         if (!isNeutralOrOwned(card, profession.id)) errors.push('DECK_CARD_PROFESSION_FORBIDDEN');
-        if (!profession.skillIds.includes(card.skillId ?? card.id)) errors.push('DECK_SKILL_PROFESSION_FORBIDDEN');
+        if (card.skillId === undefined || !profession.skillIds.includes(card.skillId)) {
+          errors.push('DECK_SKILL_PROFESSION_FORBIDDEN');
+        }
         continue;
       }
       errors.push('DECK_CARD_TYPE_UNSUPPORTED');
