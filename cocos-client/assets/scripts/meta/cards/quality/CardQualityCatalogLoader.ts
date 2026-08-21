@@ -55,7 +55,10 @@ function assertProductionRegistry(metadata: CardQualityCatalogOptions['metadata'
   if (!isRecord(metadata) || !Array.isArray(metadata.cards)) {
     throw new CardQualityError('INVALID_METADATA', 'card quality loader requires the real cards.json registry');
   }
-  const enabledCards = metadata.cards.filter((card) => isRecord(card) && card.enabled !== false);
+  if (metadata.cards.some((card) => !isRecord(card))) {
+    throw new CardQualityError('INVALID_METADATA', 'real cards.json registry contains an invalid row');
+  }
+  const enabledCards = metadata.cards.filter((card) => card.enabled !== false);
   if (enabledCards.length !== EXPECTED_CARD_QUALITY_CARD_COUNT) {
     throw new CardQualityError('INVALID_METADATA', 'real cards.json registry must contain exactly 44 enabled cards');
   }

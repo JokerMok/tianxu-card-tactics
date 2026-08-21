@@ -74,8 +74,10 @@ function dataWithEntries(entries) {
   return data;
 }
 
+const cardsTableBeforeLoad = structuredClone(cardsTable);
 const catalog = loadCardQualityCatalog(cardsTable);
 assert(catalog instanceof CardQualityCatalog, 'production loader must create a CardQualityCatalog');
+assert.deepEqual(cardsTable, cardsTableBeforeLoad, 'loader must not mutate the real cards.json registry input');
 const snapshot = catalog.snapshot();
 assert.equal(catalog.cardIds().length, EXPECTED_CARD_COUNT);
 assert.deepEqual(catalog.cardIds(), cards.map(({ id }) => id).sort(), 'all enabled real cards must be represented');
@@ -170,7 +172,11 @@ const negativeCases = [
     forgedRegistry.cards.find((card) => card.id === 'U001').copyLimit = 5;
     return loadCardQualityCatalog(forgedRegistry);
   }, 'INVALID_METADATA'],
-  ['forged.name', () => loadCardQualityCatalog(cardsTable, dataWithEntries(replaceEntry('U001', 1, () => ({ name: 'forged' })))), 'INVALID_CONFIG'],
+  ['forged.name', () => {
+    const forgedRegistry = structuredClone(cardsTable);
+    forgedRegistry.cards.find((card) => card.id === 'U001').name = 'forged';
+    return loadCardQualityCatalog(forgedRegistry);
+  }, 'INVALID_METADATA'],
   ['unknown entries wrapper field', () => createCardQualityCatalog({ metadata: cards, entries: { entries: baseEntries, forged: true } }), 'INVALID_CONFIG'],
   ['unknown grant source', () => catalog.validateGrant({ cardId: 'U001', quality: 6, source: 'NOT_A_REAL_SOURCE', quantity: 1 }), 'INVALID_SOURCE'],
   ['quality source mismatch', () => catalog.validateGrant({ cardId: 'U001', quality: 1, source: 'CRAFT', quantity: 1 }), 'SOURCE_NOT_ALLOWED'],
