@@ -1,0 +1,14 @@
+{
+  "kind": "release-recovery-failure-sample",
+  "evidenceClass": "corrupt-input",
+  "scenario": "primary-and-backup-unreadable",
+  "primary": "{bad-json",
+  "backup": {
+    "schemaVersion": 99
+  },
+  "expected": {
+    "reason": "default",
+    "recovered": true,
+    "playerId": "T329-FALLBACK"
+  }
+}

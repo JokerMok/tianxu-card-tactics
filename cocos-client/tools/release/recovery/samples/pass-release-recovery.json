@@ -1,0 +1,66 @@
+{
+  "kind": "release-recovery-pass-sample",
+  "evidenceClass": "contract-rehearsal-fixture",
+  "scenario": "real-save-schema-primary-backup-default-and-legacy-migration",
+  "now": 1700000000000,
+  "primary": {
+    "schemaVersion": 1,
+    "playerId": "T329-PASS",
+    "updatedAt": 1700000000000,
+    "deck": {
+      "cardIds": ["U001"]
+    },
+    "progress": {
+      "unlockedNodes": ["N001"],
+      "clearedNodes": []
+    },
+    "resources": {
+      "gold": 100,
+      "essence": 4
+    }
+  },
+  "backup": {
+    "schemaVersion": 1,
+    "playerId": "T329-BACKUP",
+    "updatedAt": 1699999999000,
+    "deck": {
+      "cardIds": ["U002"]
+    },
+    "progress": {
+      "unlockedNodes": ["N001", "N002"],
+      "clearedNodes": ["N001"]
+    },
+    "resources": {
+      "gold": 80,
+      "essence": 2
+    }
+  },
+  "invalidPrimary": {
+    "schemaVersion": 99
+  },
+  "legacyPrimary": "{bad-json",
+  "legacyBackup": {
+    "schemaVersion": 0,
+    "playerId": "T329-LEGACY",
+    "updatedAt": 1699999998000,
+    "cardIds": ["U002"],
+    "unlockedNodes": ["N001", "N002"],
+    "clearedNodes": ["N001"],
+    "gold": 80,
+    "essence": 2
+  },
+  "expected": {
+    "currentSchemaVersion": 1,
+    "primaryReason": "primary",
+    "backupReason": "backup",
+    "defaultReason": "default",
+    "migrationSource": "backup",
+    "defaultPlayerId": "T329-FALLBACK",
+    "backupPlayerId": "T329-BACKUP",
+    "legacyCardId": "U002"
+  },
+  "targetSha256": {
+    "saveSchema": "ecc5f67a361291db09c4926eae1e873d387afc67c6881ffc30617ba070424072",
+    "saveMigration": "add6e7bd8595c211d39cae7b4fc33e6fdcf45a114c5ddd71308453faf45088c8"
+  }
+}
