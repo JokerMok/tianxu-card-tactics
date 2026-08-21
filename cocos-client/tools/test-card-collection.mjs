@@ -147,6 +147,12 @@ expectCode('malformed save', () => CardCollectionService.restore(cardsTable, '{b
 const forgedSave = JSON.parse(serialized);
 forgedSave.processedRequests[0].result.rewards[0].reward.currency.coins = 9999;
 expectCode('forged processed reward', () => CardCollectionService.restore(cardsTable, JSON.stringify(forgedSave), { qualityCatalog, rewards }), 'INVALID_STATE');
+const mismatchedEntrySave = JSON.parse(serialized);
+mismatchedEntrySave.cards = mismatchedEntrySave.cards.filter(({ cardId }) => cardId === 'U002');
+expectCode('processed entry does not match cards', () => CardCollectionService.restore(cardsTable, JSON.stringify(mismatchedEntrySave), { qualityCatalog, rewards }), 'INVALID_STATE');
+const mismatchedFingerprintSave = JSON.parse(serialized);
+mismatchedFingerprintSave.processedRequests[0].fingerprint = JSON.stringify({ cardId: 'U001', quality: 2, quantity: 1 });
+expectCode('processed fingerprint does not match result', () => CardCollectionService.restore(cardsTable, JSON.stringify(mismatchedFingerprintSave), { qualityCatalog, rewards }), 'INVALID_STATE');
 
 assert.equal(saves.length >= 5, true, 'successful acquisitions must persist');
 console.log(`T230 card collection PASS: real-cards=${cards.length}, quality-definitions=${qualityCatalog.snapshot().entries.length}, saves=${saves.length}, idempotent, rollback, isolation`);
