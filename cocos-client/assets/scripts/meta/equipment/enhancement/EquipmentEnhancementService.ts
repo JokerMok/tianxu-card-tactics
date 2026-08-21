@@ -520,6 +520,100 @@ function sameMaterials(left: EquipmentEnhancementMaterials, right: EquipmentEnha
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function sameResources(left: EquipmentEnhancementResources, right: EquipmentEnhancementResources): boolean {
+  return left.gold === right.gold && sameMaterials(left.materials, right.materials);
+}
+
+function sameEquipmentAttributes(left: EquipmentItem, right: EquipmentItem): boolean {
+  return left.equipmentId === right.equipmentId
+    && left.slot === right.slot
+    && left.quality === right.quality
+    && left.primaryAttribute === right.primaryAttribute
+    && left.locked === right.locked;
+}
+
+function resourcesBeforeResult(result: EquipmentEnhancementResult): EquipmentEnhancementResources {
+  const materials = new Map<string, number>(Object.entries(result.resources.materials));
+  for (const [materialId, quantity] of Object.entries(result.materialsSpent)) {
+    const previousQuantity = (materials.get(materialId) ?? 0) + quantity;
+    if (!isNonNegativeInteger(previousQuantity)) fail('INVALID_STATE');
+    materials.set(materialId, previousQuantity);
+  }
+  const gold = result.resources.gold + result.goldCost;
+  if (!isNonNegativeInteger(gold)) fail('INVALID_STATE');
+  return { gold, materials: materialObject(materials) };
+}
+
+function assertProcessedResultSemantics(
+  request: NormalizedRequest,
+  result: EquipmentEnhancementResult,
+  record: EquipmentEnhancementRecord,
+): void {
+  if (result.requestId.length === 0 || result.equipmentId !== request.equipmentId
+    || result.roll !== request.roll || result.applied !== true || result.idempotent !== false) fail('INVALID_STATE');
+
+  const cost = getEquipmentEnhancementCost(result.levelBefore);
+  if (cost === null) fail('INVALID_STATE');
+  const expectedMaterials = canonicalMaterialsForAttempt(request, cost);
+  if (!sameMaterials(expectedMaterials, result.materialsSpent)
+    || !sameMaterials(expectedMaterials, result.materialCost)
+    || result.goldCost !== cost.gold
+    || result.successProbability !== cost.successProbability) fail('INVALID_STATE');
+
+  const success = request.roll < cost.successProbability;
+  const protectedAttempt = (expectedMaterials[EQUIPMENT_ENHANCEMENT_PROTECTION_MATERIAL_ID] ?? 0) === 1;
+  const expectedLevelAfter = success || protectedAttempt
+    ? result.levelBefore + (success ? 1 : 0)
+    : Math.max(0, result.levelBefore - 1);
+  const expectedOutcome = success ? 'SUCCESS' : 'FAILURE';
+  const expectedDowngraded = !success && !protectedAttempt && expectedLevelAfter < result.levelBefore;
+  const increment = EQUIPMENT_ENHANCEMENT_STAT_INCREMENT_BY_QUALITY[record.equipment.quality];
+  const expectedAttributeDelta = increment * (expectedLevelAfter - result.levelBefore);
+  const expectedPrimaryValue = record.basePrimaryValue + increment * expectedLevelAfter;
+
+  if (result.outcome !== expectedOutcome || result.success !== success
+    || result.protected !== protectedAttempt || result.downgraded !== expectedDowngraded
+    || result.levelAfter !== expectedLevelAfter || result.level !== expectedLevelAfter
+    || result.attributeDelta !== expectedAttributeDelta
+    || result.equipment.primaryValue !== expectedPrimaryValue
+    || !sameEquipmentAttributes(result.equipment, record.equipment)) fail('INVALID_STATE');
+}
+
+function assertProcessedResultsConsistent(
+  equipment: readonly EquipmentEnhancementRecord[],
+  resources: EquipmentEnhancementResources,
+  processedRequests: readonly EquipmentEnhancementProcessedRequest[],
+): void {
+  if (processedRequests.length === 0) return;
+
+  const records = new Map(equipment.map((record) => [record.equipment.equipmentId, record]));
+  const chronological: EquipmentEnhancementProcessedRequest[] = [];
+  const remaining = [...processedRequests];
+  let expectedResources = resources;
+  while (remaining.length > 0) {
+    const index = remaining.findIndex((request) => sameResources(request.result.resources, expectedResources));
+    if (index === -1) fail('INVALID_STATE');
+    const [request] = remaining.splice(index, 1);
+    chronological.push(request);
+    expectedResources = resourcesBeforeResult(request.result);
+  }
+
+  const levels = new Map<string, number>();
+  for (const processed of chronological.reverse()) {
+    const record = records.get(processed.result.equipmentId);
+    if (!record) fail('INVALID_STATE');
+    const request = normalizeProcessedFingerprint(processed.fingerprint);
+    assertProcessedResultSemantics(request, processed.result, record);
+    const previousLevel = levels.get(record.equipment.equipmentId);
+    if (previousLevel !== undefined && processed.result.levelBefore !== previousLevel) fail('INVALID_STATE');
+    levels.set(record.equipment.equipmentId, processed.result.levelAfter);
+  }
+  for (const record of equipment) {
+    const lastLevel = levels.get(record.equipment.equipmentId);
+    if (lastLevel !== undefined && lastLevel !== record.level) fail('INVALID_STATE');
+  }
+}
+
 function normalizeProcessedFingerprint(value: unknown): NormalizedRequest {
   if (!isText(value)) fail('INVALID_STATE');
   let parsed: unknown;
@@ -594,6 +688,7 @@ function normalizeState(value: unknown): EquipmentEnhancementState {
     if (ids.has(record.equipment.equipmentId)) fail('INVALID_STATE');
     ids.add(record.equipment.equipmentId);
   }
+  const resources = normalizeResources(parsed.resources, 'INVALID_STATE');
   const processedRequests = parsed.processedRequests.map((value) => normalizeProcessedRequest(value))
     .sort(compareProcessedRequests);
   const requestIds = new Set<string>();
@@ -601,10 +696,11 @@ function normalizeState(value: unknown): EquipmentEnhancementState {
     if (requestIds.has(request.requestId)) fail('INVALID_STATE');
     requestIds.add(request.requestId);
   }
+  assertProcessedResultsConsistent(equipment, resources, processedRequests);
   return freezeState({
     schemaVersion: EQUIPMENT_ENHANCEMENT_SCHEMA_VERSION,
     equipment,
-    resources: normalizeResources(parsed.resources, 'INVALID_STATE'),
+    resources,
     processedRequests,
   });
 }

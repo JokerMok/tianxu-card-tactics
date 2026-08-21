@@ -254,6 +254,25 @@ expectCode(
   'INVALID_STATE',
 );
 
+const tamperProcessedResult = (label, mutate) => {
+  const tampered = JSON.parse(serialized);
+  mutate(tampered.processedRequests[0].result, tampered);
+  expectCode(label, () => restoreEquipmentEnhancement(JSON.stringify(tampered)), 'INVALID_STATE');
+};
+tamperProcessedResult('tampered result equipment primary value', (result) => { result.equipment.primaryValue += 1; });
+tamperProcessedResult('tampered result equipment quality', (result) => { result.equipment.quality = 2; });
+tamperProcessedResult('tampered result level before', (result) => { result.levelBefore = 1; });
+tamperProcessedResult('tampered result level after', (result) => { result.levelAfter = 2; result.level = 2; });
+tamperProcessedResult('tampered result attribute delta', (result) => { result.attributeDelta = 99; });
+tamperProcessedResult('tampered result success branch', (result) => { result.outcome = 'FAILURE'; result.success = false; });
+tamperProcessedResult('tampered result applied flag', (result) => { result.applied = false; });
+tamperProcessedResult('tampered result gold cost', (result) => { result.goldCost += 1; result.cost.gold += 1; });
+tamperProcessedResult('tampered result resources snapshot', (result) => { result.resources.gold += 1; });
+
+const tamperedSnapshot = JSON.parse(serialized);
+tamperedSnapshot.equipment.find((record) => record.equipment.equipmentId === 'E-REAL-WEAPON').level = 3;
+expectCode('tampered snapshot equipment level', () => restoreEquipmentEnhancement(JSON.stringify(tamperedSnapshot)), 'INVALID_STATE');
+
 const malformedBefore = service.save();
 expectCode('invalid equipment shape', () => service.add({ ...realWeapon, primaryValue: 0 }), 'INVALID_PRIMARY_VALUE');
 expectCode('missing equipment', () => service.enhance('missing-equipment', { equipmentId: 'E-NOPE' }), 'EQUIPMENT_NOT_FOUND');
