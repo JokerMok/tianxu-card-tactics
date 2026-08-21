@@ -220,6 +220,8 @@ function compareHorizontalMirror(playerPng, enemyPng, correctionRegion) {
     'player-right and enemy-left previews must share a canvas'
   );
   let changedPixels = 0;
+  let changedNonTransparentPixelsInCorrection = 0;
+  let nonTransparentPixelsInCorrection = 0;
   let outsideCorrection = 0;
   let minX = Infinity;
   let minY = Infinity;
@@ -229,6 +231,13 @@ function compareHorizontalMirror(playerPng, enemyPng, correctionRegion) {
     for (let x = 0; x < enemyPng.width; x += 1) {
       const enemyOffset = (y * enemyPng.width + x) * 4;
       const playerOffset = (y * playerPng.width + (playerPng.width - 1 - x)) * 4;
+      const insideCorrection =
+        x >= correctionRegion.x &&
+        y >= correctionRegion.y &&
+        x < correctionRegion.x + correctionRegion.width &&
+        y < correctionRegion.y + correctionRegion.height;
+      const enemyAlpha = enemyPng.pixels[enemyOffset + 3];
+      if (insideCorrection && enemyAlpha > 0) nonTransparentPixelsInCorrection += 1;
       let changed = false;
       for (let channel = 0; channel < 4; channel += 1) {
         if (enemyPng.pixels[enemyOffset + channel] !== playerPng.pixels[playerOffset + channel]) {
@@ -238,6 +247,7 @@ function compareHorizontalMirror(playerPng, enemyPng, correctionRegion) {
       }
       if (!changed) continue;
       changedPixels += 1;
+      if (insideCorrection && enemyAlpha > 0) changedNonTransparentPixelsInCorrection += 1;
       minX = Math.min(minX, x);
       minY = Math.min(minY, y);
       maxX = Math.max(maxX, x);
@@ -254,6 +264,8 @@ function compareHorizontalMirror(playerPng, enemyPng, correctionRegion) {
   }
   return {
     changedPixels,
+    changedNonTransparentPixelsInCorrection,
+    nonTransparentPixelsInCorrection,
     outsideCorrection,
     bounds: changedPixels === 0
       ? null
@@ -296,7 +308,7 @@ function validatePreviewSemantics(label, preview, facing) {
   return previewPng;
 }
 
-function validateDirectionContract(skeleton) {
+function validateDirectionContract(skeleton, decodedPreviews = {}) {
   assert.deepEqual(skeleton.orientations, {
     player: { direction: 1, scaleX: 1 },
     enemy: { direction: -1, scaleX: -1 }
@@ -324,8 +336,8 @@ function validateDirectionContract(skeleton) {
   assertSameKeys(skeleton.directionContract.previewEvidence, ['enemyLeft', 'playerRight'], 'U004 previewEvidence');
   const playerRight = skeleton.directionContract.previewEvidence.playerRight;
   const enemyLeft = skeleton.directionContract.previewEvidence.enemyLeft;
-  const playerPng = validatePreviewSemantics('playerRight', playerRight, 'RIGHT');
-  const enemyPng = validatePreviewSemantics('enemyLeft', enemyLeft, 'LEFT');
+  const playerPng = decodedPreviews.playerRight ?? validatePreviewSemantics('playerRight', playerRight, 'RIGHT');
+  const enemyPng = decodedPreviews.enemyLeft ?? validatePreviewSemantics('enemyLeft', enemyLeft, 'LEFT');
   assert.equal(enemyLeft.derivedFrom, 'playerRight', 'enemyLeft preview must declare playerRight as its source');
   assert.equal(enemyLeft.transform, 'horizontal-flip-plus-independent-correction', 'enemyLeft preview must declare a horizontal-flip plus independent correction');
   assert.equal(enemyLeft.sourceRelationship, 'playerRight-reference-with-independent-enemy-correction', 'enemyLeft preview must declare its independent source relationship');
@@ -339,6 +351,8 @@ function validateDirectionContract(skeleton) {
   assert.deepEqual(enemyLeft.nonMirrorCorrection.mustPreserve, ['player-right/enemy-left semantics', 'wing root visibility', 'clear shot lane'], 'enemyLeft correction guardrails drifted');
   const mirrorDifference = compareHorizontalMirror(playerPng, enemyPng, enemyLeft.nonMirrorCorrection.region);
   assert.equal(mirrorDifference.changedPixels >= enemyLeft.nonMirrorCorrection.minimumChangedPixels, true, 'enemy-left preview must contain a measurable non-mirror correction');
+  assert.equal(mirrorDifference.changedNonTransparentPixelsInCorrection >= enemyLeft.nonMirrorCorrection.minimumChangedPixels, true, 'enemy-left correction must contain enough non-transparent decoded pixels');
+  assert.equal(mirrorDifference.nonTransparentPixelsInCorrection > 0, true, 'enemy-left correction region must contain a non-transparent decoded pixel');
   assert.equal(mirrorDifference.outsideCorrection, 0, 'enemy-left preview non-mirror correction must stay inside its declared region');
   assert.deepEqual(mirrorDifference.bounds, enemyLeft.nonMirrorCorrection.region, 'enemy-left preview correction bounds must match the declared region');
   assert.deepEqual(enemyLeft.size, playerRight.size, 'enemyLeft preview must keep the same canvas size as playerRight');
@@ -510,9 +524,9 @@ function validateSkeleton(skeleton) {
   assert.equal(despawn.time, skeleton.animations.Death.duration, 'U004 Death despawn must align with the final keyframe');
 }
 
-function validateAgainstConfigAndDocs(skeleton) {
-  const units = readJson(resolve(projectRoot, 'assets/resources/config/units.json')).units;
-  const cards = readJson(resolve(projectRoot, 'assets/resources/config/cards.json')).cards;
+function validateAgainstConfigAndDocs(skeleton, configOverrides = {}) {
+  const units = configOverrides.units ?? readJson(resolve(projectRoot, 'assets/resources/config/units.json')).units;
+  const cards = configOverrides.cards ?? readJson(resolve(projectRoot, 'assets/resources/config/cards.json')).cards;
   const unit = units.find((entry) => entry.id === 'U004');
   const card = cards.find((entry) => entry.id === 'U004');
   assert(unit, 'real units.json must contain U004');
@@ -524,6 +538,7 @@ function validateAgainstConfigAndDocs(skeleton) {
   assert.equal(skeleton.combatProfile.maxHp, unit.maxHp, 'U004 maxHp must match units.json');
   assert.equal(skeleton.combatProfile.attack, unit.attack, 'U004 attack must match units.json');
   assert.equal(skeleton.combatProfile.armor, unit.armor, 'U004 armor must match units.json');
+  assert.equal(skeleton.combatProfile.spellResist, unit.spellResist, 'U004 spellResist must match units.json');
   assert.equal(skeleton.combatProfile.move, unit.move, 'U004 move must match units.json');
   assert.equal(skeleton.combatProfile.range, unit.range, 'U004 range must match units.json');
   assert.equal(skeleton.combatProfile.attackChannel, unit.attackChannel, 'U004 attackChannel must match units.json');
@@ -532,6 +547,7 @@ function validateAgainstConfigAndDocs(skeleton) {
   assert.equal(skeleton.combatProfile.element, unit.element, 'U004 element must match units.json');
   assert.equal(skeleton.combatProfile.role, unit.role, 'U004 role must match units.json');
   assert.equal(skeleton.combatProfile.abilityId, unit.abilityIds[0], 'U004 abilityId must match units.json');
+  assert.equal(card.unitId, unit.id, 'cards.json U004 unitId must match units.json.id');
   assert.equal(skeleton.combatProfile.prepare, card.prepare, 'U004 prepare must match cards.json');
   assert.equal(skeleton.combatProfile.copyLimit, card.copyLimit, 'U004 copyLimit must match cards.json');
 
@@ -604,6 +620,18 @@ expectFailure('range drift from real config', () => validateAgainstConfigAndDocs
   combatProfile: { ...skeleton.combatProfile, range: 2 }
 }), /range/);
 
+expectFailure('spellResist drift from real config', () => validateAgainstConfigAndDocs({
+  ...skeleton,
+  combatProfile: { ...skeleton.combatProfile, spellResist: 1 }
+}), /spellResist/);
+
+expectFailure('card unitId drift from units binding', () => {
+  const cards = readJson(resolve(projectRoot, 'assets/resources/config/cards.json')).cards.map((entry) => (
+    entry.id === 'U004' ? { ...entry, unitId: 'U003' } : entry
+  ));
+  validateAgainstConfigAndDocs(skeleton, { cards });
+}, /unitId/);
+
 expectFailure('pose panel overflow', () => validateSkeleton({
   ...skeleton,
   atlases: {
@@ -647,6 +675,19 @@ expectFailure('enemy-left exact horizontal mirror', () => {
   exactMirror.directionContract.previewEvidence.enemyLeft.sha256 = exactMirror.directionContract.previewEvidence.playerRight.sha256;
   validateSkeleton(exactMirror);
 }, /correction|outside|measurable|bounds/);
+
+expectFailure('enemy correction without non-transparent pixel evidence', () => {
+  const playerPng = pngAssets.get('U004-PLAYER-RIGHT-PREVIEW.png').png;
+  const sourceEnemyPng = pngAssets.get('U004-ENEMY-LEFT-PREVIEW.png').png;
+  const enemyPng = { ...sourceEnemyPng, pixels: Buffer.from(sourceEnemyPng.pixels) };
+  const region = skeleton.directionContract.previewEvidence.enemyLeft.nonMirrorCorrection.region;
+  for (let y = region.y; y < region.y + region.height; y += 1) {
+    for (let x = region.x; x < region.x + region.width; x += 1) {
+      enemyPng.pixels[(y * enemyPng.width + x) * 4 + 3] = 0;
+    }
+  }
+  validateDirectionContract(skeleton, { playerRight: playerPng, enemyLeft: enemyPng });
+}, /non-transparent/);
 
 expectFailure('incomplete Cocos image meta', () => {
   const image = pngAssets.get('U004-PLAYER-RIGHT-PREVIEW.png');
