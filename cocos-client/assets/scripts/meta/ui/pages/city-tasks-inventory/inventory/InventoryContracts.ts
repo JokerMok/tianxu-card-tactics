@@ -4,6 +4,7 @@ import {
   EQUIPMENT_SLOTS,
   type EquipmentInventoryState,
   type EquipmentItem,
+  type EquipmentSellResult,
   type EquipmentPrimaryAttribute,
   type EquipmentQuality,
   type EquipmentSlot,
@@ -151,6 +152,34 @@ export interface InventoryPageServiceOptions {
   readonly initialState?: unknown;
   readonly onSave?: (serialized: string) => void;
   readonly persist?: (serialized: string) => void;
+}
+
+/**
+ * The page never exposes the mutable T231 service instance. Write methods on
+ * this facade are routed through the page transaction boundary.
+ */
+export interface InventoryServiceFacade {
+  readonly capacity: number;
+  snapshot(): EquipmentInventoryState;
+  save(): string;
+  list(): readonly EquipmentItem[];
+  query(): readonly EquipmentItem[];
+  get(equipmentId: string): EquipmentItem;
+  getEquipment(equipmentId: string): EquipmentItem;
+  add(input: unknown): EquipmentItem;
+  addEquipment(input: unknown): EquipmentItem;
+  setLocked(equipmentId: string, locked: boolean): EquipmentItem;
+  lock(equipmentId: string): EquipmentItem;
+  unlock(equipmentId: string): EquipmentItem;
+  equip(equipmentId: string): EquipmentItem;
+  equipEquipment(equipmentId: string): EquipmentItem;
+  unequip(slot: string): EquipmentItem | undefined;
+  unequipEquipment(slot: string): EquipmentItem | undefined;
+  sell(requestId: string, equipmentId: string): EquipmentSellResult;
+  sell(equipmentId: string): EquipmentSellResult;
+  sell(request: { readonly requestId: string; readonly equipmentId: string }): EquipmentSellResult;
+  sellBatch(requestId: string, equipmentIds: readonly string[]): EquipmentSellResult;
+  setSort(sort: unknown): EquipmentSort;
 }
 
 export const INVENTORY_DEFAULT_TITLE = '行囊';

@@ -107,6 +107,11 @@ assert.equal(initial.components.find((component) => component.id === 'equipment-
 assert.equal(initial.components.find((component) => component.id === 'detail')?.equipmentId, 'E-REAL-ARMOR');
 assert.equal(initial.components.find((component) => component.id === 'detail')?.location, 'bag');
 assert.equal(initial.state?.inventory, productionInventory.save(), 'page must bind to the T231 production inventory state');
+const exposedInventory = page.inventoryService;
+assert(exposedInventory, 'inventory getter must expose a controlled facade');
+assert.notEqual(exposedInventory, productionInventory, 'inventory getter must not expose the mutable T231 instance');
+assert.equal('current' in exposedInventory, false, 'inventory facade must not expose T231 internal state');
+assert.deepEqual(exposedInventory.snapshot(), productionInventory.snapshot(), 'inventory facade must read the live T231 state');
 
 const frozen = page.snapshot();
 assertDeepFrozen(frozen, 'inventory snapshot');
@@ -122,6 +127,7 @@ assert.deepEqual(page.selectEquipment('E-REAL-WEAPON'), { accepted: true, change
 assert.deepEqual(page.selectEquipment('E-REAL-ARMOR'), { accepted: true, changed: true, reason: 'selected', equipmentId: 'E-REAL-ARMOR' });
 assert.deepEqual(page.selectEquipment('E-REAL-ARMOR'), { accepted: true, changed: false, reason: 'same', equipmentId: 'E-REAL-ARMOR' });
 assert.deepEqual(page.interact({ type: 'toggleLock', equipmentId: 'E-REAL-ARMOR' }), { accepted: true, changed: true, reason: 'unlocked', equipmentId: 'E-REAL-ARMOR' });
+assert.equal(productionInventory.get('E-REAL-ARMOR').locked, false, 'direct page write must update the external T231 instance');
 assert.deepEqual(page.interact({ type: 'toggleLock', equipmentId: 'E-REAL-ARMOR', locked: true }), { accepted: true, changed: true, reason: 'locked', equipmentId: 'E-REAL-ARMOR' });
 assert.deepEqual(page.setFilter({ slot: 'armor', qualities: [3] }), { accepted: true, changed: true, reason: 'filtered', equipmentId: 'E-REAL-ARMOR' });
 assert.equal(page.snapshot().components.find((component) => component.id === 'header')?.visibleItems, 1);
@@ -157,6 +163,12 @@ assert.deepEqual(page.sell('sale-real-armor', 'E-REAL-ARMOR'), {
 });
 assert.equal(page.serialize(), afterSale);
 assert.equal(saves.length, saveCountBeforeSale + 1, 'idempotent sale must not persist twice');
+
+const externallyAdded = productionInventory.add({ equipmentId: 'E-EXTERNAL', slot: 'cloak', quality: 1, primaryAttribute: 'draw', primaryValue: 2 });
+assert.deepEqual(page.inventoryService?.get('E-EXTERNAL'), externallyAdded, 'page getter must follow external T231 additions');
+assert(page.snapshot().components.some((component) => component.id === 'equipment-E-EXTERNAL'), 'external T231 addition must enter the page projection');
+productionInventory.equip('E-EXTERNAL');
+assert.equal(page.snapshot().components.find((component) => component.id === 'equipped-slots')?.slots.cloak?.equipmentId, 'E-EXTERNAL', 'external T231 equip must enter the page projection');
 
 const serialized = page.serialize();
 const restored = new InventoryPageService({ data: createDefaultInventoryPageData(), initialState: serialized });
@@ -210,14 +222,16 @@ expectEquipmentFailure('malformed production inventory state', () => EquipmentIn
 expectPageFailure('empty page serialize', () => unavailable.serialize(), 'STATE_NOT_AVAILABLE');
 expectPageFailure('empty page persistence', () => new InventoryPageService({ data: createEmptyInventoryPageData(), persist: () => {} }), 'STATE_NOT_AVAILABLE');
 
+const persistenceFailureInventory = new EquipmentInventoryService({ state: inventoryState(2, [item('E-PERSIST', 'cloak', 1, 'draw', 1)]) });
 const persistenceFailure = new InventoryPageService({
   data: createDefaultInventoryPageData(),
-  inventory: new EquipmentInventoryService({ state: inventoryState(2, [item('E-PERSIST', 'cloak', 1, 'draw', 1)]) }),
+  inventory: persistenceFailureInventory,
   persist: () => { throw new Error('disk full'); },
 });
 const beforePersistenceFailure = persistenceFailure.serialize();
 expectPageFailure('page persistence failure is atomic', () => persistenceFailure.toggleLock('E-PERSIST', true), 'PERSISTENCE_FAILED');
 assert.equal(persistenceFailure.serialize(), beforePersistenceFailure);
+assert.equal(persistenceFailureInventory.save(), JSON.parse(beforePersistenceFailure).inventory, 'failed page write must roll back the external T231 instance');
 
 const reentrantSaves = [];
 let reentrantPage;
@@ -227,9 +241,14 @@ reentrantPage = new InventoryPageService({
   inventory: new EquipmentInventoryService({ state: inventoryState(2, [item('E-REENTRANT', 'cloak', 1, 'draw', 1)]) }),
   onSave: (serialized) => {
     try {
-      reentrantPage.toggleLock('E-REENTRANT', true);
+      reentrantPage.inventoryService.add({ equipmentId: 'E-REENTRANT-ADD', slot: 'weapon', quality: 1, primaryAttribute: 'attack', primaryValue: 1 });
     } catch (error) {
       nestedFailure = error;
+    }
+    try {
+      reentrantPage.inventoryService.equip('E-REENTRANT');
+    } catch (error) {
+      assert.equal(error.code, 'PERSISTENCE_REENTRANT', 'facade equip re-entry must be rejected explicitly');
     }
     reentrantSaves.push(serialized);
   },
@@ -241,6 +260,7 @@ assert.equal(nestedFailure.code, 'PERSISTENCE_REENTRANT');
 assert.equal(reentrantSaves.length, 1, 'reentrant page mutation must not create a nested persistence record');
 assert.equal(reentrantSaves[0], reentrantPage.serialize(), 'persisted and committed page state must match');
 assert.equal(reentrantPage.snapshot().components.find((component) => component.id === 'equipment-E-REENTRANT')?.locked, true);
+assert.throws(() => reentrantPage.inventoryService?.get('E-REENTRANT-ADD'), /EQUIPMENT_NOT_FOUND/, 'reentrant facade add must not split the inventory state');
 
 assert.equal(negativeCaseCount >= 15, true, 'missing, invalid, out-of-range and atomicity cases must execute');
 assert(saves.length >= 6, 'real page transitions must invoke persistence');

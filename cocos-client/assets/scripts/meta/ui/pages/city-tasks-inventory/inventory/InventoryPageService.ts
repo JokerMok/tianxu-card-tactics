@@ -6,6 +6,7 @@ import {
   type EquipmentInventoryState,
   type EquipmentItem,
   type EquipmentQuality,
+  type EquipmentSellResult,
   type EquipmentSlot,
   type EquipmentSort,
 } from '../../../../equipment/index.ts';
@@ -26,6 +27,7 @@ import {
   type InventoryPageServiceOptions,
   type InventoryPageSnapshot,
   type InventoryPageState,
+  type InventoryServiceFacade,
 } from './InventoryContracts.ts';
 
 export type InventoryPageErrorCode =
@@ -187,13 +189,47 @@ function cloneData(data: InventoryPageData): InventoryPageData {
   return { ...data };
 }
 
+interface EquipmentInventoryRuntime {
+  current: EquipmentInventoryState;
+  committing: boolean;
+}
+
+function inventoryRuntime(service: EquipmentInventoryService): EquipmentInventoryRuntime {
+  return service as unknown as EquipmentInventoryRuntime;
+}
+
+function validateInventorySnapshot(serialized: string): EquipmentInventoryState {
+  try {
+    // T231 restore is used only as a validator. The temporary service is never
+    // retained as page state or exposed to callers.
+    return EquipmentInventoryService.restore(serialized).snapshot();
+  } catch (error) {
+    mapEquipmentError(error);
+  }
+}
+
+function installInventorySnapshot(service: EquipmentInventoryService, state: EquipmentInventoryState): void {
+  const runtime = inventoryRuntime(service);
+  if (runtime.committing) fail('PERSISTENCE_REENTRANT', 'equipment inventory is committing a persistence transaction');
+  runtime.current = state;
+}
+
+function ownedEquipmentIdsFromState(state: EquipmentInventoryState): readonly string[] {
+  return [
+    ...state.items.map((item) => item.equipmentId),
+    ...EQUIPMENT_SLOTS.flatMap((slot) => state.equipped[slot] === null ? [] : [state.equipped[slot]!.equipmentId]),
+  ];
+}
+
 export class InventoryPageService {
   private readonly data: InventoryPageData;
   private inventory: EquipmentInventoryService | null;
+  private readonly inventoryFacade: InventoryServiceFacade | null;
   private selectedEquipmentId: string | null;
   private filter: InventoryFilter;
   private readonly persist?: (serialized: string) => void;
   private persisting = false;
+  private transactionActive = false;
 
   constructor(input: InventoryPageData | InventoryPageServiceOptions = {}) {
     const options: InventoryPageServiceOptions = isRecord(input) && Object.prototype.hasOwnProperty.call(input, 'schemaVersion')
@@ -216,6 +252,7 @@ export class InventoryPageService {
         fail('STATE_NOT_AVAILABLE', 'an empty inventory page has no inventory-backed state');
       }
       this.inventory = null;
+      this.inventoryFacade = null;
       this.selectedEquipmentId = null;
       this.filter = deepFreeze({});
       return;
@@ -223,16 +260,17 @@ export class InventoryPageService {
     const save = options.initialState === undefined ? null : parseSave(options.initialState);
     try {
       this.inventory = options.inventory instanceof EquipmentInventoryService
-        ? EquipmentInventoryService.restore(options.inventory.save())
+        ? options.inventory
         : EquipmentInventoryService.restore(save?.inventory ?? new EquipmentInventoryService({ capacity: options.capacity }).save());
     } catch (error) { mapEquipmentError(error); }
+    this.inventoryFacade = this.inventory === null ? null : this.createInventoryFacade(this.inventory);
     this.filter = save?.filter ?? deepFreeze({});
     this.selectedEquipmentId = save?.selectedEquipmentId ?? this.firstVisibleEquipmentId();
     this.normalizeSelection();
   }
 
   get pageData(): InventoryPageData { return cloneData(this.data); }
-  get inventoryService(): EquipmentInventoryService | null { return this.inventory; }
+  get inventoryService(): InventoryServiceFacade | null { return this.inventoryFacade; }
 
   snapshot(): InventoryPageSnapshot {
     if (this.inventory === null) {
@@ -265,7 +303,7 @@ export class InventoryPageService {
   }
 
   interact(action: InventoryInteraction): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (!isRecord(action) || typeof action.type !== 'string') fail('INVALID_ARGUMENT', 'inventory interaction must contain a type');
     const interactionKeys: Record<string, readonly (readonly string[])[]> = {
       selectEquipment: [['type', 'equipmentId']],
@@ -304,7 +342,7 @@ export class InventoryPageService {
   }
 
   selectEquipment(equipmentId: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (this.ownedEquipmentIds().length === 0) return interactionResult(false, false, 'empty', null);
     this.assertEquipmentId(equipmentId);
@@ -320,7 +358,7 @@ export class InventoryPageService {
   }
 
   selectEquipmentAt(index: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (this.ownedEquipmentIds().length === 0) return interactionResult(false, false, 'empty', null);
     safeInteger(index, 'inventory equipment index');
@@ -330,7 +368,7 @@ export class InventoryPageService {
   }
 
   setFilter(filter: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     const next = validateFilter(filter);
     if (JSON.stringify(next) === JSON.stringify(this.filter)) return interactionResult(true, false, 'same', this.selectedEquipmentId);
@@ -344,7 +382,7 @@ export class InventoryPageService {
   clearFilter(): InventoryInteractionResult { return this.setFilter({}); }
 
   setSort(sort: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     return this.mutate(() => {
       const before = this.inventory!.save();
@@ -356,7 +394,7 @@ export class InventoryPageService {
   }
 
   toggleLock(equipmentId: unknown, locked?: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     this.assertEquipmentId(equipmentId);
     const item = this.getEquipment(equipmentId);
@@ -369,7 +407,7 @@ export class InventoryPageService {
   }
 
   equip(equipmentId?: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     const target = equipmentId ?? this.selectedEquipmentId;
     this.assertEquipmentId(target);
@@ -383,7 +421,7 @@ export class InventoryPageService {
   }
 
   unequip(slot: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (typeof slot !== 'string' || !EQUIPMENT_SLOTS.includes(slot as EquipmentSlot)) fail('INVALID_ARGUMENT', 'invalid equipment slot');
     const current = this.inventory.snapshot().equipped[slot as EquipmentSlot];
@@ -396,7 +434,7 @@ export class InventoryPageService {
   }
 
   sell(requestId: unknown, equipmentId?: unknown): InventoryInteractionResult {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return interactionResult(false, false, 'empty', null);
     if (typeof requestId !== 'string' || requestId.trim().length === 0) fail('INVALID_REQUEST', 'request id must be non-empty');
     const target = equipmentId ?? this.selectedEquipmentId;
@@ -420,23 +458,24 @@ export class InventoryPageService {
   }
 
   save(): string {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     const serialized = this.serialize();
     this.persistSafely(serialized);
     return serialized;
   }
 
   restore(serialized: unknown): InventoryPageSnapshot {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) fail('STATE_NOT_AVAILABLE', 'empty inventory page has no state to restore');
     const parsed = parseSave(serialized);
     const before = this.serialize();
+    this.transactionActive = true;
     try {
-      const restored = EquipmentInventoryService.restore(parsed.inventory);
-      if (parsed.selectedEquipmentId !== null && !this.ownedEquipmentIdsFrom(restored).includes(parsed.selectedEquipmentId)) {
+      const validatedInventory = validateInventorySnapshot(parsed.inventory);
+      if (parsed.selectedEquipmentId !== null && !ownedEquipmentIdsFromState(validatedInventory).includes(parsed.selectedEquipmentId)) {
         fail('EQUIPMENT_NOT_FOUND', `saved selected equipment is not present: ${parsed.selectedEquipmentId}`);
       }
-      this.inventory = restored;
+      installInventorySnapshot(this.inventory, validatedInventory);
       this.filter = parsed.filter;
       this.selectedEquipmentId = parsed.selectedEquipmentId;
       this.normalizeSelection();
@@ -444,25 +483,30 @@ export class InventoryPageService {
       if (next !== before) this.persistSafely(next);
       return this.snapshot();
     } catch (error) {
-      this.restoreInternal(before);
+      this.rollback(before, error);
       if (error instanceof InventoryPageError) throw error;
       mapEquipmentError(error);
+    } finally {
+      this.transactionActive = false;
     }
   }
 
   private mutate<T>(action: () => T): T {
-    this.assertNotPersisting();
+    this.assertCanStartTransaction();
     if (this.inventory === null) return action();
     const before = this.serialize();
+    this.transactionActive = true;
     try {
       const result = action();
       const next = this.serialize();
       if (next !== before) this.persistSafely(next);
       return result;
     } catch (error) {
-      this.restoreInternal(before);
+      this.rollback(before, error);
       if (error instanceof InventoryPageError) throw error;
       mapEquipmentError(error);
+    } finally {
+      this.transactionActive = false;
     }
   }
 
@@ -480,16 +524,61 @@ export class InventoryPageService {
     }
   }
 
-  private assertNotPersisting(): void {
-    if (this.persisting) fail('PERSISTENCE_REENTRANT', 'inventory page persistence callback cannot re-enter the page');
+  private assertCanStartTransaction(): void {
+    if (this.transactionActive || this.persisting) fail('PERSISTENCE_REENTRANT', 'inventory page transaction cannot be re-entered');
   }
 
   private restoreInternal(serialized: string): void {
     const parsed = parseSave(serialized);
-    this.inventory = EquipmentInventoryService.restore(parsed.inventory);
+    if (this.inventory === null) fail('STATE_NOT_AVAILABLE', 'empty inventory page has no state to restore');
+    installInventorySnapshot(this.inventory, validateInventorySnapshot(parsed.inventory));
     this.filter = parsed.filter;
     this.selectedEquipmentId = parsed.selectedEquipmentId;
     this.normalizeSelection();
+  }
+
+  private rollback(before: string, originalError: unknown): void {
+    try {
+      this.restoreInternal(before);
+    } catch (rollbackError) {
+      throw new InventoryPageError('INVALID_STATE', 'inventory page transaction rollback failed', { originalError, rollbackError });
+    }
+  }
+
+  private createInventoryFacade(service: EquipmentInventoryService): InventoryServiceFacade {
+    const controlled = <T>(action: () => T): T => this.mutate(() => {
+      const result = action();
+      this.normalizeSelection();
+      return result;
+    });
+    const facade = {
+      get capacity(): number { return service.capacity; },
+      snapshot: (): EquipmentInventoryState => service.snapshot(),
+      save: (): string => service.save(),
+      list: (): readonly EquipmentItem[] => service.list(),
+      query: (): readonly EquipmentItem[] => service.query(),
+      get: (equipmentId: string): EquipmentItem => service.get(equipmentId),
+      getEquipment: (equipmentId: string): EquipmentItem => service.getEquipment(equipmentId),
+      add: (input: unknown): EquipmentItem => controlled(() => service.add(input)),
+      addEquipment: (input: unknown): EquipmentItem => controlled(() => service.addEquipment(input)),
+      setLocked: (equipmentId: string, locked: boolean): EquipmentItem => controlled(() => service.setLocked(equipmentId, locked)),
+      lock: (equipmentId: string): EquipmentItem => controlled(() => service.lock(equipmentId)),
+      unlock: (equipmentId: string): EquipmentItem => controlled(() => service.unlock(equipmentId)),
+      equip: (equipmentId: string): EquipmentItem => controlled(() => service.equip(equipmentId)),
+      equipEquipment: (equipmentId: string): EquipmentItem => controlled(() => service.equipEquipment(equipmentId)),
+      unequip: (slot: string): EquipmentItem | undefined => controlled(() => service.unequip(slot)),
+      unequipEquipment: (slot: string): EquipmentItem | undefined => controlled(() => service.unequipEquipment(slot)),
+      sell: ((requestIdOrEquipment: unknown, equipmentId?: string): EquipmentSellResult => controlled(() => {
+        if (typeof requestIdOrEquipment === 'object' && requestIdOrEquipment !== null) {
+          return service.sell(requestIdOrEquipment as { readonly requestId: string; readonly equipmentId: string });
+        }
+        if (equipmentId === undefined) return service.sell(requestIdOrEquipment as string);
+        return service.sell(requestIdOrEquipment as string, equipmentId);
+      })) as InventoryServiceFacade['sell'],
+      sellBatch: (requestId: string, equipmentIds: readonly string[]): EquipmentSellResult => controlled(() => service.sellBatch(requestId, equipmentIds)),
+      setSort: (sort: unknown): EquipmentSort => controlled(() => service.setSort(sort)),
+    } satisfies InventoryServiceFacade;
+    return Object.freeze(facade);
   }
 
   private assertEquipmentId(value: unknown): asserts value is string {
@@ -503,11 +592,7 @@ export class InventoryPageService {
   private ownedEquipmentIds(): readonly string[] { return this.ownedEquipmentIdsFrom(this.inventory!); }
 
   private ownedEquipmentIdsFrom(service: EquipmentInventoryService): readonly string[] {
-    const state = service.snapshot();
-    return [
-      ...state.items.map((item) => item.equipmentId),
-      ...EQUIPMENT_SLOTS.flatMap((slot) => state.equipped[slot] === null ? [] : [state.equipped[slot]!.equipmentId]),
-    ];
+    return ownedEquipmentIdsFromState(service.snapshot());
   }
 
   private equippedEquipmentIds(): readonly string[] {
