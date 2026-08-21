@@ -380,7 +380,7 @@ function alphaCoverageInRect(image, rect) {
   return visible / total;
 }
 
-function validateProvenance(contract) {
+function validateProvenance(contract, referenceManifestOverride = null) {
   assert.equal(contract.provenance.referenceManifest, EXPECTED_PROVENANCE.referenceManifest, 'approved provenance manifest path drift');
   assert.equal(contract.provenance.referenceAssetId, EXPECTED_PROVENANCE.referenceAssetId, 'approved reference asset id drift');
   assert.equal(contract.provenance.referenceAsset, EXPECTED_PROVENANCE.referenceAsset, 'approved reference asset path drift');
@@ -388,9 +388,10 @@ function validateProvenance(contract) {
   assert.equal(contract.provenance.runtimeCompositeSha256, EXPECTED_PROVENANCE.runtimeCompositeSha256, 'runtime composite hash fixture drift');
   assert.deepEqual(contract.provenance.runtimeCompositeSize, EXPECTED_PROVENANCE.runtimeCompositeSize, 'runtime composite size fixture drift');
   const referenceManifestPath = path.join(repoRoot, contract.provenance.referenceManifest);
-  const referenceManifest = readJson(referenceManifestPath);
+  const referenceManifest = referenceManifestOverride ?? readJson(referenceManifestPath);
   const referenceAsset = referenceManifest.assets.find((asset) => asset.id === contract.provenance.referenceAssetId);
   assert(referenceAsset, `missing reference asset: ${contract.provenance.referenceAssetId}`);
+  assert.equal(referenceAsset.path, contract.provenance.referenceAsset, 'manifest reference asset path mismatch');
   assert.deepEqual(referenceAsset.size, contract.provenance.runtimeCompositeSize);
   assert.equal(referenceAsset.sha256, contract.provenance.runtimeCompositeSha256);
 
@@ -563,6 +564,12 @@ function validateContract(contract) {
 
 const contract = readJson(contractPath);
 validateContract(contract);
+
+const manifestPathDriftCase = structuredClone(contract);
+const driftedManifest = readJson(path.join(repoRoot, contract.provenance.referenceManifest));
+const driftedReferenceAsset = driftedManifest.assets.find((asset) => asset.id === contract.provenance.referenceAssetId);
+driftedReferenceAsset.path = contract.provenance.runtimeComposite;
+assert.throws(() => validateProvenance(manifestPathDriftCase, driftedManifest), /manifest reference asset path mismatch/);
 
 const provenanceShortcutCase = structuredClone(contract);
 provenanceShortcutCase.provenance.referenceAsset = provenanceShortcutCase.provenance.runtimeComposite;
