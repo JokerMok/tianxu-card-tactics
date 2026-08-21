@@ -8,7 +8,10 @@ import {
   type CampaignLevelId,
   type CampaignState,
 } from '../../../../campaign/CampaignState.ts';
-import { createCampaignPageComponents } from './CampaignComponents.ts';
+import {
+  createCampaignPageComponents,
+  resolveCampaignSelectedLevelId,
+} from './CampaignComponents.ts';
 import {
   CAMPAIGN_PAGE_SCHEMA_VERSION,
   createDefaultCampaignPageData,
@@ -91,6 +94,16 @@ function cloneData(data: CampaignPageData): CampaignPageData {
   };
 }
 
+function cloneAndFreeze<T>(value: T): T {
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return Object.freeze(value.map((item) => cloneAndFreeze(item))) as T;
+  const copy: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    copy[key] = cloneAndFreeze(child);
+  }
+  return Object.freeze(copy) as T;
+}
+
 function validateData(input: CampaignPageData): CampaignPageData {
   assertRecord(input, 'campaign page data');
   assertExactKeys(input, ['schemaVersion', 'chapterId', 'title', 'subtitle', 'levels'], 'campaign page data');
@@ -137,6 +150,22 @@ function defaultDefinition(): CampaignDefinition {
       prerequisiteLevelId: index === 0 ? null : CAMPAIGN_LEVEL_IDS[index - 1],
     })),
   };
+}
+
+function seedStateForVisibleLevel(
+  definition: CampaignDefinition | readonly CampaignLevelDefinition[],
+  data: CampaignPageData,
+): string | undefined {
+  const firstVisibleLevelId = data.levels[0]?.id;
+  if (firstVisibleLevelId === undefined || firstVisibleLevelId === 'L01') return undefined;
+  const seeded = new CampaignStateService(definition);
+  const firstVisibleIndex = CAMPAIGN_LEVEL_IDS.indexOf(firstVisibleLevelId);
+  for (const levelId of CAMPAIGN_LEVEL_IDS.slice(0, firstVisibleIndex)) {
+    seeded.startLevel(levelId);
+    seeded.completeLevel(levelId, 1);
+  }
+  seeded.selectLevel(firstVisibleLevelId);
+  return seeded.serialize();
 }
 
 function isPageData(value: unknown): value is CampaignPageData {
@@ -227,14 +256,18 @@ export class CampaignPageService {
     }
     const configuredDefinition = options.config !== undefined ? options.config : options.index;
     const configuredLevels = options.levels !== undefined ? options.levels : options.levelConfigs;
+    const definition = configuredDefinition ?? configuredLevels ?? defaultDefinition();
     const stateOptions = configuredDefinition !== undefined
       ? { config: configuredDefinition }
       : configuredLevels !== undefined
         ? { levels: configuredLevels, chapterId: options.chapterId }
         : { config: defaultDefinition() };
+    const initialState = options.initialState === undefined
+      ? seedStateForVisibleLevel(definition, this.data)
+      : options.initialState;
     this.campaign = new CampaignStateService({
       ...stateOptions,
-      initialState: options.initialState,
+      initialState,
       onSave: options.onSave,
       persist: options.persist,
     });
@@ -250,16 +283,16 @@ export class CampaignPageService {
 
   snapshot(): CampaignPageSnapshot {
     const state = this.campaign?.snapshot() ?? null;
-    return Object.freeze({
+    return cloneAndFreeze({
       schemaVersion: CAMPAIGN_PAGE_SCHEMA_VERSION,
       pageId: 'campaign',
       selectedLevelId: state === null
         ? this.data.levels[0]?.id ?? null
-        : projectVisibleLevelId(this.data, state.selectedLevelId),
+        : resolveCampaignSelectedLevelId(this.data, state),
       activeLevelId: projectVisibleLevelId(this.data, state?.activeLevelId ?? null),
       state,
       components: createCampaignPageComponents(this.data, state),
-    });
+    }) as CampaignPageSnapshot;
   }
 
   interact(action: CampaignInteraction): CampaignInteractionResult {

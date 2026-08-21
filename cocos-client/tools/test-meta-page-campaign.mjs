@@ -9,7 +9,7 @@ import {
   createEmptyCampaignPageData,
   createCampaignPageComponents,
 } from '../assets/scripts/meta/ui/pages/home-campaign-cards/campaign/index.ts';
-import { CampaignStateError } from '../assets/scripts/meta/campaign/CampaignState.ts';
+import { CampaignStateError, CampaignStateService } from '../assets/scripts/meta/campaign/CampaignState.ts';
 
 const root = path.resolve(import.meta.dirname, '..');
 const campaignRoot = path.join(root, 'assets/scripts/meta/ui/pages/home-campaign-cards/campaign');
@@ -94,6 +94,16 @@ const levelsOnly = new CampaignPageService({ levels: levelConfigs });
 assert.equal(levelsOnly.snapshot().components.find((component) => component.id === 'header')?.totalLevels, 12, 'levels-only options must use default page data');
 const dataAndLevels = new CampaignPageService({ data: defaultData, levels: levelConfigs });
 assert.equal(dataAndLevels.snapshot().components.find((component) => component.id === 'detail')?.title, defaultData.levels[0].title, 'data-plus-levels options must preserve page data');
+const legacyCampaign = new CampaignStateService(index);
+const legacyPage = new CampaignPageService(defaultData, legacyCampaign);
+assert.equal(legacyPage.snapshot().selectedLevelId, 'L01', 'legacy page-data plus injected-state construction must remain compatible');
+const l02OnlyPage = new CampaignPageService({ data: l02OnlyData, config: index });
+const l02OnlySnapshot = l02OnlyPage.snapshot();
+assert.equal(l02OnlySnapshot.selectedLevelId, 'L02', 'service snapshot must target the only visible level');
+assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'level-L02')?.selected, true, 'service snapshot must select the only visible level');
+assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'detail')?.levelId, 'L02', 'service detail must target the only visible level');
+assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'detail')?.canStart, true, 'service detail must expose the only visible level as startable');
+assert.deepEqual(l02OnlyPage.startLevel(), { accepted: true, changed: true, reason: 'started', levelId: 'L02' }, 'only visible level must be the default start target');
 
 const mutableInput = createDefaultCampaignPageData();
 const isolatedInputPage = new CampaignPageService({ data: mutableInput, levels: levelConfigs });
@@ -103,9 +113,13 @@ assert.equal(isolatedInputPage.snapshot().components.find((component) => compone
 
 const snapshotBeforeRewardMutation = page.snapshot();
 const snapshotReward = snapshotBeforeRewardMutation.components.find((component) => component.id === 'level-L01')?.rewards[0];
+assert(Object.isFrozen(snapshotBeforeRewardMutation), 'page snapshots must be frozen');
+assert(Object.isFrozen(snapshotBeforeRewardMutation.components), 'snapshot components must be frozen');
 assert(Object.isFrozen(snapshotReward), 'component reward snapshots must be frozen');
 assert.throws(() => { snapshotReward.quantity = 999; }, TypeError, 'component reward snapshots must reject mutation');
-assert.equal(page.snapshot().components.find((component) => component.id === 'level-L01')?.rewards[0].quantity, 900, 'mutating one snapshot must not contaminate later snapshots');
+const snapshotAfterRewardMutation = page.snapshot();
+assert.notEqual(snapshotAfterRewardMutation, snapshotBeforeRewardMutation, 'each snapshot must be a fresh copy');
+assert.equal(snapshotAfterRewardMutation.components.find((component) => component.id === 'level-L01')?.rewards[0].quantity, 900, 'mutating one snapshot must not contaminate later snapshots');
 
 // Selecting the already selected node is a real idempotent no-op and must not save.
 const savesBeforeSameSelection = saves.length;

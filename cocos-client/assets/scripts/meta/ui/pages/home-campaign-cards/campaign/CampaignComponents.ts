@@ -27,16 +27,29 @@ function cloneLevelData(data: CampaignPageData['levels'][number]): CampaignPageD
   };
 }
 
+export function resolveCampaignSelectedLevelId(
+  data: CampaignPageData,
+  state: CampaignState | null,
+): CampaignLevelId | null {
+  if (data.levels.length === 0) return null;
+  const visibleIds = new Set(data.levels.map((level) => level.id));
+  return state !== null && visibleIds.has(state.selectedLevelId)
+    ? state.selectedLevelId
+    : data.levels[0]!.id;
+}
+
 function stateForLevel(
   levelId: CampaignLevelId,
   state: CampaignState | null,
   selectedLevelId: CampaignLevelId | null,
+  syntheticSelection: boolean,
 ): CampaignLevelComponent['state'] {
   const progress = state?.levels[levelId];
   if (!progress) return state === null && selectedLevelId === levelId ? 'selected' : 'locked';
   if (progress.lastOutcome === 'IN_PROGRESS') return 'inProgress';
   if (progress.lastOutcome === 'FAILED') return 'failed';
   if (progress.firstClear) return 'cleared';
+  if (syntheticSelection && selectedLevelId === levelId) return 'selected';
   if (progress.unlocked && selectedLevelId === levelId) return 'selected';
   if (progress.unlocked) return 'ready';
   return 'locked';
@@ -46,15 +59,16 @@ function levelComponent(
   data: CampaignPageData['levels'][number],
   state: CampaignState | null,
   selectedLevelId: CampaignLevelId | null,
+  syntheticSelection: boolean,
 ): CampaignLevelComponent {
   const progress = state?.levels[data.id];
   const selected = selectedLevelId === data.id;
-  const unlocked = progress?.unlocked ?? (state === null && selected);
+  const unlocked = progress?.unlocked || (syntheticSelection && selected) || (state === null && selected);
   return deepFreeze({
     ...cloneLevelData(data),
     id: `level-${data.id}` as `level-${CampaignLevelId}`,
     kind: 'level',
-    state: stateForLevel(data.id, state, selectedLevelId),
+    state: stateForLevel(data.id, state, selectedLevelId, syntheticSelection),
     levelId: data.id,
     selected,
     unlocked,
@@ -67,10 +81,11 @@ function detailComponent(
   data: CampaignPageData['levels'][number],
   state: CampaignState | null,
   selectedLevelId: CampaignLevelId | null,
+  syntheticSelection: boolean,
 ): CampaignDetailComponent {
   const progress = state?.levels[data.id];
   const selected = selectedLevelId === data.id;
-  const unlocked = progress?.unlocked ?? (state === null && selected);
+  const unlocked = progress?.unlocked || (syntheticSelection && selected) || (state === null && selected);
   const activeLevelId = state?.activeLevelId ?? null;
   return deepFreeze({
     ...cloneLevelData(data),
@@ -92,12 +107,8 @@ export function createCampaignPageComponents(
 ): readonly CampaignPageComponent[] {
   if (data.levels.length === 0) return Object.freeze([emptyComponent('当前没有可征战的章节。')]);
 
-  const visibleIds = new Set(data.levels.map((level) => level.id));
-  const selectedLevelId = state === null
-    ? data.levels[0]!.id
-    : visibleIds.has(state.selectedLevelId)
-      ? state.selectedLevelId
-      : null;
+  const selectedLevelId = resolveCampaignSelectedLevelId(data, state);
+  const syntheticSelection = state !== null && state.selectedLevelId !== selectedLevelId;
   const selectedData = data.levels.find((level) => level.id === selectedLevelId) ?? data.levels[0]!;
   const visibleProgress = data.levels
     .map((level) => state?.levels[level.id])
@@ -113,6 +124,6 @@ export function createCampaignPageComponents(
     earnedStars: visibleProgress.reduce((total, progress) => total + progress.stars, 0),
     totalStars: data.levels.length * 3,
   });
-  const levels = data.levels.map((level) => levelComponent(level, state, selectedLevelId));
-  return Object.freeze([header, ...levels, detailComponent(selectedData, state, selectedLevelId)]);
+  const levels = data.levels.map((level) => levelComponent(level, state, selectedLevelId, syntheticSelection));
+  return Object.freeze([header, ...levels, detailComponent(selectedData, state, selectedLevelId, syntheticSelection)]);
 }
