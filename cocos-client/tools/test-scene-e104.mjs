@@ -10,6 +10,14 @@ const sceneRoot = path.join(clientRoot, 'assets/resources/art/battle/scenes/E104
 const contractPath = path.join(sceneRoot, 'scene-contract.json');
 const EXPECTED_CANVAS = [1920, 1080];
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const EXPECTED_PROVENANCE = {
+  referenceManifest: '美术素材/A0/资源清单.json',
+  referenceAssetId: 'E104-PARALLAX-BOARD',
+  referenceAsset: '美术素材/A0/场景/E104-PARALLAX-BOARD.png',
+  runtimeComposite: 'cocos-client/assets/resources/a0/background/E104-PARALLAX-BOARD.png',
+  runtimeCompositeSha256: '368ead21d68c2a202cbe76304e9dd7a33aa21cd5d7c1e296fcaf529b94790429',
+  runtimeCompositeSize: [1672, 941]
+};
 
 // These values are fixed review fixtures, independent of scene-contract.json.
 // A JSON-only edit must therefore fail before it can redefine the evidence.
@@ -373,6 +381,12 @@ function alphaCoverageInRect(image, rect) {
 }
 
 function validateProvenance(contract) {
+  assert.equal(contract.provenance.referenceManifest, EXPECTED_PROVENANCE.referenceManifest, 'approved provenance manifest path drift');
+  assert.equal(contract.provenance.referenceAssetId, EXPECTED_PROVENANCE.referenceAssetId, 'approved reference asset id drift');
+  assert.equal(contract.provenance.referenceAsset, EXPECTED_PROVENANCE.referenceAsset, 'approved reference asset path drift');
+  assert.equal(contract.provenance.runtimeComposite, EXPECTED_PROVENANCE.runtimeComposite, 'runtime composite path drift');
+  assert.equal(contract.provenance.runtimeCompositeSha256, EXPECTED_PROVENANCE.runtimeCompositeSha256, 'runtime composite hash fixture drift');
+  assert.deepEqual(contract.provenance.runtimeCompositeSize, EXPECTED_PROVENANCE.runtimeCompositeSize, 'runtime composite size fixture drift');
   const referenceManifestPath = path.join(repoRoot, contract.provenance.referenceManifest);
   const referenceManifest = readJson(referenceManifestPath);
   const referenceAsset = referenceManifest.assets.find((asset) => asset.id === contract.provenance.referenceAssetId);
@@ -549,6 +563,10 @@ function validateContract(contract) {
 
 const contract = readJson(contractPath);
 validateContract(contract);
+
+const provenanceShortcutCase = structuredClone(contract);
+provenanceShortcutCase.provenance.referenceAsset = provenanceShortcutCase.provenance.runtimeComposite;
+assert.throws(() => validateContract(provenanceShortcutCase), /approved reference asset path/);
 
 const missingLayerCase = structuredClone(contract);
 missingLayerCase.layers.pop();
