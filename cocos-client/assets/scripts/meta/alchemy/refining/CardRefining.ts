@@ -968,7 +968,7 @@ function normalizeReceipt(value: unknown, index: number, recipeMap: ReadonlyMap<
 }
 
 function makeProductionRecipes(): readonly CardRefiningRecipe[] {
-  const cardIds = [...new Set(CARD_QUALITY_CATALOG_DATA.entries.map((entry) => entry.cardId))];
+  const cardIds = Array.from(new Set(CARD_QUALITY_CATALOG_DATA.entries.map((entry) => entry.cardId)));
   return Object.freeze(cardIds.map((cardId, index) => normalizeRecipe({
     id: `${cardId}-REFINE`,
     materials: [{ materialId: 'CARD_DUST', quantity: 10 }],
