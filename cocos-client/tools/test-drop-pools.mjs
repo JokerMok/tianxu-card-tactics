@@ -147,4 +147,18 @@ assert.throws(
   'a rare-miss increment must be rejected before it overflows',
 );
 
+assert.throws(
+  () => resolveDrop(pool, { claims: 4, firstClearClaimed: true, rareMisses: 3 }, () => 0),
+  /pity threshold/i,
+  'persisted pity misses beyond the threshold are an impossible state',
+);
+
+const maxClaimsPool = { ...pool, maxClaims: Number.MAX_SAFE_INTEGER };
+const maxClaimsState = { claims: Number.MAX_SAFE_INTEGER, firstClearClaimed: true, rareMisses: 0 };
+const maxClaimsLimited = resolveDrop(maxClaimsPool, maxClaimsState, () => {
+  throw new Error('a max-safe claim limit must not consume RNG');
+});
+assert.equal(maxClaimsLimited.code, 'LIMIT_REACHED');
+assert.deepEqual(maxClaimsLimited.nextState, maxClaimsState, 'max-safe claim state must remain stable at the limit');
+
 console.log('T208 drop pools PASS: fixed first clear, injected weighted RNG, pity counter and claim limit');

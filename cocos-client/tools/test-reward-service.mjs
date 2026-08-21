@@ -82,6 +82,20 @@ assert.equal(saveAttempts, 2);
 assert.deepEqual(rollback.snapshot().resources, { gold: 100, essence: 0 });
 assert.deepEqual(rollback.snapshot().processedRewardKeys, ['drop:stage:N001:rollback']);
 
+const overflowState = initialState();
+overflowState.resources.gold = Number.MAX_SAFE_INTEGER - 99;
+let overflowPersisted = false;
+const overflow = new DropRewardService(overflowState, config.pools, () => 0, () => {
+  overflowPersisted = true;
+});
+assert.throws(
+  () => overflow.claim('drop:stage:N001:overflow', pool.id),
+  /overflow/i,
+  'resource overflow must fail before persistence',
+);
+assert.equal(overflowPersisted, false);
+assert.deepEqual(overflow.snapshot(), overflowState, 'resource overflow must roll back the complete transaction');
+
 const rngReentrantPool = { ...pool, maxClaims: 2 };
 const rngReentrantState = {
   resources: { gold: 0, essence: 0 },
@@ -141,6 +155,26 @@ assert.throws(
   /missing drop pool progress/i,
   'the reward service must reject state without progress for every configured pool',
 );
+
+const impossiblePityState = initialState();
+impossiblePityState.dropPools[pool.id] = { claims: 4, firstClearClaimed: true, rareMisses: 3 };
+assert.throws(
+  () => new DropRewardService(impossiblePityState, config.pools, () => 0, () => {}),
+  /pity threshold/i,
+  'the reward service must reject impossible persisted pity progress',
+);
+
+const mutablePool = structuredClone(pool);
+const isolatedState = {
+  resources: { gold: 0, essence: 0 },
+  processedRewardKeys: [],
+  dropPools: { [mutablePool.id]: { claims: 1, firstClearClaimed: true, rareMisses: 0 } },
+};
+const isolated = new DropRewardService(isolatedState, [mutablePool], () => 0, () => {});
+mutablePool.repeat[0].weight = 1;
+mutablePool.repeat[0].rewards.gold = Number.MAX_SAFE_INTEGER;
+assert.equal(isolated.claim('drop:stage:N001:isolated', mutablePool.id).code, 'APPLIED');
+assert.deepEqual(isolated.snapshot().resources, { gold: 10, essence: 0 }, 'service must retain an immutable config snapshot');
 
 let reentrantService;
 let reentrantResult;
