@@ -112,6 +112,9 @@ assert(exposedInventory, 'inventory getter must expose a controlled facade');
 assert.notEqual(exposedInventory, productionInventory, 'inventory getter must not expose the mutable T231 instance');
 assert.equal('current' in exposedInventory, false, 'inventory facade must not expose T231 internal state');
 assert.deepEqual(exposedInventory.snapshot(), productionInventory.snapshot(), 'inventory facade must read the live T231 state');
+assert.equal(exposedInventory.lock('E-REAL-CLOAK').locked, true, 'public inventory facade writes must be controlled by the page transaction');
+assert.equal(productionInventory.get('E-REAL-CLOAK').locked, true, 'public facade writes must commit to the real T231 instance');
+assert.equal(exposedInventory.unlock('E-REAL-CLOAK').locked, false, 'public inventory facade unlock must remain available');
 
 const frozen = page.snapshot();
 assertDeepFrozen(frozen, 'inventory snapshot');
@@ -213,6 +216,10 @@ const hiddenFilterField = {};
 Object.defineProperty(hiddenFilterField, 'source', { value: 'SHOP', enumerable: false });
 expectPageFailure('non-enumerable invalid filter field', () => page.setFilter(hiddenFilterField), 'INVALID_FILTER');
 expectPageFailure('symbol invalid filter field', () => page.setFilter({ [Symbol('source')]: 'SHOP' }), 'INVALID_FILTER');
+const hiddenPageOption = {};
+Object.defineProperty(hiddenPageOption, 'unknown', { value: true, enumerable: false });
+expectPageFailure('non-enumerable unknown page option', () => new InventoryPageService(hiddenPageOption), 'INVALID_ARGUMENT');
+expectPageFailure('symbol unknown page option', () => new InventoryPageService({ [Symbol('unknown')]: true }), 'INVALID_ARGUMENT');
 expectPageFailure('invalid sort', () => page.setSort({ field: 'random', direction: 'asc' }), 'INVALID_SORT');
 expectPageFailure('unknown interaction', () => page.interact({ type: 'not-supported' }), 'INVALID_ARGUMENT');
 expectPageFailure('extra interaction field', () => page.interact({ type: 'clearFilter', unexpected: true }), 'INVALID_ARGUMENT');
@@ -232,6 +239,53 @@ const beforePersistenceFailure = persistenceFailure.serialize();
 expectPageFailure('page persistence failure is atomic', () => persistenceFailure.toggleLock('E-PERSIST', true), 'PERSISTENCE_FAILED');
 assert.equal(persistenceFailure.serialize(), beforePersistenceFailure);
 assert.equal(persistenceFailureInventory.save(), JSON.parse(beforePersistenceFailure).inventory, 'failed page write must roll back the external T231 instance');
+
+let dualPersistExternalCalls = 0;
+let dualPersistPageCalls = 0;
+let dualPersistedExternalSnapshot = null;
+const dualPersistInventory = new EquipmentInventoryService({
+  state: inventoryState(2, [item('E-DUAL-PERSIST', 'cloak', 1, 'draw', 1)]),
+  persist: (serialized) => {
+    dualPersistExternalCalls += 1;
+    dualPersistedExternalSnapshot = serialized;
+  },
+});
+const dualPersistPage = new InventoryPageService({
+  data: createDefaultInventoryPageData(),
+  inventory: dualPersistInventory,
+  persist: () => {
+    dualPersistPageCalls += 1;
+    throw new Error('page store unavailable');
+  },
+});
+const beforeDualPersistFailure = dualPersistPage.serialize();
+expectPageFailure('double persistence failure is atomic', () => dualPersistPage.toggleLock('E-DUAL-PERSIST', true), 'PERSISTENCE_FAILED');
+assert.equal(dualPersistExternalCalls, 0, 'staged page writes must not invoke the bound T231 persistence callback');
+assert.equal(dualPersistPageCalls, 1, 'failed page transaction must have one final page persistence attempt');
+assert.equal(dualPersistPage.serialize(), beforeDualPersistFailure, 'failed double persistence must restore page state');
+assert.equal(dualPersistInventory.save(), JSON.parse(beforeDualPersistFailure).inventory, 'failed double persistence must restore the external instance');
+assert.equal(dualPersistedExternalSnapshot, null, 'failed double persistence must not leave an external persisted snapshot');
+
+let singleFinalExternalCalls = 0;
+let singleFinalPageSnapshot = null;
+const singleFinalInventory = new EquipmentInventoryService({
+  state: inventoryState(2, [item('E-SINGLE-FINAL', 'cloak', 1, 'draw', 1)]),
+  persist: () => { singleFinalExternalCalls += 1; },
+});
+const singleFinalPage = new InventoryPageService({
+  data: createDefaultInventoryPageData(),
+  inventory: singleFinalInventory,
+  persist: (serialized) => { singleFinalPageSnapshot = serialized; },
+});
+assert.deepEqual(singleFinalPage.toggleLock('E-SINGLE-FINAL', true), {
+  accepted: true,
+  changed: true,
+  reason: 'locked',
+  equipmentId: 'E-SINGLE-FINAL',
+});
+assert.equal(singleFinalExternalCalls, 0, 'successful page writes must not double-persist through T231');
+assert.equal(singleFinalPageSnapshot, singleFinalPage.serialize(), 'the final persisted page snapshot must match committed state');
+assert.equal(singleFinalPageSnapshot && JSON.parse(singleFinalPageSnapshot).inventory, singleFinalInventory.save(), 'the real T231 state must match the final page snapshot');
 
 const reentrantSaves = [];
 let reentrantPage;

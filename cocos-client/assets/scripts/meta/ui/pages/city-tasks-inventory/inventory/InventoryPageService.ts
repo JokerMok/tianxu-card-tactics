@@ -97,6 +97,12 @@ function assertExactKeys(value: Record<string, unknown>, expected: readonly stri
   }
 }
 
+function assertAllowedKeys(value: Record<string, unknown>, allowed: readonly string[], label: string): void {
+  for (const key of Reflect.ownKeys(value)) {
+    if (typeof key !== 'string' || !allowed.includes(key)) fail('INVALID_ARGUMENT', `${label} contains an unknown field`);
+  }
+}
+
 function nonEmptyString(value: unknown, label: string): asserts value is string {
   if (typeof value !== 'string' || value.trim().length === 0) fail('INVALID_DATA', `${label} must be a non-empty string`);
 }
@@ -192,6 +198,7 @@ function cloneData(data: InventoryPageData): InventoryPageData {
 interface EquipmentInventoryRuntime {
   current: EquipmentInventoryState;
   committing: boolean;
+  persist: (serialized: string) => void;
 }
 
 function inventoryRuntime(service: EquipmentInventoryService): EquipmentInventoryRuntime {
@@ -212,6 +219,22 @@ function installInventorySnapshot(service: EquipmentInventoryService, state: Equ
   const runtime = inventoryRuntime(service);
   if (runtime.committing) fail('PERSISTENCE_REENTRANT', 'equipment inventory is committing a persistence transaction');
   runtime.current = state;
+}
+
+interface StagedInventoryPersistence {
+  readonly persist: (serialized: string) => void;
+  readonly restore: () => void;
+}
+
+function stageInventoryPersistence(service: EquipmentInventoryService): StagedInventoryPersistence {
+  const runtime = inventoryRuntime(service);
+  if (runtime.committing) fail('PERSISTENCE_REENTRANT', 'equipment inventory is committing a persistence transaction');
+  const previousPersist = runtime.persist;
+  runtime.persist = () => {};
+  return {
+    persist: previousPersist,
+    restore: () => { runtime.persist = previousPersist; },
+  };
 }
 
 function ownedEquipmentIdsFromState(state: EquipmentInventoryState): readonly string[] {
@@ -237,7 +260,7 @@ export class InventoryPageService {
       : input as InventoryPageServiceOptions;
     assertRecord(options, 'inventory page options');
     const allowed = ['data', 'inventory', 'capacity', 'initialState', 'onSave', 'persist'];
-    if (Object.keys(options).some((key) => !allowed.includes(key))) fail('INVALID_ARGUMENT', 'inventory page options contain an unknown field');
+    assertAllowedKeys(options, allowed, 'inventory page options');
     if (options.onSave !== undefined && options.persist !== undefined) fail('INVALID_ARGUMENT', 'onSave and persist cannot both be provided');
     if (options.onSave !== undefined && typeof options.onSave !== 'function') fail('INVALID_ARGUMENT', 'onSave must be a function');
     if (options.persist !== undefined && typeof options.persist !== 'function') fail('INVALID_ARGUMENT', 'persist must be a function');
@@ -469,6 +492,7 @@ export class InventoryPageService {
     if (this.inventory === null) fail('STATE_NOT_AVAILABLE', 'empty inventory page has no state to restore');
     const parsed = parseSave(serialized);
     const before = this.serialize();
+    const stagedPersistence = stageInventoryPersistence(this.inventory);
     this.transactionActive = true;
     try {
       const validatedInventory = validateInventorySnapshot(parsed.inventory);
@@ -480,7 +504,7 @@ export class InventoryPageService {
       this.selectedEquipmentId = parsed.selectedEquipmentId;
       this.normalizeSelection();
       const next = this.serialize();
-      if (next !== before) this.persistSafely(next);
+      if (next !== before) this.commitPersistence(next, before, stagedPersistence.persist);
       return this.snapshot();
     } catch (error) {
       this.rollback(before, error);
@@ -488,6 +512,7 @@ export class InventoryPageService {
       mapEquipmentError(error);
     } finally {
       this.transactionActive = false;
+      stagedPersistence.restore();
     }
   }
 
@@ -495,11 +520,12 @@ export class InventoryPageService {
     this.assertCanStartTransaction();
     if (this.inventory === null) return action();
     const before = this.serialize();
+    const stagedPersistence = stageInventoryPersistence(this.inventory);
     this.transactionActive = true;
     try {
       const result = action();
       const next = this.serialize();
-      if (next !== before) this.persistSafely(next);
+      if (next !== before) this.commitPersistence(next, before, stagedPersistence.persist);
       return result;
     } catch (error) {
       this.rollback(before, error);
@@ -507,6 +533,29 @@ export class InventoryPageService {
       mapEquipmentError(error);
     } finally {
       this.transactionActive = false;
+      stagedPersistence.restore();
+    }
+  }
+
+  private commitPersistence(serialized: string, before: string, inventoryPersist: (serialized: string) => void): void {
+    if (this.inventory === null) return;
+    const beforeInventory = JSON.parse(before).inventory as string;
+    const nextInventory = this.inventory.save();
+    const runtime = inventoryRuntime(this.inventory);
+    const previousCommitting = runtime.committing;
+    runtime.committing = true;
+    try {
+      if (this.persist) {
+        this.persistSafely(serialized);
+      } else if (beforeInventory !== nextInventory) {
+        try {
+          inventoryPersist(nextInventory);
+        } catch (error) {
+          throw new InventoryPageError('PERSISTENCE_FAILED', 'equipment inventory state persistence failed', error);
+        }
+      }
+    } finally {
+      runtime.committing = previousCommitting;
     }
   }
 
