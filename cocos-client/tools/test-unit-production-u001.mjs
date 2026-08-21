@@ -13,6 +13,7 @@ const REQUIRED_ACTIONS = ['Idle', 'Move', 'Attack', 'Hit', 'Death'];
 const REQUIRED_MOUNTS = ['attackOrigin', 'effect', 'healthBar', 'shadow', 'cardAnchor'];
 const TRACK_PROPERTIES = new Set(['translateX', 'translateY', 'rotate', 'scaleX', 'scaleY', 'opacity']);
 const EXPECTED_POSE_STATES = new Map(REQUIRED_ACTIONS.map((state, index) => [state, index]));
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const EXPECTED_GAMEPLAY = Object.freeze({
   unit: Object.freeze({
     id: 'U001',
@@ -66,6 +67,16 @@ const EXPECTED_SOURCES = Object.freeze({
     size: Object.freeze({ width: 2000, height: 800 }),
     sha256: 'af901a19646f02532e855133c9e8f1b492c5eb73b5b426d7b58ed53ad7d96fea'
   }),
+  poseAtlas: Object.freeze({
+    id: 'U001-POSE-ATLAS',
+    path: 'assets/resources/art/battle/units/U001/U001-POSE-ATLAS.png',
+    referencePath: 'assets/resources/art/battle/units/U001/U001-POSE-ATLAS.png',
+    status: 'production-derived-frozen',
+    kind: 'production-derived-pose-atlas',
+    derivedFrom: 'poseSheet',
+    size: Object.freeze({ width: 1760, height: 640 }),
+    sha256: '2b7427a2e3c489da49aace061104beced9aabb804f38797711ff3b4cfd487138'
+  }),
   cutoutSheet: Object.freeze({
     id: 'U001-CUTOUT-SHEET',
     path: 'assets/resources/art/battle/units/U001/U001-CUTOUT-SHEET.png',
@@ -74,8 +85,19 @@ const EXPECTED_SOURCES = Object.freeze({
     kind: 'production-cutout-sheet',
     size: Object.freeze({ width: 1536, height: 1024 }),
     sha256: '35d0b6b232caf1e06633d5d0f772603810a4aa8936b3ccb7a86aa8a9d812717e'
+  }),
+  cutoutAtlas: Object.freeze({
+    id: 'U001-CUTOUT-ATLAS',
+    path: 'assets/resources/art/battle/units/U001/U001-CUTOUT-ATLAS.png',
+    referencePath: 'assets/resources/art/battle/units/U001/U001-CUTOUT-ATLAS.png',
+    status: 'production-derived-frozen',
+    kind: 'production-derived-cutout-atlas',
+    derivedFrom: 'cutoutSheet',
+    size: Object.freeze({ width: 1536, height: 1024 }),
+    sha256: '5e3530093a4316b60814dc562631f505a2a983e658aa1786801d82470a0b7d16'
   })
 });
+const EXPECTED_SOURCE_KEYS = Object.freeze(['poseSheet', 'poseAtlas', 'cutoutSheet', 'cutoutAtlas']);
 const MOUNT_CONTRACT = Object.freeze({
   expectedNames: Object.freeze(REQUIRED_MOUNTS),
   canvasBounds: Object.freeze({ x: Object.freeze([-256, 256]), y: Object.freeze([-256, 256]) }),
@@ -98,6 +120,10 @@ function isRecord(value) {
 
 function assertExactKeys(record, expectedKeys, label) {
   assert.deepEqual(Object.keys(record).sort(), [...expectedKeys].sort(), `${label} keys must match the approved set`);
+}
+
+function assertUuid(value, label) {
+  assert.match(value ?? '', UUID_PATTERN, `${label} must be a UUID`);
 }
 
 function sha256(file) {
@@ -134,6 +160,8 @@ function validatePngSource(label, source, expected) {
   const bytes = readFileSync(file);
   assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${label} must be PNG`);
   assert.equal(bytes.toString('ascii', 12, 16), 'IHDR', `${label} PNG must contain IHDR`);
+  assert.equal(bytes[24], 8, `${label} PNG must use 8-bit channels`);
+  assert.equal(bytes[25], 6, `${label} PNG must use RGBA pixels`);
   const actualSize = { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
   assert.deepEqual(actualSize, expected.size, `${label} dimensions drifted`);
   assert.deepEqual(source.size, expected.size, `${label} manifest size drifted`);
@@ -146,6 +174,39 @@ function validatePngSource(label, source, expected) {
   assert.equal(source.status, expected.status, `${label} status must stay frozen`);
   assert.equal(source.sha256, expected.sha256, `${label} manifest hash must stay frozen`);
   return actualSize;
+}
+
+function validateImageMeta(label, file, expected) {
+  const meta = loadJson(`${file}.meta`);
+  assert.equal(meta.ver, '1.0.27', `${label} meta version must stay frozen`);
+  assert.equal(meta.importer, 'image', `${label} meta importer must stay image`);
+  assert.equal(meta.imported, true, `${label} meta must stay imported`);
+  assertUuid(meta.uuid, `${label} meta uuid`);
+  assert.deepEqual(meta.files, ['.json', '.png'], `${label} meta files must stay frozen`);
+  assert.equal(isRecord(meta.subMetas), true, `${label} meta must contain subMetas`);
+  const textureMeta = meta.subMetas['6c48a'];
+  const spriteMeta = meta.subMetas.f9941;
+  assert.equal(isRecord(textureMeta), true, `${label} texture subMeta is required`);
+  assert.equal(isRecord(spriteMeta), true, `${label} spriteFrame subMeta is required`);
+  assert.equal(textureMeta.importer, 'texture', `${label} texture importer must stay frozen`);
+  assert.equal(spriteMeta.importer, 'sprite-frame', `${label} spriteFrame importer must stay frozen`);
+  assert.equal(textureMeta.displayName, expected.id, `${label} texture displayName drifted`);
+  assert.equal(spriteMeta.displayName, expected.id, `${label} spriteFrame displayName drifted`);
+  assert.equal(textureMeta.uuid, `${meta.uuid}@6c48a`, `${label} texture uuid must stay derived from root uuid`);
+  assert.equal(spriteMeta.uuid, `${meta.uuid}@f9941`, `${label} spriteFrame uuid must stay derived from root uuid`);
+  assert.equal(textureMeta.userData?.imageUuidOrDatabaseUri, meta.uuid, `${label} texture source uuid drifted`);
+  assert.equal(textureMeta.userData?.isUuid, true, `${label} texture source must stay uuid-backed`);
+  assert.equal(spriteMeta.userData?.imageUuidOrDatabaseUri, textureMeta.uuid, `${label} spriteFrame must target the texture subMeta`);
+  assert.equal(spriteMeta.userData?.isUuid, true, `${label} spriteFrame source must stay uuid-backed`);
+  assert.equal(spriteMeta.userData?.atlasUuid, '', `${label} atlasUuid must stay empty`);
+  assert.equal(spriteMeta.userData?.width, expected.size.width, `${label} spriteFrame width drifted`);
+  assert.equal(spriteMeta.userData?.height, expected.size.height, `${label} spriteFrame height drifted`);
+  assert.equal(spriteMeta.userData?.rawWidth, expected.size.width, `${label} spriteFrame rawWidth drifted`);
+  assert.equal(spriteMeta.userData?.rawHeight, expected.size.height, `${label} spriteFrame rawHeight drifted`);
+  assert.equal(meta.userData?.type, 'sprite-frame', `${label} meta type must stay sprite-frame`);
+  assert.equal(meta.userData?.fixAlphaTransparencyArtifacts, false, `${label} alpha artifact fix flag must stay false`);
+  assert.equal(meta.userData?.hasAlpha, true, `${label} meta must preserve alpha`);
+  assert.equal(meta.userData?.redirect, textureMeta.uuid, `${label} redirect must stay pinned to the texture uuid`);
 }
 
 function validateRect(label, rect, sourceSize) {
@@ -161,10 +222,23 @@ function validateRect(label, rect, sourceSize) {
 
 function validateSources(skeleton) {
   assert.equal(isRecord(skeleton.sources), true, 'skeleton must declare source assets');
+  assertExactKeys(skeleton.sources, EXPECTED_SOURCE_KEYS, 'sources');
   const poseSheet = skeleton.sources.poseSheet;
+  const poseAtlas = skeleton.sources.poseAtlas;
   const cutoutSheet = skeleton.sources.cutoutSheet;
+  const cutoutAtlas = skeleton.sources.cutoutAtlas;
   const poseSize = validatePngSource('poseSheet', poseSheet, EXPECTED_SOURCES.poseSheet);
+  validateImageMeta('poseSheet', sourceFile(poseSheet, 'path'), EXPECTED_SOURCES.poseSheet);
+  const poseAtlasSize = validatePngSource('poseAtlas', poseAtlas, EXPECTED_SOURCES.poseAtlas);
+  validateImageMeta('poseAtlas', sourceFile(poseAtlas, 'path'), EXPECTED_SOURCES.poseAtlas);
   const cutoutSize = validatePngSource('cutoutSheet', cutoutSheet, EXPECTED_SOURCES.cutoutSheet);
+  validateImageMeta('cutoutSheet', sourceFile(cutoutSheet, 'path'), EXPECTED_SOURCES.cutoutSheet);
+  const cutoutAtlasSize = validatePngSource('cutoutAtlas', cutoutAtlas, EXPECTED_SOURCES.cutoutAtlas);
+  validateImageMeta('cutoutAtlas', sourceFile(cutoutAtlas, 'path'), EXPECTED_SOURCES.cutoutAtlas);
+  assert.equal(poseAtlas.derivedFrom, EXPECTED_SOURCES.poseAtlas.derivedFrom, 'poseAtlas must stay derived from poseSheet');
+  assert.equal(cutoutAtlas.derivedFrom, EXPECTED_SOURCES.cutoutAtlas.derivedFrom, 'cutoutAtlas must stay derived from cutoutSheet');
+  assert.deepEqual(poseAtlas.size, poseAtlasSize, 'poseAtlas manifest size drifted');
+  assert.deepEqual(cutoutAtlas.size, cutoutAtlasSize, 'cutoutAtlas manifest size drifted');
 
   assert.equal(Array.isArray(poseSheet.poseGrid), true, 'poseSheet must declare a pose grid');
   assert.equal(poseSheet.poseGrid.length, REQUIRED_ACTIONS.length, 'poseSheet must expose exactly five approved key poses');
@@ -381,9 +455,17 @@ const wrongSourceHash = structuredClone(skeleton);
 wrongSourceHash.sources.poseSheet.sha256 = '0'.repeat(64);
 assert.throws(() => validateSkeleton(wrongSourceHash, context), /manifest hash must stay frozen/);
 
+const wrongPoseAtlasHash = structuredClone(skeleton);
+wrongPoseAtlasHash.sources.poseAtlas.sha256 = 'f'.repeat(64);
+assert.throws(() => validateSkeleton(wrongPoseAtlasHash, context), /poseAtlas manifest hash must stay frozen/);
+
 const wrongSourcePath = structuredClone(skeleton);
 wrongSourcePath.sources.cutoutSheet.path = 'assets/resources/art/battle/units/U001/DOES-NOT-EXIST.png';
 assert.throws(() => validateSkeleton(wrongSourcePath, context), /path is missing/);
+
+const missingCutoutAtlas = structuredClone(skeleton);
+delete missingCutoutAtlas.sources.cutoutAtlas;
+assert.throws(() => validateSkeleton(missingCutoutAtlas, context), /sources keys must match the approved set/);
 
 const wrongPoseRect = structuredClone(skeleton);
 wrongPoseRect.sources.poseSheet.poseGrid[2].rect.width = 401;
@@ -437,4 +519,4 @@ const wrongFactionSnapshot = structuredClone(skeleton);
 wrongFactionSnapshot.gameplayProfile.politicalFaction = '山海诸庭';
 assert.throws(() => validateSkeleton(wrongFactionSnapshot, context), /gameplayProfile must match/);
 
-console.log('T278 U001 production contract PASS: config, faction, role, pose/cutout hashes, actions, mounts, mirror mapping; 15 counterexamples rejected');
+console.log('T278 U001 production contract PASS: config, faction, role, pose/cutout/atlas hashes, actions, mounts, mirror mapping; 18 counterexamples rejected');

@@ -109,6 +109,19 @@
         }
       ]
     },
+    "poseAtlas": {
+      "id": "U001-POSE-ATLAS",
+      "path": "assets/resources/art/battle/units/U001/U001-POSE-ATLAS.png",
+      "referencePath": "assets/resources/art/battle/units/U001/U001-POSE-ATLAS.png",
+      "kind": "production-derived-pose-atlas",
+      "status": "production-derived-frozen",
+      "derivedFrom": "poseSheet",
+      "size": {
+        "width": 1760,
+        "height": 640
+      },
+      "sha256": "2b7427a2e3c489da49aace061104beced9aabb804f38797711ff3b4cfd487138"
+    },
     "cutoutSheet": {
       "id": "U001-CUTOUT-SHEET",
       "path": "assets/resources/art/battle/units/U001/U001-CUTOUT-SHEET.png",
@@ -120,6 +133,19 @@
         "height": 1024
       },
       "sha256": "35d0b6b232caf1e06633d5d0f772603810a4aa8936b3ccb7a86aa8a9d812717e"
+    },
+    "cutoutAtlas": {
+      "id": "U001-CUTOUT-ATLAS",
+      "path": "assets/resources/art/battle/units/U001/U001-CUTOUT-ATLAS.png",
+      "referencePath": "assets/resources/art/battle/units/U001/U001-CUTOUT-ATLAS.png",
+      "kind": "production-derived-cutout-atlas",
+      "status": "production-derived-frozen",
+      "derivedFrom": "cutoutSheet",
+      "size": {
+        "width": 1536,
+        "height": 1024
+      },
+      "sha256": "5e3530093a4316b60814dc562631f505a2a983e658aa1786801d82470a0b7d16"
     }
   },
   "bones": [
