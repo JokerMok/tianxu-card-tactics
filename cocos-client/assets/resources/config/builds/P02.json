@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "table": "builds",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
+  "buildTarget": "P02",
+  "contractDeckId": "D001",
+  "builds": [
+    {
+      "id": "P02-B01",
+      "profession": "P002",
+      "race": "人族",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U001", "count": 4 },
+        { "slot": 2, "cardId": "U002", "count": 4 },
+        { "slot": 3, "cardId": "U003", "count": 3 },
+        { "slot": 4, "cardId": "U004", "count": 4 },
+        { "slot": 5, "cardId": "U005", "count": 3 },
+        { "slot": 6, "cardId": "U006", "count": 2 },
+        { "slot": 7, "cardId": "U007", "count": 2 },
+        { "slot": 8, "cardId": "U008", "count": 1 },
+        { "slot": 9, "cardId": "U011", "count": 2 },
+        { "slot": 10, "cardId": "U012", "count": 1 },
+        { "slot": 11, "cardId": "S001", "count": 1 },
+        { "slot": 12, "cardId": "S002", "count": 1 },
+        { "slot": 13, "cardId": "S003", "count": 1 },
+        { "slot": 14, "cardId": "S013", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["双路", "术法压制"]
+    },
+    {
+      "id": "P02-B02",
+      "profession": "P002",
+      "race": "山灵",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U013", "count": 3 },
+        { "slot": 2, "cardId": "U014", "count": 2 },
+        { "slot": 3, "cardId": "U015", "count": 3 },
+        { "slot": 4, "cardId": "U016", "count": 3 },
+        { "slot": 5, "cardId": "U017", "count": 2 },
+        { "slot": 6, "cardId": "U018", "count": 2 },
+        { "slot": 7, "cardId": "U019", "count": 2 },
+        { "slot": 8, "cardId": "U020", "count": 1 },
+        { "slot": 9, "cardId": "U021", "count": 2 },
+        { "slot": 10, "cardId": "U022", "count": 1 },
+        { "slot": 11, "cardId": "U023", "count": 2 },
+        { "slot": 12, "cardId": "U024", "count": 2 },
+        { "slot": 13, "cardId": "U025", "count": 1 },
+        { "slot": 14, "cardId": "S001", "count": 1 },
+        { "slot": 15, "cardId": "S002", "count": 1 },
+        { "slot": 16, "cardId": "S003", "count": 1 },
+        { "slot": 17, "cardId": "S013", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["稳守", "山灵核心"]
+    }
+  ]
+}
