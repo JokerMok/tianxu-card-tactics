@@ -46,13 +46,24 @@ const references = {
   flagIds: rewardIds('FLAG'),
 };
 
-assert.equal(previousConfig.chapterLevels[0].id, 'L04');
+assert.equal(levelConfig.chapterLevels.length, 1, 'L05 must contain exactly one chapter level');
+assert.deepEqual(
+  Object.keys(level).sort(),
+  ['enemyDeckId', 'environmentElement', 'failureConditions', 'id', 'objectives', 'prerequisiteLevelId', 'rewards', 'scenarioRules'],
+  'L05 must contain the T331 six fields and its scenario rules',
+);
 assert.equal(level.id, 'L05');
+assert.equal(level.prerequisiteLevelId, 'L04');
+assert.equal(level.enemyDeckId, 'D001');
+assert.equal(decks.decks.some(({ id }) => id === level.enemyDeckId), true, 'L05 enemy deck must be registered');
+assert.equal(previousConfig.chapterLevels[0].id, 'L04');
 assert.equal(level.environmentElement, 'FIRE');
+assert.deepEqual(level.objectives, [{ type: 'DEFEAT_ENEMY_HERO' }]);
 assert.deepEqual(level.rewards, [
   { type: 'CARD', id: 'U007', quantity: 2 },
   { type: 'CARD', id: 'U003', quantity: 3 },
 ]);
+assert.deepEqual(level.failureConditions, [{ type: 'PLAYER_HERO_DEFEATED' }]);
 assert.doesNotThrow(() => assertChapterLevelContract(levelConfig, manifest, decks, references, 'config/levels/chapter01/L05'));
 
 function assertScenarioRules(rules) {
@@ -88,5 +99,6 @@ expectFailure('unknown deck', (candidate) => { candidate.chapterLevels[0].enemyD
 expectFailure('invalid ID', (candidate) => { candidate.chapterLevels[0].id = 'L_05'; }, 'config/levels/chapter01/L05.chapterLevels[0].id');
 expectFailure('reward copy limit', (candidate) => { candidate.chapterLevels[0].rewards[0].quantity = 5; }, 'config/levels/chapter01/L05.chapterLevels[0].rewards[0].quantity');
 expectFailure('missing failures', (candidate) => { delete candidate.chapterLevels[0].failureConditions; }, 'config/levels/chapter01/L05.chapterLevels[0].failureConditions');
+expectFailure('empty failures', (candidate) => { candidate.chapterLevels[0].failureConditions = []; }, 'config/levels/chapter01/L05.chapterLevels[0].failureConditions');
 
-console.log('Chapter 01 L05: real L04 prerequisite, FIRE rules, U007/U003 rewards, copy limits, scenario rules and negative cases PASS');
+console.log('Chapter 01 L05: T331 six fields, real L04 prerequisite, D001 deck, FIRE rules, U007/U003 rewards, failure conditions and negative cases PASS');
