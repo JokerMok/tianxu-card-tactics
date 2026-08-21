@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "table": "builds",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
+  "buildTarget": "P04",
+  "contractDeckId": "D001",
+  "builds": [
+    {
+      "id": "P04-B01",
+      "profession": "P004",
+      "race": "冥裔",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U009", "count": 3 },
+        { "slot": 2, "cardId": "U010", "count": 3 },
+        { "slot": 3, "cardId": "U021", "count": 2 },
+        { "slot": 4, "cardId": "U022", "count": 1 },
+        { "slot": 5, "cardId": "U001", "count": 4 },
+        { "slot": 6, "cardId": "U002", "count": 4 },
+        { "slot": 7, "cardId": "U003", "count": 3 },
+        { "slot": 8, "cardId": "U013", "count": 3 },
+        { "slot": 9, "cardId": "U004", "count": 3 },
+        { "slot": 10, "cardId": "S005", "count": 1 },
+        { "slot": 11, "cardId": "S009", "count": 1 },
+        { "slot": 12, "cardId": "S010", "count": 1 },
+        { "slot": 13, "cardId": "S011", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["冥裔核心", "持续压制"]
+    },
+    {
+      "id": "P04-B02",
+      "profession": "P004",
+      "race": "巧民",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U023", "count": 3 },
+        { "slot": 2, "cardId": "U024", "count": 2 },
+        { "slot": 3, "cardId": "U025", "count": 2 },
+        { "slot": 4, "cardId": "U026", "count": 1 },
+        { "slot": 5, "cardId": "U015", "count": 3 },
+        { "slot": 6, "cardId": "U016", "count": 3 },
+        { "slot": 7, "cardId": "U017", "count": 2 },
+        { "slot": 8, "cardId": "U018", "count": 2 },
+        { "slot": 9, "cardId": "U001", "count": 4 },
+        { "slot": 10, "cardId": "U002", "count": 4 },
+        { "slot": 11, "cardId": "S009", "count": 1 },
+        { "slot": 12, "cardId": "S010", "count": 1 },
+        { "slot": 13, "cardId": "S011", "count": 1 },
+        { "slot": 14, "cardId": "S012", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["巧民核心", "稳守反击"]
+    }
+  ]
+}
