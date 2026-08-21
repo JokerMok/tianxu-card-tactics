@@ -18,6 +18,9 @@ import {
 const clone = (value) => structuredClone(value);
 const unit = (id, kind, hp, maxHp, threat = 0, attack = 0, status = 'ACTIVE') => ({ id, kind, status, hp, maxHp, threat, attack });
 const emptyContext = { allies: [], enemies: [], boss: null };
+function assertStateError(label, operation, code) {
+  assert.throws(operation, (error) => error instanceof ReinforcementStateError && error.code === code, label);
+}
 const fullContext = {
   allies: [unit('C001', 'ALLY', 18, 18), unit('C002', 'ALLY', 14, 14), unit('C003', 'ALLY', 24, 24)],
   enemies: [unit('enemy-low', 'ENEMY', 3, 10, 4, 2), unit('enemy-threat', 'ENEMY', 8, 12, 12, 5)],
@@ -198,6 +201,56 @@ assert.equal(Object.isFrozen(restoreNestedPayload), false, 'restore must not fre
 restoreNestedPayload.marker = 'changed-after-restore';
 assert.equal(restoredMutationProbe.events[0].payload.nested.marker, 'original');
 assert.equal(Object.isFrozen(restoredMutationProbe.events[0].payload.nested), true, 'restored payload must be frozen');
+
+const forgedActiveDownCountSave = JSON.parse(saved);
+forgedActiveDownCountSave.reinforcements[0].downCount = 1;
+assertStateError('ACTIVE downCount without a recovery must be rejected by serialization', () => serializeReinforcementState(forgedActiveDownCountSave), 'INVALID_STATE');
+assertStateError('ACTIVE downCount without a recovery must be rejected on restore', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, forgedActiveDownCountSave), 'INVALID_SAVE');
+const forgedActiveRecoveryCountSave = JSON.parse(saved);
+forgedActiveRecoveryCountSave.reinforcements[0].recoveriesUsed = 1;
+assertStateError('ACTIVE recovery without a down must be rejected', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, forgedActiveRecoveryCountSave), 'INVALID_SAVE');
+const forgedDownedCounterSave = JSON.parse(serializeReinforcementState(downedState));
+forgedDownedCounterSave.reinforcements[2].recoveriesUsed = 1;
+assertStateError('DOWNED counters must describe one more down than recoveries', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, forgedDownedCounterSave), 'INVALID_SAVE');
+
+const validDefeatedSave = JSON.parse(serializeReinforcementState(defeated));
+assert.doesNotThrow(() => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, validDefeatedSave), 'a causally valid DEFEATED state must remain restorable');
+const forgedDefeatedSave = JSON.parse(serializeReinforcementState(defeated));
+forgedDefeatedSave.reinforcements[2].recoveriesUsed = 0;
+const defeatedCounterConfigValue = clone(DEFAULT_REINFORCEMENT_CONFIG);
+defeatedCounterConfigValue.reinforcements[2].downed.maxOccurrences = 2;
+defeatedCounterConfigValue.reinforcements[2].recovery.maxUses = 3;
+const defeatedCounterConfig = validateReinforcementConfig(defeatedCounterConfigValue);
+forgedDefeatedSave.reinforcements[2].recoveriesUsed = 2;
+assertStateError('DEFEATED recoveriesUsed greater than downCount must be rejected', () => restoreReinforcementState(defeatedCounterConfig, forgedDefeatedSave), 'INVALID_SAVE');
+const prematureDefeatedSave = JSON.parse(saved);
+prematureDefeatedSave.reinforcements[2].status = 'DEFEATED';
+prematureDefeatedSave.reinforcements[2].hp = 0;
+prematureDefeatedSave.reinforcements[2].downedAtRound = prematureDefeatedSave.round;
+prematureDefeatedSave.reinforcements[2].recoveryReadyRound = null;
+assertStateError('DEFEATED before the downed cap or recovery budget is exhausted must be rejected', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, prematureDefeatedSave), 'INVALID_SAVE');
+const forgedDefeatedMetadataSave = JSON.parse(serializeReinforcementState(defeated));
+forgedDefeatedMetadataSave.reinforcements[2].recoveryReadyRound = defeated.round;
+assertStateError('DEFEATED recovery metadata must be null', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, forgedDefeatedMetadataSave), 'INVALID_SAVE');
+forgedDefeatedMetadataSave.reinforcements[2].recoveryReadyRound = null;
+forgedDefeatedMetadataSave.reinforcements[2].downedAtRound = defeated.round + 1;
+assertStateError('DEFEATED metadata cannot point into the future', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, forgedDefeatedMetadataSave), 'INVALID_SAVE');
+
+for (const [label, invalidValue] of [
+  ['NaN', NaN], ['Infinity', Infinity], ['negative Infinity', -Infinity], ['BigInt', 1n],
+  ['undefined', undefined], ['function', () => true], ['symbol', Symbol('invalid')],
+]) {
+  const invalidPayloadSave = JSON.parse(saved);
+  invalidPayloadSave.events[0].payload = { nested: [invalidValue] };
+  assertStateError(`${label} payload must be rejected by serialization`, () => serializeReinforcementState(invalidPayloadSave), 'INVALID_STATE');
+  assertStateError(`${label} payload must be rejected on restore`, () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, invalidPayloadSave), 'INVALID_SAVE');
+}
+const cyclicPayloadSave = JSON.parse(saved);
+cyclicPayloadSave.events[0].payload = {};
+cyclicPayloadSave.events[0].payload.self = cyclicPayloadSave.events[0].payload;
+assertStateError('cyclic payload must be rejected by serialization', () => serializeReinforcementState(cyclicPayloadSave), 'INVALID_STATE');
+assertStateError('cyclic payload must be rejected on restore', () => restoreReinforcementState(DEFAULT_REINFORCEMENT_CONFIG, cyclicPayloadSave), 'INVALID_SAVE');
+
 const corrupted = JSON.parse(saved);
 corrupted.reinforcements[0].hp = 999;
 assert.throws(() => serializeReinforcementState(corrupted), /ACTIVE/, 'serialization must run full state validation');

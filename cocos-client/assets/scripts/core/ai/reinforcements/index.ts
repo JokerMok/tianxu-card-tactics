@@ -370,17 +370,47 @@ function assertDenseStateArray(value: unknown, path: string): asserts value is u
   if (missingIndex !== null) stateError('INVALID_STATE', `${path}[${missingIndex}] must not be a hole`);
 }
 
-function assertNoSparseStateArrays(value: unknown, path: string, seen = new WeakSet<object>()): void {
-  if (value === null || typeof value !== 'object' || seen.has(value)) return;
-  seen.add(value);
-  if (Array.isArray(value)) {
-    assertDenseStateArray(value, path);
-    for (let index = 0; index < value.length; index += 1) {
-      assertNoSparseStateArrays(value[index], `${path}[${index}]`, seen);
-    }
+function isPlainStateObject(value: object): value is Record<string, unknown> {
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+}
+
+function isArrayIndexKey(key: string, length: number): boolean {
+  const index = Number(key);
+  return Number.isSafeInteger(index) && index >= 0 && index < length && String(index) === key;
+}
+
+function assertJsonValue(value: unknown, path: string, ancestors = new WeakSet<object>()): void {
+  if (value === null) return;
+  const type = typeof value;
+  if (type === 'string' || type === 'boolean') return;
+  if (type === 'number') {
+    if (!Number.isFinite(value)) stateError('INVALID_STATE', `${path} must be a finite JSON number`);
     return;
   }
-  for (const [key, child] of Object.entries(value)) assertNoSparseStateArrays(child, `${path}.${key}`, seen);
+  if (type !== 'object') stateError('INVALID_STATE', `${path} must contain only JSON values`);
+  if (ancestors.has(value)) stateError('INVALID_STATE', `${path} must not contain a cycle`);
+  if (!Array.isArray(value) && !isPlainStateObject(value)) stateError('INVALID_STATE', `${path} must be a JSON object or array`);
+  if (Object.getOwnPropertySymbols(value).length > 0) stateError('INVALID_STATE', `${path} must not contain symbol keys`);
+  if (typeof (value as { toJSON?: unknown }).toJSON === 'function') stateError('INVALID_STATE', `${path}.toJSON must not be a function`);
+
+  ancestors.add(value);
+  try {
+    if (Array.isArray(value)) {
+      assertDenseStateArray(value, path);
+      for (let index = 0; index < value.length; index += 1) {
+        assertJsonValue(value[index], `${path}[${index}]`, ancestors);
+      }
+      for (const key of Object.keys(value)) {
+        if (isArrayIndexKey(key, value.length)) continue;
+        assertJsonValue(value[key], `${path}.${key}`, ancestors);
+      }
+      return;
+    }
+    for (const key of Object.keys(value)) assertJsonValue(value[key], `${path}.${key}`, ancestors);
+  } finally {
+    ancestors.delete(value);
+  }
 }
 
 function makeRuntime(config: ReinforcementConfig): ReinforcementRuntimeState {
@@ -398,6 +428,7 @@ function addEvent(
   patch: Partial<ReinforcementState> = {},
 ): ReinforcementState {
   if (state.nextEventId >= Number.MAX_SAFE_INTEGER) stateError('INVALID_STATE', 'event id would overflow');
+  assertJsonValue(payload, 'event.payload');
   const event: ReinforcementEvent = {
     eventId: state.nextEventId,
     round: state.round,
@@ -434,7 +465,17 @@ function validateRuntime(value: unknown, config: ReinforcementConfig, stateRound
   if (value.status !== 'ACTIVE' && hp !== 0) stateError('INVALID_STATE', `${path}.hp must be 0 when not ACTIVE`);
   const downedAtRound = value.downedAtRound === null ? null : assertSafeStateNumber(value.downedAtRound, `${path}.downedAtRound`, 0);
   const recoveryReadyRound = value.recoveryReadyRound === null ? null : assertSafeStateNumber(value.recoveryReadyRound, `${path}.recoveryReadyRound`, 0);
+  if (value.status === 'ACTIVE' && downCount !== recoveriesUsed) {
+    stateError('INVALID_STATE', `${path} ACTIVE counters are not causal`);
+  }
+  if (value.status === 'ACTIVE' && (downedAtRound !== null || recoveryReadyRound !== null)) stateError('INVALID_STATE', `${path} has stale downed metadata`);
   if (value.status === 'DOWNED') {
+    if (recoveriesUsed >= config.recovery.maxUses) {
+      stateError('INVALID_STATE', `${path} is downed with an exhausted recovery budget`);
+    }
+    if (recoveriesUsed >= Number.MAX_SAFE_INTEGER || downCount !== recoveriesUsed + 1) {
+      stateError('INVALID_STATE', `${path} DOWNED counters are not causal`);
+    }
     if (downCount === 0 || downedAtRound === null || recoveryReadyRound === null) {
       stateError('INVALID_STATE', `${path} downed metadata is invalid`);
     }
@@ -445,10 +486,14 @@ function validateRuntime(value: unknown, config: ReinforcementConfig, stateRound
       stateError('INVALID_STATE', `${path}.recoveryReadyRound does not match recovery delay`);
     }
   }
-  if (value.status === 'DOWNED' && recoveriesUsed >= config.recovery.maxUses) {
-    stateError('INVALID_STATE', `${path} is downed with an exhausted recovery budget`);
+  if (value.status === 'DEFEATED') {
+    if (recoveriesUsed !== downCount) stateError('INVALID_STATE', `${path} DEFEATED counters are not causal`);
+    if (downedAtRound === null || recoveryReadyRound !== null) stateError('INVALID_STATE', `${path} DEFEATED metadata is invalid`);
+    if (downedAtRound > stateRound) stateError('INVALID_STATE', `${path}.downedAtRound cannot be after state.round`);
+    if (config.downed.enabled && downCount < config.downed.maxOccurrences && recoveriesUsed < config.recovery.maxUses) {
+      stateError('INVALID_STATE', `${path} DEFEATED counters are not exhausted`);
+    }
   }
-  if (value.status === 'ACTIVE' && (downedAtRound !== null || recoveryReadyRound !== null)) stateError('INVALID_STATE', `${path} has stale downed metadata`);
   return {
     id: value.id as string, profession: value.profession as ReinforcementProfession, battleRole: value.battleRole as ReinforcementBattleRole,
     status: value.status as ReinforcementStatus, hp, maxHp: value.maxHp as number, downCount, recoveriesUsed,
@@ -464,7 +509,7 @@ function validateEvent(value: unknown, index: number, stateRound: number): Reinf
   if (round > stateRound || typeof value.type !== 'string' || !EVENT_TYPES.has(value.type as ReinforcementEventType) || !isRecord(value.payload)) {
     stateError('INVALID_STATE', `events[${index}] has invalid fields`);
   }
-  assertNoSparseStateArrays(value.payload, `events[${index}].payload`);
+  assertJsonValue(value.payload, `events[${index}].payload`);
   return { eventId, round, type: value.type as ReinforcementEventType, payload: cloneDeep(value.payload) };
 }
 
@@ -736,7 +781,12 @@ export function serializeReinforcementState(
   state: ReinforcementState,
   configInput: unknown = DEFAULT_REINFORCEMENT_CONFIG,
 ): string {
-  return JSON.stringify(validateReinforcementState(configInput, state));
+  const validated = validateReinforcementState(configInput, state);
+  try {
+    return JSON.stringify(validated);
+  } catch {
+    throw new ReinforcementStateError('INVALID_STATE', 'reinforcement state must contain only JSON values');
+  }
 }
 
 export function restoreReinforcementState(configInput: unknown, serialized: string | unknown): ReinforcementState {
