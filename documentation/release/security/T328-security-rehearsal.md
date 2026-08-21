@@ -51,7 +51,7 @@ T328 pass sample: PASS (SHA-256 baselines=6, evidence=contract-rehearsal-fixture
   negative PASS: resource resolver path traversal
 T328 counterexamples: PASS (missing file, invalid JSON, out-of-range integer, tampered save, config path traversal)
 T328 conclusion: release security rehearsal PASS; covered release gate is green.
-T328 rollback: stop release, save the current verifier/report/samples, git revert --no-edit 2b44a1f39e2e49f26916b4b9ef50725f01a78650 then git revert --no-edit 94f1363c190a8bb32214a6c534419b88450c3efe then git revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59, rerun the verifier from the saved copy, record its exit code, and update no shared ledger until it passes.
+T328 rollback: stop release, save the current verifier/report/samples, run git log --format=%H --reverse -- <T328 allowed paths>, revert each emitted commit in reverse order with git revert --no-edit, rerun the verifier from the saved copy, record its exit code, and update no shared ledger until it passes.
 ```
 
 ## 5. 结论
@@ -71,6 +71,7 @@ T328 安全演练通过。真实配置清单、声明资源和安全相关源码
 1. 停止发布。回退前从当前状态建立保存副本，并确认验证器、报告和全部样本均存在。输出写入副本之外；不得修改共享台账或结果文件：
 
    ```sh
+   set -eu
    test -z "$(git status --short -- cocos-client/tools/release/security documentation/release/security)"
    rollback_root="$(mktemp -d)"
    saved_copy="$rollback_root/saved-current"
@@ -90,12 +91,25 @@ T328 安全演练通过。真实配置清单、声明资源和安全相关源码
    test "$(git -C "$saved_copy" rev-parse HEAD)" = "$(git -C "$rollback_copy" rev-parse HEAD)"
    ```
 
-2. 在 `rollback_copy` 中按以下顺序执行三次回退。三步均须完成，不得跳过 `2b44a1f39e2e49f26916b4b9ef50725f01a78650` 或单独回退 `6943b5207361dfd037a4147ec34cb5d7ee530f59`：
+2. 在 `rollback_copy` 中动态计算所有触碰 T328 允许路径的提交，再按输出逆序逐个回退。`set -e` 会在任一步失败或产生冲突时立即停止；不得手工补充或删减提交：
 
    ```sh
-   git -C "$rollback_copy" revert --no-edit 2b44a1f39e2e49f26916b4b9ef50725f01a78650
-   git -C "$rollback_copy" revert --no-edit 94f1363c190a8bb32214a6c534419b88450c3efe
-   git -C "$rollback_copy" revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59
+   set -eu
+   allowed_paths=(
+     cocos-client/tools/release/security/
+     documentation/release/security/
+   )
+   commit_log="$rollback_evidence/T328-allowed-path-commits.oldest-first"
+   reverse_commit_log="$rollback_evidence/T328-allowed-path-commits.newest-first"
+   git -C "$rollback_copy" log --format=%H --reverse -- "${allowed_paths[@]}" > "$commit_log"
+   awk '{ sha[NR] = $0 } END { for (i = NR; i >= 1; i--) print sha[i] }' \
+     "$commit_log" > "$reverse_commit_log"
+   test -s "$reverse_commit_log"
+   while IFS= read -r commit_sha; do
+     test -n "$commit_sha"
+     git -C "$rollback_copy" revert --no-edit "$commit_sha"
+     test -z "$(git -C "$rollback_copy" status --short)"
+   done < "$reverse_commit_log"
    test ! -e "$rollback_copy/cocos-client/tools/release/security/verify-security.mjs"
    test -z "$(git -C "$rollback_copy" status --short)"
    ```
@@ -122,14 +136,13 @@ T328 安全演练通过。真实配置清单、声明资源和安全相关源码
    git worktree remove "$saved_copy"
    ```
 
-## 7. 第四次修复回退演练记录
+## 7. 第五次修复回退演练记录
 
-演练基线为本次修复前的当前安全状态 `2b44a1f39e2e49f26916b4b9ef50725f01a78650`。隔离 worktree 实测结果：
+演练基线为本次修复前的当前 HEAD。隔离 worktree 实测结果：
 
 - 保存副本包含验证器、报告及通过/失败/非法 JSON 三份样本：通过。
-- `git revert --no-edit 2b44a1f39e2e49f26916b4b9ef50725f01a78650`：退出码 `0`，无冲突，步骤完成后 worktree 干净。
-- `git revert --no-edit 94f1363c190a8bb32214a6c534419b88450c3efe`：退出码 `0`，无冲突，步骤完成后 worktree 干净。
-- `git revert --no-edit 6943b5207361dfd037a4147ec34cb5d7ee530f59`：退出码 `0`，无冲突，步骤完成后 worktree 干净。
+- `git log --format=%H --reverse -- <T328 allowed paths>`：动态发现全部触碰允许路径的提交。
+- 按动态输出逆序逐个执行 `git revert --no-edit`：每步退出码 `0`，无冲突，步骤完成后 worktree 干净。
 - 保存副本中的 `verify-security.mjs`：退出码 `0`。
-- 三步回退完成后的 rollback worktree：干净。
+- 全部动态回退完成后的 rollback worktree：干净。
 - 本次独立实测使用的 `saved-current` 与 `rollback` 临时 worktree：完成留证后已清理。
