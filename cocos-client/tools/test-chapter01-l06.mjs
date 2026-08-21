@@ -44,7 +44,24 @@ const references = {
 
 assert.equal(previousConfig.chapterLevels[0].id, 'L05');
 assert.doesNotThrow(() => assertChapterLevelContract(levelConfig, manifest, decks, references, 'config/levels/chapter01/L06'));
+assert.deepEqual(
+  {
+    id: level.id,
+    prerequisiteLevelId: level.prerequisiteLevelId,
+    enemyDeckId: level.enemyDeckId,
+    environmentElement: level.environmentElement,
+  },
+  {
+    id: 'L06',
+    prerequisiteLevelId: 'L05',
+    enemyDeckId: 'D001',
+    environmentElement: 'WATER',
+  },
+  'L06 must bind the real prerequisite, enemy deck, and environment',
+);
+assert.deepEqual(level.objectives, [{ type: 'DEFEAT_ENEMY_HERO' }]);
 assert.deepEqual(level.rewards, [{ type: 'CARD', id: 'S004', quantity: 1, cardType: 'SKILL' }]);
+assert.deepEqual(level.failureConditions, [{ type: 'PLAYER_HERO_DEFEATED' }]);
 assert.equal(professions.professions.find((row) => row.id === 'P001')?.skillIds[0], 'S004');
 
 function assertScenarioRules(rules) {
@@ -81,5 +98,6 @@ expectFailure('unknown deck', (candidate) => { candidate.chapterLevels[0].enemyD
 expectFailure('invalid ID', (candidate) => { candidate.chapterLevels[0].id = 'L_06'; }, 'config/levels/chapter01/L06.chapterLevels[0].id');
 expectFailure('skill copy limit', (candidate) => { candidate.chapterLevels[0].rewards[0].quantity = 2; }, 'config/levels/chapter01/L06.chapterLevels[0].rewards[0].quantity');
 expectFailure('missing failures', (candidate) => { delete candidate.chapterLevels[0].failureConditions; }, 'config/levels/chapter01/L06.chapterLevels[0].failureConditions');
+expectFailure('empty failures', (candidate) => { candidate.chapterLevels[0].failureConditions = []; }, 'config/levels/chapter01/L06.chapterLevels[0].failureConditions');
 
 console.log('Chapter 01 L06: real L05 prerequisite, WATER environment, profession skill I, freeze/purify rules, reward limit and negative cases PASS');
