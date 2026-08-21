@@ -271,6 +271,20 @@ function result(
   return Object.freeze({ accepted, changed, reason, taskId, progress });
 }
 
+function triggerMatchesEvent(task: TasksTaskData, event: MainlineTaskEvent): boolean {
+  if (task.trigger.type !== event.type) return false;
+  if (task.trigger.levelId !== undefined && task.trigger.levelId !== '*' && task.trigger.levelId !== event.levelId) return false;
+  if (task.trigger.nodeId !== undefined && task.trigger.nodeId !== '*' && task.trigger.nodeId !== event.nodeId) return false;
+  if (task.trigger.deckId !== undefined && task.trigger.deckId !== event.deckId) return false;
+  return true;
+}
+
+function eventStateKey(event: MainlineTaskEvent): string {
+  if (event.key !== undefined) return `${event.type}:${event.key}`;
+  const identity = event.levelId ?? event.nodeId ?? event.deckId ?? 'default';
+  return `${event.type}:${identity}`;
+}
+
 export class TasksPageService {
   private readonly data: TasksPageData;
   private readonly persist?: (serialized: string) => void;
@@ -373,8 +387,14 @@ export class TasksPageService {
     const task = this.task(taskId ?? this.selectedTaskId);
     const status = taskStatus(this.data, task, this.state);
     if (status === 'locked') fail('TASK_LOCKED', `task is locked: ${task.id}`);
-    if (status === 'completed' || status === 'claimed') fail('TASK_ALREADY_COMPLETE', `task is already complete: ${task.id}`);
     const taskEvent = event ?? task.trigger;
+    if (status === 'completed' || status === 'claimed') {
+      const taskState = this.state!.tasks[task.id];
+      const isProcessedEvent = isRecord(taskEvent)
+        && triggerMatchesEvent(task, taskEvent as MainlineTaskEvent)
+        && taskState.eventKeys.includes(eventStateKey(taskEvent as MainlineTaskEvent));
+      if (!isProcessedEvent) fail('TASK_ALREADY_COMPLETE', `task is already complete: ${task.id}`);
+    }
     let advanceResult: ReturnType<MainlineTaskService['advance']>;
     try {
       advanceResult = this.stateService!.advance(taskEvent);

@@ -111,8 +111,29 @@ expectPageFailure('locked task advance', () => page.advanceTask(), 'TASK_LOCKED'
 assert.deepEqual(page.selectTask('M4-10-L01'), { accepted: true, changed: true, reason: 'selected', taskId: 'M4-10-L01', progress: 0 });
 assert.deepEqual(page.advanceTask(), { accepted: true, changed: true, reason: 'completed', taskId: 'M4-10-L01', progress: 1 });
 assert.equal(page.snapshot().components.find((component) => component.id === 'task-M4-10-L02')?.state, 'ready');
+const beforeCompletedRepeat = page.serialize();
+const savesBeforeCompletedRepeat = saves.length;
+assert.deepEqual(page.advanceTask('M4-10-L01', { type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L01' }), {
+  accepted: false,
+  changed: false,
+  reason: 'duplicate',
+  taskId: 'M4-10-L01',
+  progress: 1,
+});
+assert.equal(page.serialize(), beforeCompletedRepeat, 'completed-task duplicate must preserve the serialized state');
+assert.equal(saves.length, savesBeforeCompletedRepeat, 'completed-task duplicate must not persist');
+expectPageFailure('completed task with a different event', () => page.advanceTask('M4-10-L01', { type: 'CAMPAIGN_LEVEL_CLEARED', levelId: 'L02' }), 'TASK_ALREADY_COMPLETE');
 assert.deepEqual(page.claimTask('M4-10-L01'), { accepted: true, changed: true, reason: 'claimed', taskId: 'M4-10-L01', progress: 1 });
 assert.equal(page.snapshot().components.find((component) => component.id === 'header')?.pendingRewardCount, 1);
+const beforeClaimedRepeat = page.serialize();
+assert.deepEqual(page.advanceTask('M4-10-L01'), {
+  accepted: false,
+  changed: false,
+  reason: 'duplicate',
+  taskId: 'M4-10-L01',
+  progress: 1,
+});
+assert.equal(page.serialize(), beforeClaimedRepeat, 'claimed-task duplicate must preserve the serialized state');
 assert.deepEqual(page.claimTask('M4-10-L01'), { accepted: false, changed: false, reason: 'not-ready', taskId: 'M4-10-L01', progress: 1 });
 assert.deepEqual(page.advanceTask('M4-10-L02'), { accepted: true, changed: true, reason: 'completed', taskId: 'M4-10-L02', progress: 1 });
 assert.deepEqual(page.claimTask('M4-10-L02'), { accepted: true, changed: true, reason: 'claimed', taskId: 'M4-10-L02', progress: 1 });
@@ -183,6 +204,6 @@ const beforeFailure = failing.serialize();
 expectPageFailure('persistence failure', () => failing.advanceTask(), 'PERSISTENCE_FAILED');
 assert.equal(failing.serialize(), beforeFailure);
 
-assert.equal(negativeCaseCount, 20, 'all negative cases must execute');
+assert.equal(negativeCaseCount, 21, 'all negative cases must execute');
 assert(saves.length >= 4, 'real transitions must invoke persistence');
 console.log(`T313 tasks page PASS: real-levels=${realLevels.length}, real-tasks=${realData.tasks.length}, components=${initial.components.length}, empty-components=${emptySnapshot.components.length}, saves=${saves.length}, negative-cases=${negativeCaseCount}`);
