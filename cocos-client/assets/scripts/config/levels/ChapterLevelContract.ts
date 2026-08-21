@@ -237,18 +237,47 @@ function deckIds(value: unknown): Set<string> {
   return new Set((value as DeckTable).decks.map((deck) => deck.id));
 }
 
+function isIterator(value: unknown): value is Iterator<unknown> {
+  return isLevelRecord(value) && typeof value.next === 'function';
+}
+
 function normalizeStringRegistry(value: unknown, configPath: string, pattern: RegExp): ReadonlySet<string> {
   if (!(value instanceof Set) || value.size === 0) throw new ConfigLoadError(configPath, '必须是非空 Set');
   const normalized = new Set<string>();
-  const addCandidate = (candidate: unknown, candidatePath: string): void => {
-    if (candidate instanceof Set) {
-      if (candidate.size === 0) throw new ConfigLoadError(candidatePath, '必须是非空 Set');
-      candidate.forEach((nestedCandidate) => addCandidate(nestedCandidate, `${candidatePath}[${nestedCandidate}]`));
-      return;
+  const activeCollections = new Set<object>();
+
+  const visitCollection = (collection: Set<unknown> | unknown[] | Iterator<unknown>, collectionPath: string): void => {
+    if (activeCollections.has(collection)) throw new ConfigLoadError(collectionPath, '注册表集合不得循环引用');
+    activeCollections.add(collection);
+    let count = 0;
+    const visit = (candidate: unknown, candidatePath: string): void => {
+      if (candidate instanceof Set || Array.isArray(candidate) || isIterator(candidate)) {
+        visitCollection(candidate, candidatePath);
+        return;
+      }
+      normalized.add(assertId(candidate, candidatePath, pattern));
+    };
+    if (collection instanceof Set || Array.isArray(collection)) {
+      collection.forEach((candidate) => {
+        visit(candidate, `${collectionPath}[${count}]`);
+        count += 1;
+      });
+    } else {
+      while (true) {
+        const step = collection.next();
+        if (!isLevelRecord(step) || typeof step.done !== 'boolean') {
+          throw new ConfigLoadError(collectionPath, '必须是有效 Iterator');
+        }
+        if (step.done) break;
+        visit(step.value, `${collectionPath}[${count}]`);
+        count += 1;
+      }
     }
-    normalized.add(assertId(candidate, candidatePath, pattern));
+    activeCollections.delete(collection);
+    if (count === 0) throw new ConfigLoadError(collectionPath, '必须是非空注册表集合');
   };
-  value.forEach((candidate) => addCandidate(candidate, `${configPath}[${candidate}]`));
+
+  visitCollection(value, configPath);
   if (normalized.size === 0) throw new ConfigLoadError(configPath, '必须是非空 Set');
   return normalized;
 }
