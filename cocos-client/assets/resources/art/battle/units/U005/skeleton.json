@@ -72,7 +72,7 @@
         "width": 1800,
         "height": 640
       },
-      "sha256": "d477c209363a0ec983591d21f6a9d69f971d137394d09324e69ffc206ebc1a15",
+      "sha256": "3f18f5abe523ba8c6be049313971bebb1f77070e055ba9d57d4724fb7819a084",
       "statePanels": [
         {
           "index": 0,
@@ -133,7 +133,7 @@
         "width": 1536,
         "height": 1024
       },
-      "sha256": "47b0fc64562e1d8f464ac111471c74052a363a075efb6222736945ba76e36a0c",
+      "sha256": "d6b21170b73b79cd58a2ae0ace42b39294bb350e3a10e3d767581240efb1b400",
       "slices": [
         {
           "name": "fullBody",

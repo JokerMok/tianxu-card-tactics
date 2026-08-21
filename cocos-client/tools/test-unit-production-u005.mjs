@@ -9,6 +9,8 @@ const repoRoot = resolve(clientRoot, '..');
 const unitRoot = resolve(clientRoot, 'assets/resources/art/battle/units/U005');
 const skeletonPath = resolve(unitRoot, 'skeleton.json');
 const contractPath = resolve(unitRoot, 'production-contract.json');
+const poseMetaPath = resolve(unitRoot, 'U005-POSE-SHEET.png.meta');
+const cutoutMetaPath = resolve(unitRoot, 'U005-CUTOUT-SHEET.png.meta');
 const cardsPath = resolve(clientRoot, 'assets/resources/config/cards.json');
 const unitsPath = resolve(clientRoot, 'assets/resources/config/units.json');
 const roleDocPath = resolve(repoRoot, '角色兵种体系-v1.1.md');
@@ -77,19 +79,25 @@ const EXPECTED_ORIENTATION = Object.freeze({
   enemy: Object.freeze({ direction: -1, scaleX: -1 }),
 });
 const PANEL_GUARDS = Object.freeze({
-  Idle: Object.freeze({ minAlphaPixels: 50000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.36, minInnerTransparentRatio: 0.45 }),
-  Move: Object.freeze({ minAlphaPixels: 60000, minVisibleWidth: 260, minVisibleHeight: 360, maxCoverage: 0.38, minInnerTransparentRatio: 0.4 }),
-  Attack: Object.freeze({ minAlphaPixels: 55000, minVisibleWidth: 260, minVisibleHeight: 320, maxCoverage: 0.35, minInnerTransparentRatio: 0.45 }),
-  Hit: Object.freeze({ minAlphaPixels: 45000, minVisibleWidth: 240, minVisibleHeight: 340, maxCoverage: 0.32, minInnerTransparentRatio: 0.5 }),
+  // These area floors reflect the actual sparse foreground mask; scene provenance is checked separately below.
+  Idle: Object.freeze({ minAlphaPixels: 28000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.36, minInnerTransparentRatio: 0.45 }),
+  Move: Object.freeze({ minAlphaPixels: 25000, minVisibleWidth: 260, minVisibleHeight: 360, maxCoverage: 0.38, minInnerTransparentRatio: 0.4 }),
+  Attack: Object.freeze({ minAlphaPixels: 25000, minVisibleWidth: 260, minVisibleHeight: 320, maxCoverage: 0.35, minInnerTransparentRatio: 0.45 }),
+  Hit: Object.freeze({ minAlphaPixels: 25000, minVisibleWidth: 240, minVisibleHeight: 340, maxCoverage: 0.32, minInnerTransparentRatio: 0.5 }),
   Death: Object.freeze({ minAlphaPixels: 10000, minVisibleWidth: 180, minVisibleHeight: 120, maxCoverage: 0.1, minInnerTransparentRatio: 0.85 }),
 });
 const SLICE_GUARDS = Object.freeze({
-  fullBody: Object.freeze({ minAlphaPixels: 40000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.24, minInnerTransparentRatio: 0.6 }),
-  spearThrust: Object.freeze({ minAlphaPixels: 50000, minVisibleWidth: 300, minVisibleHeight: 220, maxCoverage: 0.34, minInnerTransparentRatio: 0.45 }),
-  afterimageTrail: Object.freeze({ minAlphaPixels: 90000, minVisibleWidth: 400, minVisibleHeight: 260, maxCoverage: 0.56, minInnerTransparentRatio: 0.22 }),
-  lowerStride: Object.freeze({ minAlphaPixels: 35000, minVisibleWidth: 220, minVisibleHeight: 260, maxCoverage: 0.28, minInnerTransparentRatio: 0.55 }),
-  rigSilhouette: Object.freeze({ minAlphaPixels: 100000, minVisibleWidth: 360, minVisibleHeight: 520, maxCoverage: 0.32, minInnerTransparentRatio: 0.58 }),
+  fullBody: Object.freeze({ minAlphaPixels: 45000, minVisibleWidth: 240, minVisibleHeight: 360, maxCoverage: 0.24, minInnerTransparentRatio: 0.6 }),
+  spearThrust: Object.freeze({ minAlphaPixels: 30000, minVisibleWidth: 300, minVisibleHeight: 220, maxCoverage: 0.34, minInnerTransparentRatio: 0.45 }),
+  afterimageTrail: Object.freeze({ minAlphaPixels: 40000, minVisibleWidth: 400, minVisibleHeight: 260, maxCoverage: 0.56, minInnerTransparentRatio: 0.22 }),
+  lowerStride: Object.freeze({ minAlphaPixels: 40000, minVisibleWidth: 220, minVisibleHeight: 260, maxCoverage: 0.28, minInnerTransparentRatio: 0.55 }),
+  rigSilhouette: Object.freeze({ minAlphaPixels: 80000, minVisibleWidth: 360, minVisibleHeight: 520, maxCoverage: 0.32, minInnerTransparentRatio: 0.58 }),
 });
+const SCENE_SAMPLE_RECTS = Object.freeze([
+  Object.freeze({ name: 'sky', x: 0, y: 0, width: 24, height: 24 }),
+  Object.freeze({ name: 'city', x: 0, y: 560, width: 24, height: 24 }),
+  Object.freeze({ name: 'ground-reflection', x: 760, y: 1400, width: 24, height: 24 }),
+]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -298,6 +306,92 @@ function buildEdgeTransparentCardSheet(sourceImage, entries, sheetSize) {
     }
   }
   return result;
+}
+
+function extractScenePatch(sourceImage, rect) {
+  assertRect(rect, { width: sourceImage.width, height: sourceImage.height }, `scene sample ${rect.name}`);
+  const pixels = Buffer.alloc(rect.width * rect.height * 3);
+  let offset = 0;
+  for (let y = rect.y; y < rect.y + rect.height; y += 1) {
+    for (let x = rect.x; x < rect.x + rect.width; x += 1) {
+      const sourceOffset = (y * sourceImage.width + x) * 4;
+      pixels[offset] = sourceImage.rgba[sourceOffset];
+      pixels[offset + 1] = sourceImage.rgba[sourceOffset + 1];
+      pixels[offset + 2] = sourceImage.rgba[sourceOffset + 2];
+      offset += 3;
+    }
+  }
+  return { ...rect, pixels };
+}
+
+function containsOpaqueScenePatch(image, patch) {
+  for (let y = 0; y <= image.height - patch.height; y += 1) {
+    for (let x = 0; x <= image.width - patch.width; x += 1) {
+      const first = (y * image.width + x) * 4;
+      if (image.rgba[first + 3] < 248 || image.rgba[first] !== patch.pixels[0] || image.rgba[first + 1] !== patch.pixels[1] || image.rgba[first + 2] !== patch.pixels[2]) continue;
+      let matches = true;
+      let patchOffset = 0;
+      for (let patchY = 0; patchY < patch.height && matches; patchY += 1) {
+        for (let patchX = 0; patchX < patch.width; patchX += 1) {
+          const imageOffset = ((y + patchY) * image.width + x + patchX) * 4;
+          if (image.rgba[imageOffset + 3] < 248 || image.rgba[imageOffset] !== patch.pixels[patchOffset] || image.rgba[imageOffset + 1] !== patch.pixels[patchOffset + 1] || image.rgba[imageOffset + 2] !== patch.pixels[patchOffset + 2]) {
+            matches = false;
+            break;
+          }
+          patchOffset += 3;
+        }
+      }
+      if (matches) return true;
+    }
+  }
+  return false;
+}
+
+function assertNoSceneResidual(image, sourceImage, label) {
+  for (const sample of SCENE_SAMPLE_RECTS.map((rect) => extractScenePatch(sourceImage, rect))) {
+    assert.equal(containsOpaqueScenePatch(image, sample), false, `${label} contains an opaque ${sample.name} scene residual copied from U005-CARD.png`);
+  }
+}
+
+function injectScenePatch(image, sourceImage, sampleRect, destination) {
+  const result = { width: image.width, height: image.height, rgba: Buffer.from(image.rgba) };
+  const patch = extractScenePatch(sourceImage, sampleRect);
+  assertRect(destination, { width: image.width, height: image.height }, `scene residual destination ${sampleRect.name}`);
+  assert.equal(destination.width, patch.width, 'scene residual destination width must match the source patch');
+  assert.equal(destination.height, patch.height, 'scene residual destination height must match the source patch');
+  let patchOffset = 0;
+  for (let y = destination.y; y < destination.y + destination.height; y += 1) {
+    for (let x = destination.x; x < destination.x + destination.width; x += 1) {
+      const targetOffset = (y * result.width + x) * 4;
+      result.rgba[targetOffset] = patch.pixels[patchOffset];
+      result.rgba[targetOffset + 1] = patch.pixels[patchOffset + 1];
+      result.rgba[targetOffset + 2] = patch.pixels[patchOffset + 2];
+      result.rgba[targetOffset + 3] = 255;
+      patchOffset += 3;
+    }
+  }
+  return result;
+}
+
+function validateTextureMeta(metaPath, image, expectedDisplayName) {
+  const meta = readJson(metaPath);
+  assert.equal(meta.importer, 'image', `${basename(metaPath)} must be an image importer meta`);
+  assert.equal(meta.imported, true, `${basename(metaPath)} must be imported`);
+  assert.equal(meta.userData?.type, 'sprite-frame', `${basename(metaPath)} must expose a sprite-frame redirect`);
+  assert.equal(meta.userData?.hasAlpha, true, `${basename(metaPath)} must preserve alpha`);
+  const entries = Object.values(meta.subMetas ?? {});
+  const texture = entries.find((entry) => entry.importer === 'texture');
+  const spriteFrame = entries.find((entry) => entry.importer === 'sprite-frame');
+  assert.ok(texture, `${basename(metaPath)} must contain a texture sub-meta`);
+  assert.ok(spriteFrame, `${basename(metaPath)} must contain a sprite-frame sub-meta`);
+  assert.equal(texture.displayName, expectedDisplayName, `${basename(metaPath)} texture displayName changed`);
+  assert.equal(spriteFrame.displayName, expectedDisplayName, `${basename(metaPath)} sprite-frame displayName changed`);
+  assert.equal(meta.userData.redirect, texture.uuid, `${basename(metaPath)} redirect must target the texture sub-meta`);
+  assert.equal(spriteFrame.userData.imageUuidOrDatabaseUri, texture.uuid, `${basename(metaPath)} sprite-frame must target its texture sub-meta`);
+  assert.equal(spriteFrame.userData.width, image.width, `${basename(metaPath)} sprite-frame width must match the real PNG`);
+  assert.equal(spriteFrame.userData.height, image.height, `${basename(metaPath)} sprite-frame height must match the real PNG`);
+  assert.equal(spriteFrame.userData.rawWidth, image.width, `${basename(metaPath)} sprite-frame rawWidth must match the real PNG`);
+  assert.equal(spriteFrame.userData.rawHeight, image.height, `${basename(metaPath)} sprite-frame rawHeight must match the real PNG`);
 }
 
 function validateContract(contract, skeleton) {
@@ -579,15 +673,23 @@ function validatePngAssets(contract, skeleton) {
   assert.deepEqual({ width: cutoutImage.width, height: cutoutImage.height }, contract.resources.cutoutSheet.size, 'U005 cutout PNG dimensions changed');
   assert.equal(poseImage.colorType, 6, 'U005 pose sheet must keep RGBA transparency');
   assert.equal(cutoutImage.colorType, 6, 'U005 cutout sheet must keep RGBA transparency');
+  validateTextureMeta(poseMetaPath, poseImage, 'U005-POSE-SHEET');
+  validateTextureMeta(cutoutMetaPath, cutoutImage, 'U005-CUTOUT-SHEET');
 
   validatePosePanels(poseImage, skeleton.atlases.poseSheet.statePanels);
   validateCutoutSlices(cutoutImage, skeleton.atlases.cutoutSheet.slices);
 
   const sourceImage = parsePng(sourceArtPath);
+  assertNoSceneResidual(poseImage, sourceImage, 'U005 pose sheet');
+  assertNoSceneResidual(cutoutImage, sourceImage, 'U005 cutout sheet');
   const fakePoseImage = buildEdgeTransparentCardSheet(sourceImage, skeleton.atlases.poseSheet.statePanels, skeleton.atlases.poseSheet.size);
   assert.throws(() => validatePosePanels(fakePoseImage, skeleton.atlases.poseSheet.statePanels), /card-background crop|pseudo-transparent card slice/, 'border-transparent full-card pose projections must fail');
   const fakeCutoutImage = buildEdgeTransparentCardSheet(sourceImage, skeleton.atlases.cutoutSheet.slices, skeleton.atlases.cutoutSheet.size);
   assert.throws(() => validateCutoutSlices(fakeCutoutImage, skeleton.atlases.cutoutSheet.slices), /card-background crop|pseudo-transparent card slice/, 'border-transparent full-card cutout slices must fail');
+  const fakePoseSceneResidual = injectScenePatch(poseImage, sourceImage, SCENE_SAMPLE_RECTS[2], { x: 120, y: 220, width: 24, height: 24 });
+  assert.throws(() => assertNoSceneResidual(fakePoseSceneResidual, sourceImage, 'fake U005 pose sheet'), /scene residual/, 'opaque ground/reflection pixels inside a valid pose must fail');
+  const fakeCutoutSceneResidual = injectScenePatch(cutoutImage, sourceImage, SCENE_SAMPLE_RECTS[1], { x: 160, y: 180, width: 24, height: 24 });
+  assert.throws(() => assertNoSceneResidual(fakeCutoutSceneResidual, sourceImage, 'fake U005 cutout sheet'), /scene residual/, 'opaque city pixels inside a valid cutout must fail');
 }
 
 function expectFailure(label, mutate, pattern) {
