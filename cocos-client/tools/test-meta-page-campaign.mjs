@@ -51,6 +51,15 @@ assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.l
 assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.selected, true, 'single-level detail must match the selected card');
 assert.equal(l02OnlyComponents.find((component) => component.id === 'detail')?.canStart, true, 'single-level detail must match the playable card');
 
+const legacyL01State = new CampaignStateService(index).serialize();
+const rawLegacyL02Components = createCampaignPageComponents(
+  l02OnlyData,
+  new CampaignStateService(index, { initialState: legacyL01State }).snapshot(),
+);
+assert.equal(rawLegacyL02Components.find((component) => component.id === 'level-L02')?.selected, true, 'invalid legacy selection may be projected for display');
+assert.equal(rawLegacyL02Components.find((component) => component.id === 'level-L02')?.unlocked, false, 'raw invalid legacy state must not unlock a hidden prerequisite projection');
+assert.equal(rawLegacyL02Components.find((component) => component.id === 'detail')?.canStart, false, 'raw invalid legacy state must not claim startability');
+
 let negativeCaseCount = 0;
 function expectStateFailure(label, action, code) {
   negativeCaseCount += 1;
@@ -104,6 +113,46 @@ assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'le
 assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'detail')?.levelId, 'L02', 'service detail must target the only visible level');
 assert.equal(l02OnlySnapshot.components.find((component) => component.id === 'detail')?.canStart, true, 'service detail must expose the only visible level as startable');
 assert.deepEqual(l02OnlyPage.startLevel(), { accepted: true, changed: true, reason: 'started', levelId: 'L02' }, 'only visible level must be the default start target');
+
+const l02OnlyWithLegacyState = new CampaignPageService({
+  data: l02OnlyData,
+  initialState: legacyL01State,
+});
+const l02OnlyWithLegacySnapshot = l02OnlyWithLegacyState.snapshot();
+assert.equal(l02OnlyWithLegacySnapshot.selectedLevelId, 'L02', 'data-only legacy L01 state must normalize to the visible L02');
+assert.equal(l02OnlyWithLegacySnapshot.state?.selectedLevelId, 'L02', 'data-only normalized state must select the visible L02');
+assert.equal(l02OnlyWithLegacySnapshot.components.find((component) => component.id === 'level-L02')?.unlocked, true, 'data-only normalized L02 must be unlocked');
+assert.equal(l02OnlyWithLegacySnapshot.components.find((component) => component.id === 'detail')?.canStart, true, 'data-only normalized L02 must be startable');
+assert.deepEqual(l02OnlyWithLegacyState.startLevel(), { accepted: true, changed: true, reason: 'started', levelId: 'L02' }, 'data-only normalized L02 start must match snapshot');
+
+const dataAndLevelsL02Only = new CampaignPageService({
+  data: l02OnlyData,
+  levels: levelConfigs,
+  initialState: legacyL01State,
+});
+const dataAndLevelsL02Snapshot = dataAndLevelsL02Only.snapshot();
+assert.equal(dataAndLevelsL02Snapshot.selectedLevelId, 'L02', 'data-plus-levels legacy L01 state must normalize to the visible L02');
+assert.equal(dataAndLevelsL02Snapshot.state?.selectedLevelId, 'L02', 'data-plus-levels normalized state must select the visible L02');
+assert.equal(dataAndLevelsL02Snapshot.components.find((component) => component.id === 'level-L02')?.unlocked, true, 'data-plus-levels normalized L02 must be unlocked');
+assert.equal(dataAndLevelsL02Snapshot.components.find((component) => component.id === 'detail')?.canStart, true, 'data-plus-levels normalized L02 must be startable');
+assert.deepEqual(dataAndLevelsL02Only.startLevel(), { accepted: true, changed: true, reason: 'started', levelId: 'L02' }, 'data-plus-levels normalized L02 start must match snapshot');
+
+const injectedLegacyL02Only = new CampaignPageService({
+  data: l02OnlyData,
+  campaign: new CampaignStateService(index, { initialState: legacyL01State }),
+});
+const injectedLegacyL02Snapshot = injectedLegacyL02Only.snapshot();
+assert.equal(injectedLegacyL02Snapshot.selectedLevelId, 'L02', 'injected legacy L01 state must normalize to the visible L02');
+assert.equal(injectedLegacyL02Snapshot.components.find((component) => component.id === 'detail')?.canStart, true, 'injected normalized L02 must be startable');
+assert.deepEqual(injectedLegacyL02Only.startLevel(), { accepted: true, changed: true, reason: 'started', levelId: 'L02' }, 'injected normalized L02 start must match snapshot');
+
+const hiddenActiveState = new CampaignStateService(index);
+hiddenActiveState.startLevel('L01');
+expectPageFailure(
+  'hidden active initial state on partial page',
+  () => new CampaignPageService({ data: l02OnlyData, initialState: hiddenActiveState.serialize() }),
+  'STATE_DATA_MISMATCH',
+);
 
 const mutableInput = createDefaultCampaignPageData();
 const isolatedInputPage = new CampaignPageService({ data: mutableInput, levels: levelConfigs });
@@ -256,5 +305,5 @@ assert.deepEqual(illegal.snapshot(), activeBeforeInvalidSettlement, 'invalid set
 illegal.failLevel();
 expectStateFailure('settle without active level', () => illegal.completeLevel(1), 'NO_ACTIVE_LEVEL');
 
-assert.equal(negativeCaseCount, 17, 'all missing, malformed, locked, failed and boundary cases must execute');
+assert.equal(negativeCaseCount, 18, 'all missing, malformed, locked, failed and boundary cases must execute');
 console.log(`T307 campaign page PASS: components=${initial.components.length}, empty-components=${empty.snapshot().components.length}, saves=${saves.length}, negative-cases=${negativeCaseCount}, real-levels=${levelConfigs.length}, save-restore-idempotent=true`);

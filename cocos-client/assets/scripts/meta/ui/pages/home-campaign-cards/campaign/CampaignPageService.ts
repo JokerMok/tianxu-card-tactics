@@ -168,6 +168,47 @@ function seedStateForVisibleLevel(
   return seeded.serialize();
 }
 
+function normalizeStateForVisibleLevel(
+  stateOptions: Record<string, unknown>,
+  data: CampaignPageData,
+  initialState: CampaignState | string,
+): string {
+  const candidate = new CampaignStateService({ ...stateOptions, initialState });
+  const firstVisibleLevelId = data.levels[0]?.id;
+  if (firstVisibleLevelId === undefined || firstVisibleLevelId === 'L01') return candidate.serialize();
+  if (candidate.activeLevelId !== null && !data.levels.some((level) => level.id === candidate.activeLevelId)) {
+    reject('STATE_DATA_MISMATCH', 'a hidden campaign level cannot remain active on a partial campaign page');
+  }
+  if (data.levels.some((level) => level.id === candidate.selectedLevelId)) return candidate.serialize();
+
+  const normalized = new CampaignStateService({ ...stateOptions, initialState: candidate.serialize() });
+  const firstVisibleIndex = CAMPAIGN_LEVEL_IDS.indexOf(firstVisibleLevelId);
+  for (const levelId of CAMPAIGN_LEVEL_IDS.slice(0, firstVisibleIndex)) {
+    const progress = normalized.getLevel(levelId);
+    if (progress.firstClear) continue;
+    if (normalized.selectedLevelId !== levelId) normalized.selectLevel(levelId);
+    normalized.startLevel(levelId);
+    normalized.completeLevel(levelId, 1);
+  }
+  if (normalized.selectedLevelId !== firstVisibleLevelId) normalized.selectLevel(firstVisibleLevelId);
+  return normalized.serialize();
+}
+
+function normalizeInjectedCampaignForVisibleLevel(
+  campaign: CampaignStateService,
+  data: CampaignPageData,
+): CampaignStateService {
+  if (data.levels[0]?.id === 'L01' || data.levels.some((level) => level.id === campaign.selectedLevelId)) return campaign;
+  const current = campaign.serialize();
+  const normalized = normalizeStateForVisibleLevel(
+    { config: defaultDefinition() },
+    data,
+    current,
+  );
+  if (normalized !== current) campaign.restore(normalized);
+  return campaign;
+}
+
 function isPageData(value: unknown): value is CampaignPageData {
   if (!isRecord(value)) return false;
   return ['schemaVersion', 'chapterId', 'title', 'subtitle']
@@ -251,7 +292,7 @@ export class CampaignPageService {
       ) {
         reject('INVALID_ARGUMENT', 'campaign state service options cannot be combined with an injected service');
       }
-      this.campaign = suppliedCampaign;
+      this.campaign = normalizeInjectedCampaignForVisibleLevel(suppliedCampaign, this.data);
       return;
     }
     const configuredDefinition = options.config !== undefined ? options.config : options.index;
@@ -264,7 +305,13 @@ export class CampaignPageService {
         : { config: defaultDefinition() };
     const initialState = options.initialState === undefined
       ? seedStateForVisibleLevel(definition, this.data)
-      : options.initialState;
+      : this.data.levels[0]?.id === 'L01'
+        ? options.initialState
+        : normalizeStateForVisibleLevel(
+          stateOptions,
+          this.data,
+          options.initialState,
+        );
     this.campaign = new CampaignStateService({
       ...stateOptions,
       initialState,
