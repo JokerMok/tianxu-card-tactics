@@ -166,6 +166,23 @@ export const CITY_EXPEDITION_STAMINA_COST = 10 as const;
 export const CITY_EXPEDITION_DURATION_MS = 60_000 as const;
 export const CITY_EXPEDITION_REWARD_SILVER = 1_600 as const;
 
+function assertValidGameStateExpedition(expedition: GameState['expedition']): void {
+  if (typeof expedition.active !== 'boolean'
+    || !Number.isSafeInteger(expedition.endsAt)
+    || !Number.isSafeInteger(expedition.reward)
+    || expedition.endsAt < 0
+    || expedition.endsAt >= Number.MAX_SAFE_INTEGER
+    || expedition.reward < 0) {
+    throw new CityPageError('INVALID_DATA', 'game state expedition values are invalid');
+  }
+  if (expedition.active && (expedition.endsAt === 0 || expedition.reward === 0)) {
+    throw new CityPageError('INVALID_DATA', 'active expedition must have a positive endsAt and reward');
+  }
+  if (!expedition.active && (expedition.endsAt !== 0 || expedition.reward !== 0)) {
+    throw new CityPageError('INVALID_DATA', 'inactive expedition must have endsAt and reward 0');
+  }
+}
+
 function freeze<T>(value: T): T {
   if (value === null || typeof value !== 'object') return value;
   if (Array.isArray(value)) return Object.freeze(value.map((item) => freeze(item))) as T;
@@ -175,6 +192,7 @@ function freeze<T>(value: T): T {
 }
 
 export function createDefaultCityPageData(state: GameState = createDefaultState()): CityPageData {
+  assertValidGameStateExpedition(state.expedition);
   const castleLevel = state.buildings.castle;
   const buildings = CITY_BUILDING_IDS.map((id) => {
     const level = state.buildings[id];
@@ -202,7 +220,7 @@ export function createDefaultCityPageData(state: GameState = createDefaultState(
     expedition: {
       active: state.expedition.active,
       endsAt: state.expedition.endsAt,
-      rewardSilver: state.expedition.reward || CITY_EXPEDITION_REWARD_SILVER,
+      rewardSilver: state.expedition.active ? state.expedition.reward : CITY_EXPEDITION_REWARD_SILVER,
       staminaCost: CITY_EXPEDITION_STAMINA_COST,
       durationMs: CITY_EXPEDITION_DURATION_MS,
     },

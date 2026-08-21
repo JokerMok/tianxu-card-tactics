@@ -87,6 +87,9 @@ function assertComponentData(data: CityPageData, now: number): void {
       || (!data.expedition.active && data.expedition.endsAt !== 0)) {
       fail('INVALID_DATA', 'city page expedition values are invalid');
     }
+    if (data.expedition.active && data.expedition.endsAt === 0) {
+      fail('INVALID_DATA', 'active expedition must have a positive endsAt');
+    }
   }
   assertSafeTime(now, 'city snapshot time');
 }

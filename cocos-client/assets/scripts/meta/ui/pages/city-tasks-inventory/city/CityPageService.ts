@@ -118,6 +118,12 @@ function validateGameState(input: unknown): GameState {
   if (input.expedition.endsAt < 0 || input.expedition.endsAt >= Number.MAX_SAFE_INTEGER || input.expedition.reward < 0) {
     fail('INVALID_DATA', 'game state expedition values are out of range');
   }
+  if (input.expedition.active && (input.expedition.endsAt === 0 || input.expedition.reward === 0)) {
+    fail('INVALID_DATA', 'active expedition must have a positive endsAt and reward');
+  }
+  if (!input.expedition.active && (input.expedition.endsAt !== 0 || input.expedition.reward !== 0)) {
+    fail('INVALID_DATA', 'inactive expedition must have endsAt and reward 0');
+  }
   if (!Array.isArray(input.cards) || !Array.isArray(input.deck) || !Array.isArray(input.transactions)) fail('INVALID_DATA', 'game state collection fields are invalid');
   assertRecord(input.player, 'game state player');
   assertRecord(input.equipment, 'game state equipment');
@@ -186,6 +192,7 @@ function validateData(input: CityPageData): CityPageData {
       || input.expedition.rewardSilver <= 0 || input.expedition.staminaCost <= 0 || input.expedition.durationMs <= 0) {
       fail('INVALID_DATA', 'expedition values are out of range');
     }
+    if (input.expedition.active && input.expedition.endsAt === 0) fail('INVALID_DATA', 'active expedition must have a positive endsAt');
     if (!input.expedition.active && input.expedition.endsAt !== 0) fail('INVALID_DATA', 'inactive expedition must have endsAt 0');
   }
   return cloneData(input);
@@ -280,12 +287,12 @@ export class CityPageService {
     if (this.data.buildings.length === 0) return result(false, false, 'empty', null);
     const building = this.data.buildings.find((entry) => entry.id === id);
     if (building === undefined) fail('BUILDING_NOT_FOUND', `city building is not available: ${id}`);
+    const previousSelectedBuildingId = this.selectedBuildingId;
     this.selectedBuildingId = id;
     if (building.level >= building.maxLevel) return result(false, false, 'maxed', id);
     if (this.data.resources.silver < building.upgradeCost.silver || this.data.resources.crystal < building.upgradeCost.crystal) {
       return result(false, false, 'insufficient', id);
     }
-    const previousSelectedBuildingId = this.selectedBuildingId;
     const nextLevel = building.level + 1;
     if (!Number.isSafeInteger(nextLevel) || nextLevel >= Number.MAX_SAFE_INTEGER) fail('INVALID_DATA', 'building level would exceed the safe integer range');
     const nextData = cloneData(this.data);
@@ -310,7 +317,6 @@ export class CityPageService {
       nextState.resources.crystal = nextData.resources.crystal;
       nextState.buildings[id] = nextLevel;
     }
-    this.selectedBuildingId = id;
     try {
       this.commit(nextData, nextState);
     } catch (error) {
@@ -323,6 +329,7 @@ export class CityPageService {
   dispatchExpedition(now: number = Date.now()): CityInteractionResult {
     const expedition = this.data.expedition;
     if (expedition === null) return result(false, false, 'empty');
+    if (expedition.active && expedition.endsAt === 0) fail('INVALID_DATA', 'active expedition must have a positive endsAt');
     const timestamp = nowValue(now);
     if (expedition.active) return result(false, false, 'active');
     if (this.data.resources.stamina < expedition.staminaCost) return result(false, false, 'insufficient');
@@ -342,6 +349,7 @@ export class CityPageService {
   claimExpedition(now: number = Date.now()): CityInteractionResult {
     const expedition = this.data.expedition;
     if (expedition === null) return result(false, false, 'empty');
+    if (expedition.active && expedition.endsAt === 0) fail('INVALID_DATA', 'active expedition must have a positive endsAt');
     const timestamp = nowValue(now);
     if (!expedition.active) return result(false, false, 'idle');
     if (timestamp < expedition.endsAt) return result(false, false, 'active');
@@ -383,19 +391,42 @@ export class CityPageService {
 
   private commit(nextData: CityPageData, nextState: GameState | null): void {
     if (this.committing) fail('REENTRANT', 'city state submission is reentrant');
+    const previousState = this.currentState === null ? null : cloneGameState(this.currentState);
+    const previousSerialized = JSON.stringify(previousState === null ? this.data : previousState);
     const serialized = JSON.stringify(nextState === null ? nextData : nextState);
+    let stateCallbackAttempted = false;
+    let persistAttempted = false;
+    let targetStateAttempted = false;
     this.committing = true;
     try {
-      this.persistCallback?.(serialized);
-      if (nextState !== null) this.stateCallback?.(deepFreeze(cloneGameState(nextState)));
-      if (nextState !== null && this.targetState !== undefined) replaceGameState(this.targetState, nextState);
+      if (nextState !== null && this.stateCallback !== undefined) {
+        stateCallbackAttempted = true;
+        this.stateCallback(deepFreeze(cloneGameState(nextState)));
+      }
+      if (this.persistCallback !== undefined) {
+        persistAttempted = true;
+        this.persistCallback(serialized);
+      }
+      if (nextState !== null && this.targetState !== undefined) {
+        targetStateAttempted = true;
+        replaceGameState(this.targetState, nextState);
+      }
+      this.data = nextData;
+      this.currentState = nextState;
     } catch (error) {
+      if (targetStateAttempted && this.targetState !== undefined && previousState !== null) {
+        try { replaceGameState(this.targetState, previousState); } catch { /* best-effort compensation */ }
+      }
+      if (stateCallbackAttempted && nextState !== null && this.stateCallback !== undefined && previousState !== null) {
+        try { this.stateCallback(deepFreeze(cloneGameState(previousState))); } catch { /* best-effort compensation */ }
+      }
+      if (persistAttempted && this.persistCallback !== undefined) {
+        try { this.persistCallback(previousSerialized); } catch { /* best-effort compensation */ }
+      }
       if (error instanceof CityPageError) throw error;
       throw new CityPageError('PERSISTENCE_FAILED', 'city state submission failed', error);
     } finally {
       this.committing = false;
     }
-    this.data = nextData;
-    this.currentState = nextState;
   }
 }

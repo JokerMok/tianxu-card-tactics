@@ -50,7 +50,17 @@ assert.equal(alchemy?.upgradeCost.silver, realState.buildings.alchemy * 1400, 'u
 assert.equal(expedition?.state, 'idle');
 assert.equal(expedition?.canDispatch, true);
 
-// A GameState-backed page commits a candidate snapshot before exposing it to the attached state.
+let negativeCaseCount = 0;
+function expectFailure(label, action, code) {
+  negativeCaseCount += 1;
+  assert.throws(action, (error) => {
+    assert(error instanceof CityPageError, `${label} must throw CityPageError`);
+    assert.equal(error.code, code, `${label} must report ${code}`);
+    return true;
+  }, label);
+}
+
+// A GameState-backed page exposes the candidate to the callback before applying it to the attached state.
 const stateForService = createDefaultState();
 const submittedStates = [];
 const statePage = new CityPageService({ state: stateForService, onStateChange: (state) => submittedStates.push(state) });
@@ -63,6 +73,77 @@ assert.equal(stateForService.expedition.endsAt, 61000);
 assert.deepEqual(statePage.claimExpedition(61000), { accepted: true, changed: true, reason: 'claimed', buildingId: null });
 assert.equal(stateForService.expedition.active, false);
 assert.equal(stateForService.resources.silver, 11600);
+
+const invalidLiveExpeditionState = {
+  ...realState,
+  expedition: { active: true, endsAt: 0, reward: 0 },
+};
+expectFailure('invalid active expedition state rejected at construction', () => new CityPageService({ state: invalidLiveExpeditionState }), 'INVALID_DATA');
+expectFailure('invalid active expedition state rejected during recovery', () => createDefaultCityPageData(invalidLiveExpeditionState), 'INVALID_DATA');
+assert.equal(createDefaultCityPageData({
+  ...realState,
+  expedition: { active: true, endsAt: 60000, reward: 777 },
+}).expedition?.rewardSilver, 777, 'active expedition reward must remain state-owned');
+expectFailure('invalid active expedition page data rejected at construction', () => new CityPageService({
+  ...realData,
+  expedition: { ...realData.expedition, active: true, endsAt: 0 },
+}), 'INVALID_DATA');
+expectFailure('invalid active expedition rejected by component projection', () => createCityPageComponents({
+  ...realData,
+  expedition: { ...realData.expedition, active: true, endsAt: 0 },
+}), 'INVALID_DATA');
+
+const atomicEvents = [];
+const atomicState = createDefaultState();
+const atomicPage = new CityPageService({
+  state: atomicState,
+  onStateChange: (state) => atomicEvents.push(`state:${state.buildings.forge}/target:${atomicState.buildings.forge}`),
+  persist: (serialized) => atomicEvents.push(`persist:${JSON.parse(serialized).buildings.forge}/target:${atomicState.buildings.forge}`),
+});
+atomicPage.upgradeBuilding('forge');
+assert.deepEqual(atomicEvents, ['state:3/target:2', 'persist:3/target:2'], 'state callback must precede persistence and target mutation');
+assert.equal(atomicState.buildings.forge, 3);
+
+const callbackFailureState = createDefaultState();
+const callbackFailureCalls = [];
+const callbackFailureWrites = [];
+const callbackFailurePage = new CityPageService({
+  state: callbackFailureState,
+  onStateChange: (state) => {
+    callbackFailureCalls.push(state.buildings.forge);
+    if (state.buildings.forge === 3) throw new Error('state consumer rejected candidate');
+  },
+  persist: (serialized) => callbackFailureWrites.push(serialized),
+});
+const callbackFailureBefore = JSON.stringify(callbackFailureState);
+expectFailure('state callback failure rolls back without persisting candidate', () => callbackFailurePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
+assert.deepEqual(callbackFailureCalls, [3, 2]);
+assert.equal(callbackFailureWrites.length, 0);
+assert.equal(JSON.stringify(callbackFailureState), callbackFailureBefore);
+assert.equal(callbackFailurePage.state.buildings.forge, 2);
+
+const persistenceFailureState = createDefaultState();
+const persistenceFailureCalls = [];
+const persistenceFailureWrites = [];
+let persistenceFailureFirstCall = true;
+const persistenceFailurePage = new CityPageService({
+  state: persistenceFailureState,
+  onStateChange: (state) => persistenceFailureCalls.push(state.buildings.forge),
+  persist: (serialized) => {
+    persistenceFailureWrites.push(serialized);
+    if (persistenceFailureFirstCall) {
+      persistenceFailureFirstCall = false;
+      throw new Error('disk full after candidate write');
+    }
+  },
+});
+const persistenceFailureBefore = JSON.stringify(persistenceFailureState);
+expectFailure('persistence failure compensates candidate state', () => persistenceFailurePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
+assert.deepEqual(persistenceFailureCalls, [3, 2]);
+assert.equal(JSON.parse(persistenceFailureWrites[0]).buildings.forge, 3);
+assert.equal(JSON.parse(persistenceFailureWrites[1]).buildings.forge, 2);
+assert.equal(JSON.stringify(persistenceFailureState), persistenceFailureBefore);
+assert.equal(persistenceFailurePage.state.buildings.forge, 2);
 
 const configured = new CityPageService({
   ...realData,
@@ -83,16 +164,6 @@ assert.equal(page.snapshot(1000).components.find((component) => component.id ===
 assert.deepEqual(page.claimExpedition(1000 + realData.expedition.durationMs - 1), { accepted: false, changed: false, reason: 'active', buildingId: null });
 assert.deepEqual(page.claimExpedition(1000 + realData.expedition.durationMs), { accepted: true, changed: true, reason: 'claimed', buildingId: null });
 assert.equal(page.snapshot(1000 + realData.expedition.durationMs).components.find((component) => component.id === 'expedition')?.state, 'idle');
-
-let negativeCaseCount = 0;
-function expectFailure(label, action, code) {
-  negativeCaseCount += 1;
-  assert.throws(action, (error) => {
-    assert(error instanceof CityPageError, `${label} must throw CityPageError`);
-    assert.equal(error.code, code, `${label} must report ${code}`);
-    return true;
-  }, label);
-}
 
 const empty = new CityPageService(createEmptyCityPageData());
 assert.deepEqual(empty.snapshot().components.map((component) => component.id), ['city-empty']);
@@ -130,6 +201,6 @@ const stateBeforeFailure = JSON.stringify(persistenceState);
 expectFailure('state persistence failure rolls back', () => failingStatePage.upgradeBuilding('forge'), 'PERSISTENCE_FAILED');
 assert.equal(JSON.stringify(persistenceState), stateBeforeFailure);
 assert.equal(failingStatePage.state.buildings.forge, 2);
-assert.equal(negativeCaseCount, 14, 'missing, invalid and out-of-range cases must execute');
+assert.equal(negativeCaseCount, 20, 'missing, invalid, out-of-range and atomicity cases must execute');
 
 console.log(`T312 city page PASS: real-buildings=${realData.buildings.length}, components=${normal.components.length}, negative-cases=${negativeCaseCount}, normal/empty/insufficient/active/claimable`);
