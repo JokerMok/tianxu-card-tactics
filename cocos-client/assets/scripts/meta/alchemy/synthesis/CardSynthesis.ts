@@ -96,6 +96,7 @@ export type CardSynthesisErrorCode =
   | 'INSUFFICIENT_MATERIALS'
   | 'INVALID_RNG'
   | 'QUANTITY_EXCEEDED'
+  | 'REENTRANT'
   | 'PERSISTENCE_FAILED';
 
 export class CardSynthesisError extends Error {
@@ -262,7 +263,11 @@ function normalizeRecipe(value: unknown, index: number): CardSynthesisRecipe {
 }
 
 function normalizeRecipes(input: readonly unknown[] | { readonly recipes: readonly unknown[] } | undefined): ReadonlyMap<string, CardSynthesisRecipe> {
-  const rows = input === undefined ? CARD_SYNTHESIS_RECIPES : Array.isArray(input) ? input : input.recipes;
+  let rows: unknown;
+  if (input === undefined) rows = CARD_SYNTHESIS_RECIPES;
+  else if (Array.isArray(input)) rows = input;
+  else if (isRecord(input) && hasOwn(input, 'recipes')) rows = input.recipes;
+  else fail('INVALID_CONFIG', 'synthesis recipes must be a non-empty array or { recipes: [...] }');
   if (!Array.isArray(rows) || rows.length === 0) fail('INVALID_CONFIG', 'synthesis recipes must be a non-empty array');
   const recipes = new Map<string, CardSynthesisRecipe>();
   rows.forEach((row, index) => {
@@ -484,6 +489,7 @@ export class CardSynthesisService {
   private readonly rng: () => number;
   private readonly onSave?: (serialized: string) => void;
   private state: CardSynthesisState;
+  private transactionActive = false;
 
   constructor(options: CardSynthesisOptions = {}) {
     if (!isRecord(options)) fail('INVALID_ARGUMENT', 'synthesis options must be an object');
@@ -538,6 +544,16 @@ export class CardSynthesisService {
   }
 
   synthesize(input: unknown): CardSynthesisResult {
+    if (this.transactionActive) fail('REENTRANT', 'synthesis transaction cannot re-enter resolve, RNG or persistence');
+    this.transactionActive = true;
+    try {
+      return this.synthesizeTransaction(input);
+    } finally {
+      this.transactionActive = false;
+    }
+  }
+
+  private synthesizeTransaction(input: unknown): CardSynthesisResult {
     const request = normalizeRequest(input);
     const existing = this.state.receipts.find((receipt) => receipt.requestId === request.requestId);
     const fingerprint = requestFingerprint(request);
@@ -607,7 +623,7 @@ export class CardSynthesisService {
       return cloneResult(result);
     } catch (error) {
       this.state = before;
-      if (error instanceof CardSynthesisError && error.code === 'PERSISTENCE_FAILED') throw error;
+      if (error instanceof CardSynthesisError && (error.code === 'REENTRANT' || error.code === 'PERSISTENCE_FAILED')) throw error;
       throw new CardSynthesisError('PERSISTENCE_FAILED', 'synthesis state persistence failed', error);
     }
   }

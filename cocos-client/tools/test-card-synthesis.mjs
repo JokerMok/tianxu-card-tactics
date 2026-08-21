@@ -14,10 +14,41 @@ const root = path.resolve(import.meta.dirname, '..');
 const cardsTable = JSON.parse(fs.readFileSync(path.join(root, 'assets/resources/config/cards.json'), 'utf8'));
 const cards = cardsTable.cards.filter((card) => card.enabled !== false);
 const realCardIds = new Set(cards.map(({ id }) => id));
+const EXPECTED_PRODUCTION_CARD_IDS = Object.freeze([
+  'U001', 'U002', 'U003', 'U004', 'U005', 'U006', 'U007', 'U008', 'U009', 'U010', 'U011', 'U012',
+  'U013', 'U014', 'U015', 'U016', 'U017', 'U018', 'U019', 'U020', 'U021', 'U022', 'U023', 'U024',
+  'U025', 'U026', 'U027', 'U028', 'S001', 'S002', 'S003', 'S004', 'S005', 'S006', 'S007', 'S008',
+  'S009', 'S010', 'S011', 'S012', 'S013', 'S014', 'S015', 'S016',
+]);
+const EXPECTED_PRODUCTION_BY_SOURCE_QUALITY = Object.freeze({
+  1: Object.freeze({ outputQuality: 2, materialQuantity: 3, outputQuantity: 1, baseProbability: 0.8 }),
+  2: Object.freeze({ outputQuality: 3, materialQuantity: 3, outputQuantity: 1, baseProbability: 0.7 }),
+  3: Object.freeze({ outputQuality: 4, materialQuantity: 3, outputQuantity: 1, baseProbability: 0.6 }),
+  4: Object.freeze({ outputQuality: 5, materialQuantity: 3, outputQuantity: 1, baseProbability: 0.5 }),
+  5: Object.freeze({ outputQuality: 6, materialQuantity: 3, outputQuantity: 1, baseProbability: 0.4 }),
+});
 const productionRecipe = CARD_SYNTHESIS_RECIPES.find((recipe) => recipe.id === 'U001-Q1-TO-Q2');
 assert(productionRecipe, 'production synthesis must expose the real U001 Q1 to Q2 recipe');
+assert.equal(cards.length, 44, 'the production card registry must contain exactly 44 enabled cards');
+assert.deepEqual([...realCardIds].sort(), [...EXPECTED_PRODUCTION_CARD_IDS].sort(), 'production card IDs must match the fixed synthesis fixture');
 assert.equal(CARD_SYNTHESIS_RECIPES.length, cards.length * 5, 'production must expose one recipe for every card and source quality');
+assert.equal(CARD_SYNTHESIS_RECIPES.length, 44 * 5, 'production must expose exactly 44 cards x 5 source qualities');
 assert(CARD_SYNTHESIS_RECIPES.every((recipe) => realCardIds.has(recipe.output.cardId)), 'production recipes must target real cards');
+const expectedProductionRecipeIds = new Set(EXPECTED_PRODUCTION_CARD_IDS.flatMap((cardId) => Object.keys(EXPECTED_PRODUCTION_BY_SOURCE_QUALITY).map((quality) => `${cardId}-Q${quality}-TO-Q${EXPECTED_PRODUCTION_BY_SOURCE_QUALITY[quality].outputQuality}`)));
+assert.deepEqual(new Set(CARD_SYNTHESIS_RECIPES.map((recipe) => recipe.id)), expectedProductionRecipeIds, 'production recipe IDs must cover every fixed cardId/quality from-to combination');
+for (const cardId of EXPECTED_PRODUCTION_CARD_IDS) {
+  for (const [sourceQualityText, expected] of Object.entries(EXPECTED_PRODUCTION_BY_SOURCE_QUALITY)) {
+    const sourceQuality = Number(sourceQualityText);
+    const recipeId = `${cardId}-Q${sourceQuality}-TO-Q${expected.outputQuality}`;
+    const production = CARD_SYNTHESIS_RECIPES.find((entry) => entry.id === recipeId);
+    assert(production, `missing fixed production recipe ${recipeId}`);
+    assert.deepEqual(production.materials, [{ cardId, quality: sourceQuality, quantity: expected.materialQuantity }], `${recipeId} input must match the fixed fixture`);
+    assert.deepEqual(production.output, { cardId, quality: expected.outputQuality, quantity: expected.outputQuantity }, `${recipeId} output must match the fixed fixture`);
+    assert.equal(production.baseProbability, expected.baseProbability, `${recipeId} base probability must match the fixed fixture`);
+    assert.deepEqual(production.pity, { increment: 0.1, guaranteedAfterFailures: 4 }, `${recipeId} pity must match the fixed fixture`);
+    assert.deepEqual(production.failureRefund, [{ cardId, quality: sourceQuality, quantity: 1 }], `${recipeId} failure refund must match the fixed fixture`);
+  }
+}
 
 const recipe = {
   id: 'U001-Q1-TEST',
@@ -128,6 +159,60 @@ assert.equal(persistenceService.save(), persistenceBefore, 'persist failure must
 shouldFailPersist = false;
 assert.equal(persistenceService.synthesize({ requestId: 'persist-1', recipeId: recipe.id }).outcome, 'SUCCESS', 'service must remain usable after persistence failure');
 
+let rngReentryError;
+let rngReentryService;
+rngReentryService = makeService({
+  materials: [{ cardId: 'U001', quality: 1, quantity: 6 }],
+  rng: () => {
+    try {
+      rngReentryService.synthesize({ requestId: 'nested-rng-1', recipeId: recipe.id });
+    } catch (error) {
+      rngReentryError = error;
+    }
+    return 0;
+  },
+});
+const rngReentryResult = rngReentryService.synthesize({ requestId: 'outer-rng-1', recipeId: recipe.id });
+assert(rngReentryError instanceof CardSynthesisError && rngReentryError.code === 'REENTRANT', 'RNG re-entry must fail fast with a controlled CardSynthesisError');
+assert.equal(rngReentryResult.outcome, 'SUCCESS', 'the outer RNG transaction may commit after the rejected nested attempt');
+assert.equal(rngReentryService.snapshot().ledger.length, 1, 'RNG re-entry must not append a nested ledger entry');
+assert.equal(rngReentryService.snapshot().receipts.length, 1, 'RNG re-entry must not append a nested receipt');
+assert.deepEqual(rngReentryService.snapshot().materials, [
+  { cardId: 'U001', quality: 1, quantity: 3 },
+  { cardId: 'U001', quality: 2, quantity: 1 },
+], 'RNG re-entry must preserve strict single-transaction material conservation');
+
+let persistenceReentryError;
+let persistenceReentryService;
+persistenceReentryService = makeService({
+  materials: [{ cardId: 'U001', quality: 1, quantity: 6 }],
+  onSave: () => {
+    try {
+      persistenceReentryService.synthesize({ requestId: 'nested-persist-1', recipeId: recipe.id });
+    } catch (error) {
+      persistenceReentryError = error;
+    }
+  },
+});
+const persistenceReentryResult = persistenceReentryService.synthesize({ requestId: 'outer-persist-1', recipeId: recipe.id });
+assert(persistenceReentryError instanceof CardSynthesisError && persistenceReentryError.code === 'REENTRANT', 'persistence re-entry must fail fast with a controlled CardSynthesisError');
+assert.equal(persistenceReentryResult.outcome, 'SUCCESS', 'the outer persistence transaction may commit after the rejected nested attempt');
+assert.equal(persistenceReentryService.snapshot().ledger.length, 1, 'persistence re-entry must not append a nested ledger entry');
+assert.equal(persistenceReentryService.snapshot().receipts.length, 1, 'persistence re-entry must not append a nested receipt');
+
+let abortingPersistenceService;
+let abortPersistence = true;
+abortingPersistenceService = makeService({
+  onSave: () => {
+    if (abortPersistence) abortingPersistenceService.synthesize({ requestId: 'nested-persist-abort-1', recipeId: recipe.id });
+  },
+});
+const abortingPersistenceBefore = abortingPersistenceService.save();
+expectCode('unhandled persistence re-entry', () => abortingPersistenceService.synthesize({ requestId: 'outer-persist-abort-1', recipeId: recipe.id }), 'REENTRANT');
+assert.equal(abortingPersistenceService.save(), abortingPersistenceBefore, 'unhandled persistence re-entry must not partially commit the outer transaction');
+abortPersistence = false;
+assert.equal(abortingPersistenceService.synthesize({ requestId: 'after-persist-abort-1', recipeId: recipe.id }).success, true, 'transaction guard must release after an aborted re-entry');
+
 const serialized = boundaryService.save();
 const restored = restoreCardSynthesisService(serialized, { recipes: [recipe], rng: () => 0 });
 assert.deepEqual(restored.snapshot(), boundaryService.snapshot(), 'serialization restore must preserve all synthesis state');
@@ -141,6 +226,15 @@ for (const material of boundaryFailure.returned) net.set(`${material.cardId}:${m
 for (const material of boundaryFailure.credited) net.set(`${material.cardId}:${material.quality}`, (net.get(`${material.cardId}:${material.quality}`) ?? 0) + material.quantity);
 assert.deepEqual([...net.entries()], [['U001:1', -2]], 'failure ledger net delta must equal three投入 minus one返还');
 
+for (const [label, invalidRecipes] of [
+  ['null recipes', null],
+  ['null wrapped recipes', { recipes: null }],
+  ['missing wrapped recipes', {}],
+  ['numeric recipes', 42],
+  ['string recipes', 'invalid'],
+]) {
+  expectCode(label, () => createCardSynthesisService({ recipes: invalidRecipes }), 'INVALID_CONFIG');
+}
 expectCode('prototype recipe key', () => createCardSynthesisService({ recipes: [{ ...recipe, id: '__proto__' }] }), 'INVALID_CONFIG');
 expectCode('prototype card key', () => createCardSynthesisService({ recipes: [{ ...recipe, materials: [{ cardId: '__proto__', quality: 1, quantity: 3 }] }] }), 'INVALID_CONFIG');
 expectCode('zero quantity', () => createCardSynthesisService({ recipes: [{ ...recipe, materials: [{ cardId: 'U001', quality: 1, quantity: 0 }] }] }), 'INVALID_CONFIG');
