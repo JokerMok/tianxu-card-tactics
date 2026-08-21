@@ -228,6 +228,14 @@ for (const [label, corruptedState] of [
     ...validFailureSave,
     ledger: [{ ...validFailureSave.ledger[0], requestId: 'boundary-ledger-mismatch' }],
   }],
+  ['ledgerRequestIdWithWhitespace', {
+    ...validFailureSave,
+    ledger: [{ ...validFailureSave.ledger[0], requestId: ' bad' }],
+  }],
+  ['ledgerProbabilityOutOfRange', {
+    ...validFailureSave,
+    ledger: [{ ...validFailureSave.ledger[0], probability: 2 }],
+  }],
   ['inventoryLedgerMismatch', { ...validSuccessSave, materials: [] }],
 ]) {
   expectCode(label, () => restoreCardSynthesisService(JSON.stringify(corruptedState), { recipes: [recipe] }), 'INVALID_STATE');

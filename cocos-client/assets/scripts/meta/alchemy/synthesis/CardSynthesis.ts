@@ -148,9 +148,14 @@ function assertOnlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<str
   }
 }
 
-function assertId(value: unknown, label: string, pattern = ID_PATTERN): asserts value is string {
+function assertId(
+  value: unknown,
+  label: string,
+  pattern = ID_PATTERN,
+  code: CardSynthesisErrorCode = 'INVALID_CONFIG',
+): asserts value is string {
   if (typeof value !== 'string' || !pattern.test(value) || value.trim() !== value) {
-    fail('INVALID_CONFIG', `${label} must be a non-empty safe identifier`);
+    fail(code, `${label} must be a non-empty safe identifier`);
   }
 }
 
@@ -166,9 +171,13 @@ function assertNonNegativeInteger(value: unknown, label: string, code: CardSynth
   }
 }
 
-function assertProbability(value: unknown, label: string): asserts value is number {
+function assertProbability(
+  value: unknown,
+  label: string,
+  code: CardSynthesisErrorCode = 'INVALID_CONFIG',
+): asserts value is number {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) {
-    fail('INVALID_CONFIG', `${label} must be a finite number in [0, 1]`);
+    fail(code, `${label} must be a finite number in [0, 1]`);
   }
 }
 
@@ -197,7 +206,7 @@ function normalizeMaterial(value: unknown, label: string, code: CardSynthesisErr
   if (!hasOwn(value, 'cardId') || !hasOwn(value, 'quality') || !hasOwn(value, 'quantity')) {
     fail(code, `${label} must contain cardId, quality and quantity`);
   }
-  assertId(value.cardId, `${label}.cardId`, CARD_ID_PATTERN);
+  assertId(value.cardId, `${label}.cardId`, CARD_ID_PATTERN, code);
   const quality = normalizeQuality(value.quality, `${label}.quality`, code);
   assertPositiveInteger(value.quantity, `${label}.quantity`, code);
   return { cardId: value.cardId, quality, quantity: value.quantity };
@@ -298,12 +307,12 @@ function cloneResult(result: CardSynthesisResult): CardSynthesisResult {
 function normalizeResult(value: unknown, label: string): CardSynthesisResult {
   if (!isRecord(value)) fail('INVALID_STATE', `${label} must be an object`);
   assertOnlyKeys(value, RESULT_KEYS, label, 'INVALID_STATE');
-  assertId(value.requestId, `${label}.requestId`);
-  assertId(value.recipeId, `${label}.recipeId`);
+  assertId(value.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
+  assertId(value.recipeId, `${label}.recipeId`, ID_PATTERN, 'INVALID_STATE');
   if (value.outcome !== 'SUCCESS' && value.outcome !== 'FAILURE') fail('INVALID_STATE', `${label}.outcome is invalid`);
   if (typeof value.success !== 'boolean' || value.success !== (value.outcome === 'SUCCESS')) fail('INVALID_STATE', `${label}.success is inconsistent`);
   if (value.roll !== null && (typeof value.roll !== 'number' || !Number.isFinite(value.roll) || value.roll < 0 || value.roll >= 1)) fail('INVALID_STATE', `${label}.roll is invalid`);
-  assertProbability(value.probability, `${label}.probability`);
+  assertProbability(value.probability, `${label}.probability`, 'INVALID_STATE');
   if (typeof value.guaranteed !== 'boolean') fail('INVALID_STATE', `${label}.guaranteed is invalid`);
   assertNonNegativeInteger(value.pityBefore, `${label}.pityBefore`);
   assertNonNegativeInteger(value.pityAfter, `${label}.pityAfter`);
@@ -343,7 +352,7 @@ function normalizeState(value: unknown): CardSynthesisState {
     const label = `synthesis state.pity[${index}]`;
     if (!isRecord(entry)) fail('INVALID_STATE', `${label} must be an object`);
     assertOnlyKeys(entry, PITY_STATE_KEYS, label, 'INVALID_STATE');
-    assertId(entry.recipeId, `${label}.recipeId`);
+    assertId(entry.recipeId, `${label}.recipeId`, ID_PATTERN, 'INVALID_STATE');
     assertNonNegativeInteger(entry.failures, `${label}.failures`);
     return { recipeId: entry.recipeId, failures: entry.failures };
   });
@@ -354,11 +363,11 @@ function normalizeState(value: unknown): CardSynthesisState {
     if (!isRecord(entry)) fail('INVALID_STATE', `${label} must be an object`);
     assertOnlyKeys(entry, LEDGER_KEYS, label, 'INVALID_STATE');
     assertPositiveInteger(entry.sequence, `${label}.sequence`, 'INVALID_STATE');
-    assertId(entry.requestId, `${label}.requestId`);
-    assertId(entry.recipeId, `${label}.recipeId`);
+    assertId(entry.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
+    assertId(entry.recipeId, `${label}.recipeId`, ID_PATTERN, 'INVALID_STATE');
     if (entry.outcome !== 'SUCCESS' && entry.outcome !== 'FAILURE') fail('INVALID_STATE', `${label}.outcome is invalid`);
     if (entry.roll !== null && (typeof entry.roll !== 'number' || !Number.isFinite(entry.roll) || entry.roll < 0 || entry.roll >= 1)) fail('INVALID_STATE', `${label}.roll is invalid`);
-    assertProbability(entry.probability, `${label}.probability`);
+    assertProbability(entry.probability, `${label}.probability`, 'INVALID_STATE');
     if (typeof entry.guaranteed !== 'boolean') fail('INVALID_STATE', `${label}.guaranteed is invalid`);
     assertNonNegativeInteger(entry.pityBefore, `${label}.pityBefore`);
     assertNonNegativeInteger(entry.pityAfter, `${label}.pityAfter`);
@@ -379,7 +388,7 @@ function normalizeState(value: unknown): CardSynthesisState {
     const label = `synthesis state.receipts[${index}]`;
     if (!isRecord(entry)) fail('INVALID_STATE', `${label} must be an object`);
     assertOnlyKeys(entry, RECEIPT_KEYS, label, 'INVALID_STATE');
-    assertId(entry.requestId, `${label}.requestId`);
+    assertId(entry.requestId, `${label}.requestId`, ID_PATTERN, 'INVALID_STATE');
     if (typeof entry.fingerprint !== 'string' || entry.fingerprint.length === 0) fail('INVALID_STATE', `${label}.fingerprint is invalid`);
     const result = normalizeResult(entry.result, `${label}.result`);
     if (result.requestId !== entry.requestId) fail('INVALID_STATE', `${label} result requestId is inconsistent`);
