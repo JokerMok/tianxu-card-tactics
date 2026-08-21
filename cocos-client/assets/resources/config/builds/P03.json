@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "table": "builds",
+  "evidenceLevel": "C",
+  "version": 1,
+  "enabled": true,
+  "buildTarget": "P03",
+  "contractDeckId": "D001",
+  "builds": [
+    {
+      "id": "P03-B01",
+      "profession": "P003",
+      "race": "异兽",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U007", "count": 3 },
+        { "slot": 2, "cardId": "U008", "count": 1 },
+        { "slot": 3, "cardId": "U027", "count": 2 },
+        { "slot": 4, "cardId": "U028", "count": 1 },
+        { "slot": 5, "cardId": "U001", "count": 4 },
+        { "slot": 6, "cardId": "U002", "count": 4 },
+        { "slot": 7, "cardId": "U003", "count": 3 },
+        { "slot": 8, "cardId": "U013", "count": 3 },
+        { "slot": 9, "cardId": "U004", "count": 2 },
+        { "slot": 10, "cardId": "U005", "count": 1 },
+        { "slot": 11, "cardId": "U006", "count": 2 },
+        { "slot": 12, "cardId": "S007", "count": 1 },
+        { "slot": 13, "cardId": "S008", "count": 1 },
+        { "slot": 14, "cardId": "S015", "count": 1 },
+        { "slot": 15, "cardId": "S016", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["异兽核心", "双路突击"]
+    },
+    {
+      "id": "P03-B02",
+      "profession": "P003",
+      "race": "鳞民",
+      "cardEntries": [
+        { "slot": 1, "cardId": "U015", "count": 3 },
+        { "slot": 2, "cardId": "U016", "count": 3 },
+        { "slot": 3, "cardId": "U017", "count": 2 },
+        { "slot": 4, "cardId": "U018", "count": 2 },
+        { "slot": 5, "cardId": "U001", "count": 4 },
+        { "slot": 6, "cardId": "U002", "count": 4 },
+        { "slot": 7, "cardId": "U004", "count": 4 },
+        { "slot": 8, "cardId": "U005", "count": 2 },
+        { "slot": 9, "cardId": "U011", "count": 2 },
+        { "slot": 10, "cardId": "S007", "count": 1 },
+        { "slot": 11, "cardId": "S008", "count": 1 },
+        { "slot": 12, "cardId": "S015", "count": 1 },
+        { "slot": 13, "cardId": "S016", "count": 1 }
+      ],
+      "totalCards": 30,
+      "minUnitCards": 24,
+      "maxSkillCards": 6,
+      "purposeTags": ["鳞民核心", "稳守反击"]
+    }
+  ]
+}
