@@ -1,6 +1,7 @@
 import {
   assertDropPoolConfig,
   assertDropPoolState,
+  cloneDropPool,
   resolveDrop,
   type DropPool,
   type DropPoolState,
@@ -60,7 +61,12 @@ function assertState(state: DropRewardState): void {
 function copyState(state: DropRewardState): DropRewardState {
   const dropPools: Record<string, DropPoolState> = {};
   for (const [poolId, progress] of Object.entries(state.dropPools)) {
-    dropPools[poolId] = { ...progress };
+    Object.defineProperty(dropPools, poolId, {
+      configurable: true,
+      enumerable: true,
+      value: { ...progress },
+      writable: true,
+    });
   }
   return {
     resources: { ...state.resources },
@@ -96,19 +102,19 @@ export class DropRewardService {
     assertState(initialState);
     assertDropPoolConfig({ pools });
     if (typeof rng !== 'function' || typeof persist !== 'function') throw new Error('drop reward service is invalid');
-    const poolIndex = new Map(pools.map((pool) => [pool.id, pool]));
-    for (const pool of pools) {
+    const isolatedPools = new Map(pools.map((pool) => [pool.id, cloneDropPool(pool)]));
+    for (const pool of isolatedPools.values()) {
       if (!Object.prototype.hasOwnProperty.call(initialState.dropPools, pool.id)) {
         throw new Error(`missing drop pool progress: ${pool.id}`);
       }
       assertDropPoolState(pool, initialState.dropPools[pool.id]);
     }
     for (const [poolId, progress] of Object.entries(initialState.dropPools)) {
-      const pool = poolIndex.get(poolId);
+      const pool = isolatedPools.get(poolId);
       if (pool === undefined) throw new Error(`unknown drop pool progress: ${poolId}`);
     }
     this.current = copyState(initialState);
-    this.pools = poolIndex;
+    this.pools = isolatedPools;
     this.rng = rng;
     this.persist = persist;
   }

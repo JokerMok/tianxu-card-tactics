@@ -140,6 +140,9 @@ function assertState(pool: DropPool, state: DropPoolState): void {
   if (state.rareMisses > repeatClaims) {
     throw new Error('drop pool state rareMisses exceed repeat claims');
   }
+  if (pool.pity !== undefined && state.rareMisses > pool.pity.guaranteedAfterMisses) {
+    throw new Error('drop pool state rareMisses exceed pity threshold');
+  }
 }
 
 export function assertDropPoolState(pool: DropPool, state: DropPoolState): asserts state is DropPoolState {
@@ -153,6 +156,29 @@ function copyReward(reward: DropReward): DropReward {
     ...(reward.weight === undefined ? {} : { weight: reward.weight }),
     rewards: Object.freeze({ ...reward.rewards }),
   });
+}
+
+function copyPool(pool: DropPool): DropPool {
+  return Object.freeze({
+    id: pool.id,
+    maxClaims: pool.maxClaims,
+    firstClear: copyReward(pool.firstClear),
+    repeat: Object.freeze(pool.repeat.map(copyReward)),
+    ...(pool.pity === undefined
+      ? {}
+      : {
+        pity: Object.freeze({
+          rareRewardId: pool.pity.rareRewardId,
+          guaranteedAfterMisses: pool.pity.guaranteedAfterMisses,
+        }),
+      }),
+  });
+}
+
+/** Returns an immutable pool snapshot for services that retain configuration. */
+export function cloneDropPool(pool: DropPool): DropPool {
+  assertPool(pool, 'drop pool');
+  return copyPool(pool);
 }
 
 function nextState(state: DropPoolState, rareMisses: number): DropPoolState {
