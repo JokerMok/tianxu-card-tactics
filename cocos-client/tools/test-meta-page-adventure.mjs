@@ -142,6 +142,20 @@ const lockedData = createDefaultAdventurePageData({ tasks: [
 const lockedPage = new AdventurePageService({ data: lockedData });
 assert.equal(lockedPage.snapshot().components.find((component) => component.id === 'task-second')?.state, 'locked');
 expectPageFailure('locked task start', () => lockedPage.startTask('second'), 'TASK_LOCKED');
+const illegalLockedSave = JSON.parse(lockedPage.serialize());
+illegalLockedSave.tasks.second.status = 'completed';
+illegalLockedSave.tasks.second.progress = lockedData.tasks[1].target;
+const illegalLockedSerialized = JSON.stringify(illegalLockedSave);
+for (const [label, normalizedLockedPage] of [
+  ['loaded', new AdventurePageService({ data: lockedData, initialState: illegalLockedSerialized })],
+  ['restored', new AdventurePageService({ data: lockedData })],
+]) {
+  if (label === 'restored') normalizedLockedPage.restore(illegalLockedSerialized);
+  assert.equal(normalizedLockedPage.snapshot().components.find((component) => component.id === 'task-second')?.state, 'locked');
+  assert.equal(normalizedLockedPage.state.tasks.second.status, 'ready', `${label} locked completion must normalize to ready`);
+  assert.equal(normalizedLockedPage.state.tasks.second.progress, 0, `${label} locked completion must not retain claimable progress`);
+  expectPageFailure(`claiming a locked ${label} task`, () => normalizedLockedPage.claimTask('second'), 'TASK_LOCKED');
+}
 lockedPage.startTask('first');
 lockedPage.completeTask('first');
 lockedPage.claimTask('first');
@@ -166,6 +180,16 @@ unknownTaskSave.selectedTaskId = 'missing-task';
 expectPageFailure('unknown task in save', () => page.restore(JSON.stringify(unknownTaskSave)), 'TASK_NOT_FOUND');
 expectPageFailure('malformed save', () => page.restore('{bad-json'), 'INVALID_SAVE');
 expectPageFailure('out-of-range saved progress', () => page.restore(page.serialize().replace('"progress":3', '"progress":99')), 'INVALID_STATE');
+const invalidClaimedSave = JSON.parse(page.serialize());
+invalidClaimedSave.tasks['real-dungeon'] = { ...invalidClaimedSave.tasks['real-dungeon'], status: 'claimed', progress: 0, claimed: true };
+expectPageFailure('claimed task before target', () => new AdventurePageService({ data, initialState: JSON.stringify(invalidClaimedSave) }), 'INVALID_STATE');
+expectPageFailure('non-function persist rejected at construction', () => new AdventurePageService({ data, persist: 'not-a-function' }), 'INVALID_ARGUMENT');
+
+const monotonicPage = new AdventurePageService({ data });
+monotonicPage.startTask('real-dungeon');
+monotonicPage.progressTask(undefined, 2);
+expectPageFailure('progress cannot regress', () => monotonicPage.progressTask(undefined, 1), 'INVALID_PROGRESS');
+assert.equal(monotonicPage.state.tasks['real-dungeon'].progress, 2, 'rejected progress regression must preserve state');
 
 // Save/restore is deterministic, detached and idempotent; persistence failure is atomic.
 const serialized = page.serialize();

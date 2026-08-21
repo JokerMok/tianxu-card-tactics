@@ -272,6 +272,10 @@ function defaultProgress(task: AdventureTaskData): AdventureTaskProgress {
   return { taskId: task.id, status: 'ready', progress: 0, attempts: 0, claimed: false };
 }
 
+function isUnlocked(task: AdventureTaskData, tasks: Readonly<Record<string, AdventureTaskProgress>>): boolean {
+  return task.prerequisiteTaskId === null || tasks[task.prerequisiteTaskId]?.claimed === true;
+}
+
 function parseState(value: unknown, data: AdventurePageData): AdventurePageState {
   const taskIds = new Set(data.tasks.map((task) => task.id));
   let parsed: unknown = value;
@@ -299,11 +303,24 @@ function parseState(value: unknown, data: AdventurePageData): AdventurePageState
     if (raw.status === 'claimed' && raw.claimed !== true) fail('INVALID_STATE', `adventure state tasks.${task.id} claimed flag is inconsistent`);
     if (raw.claimed && raw.status !== 'claimed') fail('INVALID_STATE', `adventure state tasks.${task.id} status is inconsistent`);
     if (raw.status === 'completed' && raw.progress < task.target) fail('INVALID_STATE', `adventure state tasks.${task.id} completed before target`);
+    if (raw.status === 'claimed' && raw.progress < task.target) fail('INVALID_STATE', `adventure state tasks.${task.id} claimed before target`);
     tasks[task.id] = { taskId: task.id, status: raw.status as Exclude<AdventureTaskStatus, 'locked'>, progress: raw.progress, attempts: raw.attempts, claimed: raw.claimed };
   }
-  if (parsed.activeTaskId !== null && tasks[parsed.activeTaskId].status !== 'inProgress') fail('INVALID_STATE', 'active adventure task must be in progress');
-  if (Object.values(tasks).filter((task) => task.status === 'inProgress').length > (parsed.activeTaskId === null ? 0 : 1)) fail('INVALID_STATE', 'only one adventure task may be active');
-  return { schemaVersion: ADVENTURE_PAGE_SCHEMA_VERSION, pageId: 'adventure', selectedTaskId: parsed.selectedTaskId, activeTaskId: parsed.activeTaskId as string | null, filter, tasks };
+  let activeTaskId = parsed.activeTaskId as string | null;
+  let normalized = true;
+  while (normalized) {
+    normalized = false;
+    for (const task of data.tasks) {
+      if (!isUnlocked(task, tasks) && JSON.stringify(tasks[task.id]) !== JSON.stringify(defaultProgress(task))) {
+        tasks[task.id] = defaultProgress(task);
+        if (activeTaskId === task.id) activeTaskId = null;
+        normalized = true;
+      }
+    }
+  }
+  if (activeTaskId !== null && tasks[activeTaskId].status !== 'inProgress') fail('INVALID_STATE', 'active adventure task must be in progress');
+  if (Object.values(tasks).filter((task) => task.status === 'inProgress').length > (activeTaskId === null ? 0 : 1)) fail('INVALID_STATE', 'only one adventure task may be active');
+  return { schemaVersion: ADVENTURE_PAGE_SCHEMA_VERSION, pageId: 'adventure', selectedTaskId: parsed.selectedTaskId, activeTaskId, filter, tasks };
 }
 
 function freshState(data: AdventurePageData): AdventurePageState {
@@ -333,6 +350,8 @@ export class AdventurePageService {
     this.data = options.data === undefined
       ? createAdventurePageData(options)
       : validateData(options.data);
+    if (options.onSave !== undefined && typeof options.onSave !== 'function') fail('INVALID_ARGUMENT', 'onSave must be a function');
+    if (options.persist !== undefined && typeof options.persist !== 'function') fail('INVALID_ARGUMENT', 'persist must be a function');
     this.persistCallback = options.onSave ?? options.persist;
     if (this.data.tasks.length === 0) {
       if (options.initialState !== undefined || options.state !== undefined) fail('STATE_DATA_MISMATCH', 'an empty adventure page cannot restore state');
@@ -437,6 +456,7 @@ export class AdventurePageService {
     if (this.current.activeTaskId !== id) fail('ACTIVE_TASK_MISMATCH', `adventure task is not active: ${id}`);
     if (this.current.tasks[id].status !== 'inProgress') fail('TASK_NOT_READY', 'active adventure task is not in progress');
     this.assertProgress(progress, task.target);
+    if (progress < this.current.tasks[id].progress) fail('INVALID_PROGRESS', `adventure progress cannot decrease below ${this.current.tasks[id].progress}`);
     if (progress >= task.target) return this.completeTask(id, progress);
     const next = cloneState(this.current); next.tasks[id] = { ...next.tasks[id], progress };
     this.commit(next);
@@ -477,9 +497,12 @@ export class AdventurePageService {
     if (this.current === null) return result(false, false, 'empty', null, null, null);
     const id = taskId ?? this.current.selectedTaskId;
     const task = this.assertTask(id);
+    const effective = taskStatus(task, this.current);
+    if (!effective.unlocked) fail('TASK_LOCKED', `adventure task is locked: ${id}`);
     const current = this.current.tasks[id];
     if (current.claimed || current.status === 'claimed') fail('TASK_ALREADY_CLAIMED', `adventure reward is already claimed: ${id}`);
     if (current.status !== 'completed') fail('TASK_NOT_READY', `adventure task is not completed: ${id}`);
+    if (current.progress < task.target) fail('TASK_NOT_READY', `adventure task is not complete: ${id}`);
     const next = cloneState(this.current); next.tasks[id] = { ...next.tasks[id], status: 'claimed', claimed: true };
     this.commit(next);
     return result(true, true, 'claimed', id, task.mode, next.tasks[id].progress);
