@@ -75,6 +75,7 @@ export interface ConfigAuthenticatedIdentity {
 export type ConfigIdentityResolver = (request: FetchConfigRequest) => ConfigAuthenticatedIdentity | null;
 
 export type FetchUnavailableReason = 'CONFIG_NOT_FOUND' | 'CLIENT_OUTDATED' | 'NOT_ELIGIBLE' | 'EXPIRED' | 'CLIENT_BLOCKED' | 'SESSION_UNAVAILABLE';
+export type ConfigAuditResult = 'accepted' | 'replayed' | 'rejected' | 'unavailable';
 
 export interface FetchConfigResult {
   available: boolean;
@@ -100,11 +101,14 @@ export interface RollbackConfigResult {
 export interface ConfigAuditEvent {
   eventId: number;
   event: 'publish' | 'fetch' | 'rollback';
+  operation: 'publish' | 'fetch' | 'rollback';
   requestId: string;
   actorId?: string;
   configKey: string;
   version?: string;
-  outcome: 'accepted' | 'replayed' | 'rejected' | 'unavailable';
+  replayed: boolean;
+  result: ConfigAuditResult;
+  outcome: ConfigAuditResult;
   reason?: string;
   at: number;
 }
@@ -476,19 +480,40 @@ export class ConfigUpdateService {
     const failed = this.failedRequests.get(requestId);
     if (stored || failed) {
       const operation = stored?.operation ?? failed?.operation;
-      if (operation !== event) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+      if (operation !== event) {
+        const error = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+        this.recordAudit({ event, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
+        throw error;
+      }
       const fingerprintValue = stored?.fingerprint ?? failed?.fingerprint;
-      if (fingerprintValue !== requestFingerprint) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used for another request');
-      this.recordAudit({ event, requestId, configKey, outcome: 'replayed' });
-      if (failed) throw new ConfigUpdateError(failed.code, failed.message);
+      if (fingerprintValue !== requestFingerprint) {
+        const error = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used for another request');
+        this.recordAudit({ event, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
+        throw error;
+      }
+      if (failed) {
+        const error = new ConfigUpdateError(failed.code, failed.message);
+        this.recordAudit({ event, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
+        throw error;
+      }
+      this.recordAudit({ event, requestId, configKey, replayed: true, result: 'replayed', outcome: 'replayed' });
       return clone({ ...stored.result, replayed: true }) as T;
     }
     return null;
   }
 
-  private recordAudit(event: Omit<ConfigAuditEvent, 'eventId' | 'at'>): void {
+  private recordAudit(event: Omit<ConfigAuditEvent, 'eventId' | 'at' | 'operation' | 'replayed' | 'result'> & Partial<Pick<ConfigAuditEvent, 'operation' | 'replayed' | 'result'>>): void {
     this.ensureAuditCapacity();
-    this.audit.push({ eventId: ++this.auditSequence, at: validTimestamp(this.clock(), 'now'), ...event });
+    const operation = event.operation ?? event.event;
+    const result = event.result ?? event.outcome;
+    this.audit.push(Object.freeze({
+      eventId: ++this.auditSequence,
+      at: validTimestamp(this.clock(), 'now'),
+      ...event,
+      operation,
+      replayed: event.replayed ?? result === 'replayed',
+      result,
+    }));
   }
 
   private ensureAuditCapacity(): void {
