@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   BUILD_TARGETS,
   createBuildContext,
@@ -19,7 +20,7 @@ import {
   parseJsonWithUniqueKeys,
 } from '../assets/resources/config/balance/difficulty-matrix.mjs';
 
-const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (relativePath) => parseJsonWithUniqueKeys(fs.readFileSync(path.join(projectRoot, relativePath), 'utf8'), relativePath);
 const matrix = DIFFICULTY_MATRIX;
 
