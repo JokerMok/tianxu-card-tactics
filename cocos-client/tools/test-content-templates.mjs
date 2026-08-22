@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import {
   ContentTemplateError,
   TOWER_FLOOR_MAX,
@@ -83,7 +85,7 @@ const towerContext = {
     enemyPoolId: 'POOL_03',
     enemyIds: ['U014', 'U009', 'U010'],
     rules: {
-      threatMultiplierPercent: 150,
+      threatMultiplierPercent: 155,
       maxEnemyUnits: 3,
       enemyActionInterval: 4,
       maxRounds: 42,
@@ -103,6 +105,10 @@ const allContext = {
   ...levelContext,
   enemyIds: dungeonContext.enemyIds,
   enemyUnitIds: towerContext.enemyUnitIds,
+  stageIds: towerContext.stageIds,
+  enemyPoolIds: towerContext.enemyPoolIds,
+  stages: towerContext.stages,
+  enemyPools: towerContext.enemyPools,
   unitIds: bossContext.unitIds,
   previousFloor: towerContext.previousFloor,
 };
@@ -272,6 +278,23 @@ assert.doesNotThrow(() => {
   loadTowerConfig(productionTower);
 }, 'generated tower floor must be accepted by the production tower loader');
 
+const productionTower = structuredClone(createTowerConfig());
+let previousGeneratedFloor;
+const generatedTowerFloors = productionTower.floors.map((floorConfig, index) => {
+  const generated = generateTowerFloor({
+    id: `TOWER-FLOOR-${String(index + 1).padStart(2, '0')}`,
+    ...floorConfig,
+  }, {
+    ...towerContext,
+    previousFloor: previousGeneratedFloor,
+  });
+  assert.deepEqual(generated.config, floorConfig, `generated tower floor ${index + 1} must match production formula`);
+  previousGeneratedFloor = generated.config;
+  return generated.config;
+});
+productionTower.floors = generatedTowerFloors;
+assert.doesNotThrow(() => loadTowerConfig(productionTower), 'all 50 generated tower floors must pass the production loader');
+
 const pack = generateContentPack([
   { type: 'boss', input: bossInput },
   { type: 'level', input: levelInput },
@@ -286,6 +309,61 @@ assert.deepEqual(pack, generateContentPack([
   { type: 'boss', input: bossInput },
   { type: 'dungeon', input: dungeonInput },
 ], allContext), 'pack generation must be input-order independent');
+
+assert.doesNotThrow(() => generateLevel(levelInput, { validationMode: 'permissive' }), 'permissive mode must be explicit for pure template tests');
+expectRejected('level production registry missing', () => generateLevel(levelInput), 'MISSING_REFERENCE');
+expectRejected('level target registry missing', () => generateLevel({ ...levelInput, objectives: [{ type: 'DESTROY_TARGET', targetId: 'C010' }] }, { ...levelContext, targetIds: undefined }), 'MISSING_REFERENCE');
+expectRejected('level chapter registry missing', () => generateLevel(levelInput, { ...levelContext, chapterLevelIds: undefined }), 'MISSING_REFERENCE');
+expectRejected('level reward conflicts with deck', () => generateLevel({
+  ...levelInput,
+  rewards: [{ type: 'UNLOCK', id: 'D001', quantity: 1 }],
+}, { ...levelContext, unlockIds: new Set(['D001']) }), 'MISMATCHED_REFERENCE');
+expectRejected('level reward conflicts with target', () => generateLevel({
+  ...levelInput,
+  rewards: [{ type: 'UNLOCK', id: 'C010', quantity: 1 }],
+}, { ...levelContext, unlockIds: new Set(['C010']) }), 'MISMATCHED_REFERENCE');
+expectRejected('level reward conflicts with chapter level', () => generateLevel({
+  ...levelInput,
+  rewards: [{ type: 'UNLOCK', id: 'L11', quantity: 1 }],
+}, { ...levelContext, unlockIds: new Set(['L11']) }), 'MISMATCHED_REFERENCE');
+expectRejected('level non-card reward rejects cardType field', () => generateLevel({
+  ...levelInput,
+  rewards: [{ type: 'UNLOCK', id: 'OUTPOST', quantity: 1, cardType: 'UNIT' }],
+}, levelContext), 'UNKNOWN_FIELD');
+expectRejected('level card registry metadata reference', () => generateLevel(levelInput, {
+  ...levelContext,
+  cards: new Map([...levelContext.cards.entries()].map(([id, card]) => [id, id === 'U001' ? { ...card, unitId: 'U999' } : card])),
+}), 'MISSING_REFERENCE');
+expectRejected('tower production registry missing', () => generateTowerFloor(towerInput, { ...towerContext, enemyPoolIds: undefined }), 'MISSING_REFERENCE');
+expectRejected('tower stage registry missing', () => generateTowerFloor(towerInput, { ...towerContext, stages: undefined }), 'MISSING_REFERENCE');
+expectRejected('tower floor requires previous floor', () => generateTowerFloor(towerInput, { ...towerContext, previousFloor: undefined }), 'PROGRESSION');
+expectRejected('tower floor id mismatch', () => generateTowerFloor({ ...towerInput, id: 'TOWER-FLOOR-12' }, towerContext), 'MISMATCHED_REFERENCE');
+expectRejected('tower fixed multiplier formula', () => generateTowerFloor({
+  ...towerInput,
+  rules: { ...towerInput.rules, threatMultiplierPercent: 155 },
+}, towerContext), 'PROGRESSION');
+expectRejected('tower fixed max rounds formula', () => generateTowerFloor({
+  ...towerInput,
+  rules: { ...towerInput.rules, maxRounds: 45 },
+}, towerContext), 'PROGRESSION');
+expectRejected('tower stage environment contract', () => generateTowerFloor({
+  ...towerInput,
+  rules: { ...towerInput.rules, environmentElement: 'FIRE' },
+}, towerContext), 'MISMATCHED_REFERENCE');
+
+const pollutedModuleUrl = pathToFileURL(path.join(projectRoot, 'tools/content-templates/index.mjs')).href;
+const pollutedInput = JSON.stringify(levelInput);
+const pollutionProbe = [
+  `Object.defineProperty(Object.prototype, 'preImportPolluted', { value: true, configurable: true });`,
+  `const { generateLevel } = await import(${JSON.stringify(pollutedModuleUrl)});`,
+  `try { generateLevel(${pollutedInput}); process.exit(1); }`,
+  `catch (error) { if (error?.code !== 'INJECTION') process.exit(2); process.stdout.write('pollution-rejected'); }`,
+].join('\n');
+assert.equal(
+  execFileSync(process.execPath, ['--input-type=module', '-e', pollutionProbe], { encoding: 'utf8' }),
+  'pollution-rejected',
+  'module must reject Object.prototype pollution that happened before dynamic import',
+);
 
 expectRejected('level missing deck reference', () => generateLevel({ ...levelInput, enemyDeckId: 'D999' }, levelContext), 'MISSING_REFERENCE');
 expectRejected('level self prerequisite', () => generateLevel({ ...levelInput, id: 'L12', prerequisiteLevelId: 'L12' }, levelContext), 'REFERENCE_CYCLE');

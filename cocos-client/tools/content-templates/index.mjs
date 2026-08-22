@@ -3,7 +3,20 @@ const CONTENT_ID_PATTERN = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$/;
 const LOCAL_ID_PATTERN = /^[A-Za-z][A-Za-z0-9_-]*$/;
 const RESOURCE_SEGMENT_PATTERN = /^[A-Za-z0-9._-]+$/;
 const DANGEROUS_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
-const STANDARD_OBJECT_PROTOTYPE_KEYS = new Set(Reflect.ownKeys(Object.prototype));
+const STANDARD_OBJECT_PROTOTYPE_DESCRIPTORS = Object.freeze([
+  ['constructor', 'data'],
+  ['__defineGetter__', 'data'],
+  ['__defineSetter__', 'data'],
+  ['hasOwnProperty', 'data'],
+  ['__lookupGetter__', 'data'],
+  ['__lookupSetter__', 'data'],
+  ['isPrototypeOf', 'data'],
+  ['propertyIsEnumerable', 'data'],
+  ['toString', 'data'],
+  ['valueOf', 'data'],
+  ['__proto__', 'accessor'],
+  ['toLocaleString', 'data'],
+]);
 const ENVIRONMENTS = new Set(['NONE', 'METAL', 'WOOD', 'WATER', 'FIRE', 'EARTH']);
 const LEVEL_OBJECTIVES = new Set(['DEFEAT_ENEMY_HERO', 'DESTROY_TARGET', 'PROTECT_TARGET', 'SURVIVE_ROUNDS']);
 const LEVEL_REWARDS = new Set(['CARD', 'UNLOCK', 'CHEST', 'FLAG']);
@@ -12,6 +25,18 @@ const CHAPTER_LEVEL_ID_PATTERN = /^L(?:0[1-9]|1[0-2])$/;
 const TOWER_SPECIAL_RULES = new Set([
   'NONE', 'PRESSURE_LANES', 'ELEMENTAL_SURGE', 'REINFORCED_FRONT', 'SKILL_LOCK',
   'ESCALATING_THREAT', 'NO_SAFE_LANE', 'REVIVAL_WINDOW', 'BOSS_AURA', 'ASCENSION_TEST',
+]);
+const TOWER_STAGE_RULE_BLUEPRINTS = Object.freeze([
+  ['NONE', 'NONE'],
+  ['METAL', 'PRESSURE_LANES'],
+  ['WOOD', 'ELEMENTAL_SURGE'],
+  ['EARTH', 'REINFORCED_FRONT'],
+  ['WATER', 'SKILL_LOCK'],
+  ['FIRE', 'ESCALATING_THREAT'],
+  ['METAL', 'NO_SAFE_LANE'],
+  ['WATER', 'REVIVAL_WINDOW'],
+  ['EARTH', 'BOSS_AURA'],
+  ['FIRE', 'ASCENSION_TEST'],
 ]);
 
 export const CONTENT_TYPES = Object.freeze(['level', 'dungeon', 'tower-floor', 'boss']);
@@ -134,8 +159,41 @@ function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+function hasOwn(value, key) {
+  return Object.getOwnPropertyDescriptor(value, key) !== undefined;
+}
+
+function isPermissive(context) {
+  return context?.validationMode === 'permissive' || context?.permissive === true;
+}
+
+function assertStandardObjectPrototype(configPath) {
+  if (Object.getPrototypeOf(Object.prototype) !== null) {
+    fail('INJECTION', `${configPath}.__proto__`, 'Object.prototype 必须保持原生 prototype identity');
+  }
+  const actualKeys = Reflect.ownKeys(Object.prototype);
+  const expectedKeys = STANDARD_OBJECT_PROTOTYPE_DESCRIPTORS.map(([key]) => key);
+  if (actualKeys.length !== expectedKeys.length || actualKeys.some((key) => !expectedKeys.includes(key))) {
+    fail('INJECTION', `${configPath}.__proto__`, 'Object.prototype own-key 白名单不匹配');
+  }
+  for (const [key, kind] of STANDARD_OBJECT_PROTOTYPE_DESCRIPTORS) {
+    const descriptor = Object.getOwnPropertyDescriptor(Object.prototype, key);
+    if (!descriptor || descriptor.enumerable !== false || descriptor.configurable !== true) {
+      fail('INJECTION', `${configPath}.__proto__.${key}`, 'Object.prototype descriptor 不匹配');
+    }
+    if (kind === 'data') {
+      if (descriptor.writable !== true || typeof descriptor.value !== 'function') {
+        fail('INJECTION', `${configPath}.__proto__.${key}`, 'Object.prototype data descriptor 不匹配');
+      }
+    } else if (typeof descriptor.get !== 'function' || typeof descriptor.set !== 'function') {
+      fail('INJECTION', `${configPath}.__proto__.${key}`, 'Object.prototype accessor descriptor 不匹配');
+    }
+  }
+}
+
 function assertSafeObject(value, configPath, seen = new WeakSet()) {
   if (value === null || typeof value !== 'object') return;
+  assertStandardObjectPrototype(configPath);
   if (seen.has(value)) fail('INVALID_INPUT', configPath, '不得循环引用');
   seen.add(value);
   if (Array.isArray(value)) {
@@ -147,7 +205,7 @@ function assertSafeObject(value, configPath, seen = new WeakSet()) {
       if (!descriptor?.enumerable || descriptor.get || descriptor.set) fail('INJECTION', `${configPath}[${key}]`, '不得使用 getter、setter 或非枚举字段');
     }
     for (let index = 0; index < value.length; index += 1) {
-      if (!Object.prototype.hasOwnProperty.call(value, String(index))) fail('INVALID_INPUT', `${configPath}[${index}]`, '数组不得有空洞');
+      if (!hasOwn(value, String(index))) fail('INVALID_INPUT', `${configPath}[${index}]`, '数组不得有空洞');
       assertSafeObject(value[index], `${configPath}[${index}]`, seen);
     }
     seen.delete(value);
@@ -155,10 +213,6 @@ function assertSafeObject(value, configPath, seen = new WeakSet()) {
   }
   const prototype = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null) fail('INJECTION', `${configPath}.__proto__`, '配置对象 prototype 必须是普通对象');
-  const currentPrototypeKeys = Reflect.ownKeys(Object.prototype);
-  if (currentPrototypeKeys.length !== STANDARD_OBJECT_PROTOTYPE_KEYS.size || currentPrototypeKeys.some((key) => !STANDARD_OBJECT_PROTOTYPE_KEYS.has(key))) {
-    fail('INJECTION', `${configPath}.__proto__`, 'Object.prototype own-key 基线不匹配');
-  }
   for (const key of Reflect.ownKeys(value)) {
     if (typeof key !== 'string') fail('INJECTION', `${configPath}.${String(key)}`, '不允许 Symbol 字段');
     if (DANGEROUS_KEYS.has(key)) fail('INJECTION', `${configPath}.${key}`, '不允许原型注入字段');
@@ -199,7 +253,7 @@ function exactKeys(value, required, configPath, optional = []) {
     if (!allowed.has(key)) fail('UNKNOWN_FIELD', `${configPath}.${key}`, '不允许未知字段');
   }
   for (const key of required) {
-    if (!Object.prototype.hasOwnProperty.call(value, key)) fail('MISSING_FIELD', `${configPath}.${key}`, '缺少必需字段');
+    if (!hasOwn(value, key)) fail('MISSING_FIELD', `${configPath}.${key}`, '缺少必需字段');
   }
 }
 
@@ -241,21 +295,32 @@ function registry(context, name) {
   return new Set(value);
 }
 
-function objectIdRegistry(context, directName, objectName) {
-  const direct = registry(context, directName);
-  if (direct) return direct;
+function requiredRegistry(context, name) {
+  const ids = registry(context, name);
+  if (!ids && !isPermissive(context)) {
+    fail('MISSING_REFERENCE', `context.${name}`, `生产引用必须提供 ${name} 注册表`);
+  }
+  if (ids && ids.size === 0 && !isPermissive(context)) {
+    fail('INVALID_CONTEXT', `context.${name}`, '注册表必须是非空集合');
+  }
+  return ids;
+}
+
+function objectRegistry(context, objectName) {
   const value = context?.[objectName];
   if (value === undefined) return null;
-  if (value instanceof Map) return new Set(value.keys());
+  if (value instanceof Map) return new Map(value);
   if (Array.isArray(value)) {
-    if (value.some((item) => !isRecord(item) || typeof item.id !== 'string')) fail('INVALID_CONTEXT', `context.${objectName}`, '必须是包含 id 的 array');
-    return new Set(value.map((item) => item.id));
+    if (value.some((item) => !isRecord(item) || typeof item.id !== 'string')) {
+      fail('INVALID_CONTEXT', `context.${objectName}`, '必须是包含 id 的 array');
+    }
+    return new Map(value.map((item) => [item.id, item]));
   }
   fail('INVALID_CONTEXT', `context.${objectName}`, '必须是 array 或 Map');
 }
 
 function referenced(value, configPath, context, registryName) {
-  const ids = registry(context, registryName);
+  const ids = requiredRegistry(context, registryName);
   if (ids && !ids.has(value)) fail('MISSING_REFERENCE', configPath, `缺失 ${registryName} 引用: ${value}`);
   return value;
 }
@@ -328,6 +393,7 @@ function rewardRegistry(context, type, configPath) {
   const ids = registry(context, registryName);
   if (ids) return ids;
   if (context?.rewardIds !== undefined) fail('INVALID_CONTEXT', `context.${registryName}`, '奖励引用必须按类型提供，不能只提供无类型 rewardIds');
+  if (!isPermissive(context)) fail('MISSING_REFERENCE', `context.${registryName}`, `生产引用必须提供 ${registryName} 注册表`);
   return null;
 }
 
@@ -336,8 +402,18 @@ function assertRewardTypeReference(context, type, id, configPath) {
   if (type !== 'CARD' && cardIds?.has(id)) fail('MISMATCHED_REFERENCE', configPath, `不得将卡牌 ID作为 ${type} 奖励: ${id}`);
   for (const otherType of ['UNLOCK', 'CHEST', 'FLAG']) {
     if (otherType === type) continue;
-    const otherIds = registry(context, otherType === 'UNLOCK' ? 'unlockIds' : otherType === 'CHEST' ? 'chestIds' : 'flagIds');
+    const otherIds = requiredRegistry(
+      context,
+      otherType === 'UNLOCK' ? 'unlockIds' : otherType === 'CHEST' ? 'chestIds' : 'flagIds',
+    );
     if (otherIds?.has(id)) fail('MISMATCHED_REFERENCE', configPath, `奖励 ID 不得跨类型注册: ${id}`);
+  }
+  if (type === 'CARD') return;
+  for (const registryName of ['deckIds', 'targetIds', 'chapterLevelIds']) {
+    const protectedIds = requiredRegistry(context, registryName);
+    if (protectedIds?.has(id)) {
+      fail('MISMATCHED_REFERENCE', configPath, `奖励 ID 不得与 ${registryName} 重复: ${id}`);
+    }
   }
 }
 
@@ -345,6 +421,7 @@ function cardReference(context, id, configPath) {
   const cards = context?.cards;
   if (cards === undefined) {
     if (context?.rewardIds !== undefined) fail('INVALID_CONTEXT', 'context.cards', 'CARD 奖励必须提供带 cardType/copyLimit 的 cards 注册表');
+    if (!isPermissive(context)) fail('MISSING_REFERENCE', 'context.cards', '生产引用必须提供 cards 注册表');
     return null;
   }
   if (!(cards instanceof Map)) fail('INVALID_CONTEXT', 'context.cards', '必须是 Map');
@@ -352,7 +429,28 @@ function cardReference(context, id, configPath) {
   if (!isRecord(card)) fail('MISSING_REFERENCE', configPath, `缺失卡牌奖励引用: ${id}`);
   if (card.cardType !== 'UNIT' && card.cardType !== 'SKILL') fail('INVALID_CONTEXT', `context.cards.${id}.cardType`, '必须是 UNIT 或 SKILL');
   positiveInteger(card.copyLimit, `context.cards.${id}.copyLimit`);
+  const referenceKey = card.cardType === 'UNIT' ? 'unitId' : 'skillId';
+  const referenceId = card[referenceKey];
+  const referenceRegistry = requiredRegistry(context, card.cardType === 'UNIT' ? 'unitIds' : 'skillIds');
+  if (referenceId === undefined) {
+    if (!isPermissive(context)) fail('INVALID_CONTEXT', `context.cards.${id}.${referenceKey}`, '卡牌注册表必须提供真实单位或技能引用');
+  } else if (typeof referenceId !== 'string' || !referenceRegistry?.has(referenceId)) {
+    fail('MISSING_REFERENCE', `context.cards.${id}.${referenceKey}`, `缺失 ${card.cardType} 注册引用: ${String(referenceId)}`);
+  }
   return card;
+}
+
+function assertLevelReferenceContext(context) {
+  if (isPermissive(context)) return;
+  if (context?.cards === undefined && context?.rewardIds !== undefined) {
+    fail('INVALID_CONTEXT', 'context.cards', '章节关卡生产校验必须提供 cards 注册表，不能只提供无类型 rewardIds');
+  }
+  for (const registryName of ['chapterLevelIds', 'deckIds', 'targetIds', 'unitIds', 'skillIds', 'unlockIds', 'chestIds', 'flagIds']) {
+    requiredRegistry(context, registryName);
+  }
+  if (!(context?.cards instanceof Map) || context.cards.size === 0) {
+    fail('MISSING_REFERENCE', 'context.cards', '生产引用必须提供非空 cards 注册表');
+  }
 }
 
 function validateRuleRoundLimit(config, configPath) {
@@ -365,11 +463,13 @@ function validateRuleRoundLimit(config, configPath) {
 
 function validateLevelConfig(config, context, configPath = 'level.config.chapterLevels[0]') {
   exactKeys(config, ['id', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'], configPath, ['scenarioRules', 'battleRules']);
+  assertLevelReferenceContext(context);
   const id = localId(config.id, `${configPath}.id`);
+  referenced(id, `${configPath}.id`, context, 'chapterLevelIds');
   if (config.prerequisiteLevelId !== null) {
     const prerequisite = localId(config.prerequisiteLevelId, `${configPath}.prerequisiteLevelId`);
     if (prerequisite === id) fail('REFERENCE_CYCLE', `${configPath}.prerequisiteLevelId`, '关卡不得引用自身');
-    referenced(prerequisite, `${configPath}.prerequisiteLevelId`, context, 'levelIds');
+    referenced(prerequisite, `${configPath}.prerequisiteLevelId`, context, 'chapterLevelIds');
   }
   referenced(localId(config.enemyDeckId, `${configPath}.enemyDeckId`), `${configPath}.enemyDeckId`, context, 'deckIds');
   if (!ENVIRONMENTS.has(config.environmentElement)) fail('INVALID_VALUE', `${configPath}.environmentElement`, '环境元素不受支持');
@@ -498,22 +598,32 @@ function expectedTowerEnemyIds(floor) {
   return Array.from({ length: count }, (_item, index) => pool[(offset + index) % pool.length]);
 }
 
-function validateTowerFloor(config, context, configPath = 'tower-floor.config') {
+function validateTowerFloor(config, context, configPath = 'tower-floor.config', { allowMissingPreviousFloor = false } = {}) {
   exactKeys(config, ['floor', 'stageId', 'enemyPoolId', 'enemyIds', 'rules'], configPath);
   boundedInteger(config.floor, `${configPath}.floor`, TOWER_FLOOR_MIN, TOWER_FLOOR_MAX);
-  const expectedStageId = `STAGE_${String(Math.floor((config.floor - 1) / 5) + 1).padStart(2, '0')}`;
-  const expectedPoolId = `POOL_${String(Math.floor((config.floor - 1) / 5) + 1).padStart(2, '0')}`;
+  const floorIndex = config.floor - 1;
+  const stageIndex = Math.floor(floorIndex / 5);
+  const expectedStageId = `STAGE_${String(stageIndex + 1).padStart(2, '0')}`;
+  const expectedPoolId = `POOL_${String(stageIndex + 1).padStart(2, '0')}`;
   if (localId(config.stageId, `${configPath}.stageId`) !== expectedStageId) fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, `必须与 floor ${config.floor} 一致: ${expectedStageId}`);
   if (localId(config.enemyPoolId, `${configPath}.enemyPoolId`) !== expectedPoolId) fail('MISMATCHED_REFERENCE', `${configPath}.enemyPoolId`, `必须与 stageId 一致: ${expectedPoolId}`);
-  const stageIds = objectIdRegistry(context, 'stageIds', 'stages');
-  const poolIds = objectIdRegistry(context, 'enemyPoolIds', 'enemyPools');
+  const stageIds = requiredRegistry(context, 'stageIds');
+  const poolIds = requiredRegistry(context, 'enemyPoolIds');
   if (stageIds && !stageIds.has(config.stageId)) fail('MISSING_REFERENCE', `${configPath}.stageId`, `缺失 stageIds 引用: ${config.stageId}`);
   if (poolIds && !poolIds.has(config.enemyPoolId)) fail('MISSING_REFERENCE', `${configPath}.enemyPoolId`, `缺失 enemyPoolIds 引用: ${config.enemyPoolId}`);
-  const stages = context?.stages;
-  if (Array.isArray(stages)) {
-    const stage = stages.find((candidate) => isRecord(candidate) && candidate.id === config.stageId);
-    if (!stage) fail('MISSING_REFERENCE', `${configPath}.stageId`, `缺失 stages 引用: ${config.stageId}`);
-    if (stage.enemyPoolId !== config.enemyPoolId || config.floor < stage.floorStart || config.floor > stage.floorEnd) fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, '楼层、阶段与敌方池引用不一致');
+  const stages = objectRegistry(context, 'stages');
+  if (!stages && !isPermissive(context)) fail('MISSING_REFERENCE', 'context.stages', '生产引用必须提供 stages 注册表');
+  const stage = stages?.get(config.stageId);
+  if (stages && !stage) fail('MISSING_REFERENCE', `${configPath}.stageId`, `缺失 stages 引用: ${config.stageId}`);
+  if (stage) {
+    const [expectedEnvironment, expectedSpecialRule] = TOWER_STAGE_RULE_BLUEPRINTS[stageIndex];
+    if (stage.id !== config.stageId || stage.floorStart !== stageIndex * 5 + 1 || stage.floorEnd !== (stageIndex + 1) * 5) {
+      fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, '楼层、阶段与阶段范围引用不一致');
+    }
+    if (stage.enemyPoolId !== config.enemyPoolId) fail('MISMATCHED_REFERENCE', `${configPath}.enemyPoolId`, '楼层敌方池必须与阶段一致');
+    if (stage.environmentElement !== expectedEnvironment || stage.specialRule !== expectedSpecialRule) {
+      fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, '阶段环境与特殊规则不符合生产阶段契约');
+    }
   }
   uniqueIds(config.enemyIds, `${configPath}.enemyIds`);
   if (config.enemyIds.length < 2 || config.enemyIds.length > 6) fail('BOUNDARY', `${configPath}.enemyIds`, '必须是 2 到 6 个敌人');
@@ -522,11 +632,16 @@ function validateTowerFloor(config, context, configPath = 'tower-floor.config') 
   if (config.enemyIds.length !== expectedEnemyIds.length || config.enemyIds.some((id, index) => id !== expectedEnemyIds[index])) {
     fail('PROGRESSION', `${configPath}.enemyIds`, '楼层敌人必须使用生产配置的固定递进序列；随机种子不受支持');
   }
-  const pools = context?.enemyPools;
-  if (Array.isArray(pools)) {
-    const pool = pools.find((candidate) => isRecord(candidate) && candidate.id === config.enemyPoolId);
-    if (!pool) fail('MISSING_REFERENCE', `${configPath}.enemyPoolId`, `缺失 enemyPools 引用: ${config.enemyPoolId}`);
-    if (!config.enemyIds.every((enemyId) => Array.isArray(pool.unitIds) && pool.unitIds.includes(enemyId))) fail('MISSING_REFERENCE', `${configPath}.enemyIds`, '敌人必须来自引用的敌方池');
+  const pools = objectRegistry(context, 'enemyPools');
+  if (!pools && !isPermissive(context)) fail('MISSING_REFERENCE', 'context.enemyPools', '生产引用必须提供 enemyPools 注册表');
+  const pool = pools?.get(config.enemyPoolId);
+  if (pools && !pool) fail('MISSING_REFERENCE', `${configPath}.enemyPoolId`, `缺失 enemyPools 引用: ${config.enemyPoolId}`);
+  if (pool) {
+    const expectedPoolIds = TOWER_ENEMY_POOL_BLUEPRINTS[stageIndex];
+    if (pool.id !== config.enemyPoolId || pool.tier !== stageIndex + 1 || !Array.isArray(pool.unitIds) || pool.unitIds.length !== expectedPoolIds.length || pool.unitIds.some((id, index) => id !== expectedPoolIds[index])) {
+      fail('MISMATCHED_REFERENCE', `${configPath}.enemyPoolId`, '敌方池必须匹配生产配置的 tier 与固定单位序列');
+    }
+    if (!config.enemyIds.every((enemyId) => pool.unitIds.includes(enemyId))) fail('MISSING_REFERENCE', `${configPath}.enemyIds`, '敌人必须来自引用的敌方池');
   }
   exactKeys(config.rules, [
     'threatMultiplierPercent', 'maxEnemyUnits', 'enemyActionInterval', 'maxRounds', 'randomness',
@@ -539,12 +654,29 @@ function validateTowerFloor(config, context, configPath = 'tower-floor.config') 
   boundedInteger(config.rules.randomness, `${configPath}.rules.randomness`, 0, 500);
   if (!ENVIRONMENTS.has(config.rules.environmentElement)) fail('INVALID_VALUE', `${configPath}.rules.environmentElement`, '环境元素不受支持');
   if (!TOWER_SPECIAL_RULES.has(config.rules.specialRule)) fail('INVALID_VALUE', `${configPath}.rules.specialRule`, '特殊规则不受支持');
+  const [expectedEnvironment, expectedSpecialRule] = TOWER_STAGE_RULE_BLUEPRINTS[stageIndex];
+  if (config.rules.environmentElement !== expectedEnvironment || config.rules.specialRule !== expectedSpecialRule) {
+    fail('MISMATCHED_REFERENCE', `${configPath}.rules`, '楼层规则必须匹配生产阶段环境与特殊规则');
+  }
+  const expectedRules = {
+    threatMultiplierPercent: 100 + floorIndex * 5,
+    maxEnemyUnits: Math.min(6, 2 + Math.floor(floorIndex / 10)),
+    enemyActionInterval: Math.max(1, 5 - Math.floor(floorIndex / 10)),
+    maxRounds: 48 - stageIndex * 3,
+    randomness: 500 - floorIndex * 7,
+  };
+  for (const [key, expected] of Object.entries(expectedRules)) {
+    if (config.rules[key] !== expected) fail('PROGRESSION', `${configPath}.rules.${key}`, `必须遵循生产逐层公式 ${expected}`);
+  }
   if (config.enemyIds.length > config.rules.maxEnemyUnits) fail('BOUNDARY', `${configPath}.enemyIds`, '敌人数不得超过该层上限');
   const previous = context?.previousFloor;
+  if (config.floor > TOWER_FLOOR_MIN && !previous && !allowMissingPreviousFloor && !isPermissive(context)) {
+    fail('PROGRESSION', `${configPath}.floor`, '生产递进楼层必须提供紧邻的 previousFloor');
+  }
   if (previous) {
-    if (!isRecord(previous) || previous.floor >= config.floor) fail('PROGRESSION', `${configPath}.floor`, '当前楼层必须高于 context.previousFloor');
+    if (!isRecord(previous) || previous.floor !== config.floor - 1) fail('PROGRESSION', `${configPath}.floor`, 'previousFloor 必须是紧邻前一层');
     const { previousFloor: _previousFloor, ...previousContext } = context;
-    validateTowerFloor(previous, previousContext, 'context.previousFloor');
+    validateTowerFloor(previous, previousContext, 'context.previousFloor', { allowMissingPreviousFloor: true });
     if (config.rules.threatMultiplierPercent <= previous.rules.threatMultiplierPercent) fail('PROGRESSION', `${configPath}.rules.threatMultiplierPercent`, '威胁倍率必须递增');
     if (config.rules.maxEnemyUnits < previous.rules.maxEnemyUnits) fail('PROGRESSION', `${configPath}.rules.maxEnemyUnits`, '敌人数上限不得下降');
     if (config.rules.enemyActionInterval > previous.rules.enemyActionInterval) fail('PROGRESSION', `${configPath}.rules.enemyActionInterval`, '敌方行动间隔不得变慢');
@@ -673,6 +805,8 @@ export function generateTowerFloor(input, context = {}) {
     rules: source.rules,
   };
   validateTowerFloor(config, context);
+  const expectedId = `TOWER-FLOOR-${String(config.floor).padStart(2, '0')}`;
+  if (id !== expectedId) fail('MISMATCHED_REFERENCE', 'tower-floor.id', `必须与 floor ${config.floor} 一致: ${expectedId}`);
   return makeEntry('tower-floor', id, resource, config);
 }
 
