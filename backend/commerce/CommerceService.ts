@@ -124,6 +124,19 @@ interface StoredLedgerError {
 
 type StoredLedger = StoredLedgerResult | StoredLedgerError;
 
+interface StoredRestoreSuccess {
+  readonly kind: 'success';
+  readonly fingerprint: string;
+  readonly result: RestoreOrdersResult;
+}
+
+interface StoredRestoreFailure {
+  readonly kind: 'failure';
+  readonly fingerprint: string;
+  readonly code: CommerceResultCode;
+  readonly message: string;
+}
+
 type TrustedCallback = TrustedCallbackVerification;
 
 type CallbackResult = Readonly<{
@@ -146,6 +159,15 @@ interface CommerceMutationSnapshot {
   readonly orders: ReadonlyMap<string, CommerceOrder>;
   readonly wallets: ReadonlyMap<string, CurrencyWallet>;
   readonly transactions: ReadonlyMap<string, string>;
+  readonly restoreLedgers: ReadonlyMap<string, ReadonlyMap<string, StoredRestoreSuccess>>;
+  readonly restoreFailureLedgers: ReadonlyMap<string, ReadonlyMap<string, StoredRestoreFailure>>;
+}
+
+export interface CommerceRestoreAuditRecord {
+  readonly accountId: string;
+  readonly requestId: string;
+  readonly status: 'APPLIED' | 'FAILED';
+  readonly code?: CommerceResultCode;
 }
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
@@ -235,7 +257,8 @@ export class CommerceService {
   private readonly transactions = new Map<string, string>();
   private readonly createLedgers = new Map<string, Map<string, StoredLedger>>();
   private readonly verifyLedgers = new Map<string, Map<string, StoredLedger>>();
-  private readonly restoreLedgers = new Map<string, Map<string, StoredLedger>>();
+  private readonly restoreLedgers = new Map<string, Map<string, StoredRestoreSuccess>>();
+  private readonly restoreFailureLedgers = new Map<string, Map<string, StoredRestoreFailure>>();
   private readonly refundLedgers = new Map<string, Map<string, StoredLedger>>();
   private readonly callbacks = new Map<string, StoredLedger>();
   private orderSequence = 0;
@@ -337,8 +360,7 @@ export class CommerceService {
       throw new CommerceError('INVALID_REQUEST', 'receipts must contain 1..50 entries');
     }
     const fingerprint = stable({ receipts: request.receipts });
-    const ledger = this.ledgerFor(this.restoreLedgers, accountId);
-    const replay = this.replay<RestoreOrdersResult>(ledger, requestId, fingerprint);
+    const replay = this.replayRestore(accountId, requestId, fingerprint);
     if (replay !== undefined) return replay;
     const mutationSnapshot = this.captureMutationSnapshot();
     try {
@@ -389,12 +411,12 @@ export class CommerceService {
         }
       }
       const result: RestoreOrdersResult = { accepted: true, replayed: false, results: Object.freeze(results.map(cloneResult)) };
-      this.storeResult(ledger, requestId, fingerprint, result);
+      this.storeRestoreSuccess(accountId, requestId, fingerprint, result);
       return cloneResult(result);
     } catch (error) {
       const commerceError = errorFromUnknown(error, 'PAYMENT_VERIFICATION_FAILED', 'purchase restore failed');
       this.restoreMutationSnapshot(mutationSnapshot);
-      this.storeError(ledger, requestId, fingerprint, commerceError);
+      this.storeRestoreFailure(accountId, requestId, fingerprint, commerceError);
       throw commerceError;
     }
   }
@@ -493,6 +515,21 @@ export class CommerceService {
     return Object.freeze([...this.orders.values()].filter((order) => order.accountId === accountId).map(copyOrder));
   }
 
+  restoreAudit(adminDiagnosticToken?: string): readonly CommerceRestoreAuditRecord[] {
+    if (this.adminDiagnosticToken === null || adminDiagnosticToken !== this.adminDiagnosticToken) {
+      throw new CommerceError('UNAUTHENTICATED', 'diagnostic restore audit is not authorized');
+    }
+    const records: CommerceRestoreAuditRecord[] = [];
+    for (const [accountId, ledger] of this.restoreLedgers) {
+      for (const [requestId, record] of ledger) records.push({ accountId, requestId, status: record.kind === 'success' ? 'APPLIED' : 'FAILED' });
+    }
+    for (const [accountId, ledger] of this.restoreFailureLedgers) {
+      for (const [requestId, record] of ledger) records.push({ accountId, requestId, status: 'FAILED', code: record.code });
+    }
+    records.sort((left, right) => `${left.accountId}\u0000${left.requestId}\u0000${left.status}`.localeCompare(`${right.accountId}\u0000${right.requestId}\u0000${right.status}`));
+    return Object.freeze(records.map((record) => Object.freeze(record)));
+  }
+
   snapshot(adminDiagnosticToken?: string): CommerceSnapshot {
     if (this.adminDiagnosticToken === null || adminDiagnosticToken !== this.adminDiagnosticToken) {
       throw new CommerceError('UNAUTHENTICATED', 'diagnostic snapshot is not authorized');
@@ -563,7 +600,19 @@ export class CommerceService {
     for (const [orderId, order] of this.orders) orders.set(orderId, copyOrder(order));
     const wallets = new Map<string, CurrencyWallet>();
     for (const [accountId, wallet] of this.wallets) wallets.set(accountId, copyWallet(wallet));
-    return { orders, wallets, transactions: new Map(this.transactions) };
+    const restoreLedgers = new Map<string, ReadonlyMap<string, StoredRestoreSuccess>>();
+    for (const [accountId, ledger] of this.restoreLedgers) {
+      const copied = new Map<string, StoredRestoreSuccess>();
+      for (const [requestId, record] of ledger) copied.set(requestId, { kind: 'success', fingerprint: record.fingerprint, result: cloneResult(record.result) });
+      restoreLedgers.set(accountId, copied);
+    }
+    const restoreFailureLedgers = new Map<string, ReadonlyMap<string, StoredRestoreFailure>>();
+    for (const [accountId, ledger] of this.restoreFailureLedgers) {
+      const copied = new Map<string, StoredRestoreFailure>();
+      for (const [requestId, record] of ledger) copied.set(requestId, { ...record });
+      restoreFailureLedgers.set(accountId, copied);
+    }
+    return { orders, wallets, transactions: new Map(this.transactions), restoreLedgers, restoreFailureLedgers };
   }
 
   private restoreMutationSnapshot(snapshot: CommerceMutationSnapshot): void {
@@ -573,6 +622,18 @@ export class CommerceService {
     for (const [accountId, wallet] of snapshot.wallets) this.wallets.set(accountId, copyWallet(wallet));
     this.transactions.clear();
     for (const [key, orderId] of snapshot.transactions) this.transactions.set(key, orderId);
+    this.restoreLedgers.clear();
+    for (const [accountId, ledger] of snapshot.restoreLedgers) {
+      const copied = new Map<string, StoredRestoreSuccess>();
+      for (const [requestId, record] of ledger) copied.set(requestId, { kind: 'success', fingerprint: record.fingerprint, result: cloneResult(record.result) });
+      this.restoreLedgers.set(accountId, copied);
+    }
+    this.restoreFailureLedgers.clear();
+    for (const [accountId, ledger] of snapshot.restoreFailureLedgers) {
+      const copied = new Map<string, StoredRestoreFailure>();
+      for (const [requestId, record] of ledger) copied.set(requestId, { ...record });
+      this.restoreFailureLedgers.set(accountId, copied);
+    }
   }
 
   private planPayment(order: CommerceOrder, payment: TrustedPaymentVerification): DeliveryPlan {
@@ -792,6 +853,47 @@ export class CommerceService {
     }
     if (value.kind === 'refund') return { ...this.normalizeRefund(value), eventId, kind: 'refund' } as TrustedCallback;
     return { ...this.normalizePayment(value), eventId, kind: 'payment' } as TrustedCallback;
+  }
+
+  private restoreLedgerFor(accountId: string): Map<string, StoredRestoreSuccess> {
+    const existing = this.restoreLedgers.get(accountId);
+    if (existing !== undefined) return existing;
+    const created = new Map<string, StoredRestoreSuccess>();
+    this.restoreLedgers.set(accountId, created);
+    return created;
+  }
+
+  private restoreFailureLedgerFor(accountId: string): Map<string, StoredRestoreFailure> {
+    const existing = this.restoreFailureLedgers.get(accountId);
+    if (existing !== undefined) return existing;
+    const created = new Map<string, StoredRestoreFailure>();
+    this.restoreFailureLedgers.set(accountId, created);
+    return created;
+  }
+
+  private replayRestore(accountId: string, requestId: string, fingerprint: string): RestoreOrdersResult | undefined {
+    const success = this.restoreLedgers.get(accountId)?.get(requestId);
+    const failure = this.restoreFailureLedgers.get(accountId)?.get(requestId);
+    if (success !== undefined && failure !== undefined) throw new CommerceError('INVALID_REQUEST', 'restore success and failure ledgers conflict');
+    if (success !== undefined) {
+      if (success.fingerprint !== fingerprint) throw new CommerceError('REQUEST_ID_REUSED', 'requestId was reused with different data');
+      return { ...cloneResult(success.result), replayed: true };
+    }
+    if (failure !== undefined) {
+      if (failure.fingerprint !== fingerprint) throw new CommerceError('REQUEST_ID_REUSED', 'requestId was reused with different data');
+      throw new CommerceError(failure.code, failure.message);
+    }
+    return undefined;
+  }
+
+  private storeRestoreSuccess(accountId: string, requestId: string, fingerprint: string, result: RestoreOrdersResult): void {
+    this.restoreLedgerFor(accountId).set(requestId, { kind: 'success', fingerprint, result: cloneResult(result) });
+  }
+
+  private storeRestoreFailure(accountId: string, requestId: string, fingerprint: string, error: CommerceError): void {
+    this.restoreFailureLedgerFor(accountId).set(requestId, {
+      kind: 'failure', fingerprint, code: error.code, message: error.message,
+    });
   }
 
   private ledgerFor(collection: Map<string, Map<string, StoredLedger>>, accountId: string): Map<string, StoredLedger> {

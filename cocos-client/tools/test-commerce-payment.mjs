@@ -200,6 +200,7 @@ registerPayment(restoreReceipt, restoreCreated.order, { transactionId: 'transact
 const restored = clientA.restoreOrders([restoreReceipt], 'restore-1');
 assert.equal(restored.accepted, true);
 assert.equal(restored.results[0].delivered, true, 'restore must deliver a previously unfulfilled order');
+assert.deepEqual(server.restoreAudit(ADMIN_TOKEN).find(({ requestId }) => requestId === 'restore-1'), { accountId: 'account-a', requestId: 'restore-1', status: 'APPLIED' });
 const paidAfterRestore = restored.results[0].wallet.paidCurrency;
 const restoredReplay = clientA.restoreOrders([restoreReceipt], 'restore-1');
 assert.equal(restoredReplay.replayed, true);
@@ -248,8 +249,12 @@ overflowReceipts.set('overflow-receipt-second', paymentFor({
   provider: 'overflow-store', transactionId: 'overflow-transaction-second', receiptId: 'overflow-receipt-second', amountMinor: 2,
 }));
 const overflowBefore = overflowServer.snapshot('overflow-admin');
+const overflowAuditBefore = overflowServer.restoreAudit('overflow-admin');
 expectCode('restore overflow must abort the entire batch', () => overflowClient.restoreOrders(['overflow-receipt-first', 'overflow-receipt-second'], 'overflow-restore'), 'CURRENCY_OVERFLOW');
 assert.deepEqual(overflowServer.snapshot('overflow-admin'), overflowBefore, 'restore overflow must roll back orders, wallet and transaction state');
+const overflowAuditAfter = overflowServer.restoreAudit('overflow-admin');
+assert.deepEqual(overflowAuditAfter.filter(({ status }) => status === 'APPLIED'), overflowAuditBefore.filter(({ status }) => status === 'APPLIED'), 'failed restore must not enter the success ledger');
+assert.deepEqual(overflowAuditAfter.find(({ requestId }) => requestId === 'overflow-restore'), { accountId: 'overflow-account', requestId: 'overflow-restore', status: 'FAILED', code: 'CURRENCY_OVERFLOW' }, 'failed restore audit must be explicit and separate');
 const overflowOtherOrder = overflowClient.createOrder('overflow-first', 'overflow-create-other');
 overflowReceipts.set('overflow-receipt-other', paymentFor({
   accountId: 'overflow-account', orderId: overflowOtherOrder.order.orderId, productId: overflowOtherOrder.order.productId,
