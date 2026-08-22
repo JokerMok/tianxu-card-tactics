@@ -84,9 +84,18 @@ assert.deepEqual(claimReplay.value.ledgerEntries, claim.value.ledgerEntries);
 const claimWithNewRequest = playerA.claimMail(compensationMail.mailId, 'claim-2');
 assert.equal(claimWithNewRequest.value.idempotent, true, 'a different retry must not grant resources twice');
 assert.equal(server.queryResourceLedger({ actorToken: 'player-a-session' }).entries.length, 2);
-assert.deepEqual(server.queryResourceLedger({ actorToken: 'player-a-session' }).totals, { gold: 100, essence: 2 });
+const ledgerTotals = server.queryResourceLedger({ actorToken: 'player-a-session' }).totals;
+assert.equal(Object.getPrototypeOf(ledgerTotals), null, 'ledger totals must not inherit object prototype keys');
+assert.deepEqual(Object.fromEntries(Object.entries(ledgerTotals)), { gold: 100, essence: 2 });
 assert.equal(server.queryResourceLedger({ actorToken: 'agent-session', accountId: 'account-a' }).entries.length, 2);
 expectCode('player cannot query another ledger', () => server.queryResourceLedger({ actorToken: 'player-a-session', accountId: 'account-b' }), 'FORBIDDEN');
+
+for (const reservedResourceId of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+  expectCode(`prototype resource id ${reservedResourceId} is rejected`, () => server.createMail({
+    actorToken: 'agent-session', requestId: `mail-reserved-${reservedResourceId}`, accountId: 'account-a', title: '非法资源', body: '原型链键不应进入总量聚合。',
+    attachments: [{ resourceId: reservedResourceId, amount: 1 }], expiresAt: null, ticketId: null,
+  }), 'INVALID_REQUEST');
+}
 
 now = 2_000;
 const expiring = server.createMail({ actorToken: 'agent-session', requestId: 'mail-expiring', accountId: 'account-a', title: '限时附件', body: '过期边界测试。', attachments: [{ resourceId: 'gold', amount: 1 }], expiresAt: 2_010, ticketId: null });
@@ -116,8 +125,34 @@ failWrites = false;
 const rollbackAccepted = rollback.createTicket({ sessionToken: 'player-a-session', requestId: 'rollback-1', category: 'bug', subject: 'rollback', body: 'retry after storage recovery' });
 assert.equal(rollbackAccepted.replayed, false, 'failed persistence must not reserve the requestId');
 
+let reentrantService;
+let persistedSnapshot = null;
+let persistCalls = 0;
+reentrantService = freshService({
+  adminDiagnosticToken: 'reentrant-diagnostic-token',
+  persist: (snapshot) => {
+    persistCalls += 1;
+    persistedSnapshot = snapshot;
+    if (persistCalls === 1) {
+      reentrantService.createTicket({ sessionToken: 'player-a-session', requestId: 'inner-reentrant', category: 'bug', subject: '内层', body: '不得在持久化回调中提交。' });
+    }
+  },
+});
+expectCode('reentrant persistence callback fails closed', () => reentrantService.createTicket({
+  sessionToken: 'player-a-session', requestId: 'outer-reentrant', category: 'bug', subject: '外层', body: '外层事务也不得部分提交。',
+}), 'PERSISTENCE_FAILED');
+assert.ok(persistCalls >= 2, 'failed persistence must attempt the checkpoint snapshot');
+assert.deepEqual(persistedSnapshot, reentrantService.snapshot('reentrant-diagnostic-token'), 'memory and external snapshot must agree after reentrant failure');
+assert.equal(reentrantService.listTickets({ sessionToken: 'player-a-session' }).tickets.length, 0, 'reentrant inner mutation must not commit');
+
 const audit = server.queryAudit({ actorToken: 'admin-session', targetType: 'compensation', targetId: compensationFirst.value.compensationId });
 assert.ok(audit.events.some((event) => event.outcome === 'accepted' && event.action === 'approveCompensation'));
+const createdAuditTargets = server.queryAudit({ actorToken: 'admin-session' }).events.filter((event) => ['accepted', 'replayed'].includes(event.outcome) && ['createTicket', 'createMail', 'createCompensation'].includes(event.action));
+assert.ok(createdAuditTargets.length > 0);
+assert.ok(createdAuditTargets.every((event) => event.targetId !== 'new'), 'create audit targetId must be a real created id');
+assert.ok(createdAuditTargets.filter((event) => event.requestId === 'ticket-create-1').every((event) => event.targetId === ticketFirst.value.ticketId));
+assert.ok(createdAuditTargets.filter((event) => event.requestId === 'mail-text-only').every((event) => event.targetId === emptyMail.value.mailId));
+assert.ok(createdAuditTargets.filter((event) => event.requestId === 'comp-create-1').every((event) => event.targetId === compensationFirst.value.compensationId));
 assert.ok(audit.events.every((event) => event.requestId === null || !event.requestId.includes('session')));
 const snapshot = server.snapshot('t262-diagnostic-token');
 assert.equal(snapshot.schemaVersion, 1);

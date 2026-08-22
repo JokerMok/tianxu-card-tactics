@@ -281,6 +281,7 @@ function nonNegativeInteger(value: unknown, label: string, max = MAX_RESOURCE_AM
 function resourceId(value: unknown): string {
   const id = identifier(value, 'resourceId');
   if (!/^[A-Za-z][A-Za-z0-9_.-]{0,63}$/.test(id)) fail(SUPPORT_ERROR_CODES.INVALID_REQUEST, 'resourceId is invalid');
+  if (id in Object.prototype) fail(SUPPORT_ERROR_CODES.INVALID_REQUEST, 'resourceId is reserved');
   return id;
 }
 function actor(value: unknown): SupportActor {
@@ -360,6 +361,7 @@ export class SupportService {
   private readonly requests = new Map<string, StoredRequest>();
   private readonly rates = new Map<string, number[]>();
   private sequences: Record<string, number> = Object.create(null) as Record<string, number>;
+  private persistenceInProgress = false;
 
   constructor(options: SupportServiceOptions = {}) {
     this.clock = options.now ?? (() => Date.now());
@@ -390,7 +392,7 @@ export class SupportService {
       const ticket: Ticket = { ticketId, accountId: current.accountId as string, category: category as TicketCategory, subject,
         messages: [{ messageId, authorId: current.actorId, authorRole: 'player', body, createdAt: now }], status: 'open', assignedTo: null, createdAt: now, updatedAt: now };
       this.tickets.set(ticketId, ticket); return ticket;
-    }, 'ticket', 'new');
+    }, 'ticket', (ticket) => ticket.ticketId);
   }
 
   listTickets(request: TicketListRequest): TicketListResult {
@@ -455,7 +457,7 @@ export class SupportService {
       if (ticketId !== null && !this.tickets.has(ticketId)) fail(SUPPORT_ERROR_CODES.NOT_FOUND, 'ticket was not found');
       this.consumeRate(current, 'createMail', now); const mail: Mail = { mailId: this.nextId('mail'), accountId, source: 'support', title, body, attachments, createdAt: now, expiresAt, ticketId, compensationId: null, claimedAt: null };
       this.mails.set(mail.mailId, mail); return mail;
-    }, 'mail', 'new');
+    }, 'mail', (mail) => mail.mailId);
   }
 
   listMail(request: MailListRequest): MailListResult {
@@ -495,7 +497,7 @@ export class SupportService {
       const reason = text(input.reason, 'reason', 1000); const resources = grants(input.resources, 'resources'); const now = this.now(); this.consumeRate(current, 'createCompensation', now);
       const compensation: Compensation = { compensationId: this.nextId('compensation'), accountId, ticketId, reason, resources, status: 'pending', createdBy: current.actorId, approvedBy: null, rejectedBy: null, mailId: null, createdAt: now, decidedAt: null };
       this.compensations.set(compensation.compensationId, compensation); return compensation;
-    }, 'compensation', 'new');
+    }, 'compensation', (compensation) => compensation.compensationId);
   }
 
   approveCompensation(request: DecideCompensationRequest): MutationResult<Compensation> {
@@ -524,7 +526,7 @@ export class SupportService {
     const resource = input.resourceId === undefined ? undefined : resourceId(input.resourceId); const from = input.fromCreatedAt === undefined ? undefined : safeTime(input.fromCreatedAt, 'fromCreatedAt'); const to = input.toCreatedAt === undefined ? undefined : safeTime(input.toCreatedAt, 'toCreatedAt');
     if (from !== undefined && to !== undefined && from > to) fail(SUPPORT_ERROR_CODES.INVALID_REQUEST, 'time range is inverted');
     const entries = this.ledger.filter((entry) => (accountId === undefined || entry.accountId === accountId) && (resource === undefined || entry.resourceId === resource) && (from === undefined || entry.createdAt >= from) && (to === undefined || entry.createdAt <= to)).sort((a, b) => a.createdAt - b.createdAt || a.entryId.localeCompare(b.entryId));
-    const result = this.pageLedger(entries, page(input.limit, 'limit'), cursor(input.cursor, 'cursor')); const totals: Record<string, number> = {};
+    const result = this.pageLedger(entries, page(input.limit, 'limit'), cursor(input.cursor, 'cursor')); const totals = Object.create(null) as Record<string, number>;
     for (const entry of result.entries) totals[entry.resourceId] = (totals[entry.resourceId] ?? 0) + entry.amount;
     return { ...result, totals: Object.freeze(totals) };
   }
@@ -572,28 +574,29 @@ export class SupportService {
   private now(): number { return safeTime(this.clock(), 'now'); }
   private nextId(kind: string): string { const next = (this.sequences[kind] ?? 0) + 1; const id = identifier(this.makeId(kind, next), `${kind}Id`); if ([...this.tickets.keys(), ...this.mails.keys(), ...this.compensations.keys(), ...this.ledger.map((entry) => entry.entryId), ...this.audit.map((entry) => entry.auditId)].includes(id)) fail(SUPPORT_ERROR_CODES.INTERNAL_ERROR, `${kind} id collided`); this.sequences[kind] = next; return id; }
   private requestKey(actorValue: SupportActor, name: MutationName, requestId: string): string { return `${actorValue.accountId ?? actorValue.actorId}\u0000${name}\u0000${requestId}`; }
-  private mutate<T>(current: SupportActor, name: MutationName, requestId: string, requestFingerprint: string, action: () => T, targetType: string, targetId: string): MutationResult<T> {
+  private mutate<T>(current: SupportActor, name: MutationName, requestId: string, requestFingerprint: string, action: () => T, targetType: string, targetId: string | ((value: T) => string)): MutationResult<T> {
+    if (this.persistenceInProgress) fail(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support persistence is locked');
     const key = this.requestKey(current, name, requestId); const previous = this.requests.get(key);
     if (previous !== undefined) {
       if (previous.fingerprint !== requestFingerprint) fail(SUPPORT_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was reused with different data');
       if (previous.error) throw new SupportError(previous.error.code, previous.error.message, previous.error.retryAfterMs);
-      this.appendReplayAudit(current, name, targetType, targetId, requestId);
+      this.appendReplayAudit(current, name, targetType, this.resolveTargetId(targetId, previous.result as T, requestId), requestId);
       return { value: clone(previous.result as T), replayed: true };
     }
     const checkpoint = this.capture();
     try {
       const value = action();
       this.requests.set(key, { fingerprint: requestFingerprint, result: clone(value) });
-      this.appendAudit(current, name, targetType, targetId, requestId, 'accepted', null);
-      try { this.persistState(); } catch { this.restore(checkpoint); throw new SupportError(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support state could not be persisted'); }
+      this.appendAudit(current, name, targetType, this.resolveTargetId(targetId, value, requestId), requestId, 'accepted', null);
+      this.persistTransaction(checkpoint);
       return { value: clone(value), replayed: false };
     } catch (error) {
       if (error instanceof SupportError && error.code === SUPPORT_ERROR_CODES.PERSISTENCE_FAILED) { this.restore(checkpoint); throw error; }
       this.restore(checkpoint);
       const supportError = error instanceof SupportError ? error : new SupportError(SUPPORT_ERROR_CODES.INTERNAL_ERROR, 'support operation failed');
       const errorRecord: StoredRequest = { fingerprint: requestFingerprint, error: { code: supportError.code, message: supportError.message, retryAfterMs: supportError.retryAfterMs } };
-      this.requests.set(key, errorRecord); this.appendAudit(current, name, targetType, targetId, requestId, 'rejected', supportError.code);
-      try { this.persistState(); } catch { this.restore(checkpoint); throw new SupportError(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support state could not be persisted'); }
+      this.requests.set(key, errorRecord); this.appendAudit(current, name, targetType, this.resolveTargetId(targetId, undefined as T, requestId), requestId, 'rejected', supportError.code);
+      this.persistTransaction(checkpoint);
       throw supportError;
     }
   }
@@ -607,10 +610,30 @@ export class SupportService {
   }
   private appendReplayAudit(current: SupportActor, action: string, targetType: string, targetId: string, requestId: string): void {
     const checkpoint = this.capture();
-    try { this.appendAudit(current, action, targetType, targetId, requestId, 'replayed', null); this.persistState(); }
-    catch { this.restore(checkpoint); throw new SupportError(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support state could not be persisted'); }
+    try { this.appendAudit(current, action, targetType, targetId, requestId, 'replayed', null); this.persistTransaction(checkpoint); }
+    catch (error) {
+      this.restore(checkpoint);
+      if (error instanceof SupportError && error.code === SUPPORT_ERROR_CODES.PERSISTENCE_FAILED) throw error;
+      throw new SupportError(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support state could not be persisted');
+    }
   }
-  private persistState(): void { if (this.persist) this.persist(this.publicSnapshot()); }
+  private resolveTargetId<T>(targetId: string | ((value: T) => string), value: T, fallback: string): string {
+    return typeof targetId === 'function' ? value === undefined ? fallback : targetId(value) : targetId;
+  }
+  private persistTransaction(checkpoint: InternalSnapshot): void {
+    try { this.persistState(); }
+    catch {
+      this.restore(checkpoint);
+      try { this.persistState(); } catch { /* Keep memory at the checkpoint; the caller receives a closed failure. */ }
+      throw new SupportError(SUPPORT_ERROR_CODES.PERSISTENCE_FAILED, 'support state could not be persisted');
+    }
+  }
+  private persistState(): void {
+    if (!this.persist) return;
+    this.persistenceInProgress = true;
+    try { this.persist(this.publicSnapshot()); }
+    finally { this.persistenceInProgress = false; }
+  }
   private publicSnapshot(): SupportSnapshot { return { schemaVersion: SUPPORT_SCHEMA_VERSION, tickets: [...this.tickets.values()].map(copyTicket), mails: [...this.mails.values()].map(copyMail), compensations: [...this.compensations.values()].map(copyCompensation), ledger: clone(this.ledger), audit: clone(this.audit) }; }
   private capture(): InternalSnapshot { return { tickets: [...this.tickets.values()].map(copyTicket), mails: [...this.mails.values()].map(copyMail), compensations: [...this.compensations.values()].map(copyCompensation), ledger: clone(this.ledger), audit: clone(this.audit), requests: [...this.requests.entries()].map(([key, value]) => [key, clone(value)]), rates: [...this.rates.entries()].map(([key, value]) => [key, [...value]]), sequences: { ...this.sequences } }; }
   private restore(snapshot: InternalSnapshot): void { this.tickets.clear(); snapshot.tickets.forEach((value) => this.tickets.set(value.ticketId, value)); this.mails.clear(); snapshot.mails.forEach((value) => this.mails.set(value.mailId, value)); this.compensations.clear(); snapshot.compensations.forEach((value) => this.compensations.set(value.compensationId, value)); this.ledger.splice(0, this.ledger.length, ...snapshot.ledger); this.audit.splice(0, this.audit.length, ...snapshot.audit); this.requests.clear(); snapshot.requests.forEach(([key, value]) => this.requests.set(key, value)); this.rates.clear(); snapshot.rates.forEach(([key, value]) => this.rates.set(key, value)); this.sequences = { ...snapshot.sequences }; }
