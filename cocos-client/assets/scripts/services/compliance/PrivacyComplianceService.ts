@@ -427,26 +427,48 @@ export class PrivacyComplianceService {
 
   purgeExpired(actor: PrivacyActor, requestId: string): PrivacyPurgeResult {
     safeActor(actor); validateRequestId(requestId); if (actor.kind !== 'operator' || actor.token !== this.operatorToken) fail('PERMISSION_DENIED', 'only an authorized operator may purge retention data');
-    const now = this.now();
     return this.runRequest('retention_purge', requestId, '__retention__', { requestId }, () => {
-      if (!Number.isSafeInteger(now) || now < 0) fail('STORE_FAILURE', 'clock returned an invalid timestamp', false);
-      let records: readonly PrivacyDataRecord[];
-      try { records = this.store.list().map(safeStoreRecord); } catch (error) { if (error instanceof PrivacyComplianceError) throw error; throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing failed', false); }
+      const now = this.now();
+      const records = this.listStoredRecords();
       const expired = records.filter((record) => record.retentionUntil <= now);
+      const unexpired = records.filter((record) => record.retentionUntil > now);
       const previousConsents = new Map(expired.map((record) => [record.subjectId, this.consents.get(record.subjectId)] as const));
       const previousAges = new Map(expired.map((record) => [record.subjectId, this.ages.get(record.subjectId)] as const));
       const previousLedger = [...this.ledger.entries()];
       const specs = expired.map((record) => ({ action: 'retention_purge' as const, subjectId: record.subjectId, requestId, outcome: 'accepted' as const, sensitiveFieldCount: 0, occurredAt: now }));
       return this.withAudits(specs, () => {
         try {
-          if (this.store.purgeExpired) this.store.purgeExpired(now).map(safeStoreRecord);
-          else for (const record of expired) this.store.remove(record.subjectId);
+          if (this.store.purgeExpired) {
+            const removed = this.store.purgeExpired(now);
+            if (!Array.isArray(removed)) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge returned an invalid result', false);
+            const removedRecords = removed.map(safeStoreRecord);
+            const expiredKeys = new Set(expired.map((record) => record.subjectId));
+            const removedKeys = new Set<string>();
+            for (const record of removedRecords) {
+              if (!expiredKeys.has(record.subjectId) || removedKeys.has(record.subjectId)) fail('STORE_FAILURE', 'privacy retention purge returned an unexpected record', false);
+              removedKeys.add(record.subjectId);
+            }
+          } else {
+            for (const record of expired) this.store.remove(record.subjectId);
+          }
+          const after = this.listStoredRecords();
+          const beforeBySubject = new Map(records.map((record) => [record.subjectId, record] as const));
+          for (const record of after) {
+            const before = beforeBySubject.get(record.subjectId);
+            if (!before || canonicalPrivacyJson(record) !== canonicalPrivacyJson(before)) fail('STORE_FAILURE', 'privacy retention purge changed the storage snapshot', false);
+          }
+          for (const record of unexpired) {
+            const listed = after.find((candidate) => candidate.subjectId === record.subjectId);
+            if (!listed || canonicalPrivacyJson(listed) !== canonicalPrivacyJson(record)) fail('STORE_FAILURE', 'privacy retention purge removed or changed unexpired data', false);
+            const readBack = this.readStoredRecord(record.subjectId);
+            if (!readBack || readBack.subjectId !== record.subjectId || canonicalPrivacyJson(readBack) !== canonicalPrivacyJson(record)) fail('STORE_FAILURE', 'privacy retention purge failed to preserve unexpired data', false);
+          }
           for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) fail('STORE_FAILURE', 'privacy retention purge was not verified', false);
-        } catch (error) { if (error instanceof PrivacyComplianceError) throw error; throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
+        } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
         for (const record of expired) { this.consents.delete(record.subjectId); this.ages.delete(record.subjectId); this.removeReplayableSubjectResults(record.subjectId); }
         const purgedAuditEvents = this.pruneAudits(now); return { accepted: true, replayed: false, requestId, purgedSubjects: expired.length, purgedAuditEvents };
       }, () => {
-        for (const record of expired) { try { this.store.replace(record); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention rollback failed', false); } }
+        for (const record of records) { try { this.store.replace(record); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention rollback failed', false); } }
         for (const record of expired) {
           const consent = previousConsents.get(record.subjectId); const age = previousAges.get(record.subjectId);
           if (consent) this.consents.set(record.subjectId, consent); else this.consents.delete(record.subjectId);
@@ -462,7 +484,12 @@ export class PrivacyComplianceService {
     return freeze(this.audits.map((event) => clone(event)));
   }
 
-  private now(): number { const value = this.clock(); if (!Number.isSafeInteger(value) || value < 0) fail('STORE_FAILURE', 'clock returned an invalid timestamp', false); return value; }
+  private now(): number {
+    let value: unknown;
+    try { value = this.clock(); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'clock read failed', false); }
+    if (!Number.isSafeInteger(value) || value < 0) fail('STORE_FAILURE', 'clock returned an invalid timestamp', false);
+    return value;
+  }
   private authorize(actor: PrivacyActor, subjectId: string): void {
     if (actor.kind === 'subject' && actor.subjectId !== subjectId) fail('PERMISSION_DENIED', 'subject may access only its own data');
     if (actor.kind === 'operator' && actor.token !== this.operatorToken) fail('PERMISSION_DENIED', 'operator credential is invalid');
@@ -474,6 +501,23 @@ export class PrivacyComplianceService {
     const record = safeStoreRecord(raw);
     if (record.subjectId !== subjectId) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store returned a record for another subject', false);
     return record;
+  }
+  private listStoredRecords(): readonly PrivacyDataRecord[] {
+    let raw: unknown;
+    try { raw = this.store.list(); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing failed', false); }
+    if (!Array.isArray(raw)) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing returned an invalid result', false);
+    try {
+      const records = raw.map(safeStoreRecord);
+      const subjects = new Set<string>();
+      for (const record of records) {
+        if (subjects.has(record.subjectId)) fail('STORE_FAILURE', 'privacy store returned duplicate subjects', false);
+        subjects.add(record.subjectId);
+      }
+      return records;
+    } catch (error) {
+      if (error instanceof PrivacyComplianceError) throw error;
+      throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing returned invalid records', false);
+    }
   }
   private readLiveRecord(subjectId: string): PrivacyDataRecord {
     const record = this.readStoredRecord(subjectId); if (record === null) fail('SUBJECT_NOT_FOUND', 'subject data is not available');

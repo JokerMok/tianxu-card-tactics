@@ -131,6 +131,55 @@ const removeFailureService = new ComplianceService({ store: removeFailureStore, 
 expectCode('delete fails closed when remove throws', () => removeFailureService.deleteData({ kind: 'subject', subjectId: 'delete-failure' }, { subjectId: 'delete-failure', requestId: 'delete-error' }), 'STORE_FAILURE');
 assert.equal(removeFailureService.auditLog(operator).length, 0, 'remove failure must not leave an accepted audit event');
 
+let purgeClockShouldFail = true;
+const purgeClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'purge-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 10 }]);
+const purgeClockFailureService = new ComplianceService({ store: purgeClockStore, operatorToken: OPERATOR_TOKEN, now: () => {
+  if (purgeClockShouldFail) throw new Error('purge clock offline');
+  return 10;
+} });
+expectCode('purge clock exceptions are normalized to store failure', () => purgeClockFailureService.purgeExpired(operator, 'purge-clock-failure'), 'STORE_FAILURE');
+assert.equal(purgeClockFailureService.auditLog(operator).length, 0, 'purge clock failure must not write audit or ledger state');
+purgeClockShouldFail = false;
+assert.equal(purgeClockFailureService.purgeExpired(operator, 'purge-clock-failure').purgedSubjects, 1, 'a non-recorded purge failure must be retryable with the same request ID');
+
+class OverPurgingStore extends InMemoryPrivacyDataStore {
+  purgeCalls = 0;
+  purgeExpired(now) {
+    this.purgeCalls += 1;
+    const records = this.list();
+    for (const record of records) this.remove(record.subjectId);
+    return records;
+  }
+}
+const unsafePurgeStore = new OverPurgingStore([
+  { subjectId: 'purge-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 },
+  { subjectId: 'purge-expired', data: { safe: true }, updatedAt: 1, retentionUntil: 100 },
+]);
+const unsafePurgeService = new ComplianceService({ store: unsafePurgeStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+expectCode('purge must fail closed when the store deletes an unexpired subject', () => unsafePurgeService.purgeExpired(operator, 'purge-overreach'), 'STORE_FAILURE');
+assert.deepEqual(unsafePurgeStore.read('purge-live'), { subjectId: 'purge-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 }, 'over-deletion must be restored where possible');
+assert.deepEqual(unsafePurgeStore.read('purge-expired'), { subjectId: 'purge-expired', data: { safe: true }, updatedAt: 1, retentionUntil: 100 }, 'failed purge must restore the expired snapshot too');
+assert.equal(unsafePurgeService.auditLog(operator).length, 0, 'over-deletion must not leave accepted audit events');
+expectCode('over-deletion must not become a false-success replay', () => unsafePurgeService.purgeExpired(operator, 'purge-overreach'), 'STORE_FAILURE');
+assert.equal(unsafePurgeStore.purgeCalls, 2, 'failed purge requests must be retried rather than replayed as success');
+
+class CountingPurgeStore extends InMemoryPrivacyDataStore {
+  purgeCalls = 0;
+  purgeExpired(now) {
+    this.purgeCalls += 1;
+    return super.purgeExpired(now);
+  }
+}
+const legalPurgeStore = new CountingPurgeStore([
+  { subjectId: 'legal-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 },
+  { subjectId: 'legal-expired', data: { safe: true }, updatedAt: 1, retentionUntil: 100 },
+]);
+const legalPurgeService = new ComplianceService({ store: legalPurgeStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+assert.equal(legalPurgeService.purgeExpired(operator, 'purge-legal').purgedSubjects, 1, 'legal expired cleanup must remove only expired subjects');
+assert.deepEqual(legalPurgeStore.read('legal-live'), { subjectId: 'legal-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 }, 'legal purge must preserve unexpired data');
+assert.equal(legalPurgeService.purgeExpired(operator, 'purge-legal').replayed, true, 'legal purge must be idempotent');
+assert.equal(legalPurgeStore.purgeCalls, 1, 'idempotent purge replay must not call the time-dependent store operation again');
+
 let auditClockCalls = 0;
 const auditClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'audit-clock', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }]);
 const auditClockFailureService = new ComplianceService({ store: auditClockStore, operatorToken: OPERATOR_TOKEN, now: () => { auditClockCalls += 1; if (auditClockCalls === 3) throw new Error('audit clock offline'); return 100 + auditClockCalls; } });
