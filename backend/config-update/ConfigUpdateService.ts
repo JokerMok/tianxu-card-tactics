@@ -117,11 +117,13 @@ export interface ConfigUpdateServiceOptions {
 }
 
 interface StoredRequest {
+  operation: ConfigAuditEvent['event'];
   fingerprint: string;
   result: PublishConfigResult | FetchConfigResult | RollbackConfigResult;
 }
 
 interface StoredError {
+  operation: ConfigAuditEvent['event'];
   fingerprint: string;
   code: ConfigUpdateErrorCode;
   message: string;
@@ -373,11 +375,11 @@ export class ConfigUpdateService {
       this.history.set(scope, versions);
       this.active.set(scope, bundle);
       const result: PublishConfigResult = { accepted: true, replayed: false, bundle: clone(bundle) };
-      this.requests.set(requestId, { fingerprint: requestFingerprint, result });
+      this.requests.set(requestId, { operation: 'publish', fingerprint: requestFingerprint, result });
       this.recordAudit({ event: 'publish', requestId, actorId, configKey: bundle.configKey, version: bundle.version, outcome: 'accepted' });
       return clone(result);
     } catch (error) {
-      if (error instanceof ConfigUpdateError) this.failedRequests.set(requestId, { fingerprint: requestFingerprint, code: error.code, message: error.message });
+      if (error instanceof ConfigUpdateError) this.failedRequests.set(requestId, { operation: 'publish', fingerprint: requestFingerprint, code: error.code, message: error.message });
       this.recordAudit({ event: 'publish', requestId, actorId, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
       throw error;
     }
@@ -409,10 +411,10 @@ export class ConfigUpdateService {
     }
     if (clientId !== subjectId || clientVersion !== resolvedClientVersion) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'request identity does not match authenticated identity');
     const requestFingerprint = fingerprint({ configKey, tenantId, subjectId, clientVersion: resolvedClientVersion, available: identity.available, blocked: identity.blocked });
-    if (identity.blocked) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'CLIENT_BLOCKED' }, configKey, 'CLIENT_BLOCKED');
-    if (!identity.available) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'SESSION_UNAVAILABLE' }, configKey, 'SESSION_UNAVAILABLE');
     const replay = this.replay<FetchConfigResult>(requestId, requestFingerprint, 'fetch', configKey);
     if (replay) return replay;
+    if (identity.blocked) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'CLIENT_BLOCKED' }, configKey, 'CLIENT_BLOCKED');
+    if (!identity.available) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'SESSION_UNAVAILABLE' }, configKey, 'SESSION_UNAVAILABLE');
     const scope = scopeKey(tenantId, configKey);
     const bundle = this.active.get(scope);
     if (!bundle) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'CONFIG_NOT_FOUND' }, configKey, 'CONFIG_NOT_FOUND');
@@ -445,14 +447,14 @@ export class ConfigUpdateService {
       : versions.find((bundle) => bundle.version === targetVersion);
     if (!current || !target || compareVersions(target.version, current.version) >= 0) {
       const error = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ROLLBACK_UNAVAILABLE, 'rollback target is unavailable');
-      this.failedRequests.set(requestId, { fingerprint: requestFingerprint, code: error.code, message: error.message });
+      this.failedRequests.set(requestId, { operation: 'rollback', fingerprint: requestFingerprint, code: error.code, message: error.message });
       this.recordAudit({ event: 'rollback', requestId, actorId, configKey, outcome: 'rejected', reason: error.message });
       throw error;
     }
     this.ensureAuditCapacity();
     this.active.set(scope, target);
     const result: RollbackConfigResult = { rolledBack: true, replayed: false, bundle: clone(target) };
-    this.requests.set(requestId, { fingerprint: requestFingerprint, result });
+    this.requests.set(requestId, { operation: 'rollback', fingerprint: requestFingerprint, result });
     this.recordAudit({ event: 'rollback', requestId, actorId, configKey, version: target.version, outcome: 'accepted' });
     return clone(result);
   }
@@ -464,7 +466,7 @@ export class ConfigUpdateService {
   }
 
   private storeFetch(requestId: string, requestFingerprint: string, result: FetchConfigResult, configKey: string, reason?: string): FetchConfigResult {
-    this.requests.set(requestId, { fingerprint: requestFingerprint, result });
+    this.requests.set(requestId, { operation: 'fetch', fingerprint: requestFingerprint, result });
     this.recordAudit({ event: 'fetch', requestId, configKey, outcome: result.available ? 'accepted' : 'unavailable', ...(reason ? { reason } : {}) });
     return clone(result);
   }
@@ -473,6 +475,8 @@ export class ConfigUpdateService {
     const stored = this.requests.get(requestId);
     const failed = this.failedRequests.get(requestId);
     if (stored || failed) {
+      const operation = stored?.operation ?? failed?.operation;
+      if (operation !== event) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
       const fingerprintValue = stored?.fingerprint ?? failed?.fingerprint;
       if (fingerprintValue !== requestFingerprint) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used for another request');
       this.recordAudit({ event, requestId, configKey, outcome: 'replayed' });
