@@ -112,7 +112,9 @@ export function clone<T>(value: T): T {
 
 export function stableJson(value: unknown): string {
   const seen = new Set<object>();
-  const encode = (entry: unknown): string => {
+  let nodeCount = 0;
+  const encode = (entry: unknown, depth = 0): string => {
+    if (depth > 128 || ++nodeCount > 100_000) throw new Error('value is too deeply nested or large');
     if (entry === null) return 'null';
     if (typeof entry === 'string' || typeof entry === 'boolean') return JSON.stringify(entry);
     if (typeof entry === 'number') { if (!Number.isFinite(entry)) throw new Error('value is not finite'); return JSON.stringify(entry); }
@@ -120,12 +122,12 @@ export function stableJson(value: unknown): string {
     if (seen.has(entry)) throw new Error('value is cyclic');
     seen.add(entry);
     try {
-      if (Array.isArray(entry)) return `[${entry.map(encode).join(',')}]`;
+      if (Array.isArray(entry)) return `[${entry.map((item) => encode(item, depth + 1)).join(',')}]`;
       const object = entry as Record<string, unknown>;
       if (Object.getPrototypeOf(object) !== Object.prototype && Object.getPrototypeOf(object) !== null) throw new Error('object must be plain');
       return `{${Object.keys(object).sort().map((key) => {
         if (key === '__proto__' || key === 'constructor' || key === 'prototype') throw new Error(`unsafe key ${key}`);
-        return `${JSON.stringify(key)}:${encode(object[key])}`;
+        return `${JSON.stringify(key)}:${encode(object[key], depth + 1)}`;
       }).join(',')}}`;
     } finally { seen.delete(entry); }
   };
@@ -138,7 +140,7 @@ export function configBundleSigningBytes(bundle: ConfigBundle): string {
 }
 
 function validText(value: unknown, label: string, max = 128): string {
-  if (typeof value !== 'string' || value.length === 0 || value !== value.trim() || value.length > max) {
+  if (typeof value !== 'string' || value.length === 0 || value !== value.trim() || value.length > max || /[\u0000-\u001f\u007f]/.test(value)) {
     throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, `${label} is invalid`);
   }
   return value;

@@ -124,7 +124,9 @@ export function clone<T>(value: T): T {
 /** Stable JSON is the byte representation covered by the Ed25519 signature. */
 export function stableJson(value: unknown): string {
   const seen = new Set<object>();
-  const encode = (entry: unknown): string => {
+  let nodeCount = 0;
+  const encode = (entry: unknown, depth = 0): string => {
+    if (depth > 128 || ++nodeCount > 100_000) throw new Error('value is too deeply nested or large');
     if (entry === null) return 'null';
     if (typeof entry === 'string' || typeof entry === 'boolean') return JSON.stringify(entry);
     if (typeof entry === 'number') { if (!Number.isFinite(entry)) throw new Error('value is not finite'); return JSON.stringify(entry); }
@@ -132,12 +134,12 @@ export function stableJson(value: unknown): string {
     if (seen.has(entry)) throw new Error('value is cyclic');
     seen.add(entry);
     try {
-      if (Array.isArray(entry)) return `[${entry.map(encode).join(',')}]`;
+      if (Array.isArray(entry)) return `[${entry.map((item) => encode(item, depth + 1)).join(',')}]`;
       const object = entry as Record<string, unknown>;
       if (Object.getPrototypeOf(object) !== Object.prototype && Object.getPrototypeOf(object) !== null) throw new Error('object must be plain');
       return `{${Object.keys(object).sort().map((key) => {
         if (key === '__proto__' || key === 'constructor' || key === 'prototype') throw new Error(`unsafe key ${key}`);
-        return `${JSON.stringify(key)}:${encode(object[key])}`;
+        return `${JSON.stringify(key)}:${encode(object[key], depth + 1)}`;
       }).join(',')}}`;
     } finally { seen.delete(entry); }
   };
@@ -174,7 +176,7 @@ export function parseVersion(value: unknown): [number, number, number] {
 }
 
 function validText(value: unknown, label: string, max = 128): string {
-  if (typeof value !== 'string' || value.length === 0 || value !== value.trim() || value.length > max) {
+  if (typeof value !== 'string' || value.length === 0 || value !== value.trim() || value.length > max || /[\u0000-\u001f\u007f]/.test(value)) {
     throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, `${label} is invalid`);
   }
   return value;
@@ -321,6 +323,7 @@ export class ConfigUpdateService {
       if (latest && compareVersions(bundle.version, latest.version) <= 0) {
         throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version must increase monotonically');
       }
+      this.ensureAuditCapacity();
       versions.push(bundle);
       this.history.set(bundle.configKey, versions);
       this.active.set(bundle.configKey, bundle);
@@ -377,6 +380,7 @@ export class ConfigUpdateService {
       this.recordAudit({ event: 'rollback', requestId, actorId, configKey, outcome: 'rejected', reason: error.message });
       throw error;
     }
+    this.ensureAuditCapacity();
     this.active.set(configKey, target);
     const result: RollbackConfigResult = { rolledBack: true, replayed: false, bundle: clone(target) };
     this.requests.set(requestId, { fingerprint: requestFingerprint, result });
@@ -410,8 +414,12 @@ export class ConfigUpdateService {
   }
 
   private recordAudit(event: Omit<ConfigAuditEvent, 'eventId' | 'at'>): void {
-    if (this.audit.length >= this.maxAuditEvents) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUDIT_LIMIT, 'audit event limit reached');
+    this.ensureAuditCapacity();
     this.audit.push({ eventId: ++this.auditSequence, at: validTimestamp(this.clock(), 'now'), ...event });
+  }
+
+  private ensureAuditCapacity(): void {
+    if (this.audit.length >= this.maxAuditEvents) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUDIT_LIMIT, 'audit event limit reached');
   }
 }
 

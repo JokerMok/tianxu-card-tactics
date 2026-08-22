@@ -91,6 +91,12 @@ expectCode(() => client.apply('client-not-gray', signed({ bundleId: 'gray-off', 
 const cyclic = signed({ bundleId: 'cyclic', version: '1.4.0' });
 cyclic.payload.self = cyclic.payload;
 expectCode(() => client.apply('client-cyclic', cyclic), CLIENT_CODES.INVALID_BUNDLE);
+const deepPayload = {};
+let deepCursor = deepPayload;
+for (let depth = 0; depth < 130; depth += 1) { deepCursor.next = {}; deepCursor = deepCursor.next; }
+const deepBundle = signed({ bundleId: 'deep', version: '1.4.1' });
+deepBundle.payload = deepPayload;
+expectCode(() => client.apply('client-deep', deepBundle), CLIENT_CODES.INVALID_BUNDLE);
 failActivation = true;
 const failed = signed({ bundleId: 'bundle-5', version: '1.4.0', payload: { damageMultiplier: 1.4, source: 'new' } });
 expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.ACTIVATION_FAILED);
@@ -114,4 +120,9 @@ assert.equal(rolloutBucketForRegression(), clientRolloutBucket('combat.balance',
 function rolloutBucketForRegression() { return 4; }
 assert.equal(new BackendError(BACKEND_CODES.INVALID_REQUEST).name, 'ConfigUpdateError');
 assert.equal(new ClientError(CLIENT_CODES.INVALID_REQUEST).name, 'ConfigUpdateError');
+expectCode(() => new ConfigUpdateClientService({ clientId: 'player-1\nlog-injection', clientVersion: '1.0.0', verifySignature }), CLIENT_CODES.INVALID_REQUEST);
+const limited = new BackendConfigUpdateService({ now: () => now, verifySignature, maxAuditEvents: 1 });
+limited.publish({ requestId: 'limited-1', actorId: 'ops', bundle: signed({ configKey: 'limited', bundleId: 'limited-1', version: '1.0.0' }) });
+expectCode(() => limited.publish({ requestId: 'limited-2', actorId: 'ops', bundle: signed({ configKey: 'limited', bundleId: 'limited-2', version: '1.1.0' }) }), BACKEND_CODES.AUDIT_LIMIT);
+assert.equal(limited.snapshot().history.flat().length, 1, 'audit exhaustion must not partially publish a bundle');
 console.log('PASS config hot update: signature/version/gray/min-version/rollback/idempotency/audit/boundaries');
