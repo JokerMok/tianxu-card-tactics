@@ -21,9 +21,13 @@ export class AnalyticsClient {
   track(input: AnalyticsEventInput): AnalyticsEvent { const event = createAnalyticsEvent(input); const existing = this.queue.find((item) => item.eventId === event.eventId); if (existing && canonicalJson(existing) !== canonicalJson(event)) throw new Error('eventId payload conflict'); if (!existing) this.queue.push(event); return cloneAnalyticsEvent(event); }
   trackBatch(inputs: readonly AnalyticsEventInput[]): readonly AnalyticsEvent[] {
     if (!Array.isArray(inputs) || inputs.length === 0 || inputs.length > ANALYTICS_MAX_BATCH_SIZE) throw new Error('analytics batch is too large');
-    const events = inputs.map(createAnalyticsEvent); const pendingIds = new Set(this.queue.map(({ eventId }) => eventId)); const batchIds = new Set<string>();
-    for (const event of events) { if (batchIds.has(event.eventId) || pendingIds.has(event.eventId)) continue; batchIds.add(event.eventId); }
-    this.queue.push(...events.filter((event) => batchIds.has(event.eventId))); return Object.freeze(events.map(cloneAnalyticsEvent));
+    const events = inputs.map(createAnalyticsEvent); const pending = new Map(this.queue.map((event) => [event.eventId, event])); const unique: AnalyticsEvent[] = [];
+    for (const event of events) {
+      const existing = pending.get(event.eventId);
+      if (existing) { if (canonicalJson(existing) !== canonicalJson(event)) throw new Error('eventId payload conflict'); continue; }
+      pending.set(event.eventId, event); unique.push(event);
+    }
+    this.queue.push(...unique); return Object.freeze(unique.map(cloneAnalyticsEvent));
   }
   pending(): readonly AnalyticsEvent[] { return Object.freeze(this.queue.map(cloneAnalyticsEvent)); }
   async flush(): Promise<AnalyticsFlushResult> {
