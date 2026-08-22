@@ -38,6 +38,23 @@ const { CARD_SHOP_CONFIG } = await import('../assets/scripts/meta/shop/shop-conf
 
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
 
+function forgeBankruptcyHistory(snapshot, bankrupt, mandatoryCost) {
+    const originalCredits = snapshot.balances.credits;
+    const mandatoryCostEvent = `consume:credits:${mandatoryCost}`;
+    const events = snapshot.lastEvents.filter((event) => event !== mandatoryCostEvent && event !== 'bankruptcy-boundary');
+    events.push(bankrupt ? 'bankruptcy-boundary' : mandatoryCostEvent);
+    const latestAdvance = snapshot.processedCommands.find((item) => item.result.type === 'advance-day' && item.result.day === snapshot.day);
+    assert.ok(latestAdvance, 'snapshot must contain the latest successful advance');
+    snapshot.bankrupt = bankrupt;
+    snapshot.lastEvents = events;
+    latestAdvance.result.events = events;
+    const ledgerDelta = bankrupt ? 1 : mandatoryCost;
+    snapshot.ledger.produced.credits += ledgerDelta;
+    snapshot.ledger.consumed.credits += ledgerDelta;
+    assert.equal(snapshot.balances.credits, originalCredits, 'bankruptcy history forgery must not change credits');
+    return snapshot;
+}
+
 function assertConservation(state, label) {
     for (const [resourceId, balance] of Object.entries(state.balances)) {
         assert.equal(Number.isSafeInteger(balance) && balance >= 0, true, `${label}: ${resourceId} must be non-negative`);
@@ -161,6 +178,7 @@ function assertIdempotency() {
     const lowSnapshot = {
         ...low,
         balances: lowBalances,
+        bankrupt: true,
         ledger: { ...low.ledger, consumed: lowConsumed },
         expeditionSnapshot: { ...low.expeditionSnapshot, resources: { ...low.expeditionSnapshot.resources, crystal: 0 } },
         shopSnapshot: { ...low.shopSnapshot, balances: { coins: 0, crystals: 0 } },
@@ -230,7 +248,14 @@ function assertAdversarialBoundaries() {
 
     const tamperedSolventBankruptcy = clone(checkpoint);
     tamperedSolventBankruptcy.bankrupt = true;
-    assert.throws(() => EconomyService.fromSnapshot(tamperedSolventBankruptcy), /bankruptcy state/, 'restore must reject a forged solvent bankruptcy flag');
+    assert.throws(() => EconomyService.fromSnapshot(tamperedSolventBankruptcy), /current credit boundary/, 'restore must reject a forged solvent bankruptcy flag');
+
+    const forgedSolventBankruptcy = forgeBankruptcyHistory(
+        clone(checkpoint),
+        true,
+        ECONOMY_CONFIG.mandatoryCreditCost,
+    );
+    assert.throws(() => EconomyService.fromSnapshot(forgedSolventBankruptcy), /current credit boundary/, 'forged solvent bankruptcy history must not override the current credit boundary');
 
     const tamperedNested = clone(checkpoint);
     tamperedNested.shopSnapshot.listings[0].unexpected = true;
@@ -253,9 +278,22 @@ function assertAdversarialBoundaries() {
     assert.equal(restoredBankrupt.snapshot().bankrupt, true, 'real bankruptcy must survive fromSnapshot and its internal re-assert');
     const constructorRestoredBankrupt = new EconomyService({ config: bankruptConfig, snapshot: bankruptService.snapshot() });
     assert.equal(constructorRestoredBankrupt.snapshot().bankrupt, true, 'real bankruptcy must survive constructor restore and its second assert');
+    const recovered = restoredBankrupt.advanceDay(2, 'real-bankruptcy-recovery');
+    assert.equal(recovered.status, 'success', 'restored bankruptcy must accept the next advance');
+    assert.equal(restoredBankrupt.snapshot().bankrupt, false, 'restored bankruptcy must recover when the current balance crosses the boundary');
+    assert.equal(restoredBankrupt.snapshot().balances.credits >= bankruptConfig.mandatoryCreditCost, true, 'recovery must cross the mandatory credit boundary');
+    assertConservation(restoredBankrupt.snapshot(), 'restored bankruptcy recovery');
+
     const tamperedBankruptcy = bankruptService.snapshot();
     tamperedBankruptcy.bankrupt = false;
-    assert.throws(() => EconomyService.fromSnapshot(tamperedBankruptcy, bankruptConfig), /bankruptcy state/, 'restore must reject a forged bankrupt recovery flag');
+    assert.throws(() => EconomyService.fromSnapshot(tamperedBankruptcy, bankruptConfig), /current credit boundary/, 'restore must reject a forged bankrupt recovery flag');
+
+    const forgedBankruptRecovery = forgeBankruptcyHistory(
+        bankruptService.snapshot(),
+        false,
+        bankruptConfig.mandatoryCreditCost,
+    );
+    assert.throws(() => EconomyService.fromSnapshot(forgedBankruptRecovery, bankruptConfig), /current credit boundary/, 'forged bankrupt recovery history must not override the current credit boundary');
 }
 
 assertScope();

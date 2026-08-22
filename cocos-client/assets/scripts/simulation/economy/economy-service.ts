@@ -155,6 +155,10 @@ function expectedPriceIndex(config: EconomyConfig, day: number): Record<string, 
     }));
 }
 
+function isBankruptBoundary(day: number, balances: Readonly<Record<string, number>>, config: EconomyConfig): boolean {
+    return day > 0 && balances.credits < config.mandatoryCreditCost;
+}
+
 function currentConfigResourceIds(config: EconomyConfig): string[] {
     return config.resources.map((resource) => resource.id).sort();
 }
@@ -373,6 +377,8 @@ function assertState(raw: unknown, config: EconomyConfig): EconomyState {
     const ledger = validateLedger(raw.ledger, resourceIds);
     if (!isSafeInteger(raw.seed) || !isSafeInteger(raw.day) || raw.day > config.simulationDays) throw new Error('economy snapshot clock is invalid');
     assertLedgerInitial(ledger, config);
+    const expectedBankrupt = isBankruptBoundary(raw.day, balances, config);
+    if (raw.bankrupt !== expectedBankrupt) throw new Error('bankruptcy state does not match the current credit boundary');
     const cards = validateResourceMap(raw.cards, CARD_SHOP_CONFIG.cards.map((card) => card.id), 'economy cards');
     const expectedBuildings = new Set(config.buildings.map((building) => building.id));
     if (!isRecord(raw.buildings) || Object.keys(raw.buildings).length !== expectedBuildings.size || Object.keys(raw.buildings).some((id) => !expectedBuildings.has(id))) throw new Error('economy snapshot buildings are invalid');
@@ -455,17 +461,13 @@ function assertState(raw: unknown, config: EconomyConfig): EconomyState {
     if (taskCounts.expedition_claim !== claimedExpeditionNumbers.length) throw new Error('expedition dispatch history does not match task history');
     const latestAdvance = successfulAdvances[successfulAdvances.length - 1];
     if (raw.day === 0) {
-        if (raw.bankrupt !== false || raw.lastEvents.length !== 0 || latestAdvance !== undefined) throw new Error('bankruptcy state is invalid at day 0');
+        if (raw.lastEvents.length !== 0 || latestAdvance !== undefined) throw new Error('bankruptcy state is invalid at day 0');
     } else {
         if (latestAdvance === undefined || latestAdvance.result.day !== raw.day || canonicalJson(raw.lastEvents) !== canonicalJson(latestAdvance.result.events)) {
             throw new Error('bankruptcy state does not match the latest economy history');
         }
         const mandatoryCostEvent = `consume:credits:${config.mandatoryCreditCost}`;
         const paidMandatoryCost = raw.lastEvents.includes(mandatoryCostEvent);
-        const expectedBankrupt = !paidMandatoryCost;
-        if (raw.bankrupt !== expectedBankrupt || (expectedBankrupt && !raw.lastEvents.includes('bankruptcy-boundary'))) {
-            throw new Error('bankruptcy state does not match the mandatory-cost boundary');
-        }
         if (paidMandatoryCost && ledger.consumed.credits < config.mandatoryCreditCost) {
             throw new Error('bankruptcy state is inconsistent with the credit ledger');
         }
@@ -680,11 +682,7 @@ export class EconomyService {
         const openingCreditShortfall = this.balance('credits') < this.config.mandatoryCreditCost;
         this.produce({ credits: this.config.dailyCreditIncome, stamina: this.config.dailyStaminaIncome }, events);
         if (openingCreditShortfall) events.push('bankruptcy-boundary');
-        if (!this.consume({ credits: this.config.mandatoryCreditCost }, events)) {
-            this.state.bankrupt = true;
-        } else {
-            this.state.bankrupt = false;
-        }
+        this.consume({ credits: this.config.mandatoryCreditCost }, events);
         for (const building of this.config.buildings) {
             const level = this.state.buildings[building.id];
             const scaledYield = Object.fromEntries(Object.entries(building.dailyYield).map(([id, quantity]) => [id, multiplySafe(quantity, level)]));
@@ -752,6 +750,7 @@ export class EconomyService {
         this.state.equipmentSnapshot = this.syncCraftingService().snapshot();
         this.state.expeditionSnapshot = this.syncExpeditionService().snapshot();
         this.state.shopSnapshot = this.syncShopService().snapshot();
+        this.state.bankrupt = isBankruptBoundary(this.state.day, this.state.balances, this.config);
         this.state.lastEvents = events;
         return { status: 'success', requestId: command.requestId, type: command.type, day: this.state.day, events, reason: null };
     }
