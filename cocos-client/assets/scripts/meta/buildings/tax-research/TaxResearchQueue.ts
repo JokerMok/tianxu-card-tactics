@@ -89,6 +89,20 @@ function exactKeys(value: Record<string, unknown>, expected: readonly string[], 
   }
 }
 
+function entrySequence(entry: Record<string, unknown>, researchId: string, targetLevel: number, index: number): number {
+  const prefix = `${researchId}:L${targetLevel}:Q`;
+  if (typeof entry.id !== 'string' || !entry.id.startsWith(prefix)) {
+    throw new Error(`tax research queue entry ${index} id is invalid`);
+  }
+  const sequenceText = entry.id.slice(prefix.length);
+  if (!/^[1-9]\d*$/.test(sequenceText)) throw new Error(`tax research queue entry ${index} id is invalid`);
+  const sequence = Number(sequenceText);
+  if (!Number.isSafeInteger(sequence) || String(sequence) !== sequenceText) {
+    throw new Error(`tax research queue entry ${index} id is invalid`);
+  }
+  return sequence;
+}
+
 function validResourceMap(resources: unknown, config: TaxResearchConfig): resources is TaxResearchResources {
   if (!isRecord(resources)) return false;
   const expected = config.buildingConfig.resources.map((resource) => resource.id);
@@ -177,22 +191,30 @@ export function assertTaxResearchState(state: unknown, config: TaxResearchConfig
   if (state.lastTaxClaimDay !== null && !isSafeInteger(state.lastTaxClaimDay)) throw new Error('tax research tax day is invalid');
   const entryIds = new Set<string>();
   const researchIdsInQueue = new Set<string>();
+  let previousSequence: number | null = null;
   state.queue.forEach((entry, index) => {
     if (!isRecord(entry)) throw new Error(`tax research queue entry ${index} is invalid`);
     exactKeys(entry, ['id', 'researchId', 'fromLevel', 'targetLevel', 'cost', 'durationMs', 'startAtMs', 'finishAtMs'], `tax research queue entry ${index}`);
-    if (typeof entry.id !== 'string' || entry.id.length === 0 || entryIds.has(entry.id)) throw new Error(`tax research queue entry ${index} id is invalid`);
     const research = findResearch(config, entry.researchId as string);
     const upgrade = findResearchUpgrade(config, entry.researchId as string, entry.targetLevel as number);
     if (!research || !upgrade || researchIdsInQueue.has(entry.researchId as string)) throw new Error(`tax research queue entry ${index} research is invalid`);
     if (entry.fromLevel !== state.researchLevels[entry.researchId as string]) throw new Error(`tax research queue entry ${index} fromLevel is invalid`);
     if (!isSafeInteger(entry.fromLevel, research.initialLevel) || !isSafeInteger(entry.targetLevel, entry.fromLevel + 1) || entry.targetLevel > research.maxLevel) throw new Error(`tax research queue entry ${index} level is invalid`);
+    const sequence = entrySequence(entry, research.id, entry.targetLevel as number, index);
+    if (entryIds.has(entry.id as string) || sequence >= state.nextSequence || (previousSequence !== null && (sequence <= previousSequence || sequence !== previousSequence + 1))) {
+      throw new Error(`tax research queue entry ${index} id sequence is invalid`);
+    }
     if (!validCostMap(entry.cost, config) || Object.keys(entry.cost).length !== Object.keys(upgrade.cost).length || Object.keys(entry.cost).some((resourceId) => entry.cost[resourceId] !== upgrade.cost[resourceId])) throw new Error(`tax research queue entry ${index} cost is invalid`);
     if (!allPrerequisitesMet(state.buildingLevels, state.researchLevels, upgrade.prerequisites)) throw new Error(`tax research queue entry ${index} prerequisite is invalid`);
-    if (entry.durationMs !== upgrade.durationMs || !isSafeInteger(entry.startAtMs) || !isSafeInteger(entry.finishAtMs) || entry.finishAtMs <= entry.startAtMs) throw new Error(`tax research queue entry ${index} timing is invalid`);
+    if (entry.durationMs !== upgrade.durationMs || !isSafeInteger(entry.startAtMs) || !isSafeInteger(entry.finishAtMs) || !Number.isSafeInteger(entry.startAtMs + entry.durationMs) || entry.finishAtMs !== entry.startAtMs + entry.durationMs || entry.finishAtMs <= state.lastUpdatedAtMs) {
+      throw new Error(`tax research queue entry ${index} timing is invalid`);
+    }
     if (index > 0 && entry.startAtMs < state.queue[index - 1].finishAtMs) throw new Error(`tax research queue entry ${index} overlaps previous entry`);
     entryIds.add(entry.id);
     researchIdsInQueue.add(entry.researchId as string);
+    previousSequence = sequence;
   });
+  if (state.queue.length > 0 && previousSequence !== null && state.nextSequence !== previousSequence + 1) throw new Error('tax research queue nextSequence is invalid');
 }
 
 export function createInitialTaxResearchState(

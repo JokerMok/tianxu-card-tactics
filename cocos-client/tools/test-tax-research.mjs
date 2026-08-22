@@ -106,6 +106,14 @@ function checkConfigLoadingAndCrossTables() {
   unknownResearch.researches[2].upgrades[0].prerequisites[1].researchId = 'missing';
   expectConfigFailure('unknown research prerequisite', () => loadTaxResearchConfig(unknownResearch, buildingConfig, 'fixture'), 'researchId');
 
+  const impossibleResearch = structuredClone(rawConfig);
+  impossibleResearch.researches[2].upgrades[0].prerequisites[1].requiredLevel = 3;
+  expectConfigFailure('research prerequisite above referenced max', () => loadTaxResearchConfig(impossibleResearch, buildingConfig, 'fixture'), 'requiredLevel');
+
+  const cyclicResearch = structuredClone(rawConfig);
+  cyclicResearch.researches[0].upgrades[0].prerequisites.push({ type: 'research', researchId: 'construction-speed', requiredLevel: 1 });
+  expectConfigFailure('cyclic research prerequisite', () => loadTaxResearchConfig(cyclicResearch, buildingConfig, 'fixture'), 'researches');
+
   const unknownEffect = structuredClone(rawConfig);
   unknownEffect.researches[0].upgrades[0].effects[0].effectId = 'GUILD_SUCCESS_RATE_BPS';
   expectConfigFailure('unmigrated guild effect', () => loadTaxResearchConfig(unknownEffect, buildingConfig, 'fixture'), 'effectId');
@@ -195,6 +203,42 @@ function checkResearchSuccessFailureAndBoundaries() {
   const extraSnapshotKey = JSON.parse(serialized);
   extraSnapshotKey.extra = true;
   assert.throws(() => deserializeTaxResearchState(JSON.stringify(extraSnapshotKey), config), /tax research state shape is invalid/);
+
+  const wrongFinish = JSON.parse(serialized);
+  wrongFinish.queue[0].finishAtMs -= 1;
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(wrongFinish), config), /timing is invalid/, 'finishAtMs must equal startAtMs plus durationMs');
+
+  const completedAtSnapshot = JSON.parse(serialized);
+  completedAtSnapshot.lastUpdatedAtMs = completedAtSnapshot.queue[0].finishAtMs;
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(completedAtSnapshot), config), /timing is invalid/, 'queued entries must finish after lastUpdatedAtMs');
+
+  const outOfOrder = JSON.parse(serializeTaxResearchState(queuedForge.state, config));
+  [outOfOrder.queue[0], outOfOrder.queue[1]] = [outOfOrder.queue[1], outOfOrder.queue[0]];
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(outOfOrder), config), /overlaps previous entry|id sequence is invalid/, 'queue order must be preserved');
+
+  const malformedId = JSON.parse(serialized);
+  malformedId.queue[0].id = 'alchemy-success:L1:Q01';
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(malformedId), config), /id is invalid/, 'entry IDs must use canonical sequence text');
+
+  const sequenceAhead = JSON.parse(serialized);
+  sequenceAhead.queue[0].id = 'alchemy-success:L1:Q2';
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(sequenceAhead), config), /id sequence is invalid/, 'entry sequence must be below nextSequence');
+
+  const sequenceGap = JSON.parse(serialized);
+  sequenceGap.nextSequence = 4;
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(sequenceGap), config), /nextSequence is invalid/, 'nextSequence must follow the last queued sequence');
+
+  const unsafeSequence = JSON.parse(serialized);
+  unsafeSequence.queue[0].id = 'alchemy-success:L1:Q9007199254740992';
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(unsafeSequence), config), /id is invalid/, 'entry sequence must be a safe integer');
+
+  const unsafeNextSequence = JSON.parse(serialized);
+  unsafeNextSequence.nextSequence = Number.MAX_SAFE_INTEGER + 1;
+  assert.throws(() => deserializeTaxResearchState(JSON.stringify(unsafeNextSequence), config), /clock is invalid/, 'nextSequence must be a safe integer');
+
+  const sequenceLimitState = deserializeTaxResearchState(serializeTaxResearchState(secondDone.state, config), config);
+  sequenceLimitState.nextSequence = Number.MAX_SAFE_INTEGER;
+  failed(enqueueResearch(sequenceLimitState, config, 'forge-success', 60000), 'INVALID_TIME');
 
   const run = () => {
     let state = initialState({ castle: 3, alchemy: 3, forge: 2 }, resources());

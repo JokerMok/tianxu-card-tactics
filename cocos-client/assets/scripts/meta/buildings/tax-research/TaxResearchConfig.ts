@@ -172,8 +172,8 @@ function validatePrerequisite(
   configPath: string,
   buildingConfig: BuildingConfig,
   researchIds: ReadonlySet<string>,
+  researchMaxLevels: ReadonlyMap<string, number>,
   currentResearchId: string,
-  targetLevel: number,
 ): ResearchPrerequisite {
   if (!isRecord(value)) throw new TaxResearchConfigError(configPath, '必须是 object');
   const type = stringField(value, 'type', configPath);
@@ -196,12 +196,39 @@ function validatePrerequisite(
       throw new TaxResearchConfigError(pathKey(configPath, 'researchId'), '研究不能以前置方式引用自身');
     }
     const requiredLevel = integerField(value, 'requiredLevel', configPath, 1);
-    if (requiredLevel >= targetLevel && researchId === currentResearchId) {
-      throw new TaxResearchConfigError(pathKey(configPath, 'requiredLevel'), '本研究前置等级不合法');
+    const referencedMaxLevel = researchMaxLevels.get(researchId);
+    if (referencedMaxLevel !== undefined && requiredLevel > referencedMaxLevel) {
+      throw new TaxResearchConfigError(pathKey(configPath, 'requiredLevel'), '不能超过被引用研究的 maxLevel');
     }
     return { type: 'research', researchId, requiredLevel };
   }
   throw new TaxResearchConfigError(pathKey(configPath, 'type'), '必须是 building 或 research');
+}
+
+function assertResearchDependenciesAcyclic(
+  dependencies: ReadonlyMap<string, ReadonlySet<string>>,
+  configPath: string,
+): void {
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+  const path: string[] = [];
+
+  const visit = (researchId: string): void => {
+    if (visiting.has(researchId)) {
+      const cycleStart = path.indexOf(researchId);
+      const cycle = [...path.slice(cycleStart), researchId].join(' -> ');
+      throw new TaxResearchConfigError(configPath, `研究前置不能形成环: ${cycle}`);
+    }
+    if (visited.has(researchId)) return;
+    visiting.add(researchId);
+    path.push(researchId);
+    for (const dependency of dependencies.get(researchId) ?? []) visit(dependency);
+    path.pop();
+    visiting.delete(researchId);
+    visited.add(researchId);
+  };
+
+  for (const researchId of dependencies.keys()) visit(researchId);
 }
 
 export function assertTaxResearchConfig(
@@ -269,6 +296,7 @@ export function assertTaxResearchConfig(
     throw new TaxResearchConfigError(researchesPath, '必须是非空 array');
   }
   const researchIds = new Set<string>();
+  const researchMaxLevels = new Map<string, number>();
   value.researches.forEach((rawResearch, index) => {
     const researchPath = `${researchesPath}[${index}]`;
     if (!isRecord(rawResearch)) throw new TaxResearchConfigError(researchPath, '必须是 object');
@@ -276,9 +304,13 @@ export function assertTaxResearchConfig(
     if (typeof id === 'string' && id.length > 0 && id === id.trim()) {
       if (researchIds.has(id)) throw new TaxResearchConfigError(pathKey(researchPath, 'id'), `重复研究 ID: ${id}`);
       researchIds.add(id);
+      if (Number.isSafeInteger(rawResearch.maxLevel) && (rawResearch.maxLevel as number) >= 1) {
+        researchMaxLevels.set(id, rawResearch.maxLevel as number);
+      }
     }
   });
   const effectIds = new Set<ResearchEffectId>(['ALCHEMY_SUCCESS_RATE_BPS', 'FORGE_SUCCESS_RATE_BPS', 'BUILDING_SPEED_BPS']);
+  const researchDependencies = new Map<string, Set<string>>([...researchIds].map((researchId) => [researchId, new Set<string>()]));
   value.researches.forEach((rawResearch, index) => {
     const researchPath = `${researchesPath}[${index}]`;
     if (!isRecord(rawResearch)) throw new TaxResearchConfigError(researchPath, '必须是 object');
@@ -303,12 +335,13 @@ export function assertTaxResearchConfig(
       const prerequisiteKeys = new Set<string>();
       rawUpgrade.prerequisites.forEach((rawPrerequisite, prerequisiteIndex) => {
         const prerequisitePath = `${prerequisitesPath}[${prerequisiteIndex}]`;
-        const prerequisite = validatePrerequisite(rawPrerequisite, prerequisitePath, buildingConfig, researchIds, id, targetLevel);
+        const prerequisite = validatePrerequisite(rawPrerequisite, prerequisitePath, buildingConfig, researchIds, researchMaxLevels, id);
         const key = prerequisite.type === 'building'
           ? `building:${prerequisite.buildingId}:${prerequisite.requiredLevel}`
           : `research:${prerequisite.researchId}:${prerequisite.requiredLevel}`;
         if (prerequisiteKeys.has(key)) throw new TaxResearchConfigError(prerequisitePath, '前置不能重复');
         prerequisiteKeys.add(key);
+        if (prerequisite.type === 'research') researchDependencies.get(id)?.add(prerequisite.researchId);
       });
       const effectsPath = pathKey(upgradePath, 'effects');
       if (!Array.isArray(rawUpgrade.effects) || rawUpgrade.effects.length === 0) {
@@ -328,6 +361,7 @@ export function assertTaxResearchConfig(
       });
     });
   });
+  assertResearchDependenciesAcyclic(researchDependencies, researchesPath);
 }
 
 export function loadTaxResearchConfig(value: unknown, buildingConfig: BuildingConfig, configPath = 'meta/buildings/tax-research/tax-research-config'): TaxResearchConfig {
