@@ -1,5 +1,4 @@
 import {
-  REPUTATION_SCHEMA_VERSION,
   ReputationCatalog,
   restoreReputationState,
   type ReputationState,
@@ -12,7 +11,6 @@ import {
 import {
   ReputationShopConfigError,
   loadReputationShopConfig,
-  REPUTATION_SHOP_SCHEMA_VERSION,
   type ReputationShopConfig,
   type ReputationShopItem,
   type ReputationShopReward,
@@ -38,9 +36,25 @@ export type ReputationShopRefreshLedgerEntry = Readonly<{
   refreshId: string;
 }>;
 
+export type ReputationShopBalanceLedgerEntry = Readonly<{
+  sequence: number;
+  kind: 'INITIAL' | 'PURCHASE' | 'REFRESH';
+  referenceId: string;
+  delta: number;
+  balanceAfter: number;
+}>;
+
+const REPUTATION_SHOP_STATE_SCHEMA_VERSION = 2 as const;
+const BALANCE_WITNESS_VERSION = 'v1' as const;
+// This key is deliberately outside the serialized state. It is a tamper witness for saves,
+// not a claim that a modified client executable is a trusted accounting authority.
+const BALANCE_WITNESS_KEY = 't238-reputation-shop-balance-witness-20260822';
+
 export type ReputationShopState = Readonly<{
-  schemaVersion: typeof REPUTATION_SHOP_SCHEMA_VERSION;
+  schemaVersion: typeof REPUTATION_SHOP_STATE_SCHEMA_VERSION;
   balance: number;
+  balanceLedger: readonly ReputationShopBalanceLedgerEntry[];
+  balanceWitness: string;
   reputationState: ReputationState;
   inventory: Readonly<Record<string, number>>;
   purchased: Readonly<Record<string, number>>;
@@ -145,6 +159,67 @@ function assertBusinessKey(value: unknown, path: string): asserts value is strin
 
 function assertStateBusinessKey(value: unknown, path: string): asserts value is string {
   if (typeof value !== 'string' || value.length === 0 || value.trim() !== value) fail('INVALID_STATE', `${path} is invalid`);
+}
+
+function fnv1a(value: string, seed: number): string {
+  let hash = seed >>> 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+}
+
+function canonicalMap(value: Readonly<Record<string, string | number>>): string {
+  return Object.entries(value)
+    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+    .map(([key, child]) => `${JSON.stringify(key)}:${JSON.stringify(child)}`)
+    .join(',');
+}
+
+function canonicalPurchaseLedger(value: readonly ReputationShopPurchaseLedgerEntry[]): string {
+  return value.map((entry) => JSON.stringify([entry.sequence, entry.purchaseId, entry.fingerprint])).join(';');
+}
+
+function canonicalRefreshLedger(value: readonly ReputationShopRefreshLedgerEntry[]): string {
+  return value.map((entry) => JSON.stringify([entry.sequence, entry.refreshId])).join(';');
+}
+
+function canonicalBalanceLedger(value: readonly ReputationShopBalanceLedgerEntry[]): string {
+  return value.map((entry) => JSON.stringify([
+    entry.sequence,
+    entry.kind,
+    entry.referenceId,
+    entry.delta,
+    entry.balanceAfter,
+  ])).join(';');
+}
+
+type BalanceWitnessInput = Pick<ReputationShopState, 'balance' | 'balanceLedger' | 'processedPurchases' | 'purchaseLedger' | 'purchased' | 'inventory' | 'processedRefreshes' | 'refreshLedger'>;
+
+function balanceWitness(value: BalanceWitnessInput): string {
+  const payload = [
+    BALANCE_WITNESS_VERSION,
+    String(value.balance),
+    canonicalBalanceLedger(value.balanceLedger),
+    canonicalPurchaseLedger(value.purchaseLedger),
+    canonicalRefreshLedger(value.refreshLedger),
+    canonicalMap(value.processedPurchases),
+    canonicalMap(value.processedRefreshes),
+    canonicalMap(value.purchased),
+    canonicalMap(value.inventory),
+  ].join('|');
+  const keyedPayload = `${BALANCE_WITNESS_KEY}|${payload}`;
+  return `${BALANCE_WITNESS_VERSION}.${[
+    fnv1a(keyedPayload, 0x811c9dc5),
+    fnv1a(`${keyedPayload}|${BALANCE_WITNESS_KEY}`, 0x9e3779b9),
+    fnv1a(`${BALANCE_WITNESS_KEY}|${keyedPayload}`, 0x85ebca6b),
+    fnv1a(`${payload}|${BALANCE_WITNESS_KEY}|${payload}`, 0xc2b2ae35),
+  ].join('')}`;
+}
+
+function sealBalanceWitness(value: Omit<ReputationShopState, 'balanceWitness'>): ReputationShopState {
+  return { ...value, balanceWitness: balanceWitness(value) };
 }
 
 function hasOwn(record: Readonly<Record<string, unknown>>, key: string): boolean {
@@ -270,6 +345,83 @@ function assertRefreshLedger(
   }
 }
 
+function assertBalanceLedger(
+  value: unknown,
+  config: ReputationShopConfig,
+  balance: number,
+  purchaseLedger: readonly ReputationShopPurchaseLedgerEntry[],
+  refreshLedger: readonly ReputationShopRefreshLedgerEntry[],
+  processedPurchases: Readonly<Record<string, string>>,
+  processedRefreshes: Readonly<Record<string, string>>,
+  purchased: Readonly<Record<string, number>>,
+  inventory: Readonly<Record<string, number>>,
+  balanceWitnessValue: unknown,
+): void {
+  if (!Array.isArray(value) || value.length !== purchaseLedger.length + refreshLedger.length + 1) {
+    fail('INVALID_STATE', 'balance ledger does not cover all account events');
+  }
+  const purchaseIds = new Set(purchaseLedger.map((entry) => entry.purchaseId));
+  const refreshIds = new Set(refreshLedger.map((entry) => entry.refreshId));
+  const seenPurchases = new Set<string>();
+  const seenRefreshes = new Set<string>();
+  let runningBalance = 0;
+  for (const [index, entry] of value.entries()) {
+    const path = `state.balanceLedger[${index}]`;
+    assertPlainRecord(entry, path);
+    assertExactKeys(entry, ['sequence', 'kind', 'referenceId', 'delta', 'balanceAfter'], path);
+    assertSafeInteger(entry.sequence, `${path}.sequence`, 'INVALID_STATE');
+    if (entry.sequence !== index) fail('INVALID_STATE', `${path}.sequence must be contiguous`);
+    assertSafeInteger(entry.delta, `${path}.delta`, 'INVALID_STATE');
+    assertNonNegativeInteger(entry.balanceAfter, `${path}.balanceAfter`);
+    if (index === 0) {
+      if (entry.kind !== 'INITIAL' || entry.referenceId !== 'INITIAL' || entry.delta < 0) {
+        fail('INVALID_STATE', 'balance ledger must start with the witnessed initial balance');
+      }
+    } else if (entry.kind === 'PURCHASE') {
+      assertStateBusinessKey(entry.referenceId, `${path}.referenceId`);
+      if (!purchaseIds.has(entry.referenceId) || seenPurchases.has(entry.referenceId)) fail('INVALID_STATE', `${path}.referenceId is invalid`);
+      const purchase = purchaseLedger.find((candidate) => candidate.purchaseId === entry.referenceId);
+      if (purchase === undefined) fail('INVALID_STATE', `${path}.referenceId is missing from purchase ledger`);
+      const { item, quantity } = parsePurchaseFingerprint(purchase.fingerprint, config, `${path}.purchase`);
+      const spent = item.cost * quantity;
+      if (!Number.isSafeInteger(spent) || entry.delta !== -spent) fail('INVALID_STATE', `${path}.delta does not match purchase cost`);
+      if (!hasOwn(processedPurchases, entry.referenceId)) fail('INVALID_STATE', `${path}.referenceId is missing from processed purchases`);
+      seenPurchases.add(entry.referenceId);
+    } else if (entry.kind === 'REFRESH') {
+      assertStateBusinessKey(entry.referenceId, `${path}.referenceId`);
+      if (!refreshIds.has(entry.referenceId) || seenRefreshes.has(entry.referenceId)) fail('INVALID_STATE', `${path}.referenceId is invalid`);
+      if (entry.delta !== -config.refreshCost) fail('INVALID_STATE', `${path}.delta does not match refresh cost`);
+      if (!hasOwn(processedRefreshes, entry.referenceId)) fail('INVALID_STATE', `${path}.referenceId is missing from processed refreshes`);
+      seenRefreshes.add(entry.referenceId);
+    } else {
+      if (entry.kind !== 'INITIAL' || index !== 0 || entry.referenceId !== 'INITIAL') fail('INVALID_STATE', `${path}.kind is invalid`);
+    }
+    runningBalance += entry.delta;
+    if (!Number.isSafeInteger(runningBalance) || runningBalance < 0 || entry.balanceAfter !== runningBalance) {
+      fail('INVALID_STATE', `${path} breaks balance conservation`);
+    }
+  }
+  const initial = value[0];
+  if (initial.balanceAfter !== initial.delta) {
+    fail('INVALID_STATE', 'initial balance witness is inconsistent');
+  }
+  if (runningBalance !== balance || seenPurchases.size !== purchaseLedger.length || seenRefreshes.size !== refreshLedger.length) {
+    fail('INVALID_STATE', 'balance ledger does not match account state');
+  }
+  assertStateBusinessKey(balanceWitnessValue, 'state.balanceWitness');
+  const expectedWitness = balanceWitness({
+    balance,
+    balanceLedger: value,
+    processedPurchases,
+    purchaseLedger,
+    purchased,
+    inventory,
+    processedRefreshes,
+    refreshLedger,
+  });
+  if (balanceWitnessValue !== expectedWitness) fail('INVALID_STATE', 'balance witness mismatch');
+}
+
 function normalizeState(
   value: unknown,
   config: ReputationShopConfig,
@@ -277,10 +429,10 @@ function normalizeState(
 ): ReputationShopState {
   assertPlainRecord(value, 'state');
   assertExactKeys(value, [
-    'schemaVersion', 'balance', 'reputationState', 'inventory', 'purchased', 'offers', 'refreshCount',
+    'schemaVersion', 'balance', 'balanceLedger', 'balanceWitness', 'reputationState', 'inventory', 'purchased', 'offers', 'refreshCount',
     'processedPurchases', 'purchaseLedger', 'purchaseCount', 'purchaseSequence', 'processedRefreshes', 'refreshLedger',
   ], 'state');
-  if (value.schemaVersion !== REPUTATION_SHOP_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported schemaVersion');
+  if (value.schemaVersion !== REPUTATION_SHOP_STATE_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported schemaVersion');
   assertNonNegativeInteger(value.balance, 'state.balance');
   let reputationState: ReputationState;
   try {
@@ -315,9 +467,23 @@ function normalizeState(
   assertPurchaseLedger(value.purchaseLedger, config, value.processedPurchases, value.purchased, value.inventory, value.purchaseCount, value.purchaseSequence);
   assertPlainRecord(value.processedRefreshes, 'state.processedRefreshes');
   assertRefreshLedger(value.refreshLedger, value.processedRefreshes, value.refreshCount);
+  assertBalanceLedger(
+    value.balanceLedger,
+    config,
+    value.balance,
+    value.purchaseLedger,
+    value.refreshLedger,
+    value.processedPurchases,
+    value.processedRefreshes,
+    value.purchased,
+    value.inventory,
+    value.balanceWitness,
+  );
   return freezeDeep({
-    schemaVersion: REPUTATION_SHOP_SCHEMA_VERSION,
+    schemaVersion: REPUTATION_SHOP_STATE_SCHEMA_VERSION,
     balance: value.balance,
+    balanceLedger: value.balanceLedger.map((entry) => ({ ...entry })),
+    balanceWitness: value.balanceWitness,
     reputationState,
     inventory: { ...value.inventory },
     purchased: { ...value.purchased },
@@ -341,9 +507,17 @@ function initialState(config: ReputationShopConfig, catalog: ReputationCatalog, 
   } catch (error) {
     fail('INVALID_CONFIG', error instanceof Error ? error.message : String(error));
   }
-  return freezeDeep({
-    schemaVersion: REPUTATION_SHOP_SCHEMA_VERSION,
+  const balanceLedger: ReputationShopBalanceLedgerEntry[] = [{
+    sequence: 0,
+    kind: 'INITIAL',
+    referenceId: 'INITIAL',
+    delta: balance,
+    balanceAfter: balance,
+  }];
+  return freezeDeep(sealBalanceWitness({
+    schemaVersion: REPUTATION_SHOP_STATE_SCHEMA_VERSION,
     balance,
+    balanceLedger,
     reputationState: normalizedReputation,
     inventory: {},
     purchased: {},
@@ -355,7 +529,7 @@ function initialState(config: ReputationShopConfig, catalog: ReputationCatalog, 
     purchaseSequence: 0,
     processedRefreshes: {},
     refreshLedger: [],
-  });
+  }));
 }
 
 function copyState(value: ReputationShopState): ReputationShopState {
@@ -455,16 +629,23 @@ export class ReputationShopService {
     if (this.current.purchaseCount === Number.MAX_SAFE_INTEGER) fail('INVALID_STATE', 'purchase count would overflow');
     if (this.current.purchaseSequence === Number.MAX_SAFE_INTEGER) fail('INVALID_STATE', 'purchase sequence would overflow');
     const nextPurchaseSequence = this.current.purchaseSequence + 1;
-    const next: ReputationShopState = {
+    const next = sealBalanceWitness({
       ...this.current,
       balance: this.current.balance - spent,
+      balanceLedger: [...this.current.balanceLedger, {
+        sequence: this.current.balanceLedger.length,
+        kind: 'PURCHASE',
+        referenceId: purchaseId,
+        delta: -spent,
+        balanceAfter: this.current.balance - spent,
+      }],
       inventory: nextInventory,
       purchased: { ...this.current.purchased, [item.id]: purchased + quantity },
       processedPurchases: { ...this.current.processedPurchases, [purchaseId]: fingerprint },
       purchaseLedger: [...this.current.purchaseLedger, { sequence: nextPurchaseSequence, purchaseId, fingerprint }],
       purchaseCount: this.current.purchaseCount + 1,
       purchaseSequence: nextPurchaseSequence,
-    };
+    });
     this.commit(next);
     return operation(this.current, 'APPLIED', true, { spent, reward: item.reward });
   }
@@ -479,14 +660,21 @@ export class ReputationShopService {
     if (this.current.balance < this.config.refreshCost) return operation(this.current, 'INSUFFICIENT_FUNDS', false);
     if (this.current.refreshCount === Number.MAX_SAFE_INTEGER) fail('INVALID_STATE', 'refresh count would overflow');
     const nextRefreshCount = this.current.refreshCount + 1;
-    const next: ReputationShopState = {
+    const next = sealBalanceWitness({
       ...this.current,
       balance: this.current.balance - this.config.refreshCost,
+      balanceLedger: [...this.current.balanceLedger, {
+        sequence: this.current.balanceLedger.length,
+        kind: 'REFRESH',
+        referenceId: refreshId,
+        delta: -this.config.refreshCost,
+        balanceAfter: this.current.balance - this.config.refreshCost,
+      }],
       offers: selectOffers(this.config, nextRefreshCount),
       refreshCount: nextRefreshCount,
       processedRefreshes: { ...this.current.processedRefreshes, [refreshId]: 'refresh' },
       refreshLedger: [...this.current.refreshLedger, { sequence: nextRefreshCount, refreshId }],
-    };
+    });
     this.commit(next);
     return operation(this.current, 'APPLIED', true, { spent: this.config.refreshCost });
   }

@@ -78,6 +78,13 @@ const service = new ReputationShopService({
 });
 assert.deepEqual(service.snapshot().offers, reputationShopConfig.items.slice(0, 4).map(({ id }) => id));
 assert.equal(service.snapshot().balance, 100);
+assert.deepEqual(service.snapshot().balanceLedger, [{
+  sequence: 0,
+  kind: 'INITIAL',
+  referenceId: 'INITIAL',
+  delta: 100,
+  balanceAfter: 100,
+}]);
 assert(Object.isFrozen(service.snapshot()));
 
 const levelTwoItem = reputationShopConfig.items.find((item) => item.trackId === 'PROFESSION_ARCANIST' && item.requiredLevel === 2);
@@ -142,6 +149,47 @@ assert.equal(saved, JSON.stringify(restoredState));
 const restored = new ReputationShopService({ catalog, config: reputationShopConfig, initialState: saved });
 assert.deepEqual(restored.snapshot(), service.snapshot());
 assert.equal(restored.purchase('purchase-level-one', levelOneItem.id).code, 'DUPLICATE');
+
+const tamperedBalance = JSON.parse(saved);
+tamperedBalance.balance += 1;
+expectError('balance tamper', () => restoreReputationShop(JSON.stringify(tamperedBalance), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+
+const tamperedInitialIncome = JSON.parse(saved);
+tamperedInitialIncome.balance += 1;
+tamperedInitialIncome.balanceLedger[0].delta += 1;
+tamperedInitialIncome.balanceLedger[0].balanceAfter += 1;
+expectError('initial balance witness tamper', () => restoreReputationShop(JSON.stringify(tamperedInitialIncome), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+
+const tamperedLedger = JSON.parse(saved);
+tamperedLedger.balance += 1;
+tamperedLedger.balanceLedger[1].delta += 1;
+tamperedLedger.balanceLedger[1].balanceAfter += 1;
+expectError('balance ledger tamper', () => restoreReputationShop(JSON.stringify(tamperedLedger), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+
+const tamperedWitness = JSON.parse(saved);
+tamperedWitness.balanceWitness = `${tamperedWitness.balanceWitness.slice(0, -1)}${tamperedWitness.balanceWitness.endsWith('0') ? '1' : '0'}`;
+expectError('balance witness tamper', () => restoreReputationShop(JSON.stringify(tamperedWitness), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+
+const sameCostItem = reputationShopConfig.items.find((item) => item.id !== levelOneItem.id && item.cost === levelOneItem.cost);
+assert(sameCostItem);
+const tamperedConsumption = JSON.parse(saved);
+tamperedConsumption.purchaseLedger[0].fingerprint = `${sameCostItem.id}:1`;
+tamperedConsumption.processedPurchases['purchase-level-one'] = `${sameCostItem.id}:1`;
+tamperedConsumption.purchased = { [sameCostItem.id]: 1 };
+tamperedConsumption.inventory = { [sameCostItem.reward.id]: 1 };
+expectError('consumption record tamper', () => restoreReputationShop(JSON.stringify(tamperedConsumption), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+
+const refreshedSaved = refresher.save();
+const restoredRefresher = restoreReputationShop(refreshedSaved, reputationShopConfig, catalog);
+assert.deepEqual(restoredRefresher, refresher.snapshot());
+assert.equal(restoredRefresher.balance, 5);
+assert.deepEqual(restoredRefresher.balanceLedger.at(-1), {
+  sequence: 1,
+  kind: 'REFRESH',
+  referenceId: 'refresh-1',
+  delta: -5,
+  balanceAfter: 5,
+});
 
 const malformed = JSON.parse(saved);
 delete malformed.processedPurchases['purchase-level-one'];
