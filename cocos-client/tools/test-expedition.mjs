@@ -39,7 +39,7 @@ const {
 
 const toolsRoot = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(toolsRoot, '..');
-const allowedPaths = ['assets/scripts/meta/expedition/', 'tools/test-expedition.mjs'];
+const allowedPaths = ['cocos-client/assets/scripts/meta/expedition/', 'cocos-client/tools/test-expedition.mjs'];
 
 function clone(value) { return structuredClone(value); }
 
@@ -82,7 +82,8 @@ function checkSkeletonAndDiff() {
     const diffParent = process.env.T236_DIFF_PARENT ?? process.env.T236_DIFF_BASE ?? `${diffCommit}^`;
     const committedDiff = execFileSync('git', ['diff', '--name-only', diffParent, diffCommit, '--'], { cwd: projectRoot, encoding: 'utf8' })
         .split('\n').map((file) => file.trim()).filter(Boolean);
-    const workingDiff = execFileSync('git', ['diff', '--name-only', diffCommit, '--'], { cwd: projectRoot, encoding: 'utf8' })
+    const workingDiffBase = process.env.T236_WORKING_DIFF_BASE ?? 'HEAD';
+    const workingDiff = execFileSync('git', ['diff', '--name-only', workingDiffBase, '--'], { cwd: projectRoot, encoding: 'utf8' })
         .split('\n').map((file) => file.trim()).filter(Boolean);
     const trackedDiff = [...new Set([...committedDiff, ...workingDiff])];
     const disallowed = trackedDiff.filter((file) => !allowedPaths.some((allowed) => allowed.endsWith('/') ? file.startsWith(allowed) : file === allowed));
