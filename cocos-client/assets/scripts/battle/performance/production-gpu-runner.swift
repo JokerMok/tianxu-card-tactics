@@ -166,7 +166,22 @@ func stageProject(_ sourceRoot: String) throws -> URL {
         try copyProjectItem(item, from: sourceRoot, to: stage)
     }
     try copyTrackedProjectFiles("assets/resources", from: sourceRoot, to: stage)
-    try copyTrackedProjectFiles("assets/scripts", from: sourceRoot, to: stage)
+    // Cocos Creator executes staged script modules during bundle startup, including
+    // unrelated meta-game modules with their own runtime validators. Stage only the
+    // actual BattleA0 import closure so those modules cannot block the A0 harness.
+    for runtimeScriptPath in [
+        "assets/scripts/a0/BattleA0Bootstrap.ts",
+        "assets/scripts/a0/BattleA0Bootstrap.ts.meta",
+        "assets/scripts/config/ConfigLoader.ts",
+        "assets/scripts/config/ConfigLoader.ts.meta",
+        "assets/scripts/config/levels/ChapterLevelContract.ts",
+        "assets/scripts/meta/GameShell.ts",
+        "assets/scripts/meta/GameShell.ts.meta",
+        "assets/scripts/meta/GameState.ts",
+        "assets/scripts/meta/GameState.ts.meta",
+    ] {
+        try copyProjectItem(runtimeScriptPath, from: sourceRoot, to: stage)
+    }
     let sceneLibrary = stage.appendingPathComponent("library/ff/ffbb08e3-cb62-46d3-82aa-b2ac55763131.json")
     try FileManager.default.createDirectory(at: sceneLibrary.deletingLastPathComponent(), withIntermediateDirectories: true)
     let sceneSource = stage.appendingPathComponent("assets/scenes/BattleA0.scene")
@@ -286,10 +301,21 @@ final class CDPClient {
             responses[id] = object
         } else if object["method"] as? String == "Runtime.consoleAPICalled" {
             if let params = object["params"] as? [String: Any], let type = params["type"] as? String, type == "error" {
-                consoleErrors.append("Runtime.consoleAPICalled")
+                let arguments = (params["args"] as? [[String: Any]] ?? []).map { argument in
+                    (argument["value"] as? String)
+                        ?? (argument["description"] as? String)
+                        ?? (argument["unserializableValue"] as? String)
+                        ?? "<unknown>"
+                }
+                consoleErrors.append("Runtime.consoleAPICalled: " + arguments.joined(separator: " "))
             }
         } else if object["method"] as? String == "Runtime.exceptionThrown" {
-            exceptions.append("Runtime.exceptionThrown")
+            let params = object["params"] as? [String: Any]
+            let details = params?["exceptionDetails"] as? [String: Any]
+            let text = (details?["text"] as? String)
+                ?? ((details?["exception"] as? [String: Any])?["description"] as? String)
+                ?? "unknown page exception"
+            exceptions.append("Runtime.exceptionThrown: " + text)
         }
         lock.unlock()
         signal.signal()
@@ -365,6 +391,26 @@ final class CDPClient {
     }
 }
 
+func pageDiagnostics(_ client: CDPClient) -> String {
+    let expression = """
+        (() => ({
+          url: String(globalThis.location?.href ?? ''),
+          readyState: String(document.readyState),
+          hasCanvas: Boolean(document.querySelector('canvas')),
+          metrics: globalThis.__A0_METRICS__ ?? null,
+          startupError: globalThis.__A0_STARTUP_ERROR__ ?? null,
+          bodyText: String(document.body?.innerText ?? '').slice(0, 500)
+        }))()
+        """
+    do {
+        let value = try client.evaluate(expression)
+        let data = try JSONSerialization.data(withJSONObject: value, options: [.sortedKeys])
+        return String(decoding: data, as: UTF8.self)
+    } catch {
+        return "unavailable: " + error.localizedDescription
+    }
+}
+
 func pageTarget(_ listData: Data) throws -> (id: String, pageURL: URL) {
     let object = try JSONSerialization.jsonObject(with: listData)
     guard let targets = object as? [[String: Any]] else { throw RunnerError(description: "Chrome /json/list is not an array") }
@@ -401,7 +447,9 @@ func pollBoolean(_ client: CDPClient, expression: String, label: String, timeout
         }
         Thread.sleep(forTimeInterval: 0.1)
     }
-    throw RunnerError(description: "timed out waiting for \(label): \(lastError)")
+    let consoleErrors = client.consoleErrors.isEmpty ? "none" : client.consoleErrors.joined(separator: " | ")
+    let exceptions = client.exceptions.isEmpty ? "none" : client.exceptions.joined(separator: " | ")
+    throw RunnerError(description: "timed out waiting for \(label): \(lastError); page=\(pageDiagnostics(client)); consoleErrors=\(consoleErrors); exceptions=\(exceptions)")
 }
 
 func run() throws -> [String: Any] {
