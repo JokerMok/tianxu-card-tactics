@@ -51,9 +51,10 @@ function assertConservation(state, label) {
 function assertScope() {
     const diffCommit = process.env.T241_DIFF_COMMIT ?? 'HEAD';
     const diffParent = process.env.T241_DIFF_PARENT ?? `${diffCommit}^`;
+    const workingDiffBase = process.env.T241_WORKING_DIFF_BASE ?? diffCommit;
     const committed = execFileSync('git', ['diff', '--name-only', diffParent, diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const working = execFileSync('git', ['diff', '--name-only', diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const staged = execFileSync('git', ['diff', '--cached', '--name-only', diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const working = execFileSync('git', ['diff', '--name-only', workingDiffBase, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const staged = execFileSync('git', ['diff', '--cached', '--name-only', workingDiffBase, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
     const changed = [...new Set([...committed, ...working, ...staged])];
     const allowed = (path) => path.startsWith(`${scopePrefix}assets/scripts/simulation/economy/`) || path === `${scopePrefix}tools/test-economy-30d.mjs`;
     assert.deepEqual(changed.filter((path) => !allowed(path)), [], `scope violation: ${changed.filter((path) => !allowed(path)).join(', ')}`);
