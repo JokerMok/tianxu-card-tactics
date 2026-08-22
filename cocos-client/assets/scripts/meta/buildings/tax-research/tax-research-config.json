@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "BUILDINGS-M6-10-V1",
+  "buildingConfigId": "BUILDINGS-M6-09-V1",
+  "researchQueue": {
+    "maxEntries": 2
+  },
+  "tax": {
+    "buildingId": "castle",
+    "intervalDays": 1,
+    "tiers": [
+      { "castleLevel": 1, "payouts": [{ "resourceId": "silver", "dailyAmount": 250, "dailyCap": 500 }, { "resourceId": "crystal", "dailyAmount": 5, "dailyCap": 10 }] },
+      { "castleLevel": 2, "payouts": [{ "resourceId": "silver", "dailyAmount": 400, "dailyCap": 800 }, { "resourceId": "crystal", "dailyAmount": 8, "dailyCap": 16 }] },
+      { "castleLevel": 3, "payouts": [{ "resourceId": "silver", "dailyAmount": 600, "dailyCap": 1200 }, { "resourceId": "crystal", "dailyAmount": 12, "dailyCap": 24 }] },
+      { "castleLevel": 4, "payouts": [{ "resourceId": "silver", "dailyAmount": 800, "dailyCap": 1600 }, { "resourceId": "crystal", "dailyAmount": 16, "dailyCap": 32 }] },
+      { "castleLevel": 5, "payouts": [{ "resourceId": "silver", "dailyAmount": 1000, "dailyCap": 2000 }, { "resourceId": "crystal", "dailyAmount": 20, "dailyCap": 40 }] }
+    ]
+  },
+  "researches": [
+    {
+      "id": "alchemy-success",
+      "initialLevel": 0,
+      "maxLevel": 2,
+      "upgrades": [
+        { "targetLevel": 1, "cost": { "silver": 900, "crystal": 20 }, "durationMs": 20000, "prerequisites": [{ "type": "building", "buildingId": "castle", "requiredLevel": 2 }], "effects": [{ "effectId": "ALCHEMY_SUCCESS_RATE_BPS", "amountBps": 500 }] },
+        { "targetLevel": 2, "cost": { "silver": 1800, "crystal": 40 }, "durationMs": 40000, "prerequisites": [{ "type": "building", "buildingId": "alchemy", "requiredLevel": 3 }], "effects": [{ "effectId": "ALCHEMY_SUCCESS_RATE_BPS", "amountBps": 1000 }] }
+      ]
+    },
+    {
+      "id": "forge-success",
+      "initialLevel": 0,
+      "maxLevel": 1,
+      "upgrades": [
+        { "targetLevel": 1, "cost": { "silver": 800, "crystal": 20 }, "durationMs": 18000, "prerequisites": [{ "type": "building", "buildingId": "forge", "requiredLevel": 2 }], "effects": [{ "effectId": "FORGE_SUCCESS_RATE_BPS", "amountBps": 500 }] }
+      ]
+    },
+    {
+      "id": "construction-speed",
+      "initialLevel": 0,
+      "maxLevel": 1,
+      "upgrades": [
+        { "targetLevel": 1, "cost": { "silver": 1200, "crystal": 25 }, "durationMs": 24000, "prerequisites": [{ "type": "building", "buildingId": "castle", "requiredLevel": 3 }, { "type": "research", "researchId": "alchemy-success", "requiredLevel": 1 }], "effects": [{ "effectId": "BUILDING_SPEED_BPS", "amountBps": 750 }] }
+      ]
+    }
+  ]
+}
