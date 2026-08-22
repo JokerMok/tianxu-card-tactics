@@ -46,9 +46,7 @@ export type ReputationShopBalanceLedgerEntry = Readonly<{
 
 const REPUTATION_SHOP_STATE_SCHEMA_VERSION = 2 as const;
 const BALANCE_WITNESS_VERSION = 'v1' as const;
-// This key is deliberately outside the serialized state. It is a tamper witness for saves,
-// not a claim that a modified client executable is a trusted accounting authority.
-const BALANCE_WITNESS_KEY = 't238-reputation-shop-balance-witness-20260822';
+const TRUSTED_STATE_DIGEST_VERSION = 'v1' as const;
 
 export type ReputationShopState = Readonly<{
   schemaVersion: typeof REPUTATION_SHOP_STATE_SCHEMA_VERSION;
@@ -68,6 +66,13 @@ export type ReputationShopState = Readonly<{
   refreshLedger: readonly ReputationShopRefreshLedgerEntry[];
 }>;
 
+// This anchor must come from the caller/server account authority. It is deliberately
+// not serialized into the save and must never be reconstructed from the save being restored.
+export type ReputationShopTrustedAnchor = Readonly<{
+  balanceLedger: readonly ReputationShopBalanceLedgerEntry[];
+  expectedStateDigest: string;
+}>;
+
 export type ReputationShopPersistence = (serialized: string) => void;
 
 export type ReputationShopOptions = Readonly<{
@@ -77,6 +82,7 @@ export type ReputationShopOptions = Readonly<{
   balance?: number;
   reputationState?: ReputationState;
   initialState?: string;
+  trustedAnchor?: ReputationShopTrustedAnchor;
   persist?: ReputationShopPersistence;
 }>;
 
@@ -161,6 +167,10 @@ function assertStateBusinessKey(value: unknown, path: string): asserts value is 
   if (typeof value !== 'string' || value.length === 0 || value.trim() !== value) fail('INVALID_STATE', `${path} is invalid`);
 }
 
+function compareStrings(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
 function fnv1a(value: string, seed: number): string {
   let hash = seed >>> 0;
   for (let index = 0; index < value.length; index += 1) {
@@ -170,56 +180,59 @@ function fnv1a(value: string, seed: number): string {
   return hash.toString(16).padStart(8, '0');
 }
 
-function canonicalMap(value: Readonly<Record<string, string | number>>): string {
-  return Object.entries(value)
-    .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
-    .map(([key, child]) => `${JSON.stringify(key)}:${JSON.stringify(child)}`)
-    .join(',');
+function canonicalizeJson(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map((child) => canonicalizeJson(child));
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value as Record<string, unknown>)
+      .sort(compareStrings)
+      .map((key) => [key, canonicalizeJson((value as Record<string, unknown>)[key])]));
+  }
+  return value;
 }
 
-function canonicalPurchaseLedger(value: readonly ReputationShopPurchaseLedgerEntry[]): string {
-  return value.map((entry) => JSON.stringify([entry.sequence, entry.purchaseId, entry.fingerprint])).join(';');
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalizeJson(value));
 }
 
-function canonicalRefreshLedger(value: readonly ReputationShopRefreshLedgerEntry[]): string {
-  return value.map((entry) => JSON.stringify([entry.sequence, entry.refreshId])).join(';');
+function publicDigest(value: string): string {
+  return [
+    fnv1a(value, 0x811c9dc5),
+    fnv1a(value, 0x9e3779b9),
+    fnv1a(value, 0x85ebca6b),
+    fnv1a(value, 0xc2b2ae35),
+  ].join('');
 }
 
-function canonicalBalanceLedger(value: readonly ReputationShopBalanceLedgerEntry[]): string {
-  return value.map((entry) => JSON.stringify([
-    entry.sequence,
-    entry.kind,
-    entry.referenceId,
-    entry.delta,
-    entry.balanceAfter,
-  ])).join(';');
-}
+export type ReputationShopWitnessInput = Pick<ReputationShopState, 'balance' | 'balanceLedger' | 'processedPurchases' | 'purchaseLedger' | 'purchased' | 'inventory' | 'processedRefreshes' | 'refreshLedger'>;
 
-type BalanceWitnessInput = Pick<ReputationShopState, 'balance' | 'balanceLedger' | 'processedPurchases' | 'purchaseLedger' | 'purchased' | 'inventory' | 'processedRefreshes' | 'refreshLedger'>;
-
-function balanceWitness(value: BalanceWitnessInput): string {
-  const payload = [
-    BALANCE_WITNESS_VERSION,
-    String(value.balance),
-    canonicalBalanceLedger(value.balanceLedger),
-    canonicalPurchaseLedger(value.purchaseLedger),
-    canonicalRefreshLedger(value.refreshLedger),
-    canonicalMap(value.processedPurchases),
-    canonicalMap(value.processedRefreshes),
-    canonicalMap(value.purchased),
-    canonicalMap(value.inventory),
-  ].join('|');
-  const keyedPayload = `${BALANCE_WITNESS_KEY}|${payload}`;
-  return `${BALANCE_WITNESS_VERSION}.${[
-    fnv1a(keyedPayload, 0x811c9dc5),
-    fnv1a(`${keyedPayload}|${BALANCE_WITNESS_KEY}`, 0x9e3779b9),
-    fnv1a(`${BALANCE_WITNESS_KEY}|${keyedPayload}`, 0x85ebca6b),
-    fnv1a(`${payload}|${BALANCE_WITNESS_KEY}|${payload}`, 0xc2b2ae35),
-  ].join('')}`;
+export function reputationShopBalanceWitness(value: ReputationShopWitnessInput): string {
+  return `${BALANCE_WITNESS_VERSION}.${publicDigest(canonicalJson({
+    version: BALANCE_WITNESS_VERSION,
+    balance: value.balance,
+    balanceLedger: value.balanceLedger,
+    purchaseLedger: value.purchaseLedger,
+    refreshLedger: value.refreshLedger,
+    processedPurchases: value.processedPurchases,
+    processedRefreshes: value.processedRefreshes,
+    purchased: value.purchased,
+    inventory: value.inventory,
+  }))}`;
 }
 
 function sealBalanceWitness(value: Omit<ReputationShopState, 'balanceWitness'>): ReputationShopState {
-  return { ...value, balanceWitness: balanceWitness(value) };
+  return { ...value, balanceWitness: reputationShopBalanceWitness(value) };
+}
+
+// The digest is public and reproducible. Its trust comes only from the external anchor
+// supplied by the caller/server, not from this client-side function or the witness field.
+export function reputationShopStateDigest(value: ReputationShopState): string {
+  return `${TRUSTED_STATE_DIGEST_VERSION}.${publicDigest(canonicalJson(value))}`;
+}
+
+function sortedRecord<T>(value: Readonly<Record<string, T>>): Record<string, T> {
+  return Object.fromEntries(Object.entries(value)
+    .sort(([left], [right]) => compareStrings(left, right))
+    .map(([key, child]) => [key, child]));
 }
 
 function hasOwn(record: Readonly<Record<string, unknown>>, key: string): boolean {
@@ -409,7 +422,7 @@ function assertBalanceLedger(
     fail('INVALID_STATE', 'balance ledger does not match account state');
   }
   assertStateBusinessKey(balanceWitnessValue, 'state.balanceWitness');
-  const expectedWitness = balanceWitness({
+  const expectedWitness = reputationShopBalanceWitness({
     balance,
     balanceLedger: value,
     processedPurchases,
@@ -420,6 +433,36 @@ function assertBalanceLedger(
     refreshLedger,
   });
   if (balanceWitnessValue !== expectedWitness) fail('INVALID_STATE', 'balance witness mismatch');
+}
+
+function assertTrustedAnchorShape(value: unknown): asserts value is ReputationShopTrustedAnchor {
+  assertPlainRecord(value, 'trustedAnchor');
+  assertExactKeys(value, ['balanceLedger', 'expectedStateDigest'], 'trustedAnchor');
+  if (!Array.isArray(value.balanceLedger)) fail('INVALID_STATE', 'trustedAnchor.balanceLedger must be an array');
+  for (const [index, entry] of value.balanceLedger.entries()) {
+    const path = `trustedAnchor.balanceLedger[${index}]`;
+    assertPlainRecord(entry, path);
+    assertExactKeys(entry, ['sequence', 'kind', 'referenceId', 'delta', 'balanceAfter'], path);
+    assertSafeInteger(entry.sequence, `${path}.sequence`, 'INVALID_STATE');
+    assertSafeInteger(entry.delta, `${path}.delta`, 'INVALID_STATE');
+    assertNonNegativeInteger(entry.balanceAfter, `${path}.balanceAfter`);
+    if (entry.kind !== 'INITIAL' && entry.kind !== 'PURCHASE' && entry.kind !== 'REFRESH') {
+      fail('INVALID_STATE', `${path}.kind is invalid`);
+    }
+    if (typeof entry.referenceId !== 'string' || entry.referenceId.length === 0 || entry.referenceId.trim() !== entry.referenceId) {
+      fail('INVALID_STATE', `${path}.referenceId is invalid`);
+    }
+  }
+  assertStateBusinessKey(value.expectedStateDigest, 'trustedAnchor.expectedStateDigest');
+}
+
+function assertTrustedAnchorMatches(state: ReputationShopState, anchor: ReputationShopTrustedAnchor): void {
+  if (canonicalJson(anchor.balanceLedger) !== canonicalJson(state.balanceLedger)) {
+    fail('INVALID_STATE', 'trusted anchor balance ledger mismatch');
+  }
+  if (anchor.expectedStateDigest !== reputationShopStateDigest(state)) {
+    fail('INVALID_STATE', 'trusted anchor state digest mismatch');
+  }
 }
 
 function normalizeState(
@@ -485,15 +528,15 @@ function normalizeState(
     balanceLedger: value.balanceLedger.map((entry) => ({ ...entry })),
     balanceWitness: value.balanceWitness,
     reputationState,
-    inventory: { ...value.inventory },
-    purchased: { ...value.purchased },
+    inventory: sortedRecord(value.inventory),
+    purchased: sortedRecord(value.purchased),
     offers: [...value.offers],
     refreshCount: value.refreshCount,
-    processedPurchases: { ...value.processedPurchases },
+    processedPurchases: sortedRecord(value.processedPurchases),
     purchaseLedger: value.purchaseLedger.map((entry) => ({ ...entry })),
     purchaseCount: value.purchaseCount,
     purchaseSequence: value.purchaseSequence,
-    processedRefreshes: { ...value.processedRefreshes },
+    processedRefreshes: sortedRecord(value.processedRefreshes),
     refreshLedger: value.refreshLedger.map((entry) => ({ ...entry })),
   });
 }
@@ -550,14 +593,16 @@ export function serializeReputationShop(
   config: ReputationShopConfig = reputationShopConfig,
   catalog: ReputationCatalog = createDefaultReputationShopCatalog(),
 ): string {
-  return JSON.stringify(normalizeState(state, config, catalog));
+  return canonicalJson(normalizeState(state, config, catalog));
 }
 
 export function restoreReputationShop(
   serialized: string,
   config: ReputationShopConfig = reputationShopConfig,
   catalog: ReputationCatalog = createDefaultReputationShopCatalog(),
+  trustedAnchor?: ReputationShopTrustedAnchor,
 ): ReputationShopState {
+  assertTrustedAnchorShape(trustedAnchor);
   if (typeof serialized !== 'string' || serialized.trim().length === 0) fail('INVALID_STATE', 'reputation shop save must be a non-empty string');
   let parsed: unknown;
   try {
@@ -565,7 +610,9 @@ export function restoreReputationShop(
   } catch {
     fail('INVALID_STATE', 'reputation shop save is not valid JSON');
   }
-  return normalizeState(parsed, config, catalog);
+  const state = normalizeState(parsed, config, catalog);
+  assertTrustedAnchorMatches(state, trustedAnchor);
+  return state;
 }
 
 export class ReputationShopService {
@@ -586,7 +633,7 @@ export class ReputationShopService {
     this.persist = options.persist ?? (() => {});
     if (typeof this.persist !== 'function') fail('INVALID_CONFIG', 'persist must be a function');
     if (options.initialState !== undefined) {
-      this.current = restoreReputationShop(options.initialState, this.config, this.catalog);
+      this.current = restoreReputationShop(options.initialState, this.config, this.catalog, options.trustedAnchor);
     } else {
       const balance = options.balance ?? 0;
       assertNonNegativeInteger(balance, 'balance', 'INVALID_CONFIG');
@@ -680,16 +727,16 @@ export class ReputationShopService {
   }
 
   private commit(next: ReputationShopState): void {
-    normalizeState(next, this.config, this.catalog);
+    const normalized = normalizeState(next, this.config, this.catalog);
     if (this.committing) fail('PERSISTENCE_FAILED', 'reputation shop persistence is reentrant');
     this.committing = true;
     try {
-      this.persist(serializeReputationShop(next, this.config, this.catalog));
+      this.persist(serializeReputationShop(normalized, this.config, this.catalog));
     } catch (error) {
       throw new ReputationShopError('PERSISTENCE_FAILED', error instanceof Error ? error.message : String(error));
     } finally {
       this.committing = false;
     }
-    this.current = copyState(next);
+    this.current = copyState(normalized);
   }
 }

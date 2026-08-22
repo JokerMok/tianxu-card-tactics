@@ -13,9 +13,12 @@ import {
   diffReputationShopCatalogData,
   loadCustomReputationShopConfig,
   loadReputationShopProduction,
+  reputationShopBalanceWitness,
   reputationShopCatalogDigest,
   reputationShopConfig,
+  reputationShopStateDigest,
   restoreReputationShop,
+  serializeReputationShop,
 } from '../assets/scripts/meta/reputation/shop/index.ts';
 import { ReputationError } from '../assets/scripts/meta/reputation/index.ts';
 
@@ -27,6 +30,13 @@ const catalog = createDefaultReputationShopCatalog();
 
 function expectError(label, action, ErrorType, code) {
   assert.throws(action, (error) => error instanceof ErrorType && (!code || error.code === code), `${label} must fail`);
+}
+
+function trustedAnchorFromAccountAuthority(balanceLedger, expectedState) {
+  return Object.freeze({
+    balanceLedger: structuredClone(balanceLedger),
+    expectedStateDigest: reputationShopStateDigest(expectedState),
+  });
 }
 
 assert.equal(reputationShopCatalogDigest(REPUTATION_SHOP_CATALOG_DATA), REPUTATION_SHOP_PRODUCTION_DIGEST);
@@ -117,6 +127,12 @@ const limit = service.purchase('purchase-level-one-again', levelOneItem.id);
 assert.equal(limit.code, 'LIMIT_REACHED');
 assert.equal(limit.applied, false);
 
+assert.equal(service.refresh('refresh-for-canonical').code, 'APPLIED');
+const secondLevelOneItem = reputationShopConfig.items.find((item) => item.requiredLevel === 1
+  && item.id !== levelOneItem.id && service.snapshot().offers.includes(item.id));
+assert(secondLevelOneItem);
+assert.equal(service.purchase('purchase-level-one-second', secondLevelOneItem.id).code, 'APPLIED');
+
 const poor = new ReputationShopService({ catalog, config: reputationShopConfig, balance: 0 });
 assert.equal(poor.purchase('purchase-poor', levelOneItem.id).code, 'INSUFFICIENT_FUNDS');
 assert.equal(poor.refresh('refresh-poor').code, 'INSUFFICIENT_FUNDS');
@@ -143,32 +159,74 @@ assert.equal(refresher.snapshot().balance, 5);
 assert.deepEqual(beforeRefresh.refreshLedger, []);
 
 const saved = service.save();
-const restoredState = restoreReputationShop(saved, reputationShopConfig, catalog);
+const savedState = service.snapshot();
+const trustedServiceAnchor = trustedAnchorFromAccountAuthority(savedState.balanceLedger, savedState);
+const restoredState = restoreReputationShop(saved, reputationShopConfig, catalog, trustedServiceAnchor);
 assert.deepEqual(restoredState, service.snapshot());
-assert.equal(saved, JSON.stringify(restoredState));
-const restored = new ReputationShopService({ catalog, config: reputationShopConfig, initialState: saved });
+assert.equal(saved, serializeReputationShop(restoredState, reputationShopConfig, catalog));
+expectError('missing trusted anchor', () => restoreReputationShop(saved, reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('service missing trusted anchor', () => new ReputationShopService({
+  catalog,
+  config: reputationShopConfig,
+  initialState: saved,
+}), ReputationShopError, 'INVALID_STATE');
+const restored = new ReputationShopService({
+  catalog,
+  config: reputationShopConfig,
+  initialState: saved,
+  trustedAnchor: trustedServiceAnchor,
+});
 assert.deepEqual(restored.snapshot(), service.snapshot());
 assert.equal(restored.purchase('purchase-level-one', levelOneItem.id).code, 'DUPLICATE');
 
 const tamperedBalance = JSON.parse(saved);
 tamperedBalance.balance += 1;
-expectError('balance tamper', () => restoreReputationShop(JSON.stringify(tamperedBalance), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('balance tamper', () => restoreReputationShop(JSON.stringify(tamperedBalance), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 const tamperedInitialIncome = JSON.parse(saved);
 tamperedInitialIncome.balance += 1;
 tamperedInitialIncome.balanceLedger[0].delta += 1;
 tamperedInitialIncome.balanceLedger[0].balanceAfter += 1;
-expectError('initial balance witness tamper', () => restoreReputationShop(JSON.stringify(tamperedInitialIncome), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('initial balance witness tamper', () => restoreReputationShop(JSON.stringify(tamperedInitialIncome), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 const tamperedLedger = JSON.parse(saved);
 tamperedLedger.balance += 1;
 tamperedLedger.balanceLedger[1].delta += 1;
 tamperedLedger.balanceLedger[1].balanceAfter += 1;
-expectError('balance ledger tamper', () => restoreReputationShop(JSON.stringify(tamperedLedger), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('balance ledger tamper', () => restoreReputationShop(JSON.stringify(tamperedLedger), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 const tamperedWitness = JSON.parse(saved);
-tamperedWitness.balanceWitness = `${tamperedWitness.balanceWitness.slice(0, -1)}${tamperedWitness.balanceWitness.endsWith('0') ? '1' : '0'}`;
-expectError('balance witness tamper', () => restoreReputationShop(JSON.stringify(tamperedWitness), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+tamperedWitness.balance += 1;
+tamperedWitness.balanceLedger[0].delta += 1;
+for (const entry of tamperedWitness.balanceLedger) entry.balanceAfter += 1;
+tamperedWitness.balanceWitness = reputationShopBalanceWitness(tamperedWitness);
+assert.notEqual(tamperedWitness.balanceWitness, savedState.balanceWitness);
+expectError('recomputed public witness tamper', () => restoreReputationShop(JSON.stringify(tamperedWitness), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
+
+const tamperedTrustedAnchor = {
+  ...trustedServiceAnchor,
+  expectedStateDigest: `${trustedServiceAnchor.expectedStateDigest.slice(0, -1)}${trustedServiceAnchor.expectedStateDigest.endsWith('0') ? '1' : '0'}`,
+};
+expectError('trusted anchor tamper', () => restoreReputationShop(saved, reputationShopConfig, catalog, tamperedTrustedAnchor), ReputationShopError, 'INVALID_STATE');
+const tamperedTrustedLedger = {
+  ...trustedServiceAnchor,
+  balanceLedger: structuredClone(trustedServiceAnchor.balanceLedger),
+};
+tamperedTrustedLedger.balanceLedger[0].delta += 1;
+expectError('trusted anchor ledger tamper', () => restoreReputationShop(saved, reputationShopConfig, catalog, tamperedTrustedLedger), ReputationShopError, 'INVALID_STATE');
+
+const reverseRecord = (record) => Object.fromEntries(Object.entries(record).reverse());
+const reorderedKeys = JSON.parse(saved);
+reorderedKeys.processedPurchases = reverseRecord(reorderedKeys.processedPurchases);
+reorderedKeys.purchased = reverseRecord(reorderedKeys.purchased);
+reorderedKeys.inventory = reverseRecord(reorderedKeys.inventory);
+reorderedKeys.processedRefreshes = reverseRecord(reorderedKeys.processedRefreshes);
+reorderedKeys.balanceLedger = reorderedKeys.balanceLedger.map((entry) => reverseRecord(entry));
+reorderedKeys.purchaseLedger = reorderedKeys.purchaseLedger.map((entry) => reverseRecord(entry));
+const reorderedSerialized = JSON.stringify(reorderedKeys);
+const restoredReordered = restoreReputationShop(reorderedSerialized, reputationShopConfig, catalog, trustedServiceAnchor);
+assert.deepEqual(restoredReordered, savedState);
+assert.equal(serializeReputationShop(restoredReordered, reputationShopConfig, catalog), saved);
 
 const sameCostItem = reputationShopConfig.items.find((item) => item.id !== levelOneItem.id && item.cost === levelOneItem.cost);
 assert(sameCostItem);
@@ -177,10 +235,12 @@ tamperedConsumption.purchaseLedger[0].fingerprint = `${sameCostItem.id}:1`;
 tamperedConsumption.processedPurchases['purchase-level-one'] = `${sameCostItem.id}:1`;
 tamperedConsumption.purchased = { [sameCostItem.id]: 1 };
 tamperedConsumption.inventory = { [sameCostItem.reward.id]: 1 };
-expectError('consumption record tamper', () => restoreReputationShop(JSON.stringify(tamperedConsumption), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('consumption record tamper', () => restoreReputationShop(JSON.stringify(tamperedConsumption), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 const refreshedSaved = refresher.save();
-const restoredRefresher = restoreReputationShop(refreshedSaved, reputationShopConfig, catalog);
+const refreshedState = refresher.snapshot();
+const trustedRefresherAnchor = trustedAnchorFromAccountAuthority(refreshedState.balanceLedger, refreshedState);
+const restoredRefresher = restoreReputationShop(refreshedSaved, reputationShopConfig, catalog, trustedRefresherAnchor);
 assert.deepEqual(restoredRefresher, refresher.snapshot());
 assert.equal(restoredRefresher.balance, 5);
 assert.deepEqual(restoredRefresher.balanceLedger.at(-1), {
@@ -195,10 +255,10 @@ const malformed = JSON.parse(saved);
 delete malformed.processedPurchases['purchase-level-one'];
 delete malformed.purchased[levelOneItem.id];
 delete malformed.inventory[levelOneItem.reward.id];
-expectError('purchase ledger witness deletion', () => restoreReputationShop(JSON.stringify(malformed), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('purchase ledger witness deletion', () => restoreReputationShop(JSON.stringify(malformed), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 const invalidOffers = JSON.parse(saved);
 invalidOffers.offers.reverse();
-expectError('non-deterministic offer order', () => restoreReputationShop(JSON.stringify(invalidOffers), reputationShopConfig, catalog), ReputationShopError, 'INVALID_STATE');
+expectError('non-deterministic offer order', () => restoreReputationShop(JSON.stringify(invalidOffers), reputationShopConfig, catalog, trustedServiceAnchor), ReputationShopError, 'INVALID_STATE');
 
 console.log('T238 reputation shop PASS: level-gates, deterministic-refresh, balance/limit/inventory, idempotent-purchases, serialization, config-cross-table, skeleton-diff');
