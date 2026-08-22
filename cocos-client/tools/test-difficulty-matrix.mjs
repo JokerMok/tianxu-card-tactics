@@ -78,7 +78,7 @@ function validateMatrixShape(value) {
   }
   assert.equal(nextMin, 1000);
 
-  assert(Array.isArray(calibration.builds) && calibration.builds.length > 0);
+  assert(Array.isArray(calibration.builds) && calibration.builds.length === 22, 'calibration must preserve all 22 T255 builds');
   const buildIds = new Set();
   for (const [index, build] of calibration.builds.entries()) {
     expectKeys(build, ['buildId', 'strengthScore', 'band'], `calibration.builds[${index}]`);
@@ -119,6 +119,26 @@ function validateMatrixShape(value) {
   }
 }
 
+function validateThresholdSemantics(value) {
+  const profiles = new Map(value.modeProfiles.map((profile) => [profile.id, profile]));
+  const mainline = profiles.get('mainline');
+  const dungeon = profiles.get('dungeon');
+  const tower = profiles.get('tower');
+  const boss = profiles.get('boss');
+  assert(mainline && dungeon && tower && boss, 'all four mode profiles are required');
+  const strictlyIncreasing = (entries, label) => {
+    for (let index = 1; index < entries.length; index += 1) {
+      assert(entries[index].requiredBuildScore > entries[index - 1].requiredBuildScore, `${label} thresholds must increase`);
+    }
+  };
+  strictlyIncreasing(mainline.entries, 'mainline');
+  strictlyIncreasing(tower.entries, 'tower');
+  assert(dungeon.entries[1].requiredBuildScore > dungeon.entries[0].requiredBuildScore, 'hard dungeon threshold must increase');
+  assert(boss.entries[0].requiredBuildScore > dungeon.entries[1].requiredBuildScore, 'boss threshold must exceed hard dungeon');
+  assert(boss.minimumMetrics.minEffectApplications > dungeon.minimumMetrics.minEffectApplications, 'boss effect requirement must exceed dungeon');
+  assert(boss.minimumMetrics.minTotalMaxHp > dungeon.minimumMetrics.minTotalMaxHp, 'boss hp requirement must exceed dungeon');
+}
+
 function buildScore(summary, simulation) {
   const average = (key) => simulation.runs.reduce((sum, run) => sum + run[key], 0) / simulation.runs.length;
   const metrics = {
@@ -150,6 +170,7 @@ function isEligible(build, profile, entry) {
 }
 
 validateMatrixShape(matrix);
+validateThresholdSemantics(matrix);
 const calibration = matrix.buildStrengthCalibration;
 const readRows = (relativePath, key) => {
   const document = readJson(relativePath);
@@ -240,10 +261,13 @@ for (const profile of matrix.modeProfiles) {
 }
 
 let negativeCases = 0;
-function expectRejected(label, mutate, pattern = /matrix|calibration|mode|entry|threshold|band|score|minimum|duplicate|source|stage|boss|tower|dungeon/i) {
+function expectRejected(label, mutate) {
   const candidate = clone(matrix);
   mutate(candidate);
-  assert.throws(() => validateMatrixShape(candidate), pattern, `${label} must be rejected`);
+  assert.throws(() => {
+    validateMatrixShape(candidate);
+    validateThresholdSemantics(candidate);
+  }, `${label} must be rejected`);
   negativeCases += 1;
 }
 
