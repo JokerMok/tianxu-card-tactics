@@ -621,6 +621,7 @@ export class PrivacyComplianceService {
   private validateSubjectRequest(request: unknown): asserts request is SubjectRequest { if (!isPlainRecord(request)) fail('INVALID_INPUT', 'subject request is invalid'); validateSubjectId(request.subjectId); validateRequestId(request.requestId); }
   private validateCorrectionRequest(request: unknown): asserts request is CorrectionRequest { this.validateSubjectRequest(request); validateData(request.data); }
   private runRequest<T extends PrivacyJsonObject>(operation: string, requestId: string, subjectId: string, payload: unknown, action: () => T, validateReplay?: () => void): T {
+    this.ensureOperational();
     const fingerprint = hash(canonicalPrivacyJson({ operation, subjectId: subjectKey(subjectId), payload })); const existing = this.ledger.get(requestId);
     if (existing) {
       if (existing.operation !== operation || existing.subjectKey !== subjectKey(subjectId) || existing.fingerprint !== fingerprint) fail('REQUEST_ID_REUSED', 'requestId is already assigned to another request');

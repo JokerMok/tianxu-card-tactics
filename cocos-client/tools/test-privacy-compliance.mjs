@@ -353,4 +353,41 @@ purgeNow = 10;
 assert.equal(changingPurgeService.purgeExpired(operator, 'purge-changing-time').replayed, true, 'purge replay must remain idempotent when time changes');
 assert.equal(changingPurgeStore.list().length, 1, 'stable purge replay must not apply a second time-dependent purge');
 
+class QuarantineAfterSuccessStore extends InMemoryPrivacyDataStore {
+  invalidList = false;
+  list() {
+    if (this.invalidList) return [{ subjectId: 'invalid-store-record', data: { safe: true }, updatedAt: 2, retentionUntil: 1 }];
+    return super.list();
+  }
+}
+
+const replayAfterQuarantineCases = [
+  {
+    operation: 'delete',
+    store: new QuarantineAfterSuccessStore([{ subjectId: 'replay-delete', data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }]),
+    run(service) { return service.deleteData({ kind: 'subject', subjectId: 'replay-delete' }, { subjectId: 'replay-delete', requestId: 'delete-success-before-quarantine' }); },
+    replay(service) { return service.deleteData({ kind: 'subject', subjectId: 'replay-delete' }, { subjectId: 'replay-delete', requestId: 'delete-success-before-quarantine' }); },
+  },
+  {
+    operation: 'correct',
+    store: new QuarantineAfterSuccessStore([{ subjectId: 'replay-correct', data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }]),
+    run(service) { return service.correctData({ kind: 'subject', subjectId: 'replay-correct' }, { subjectId: 'replay-correct', requestId: 'correct-success-before-quarantine', data: { safe: false } }); },
+    replay(service) { return service.correctData({ kind: 'subject', subjectId: 'replay-correct' }, { subjectId: 'replay-correct', requestId: 'correct-success-before-quarantine', data: { safe: false } }); },
+  },
+  {
+    operation: 'purge',
+    store: new QuarantineAfterSuccessStore([{ subjectId: 'replay-purge', data: { safe: true }, updatedAt: 1, retentionUntil: 100 }]),
+    run(service) { return service.purgeExpired(operator, 'purge-success-before-quarantine'); },
+    replay(service) { return service.purgeExpired(operator, 'purge-success-before-quarantine'); },
+  },
+];
+
+for (const testCase of replayAfterQuarantineCases) {
+  const service = new ComplianceService({ store: testCase.store, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+  assert.equal(testCase.run(service).replayed, false, `${testCase.operation} must first commit a success receipt`);
+  testCase.store.invalidList = true;
+  expectCode(`${testCase.operation} quarantine trigger must fail closed`, () => service.purgeExpired(operator, `quarantine-trigger-${testCase.operation}`), 'STORE_FAILURE');
+  expectCode(`${testCase.operation} success receipt must not replay after quarantine`, () => testCase.replay(service), 'STORE_FAILURE');
+}
+
 console.log(`T264 privacy compliance PASS: consent, age-gate, access, deterministic-export, correction, deletion, retention, audit-redaction, permission-isolation, sensitive-fields, idempotency, invalid-input and fail-closed=${audit.length}`);
