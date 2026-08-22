@@ -89,6 +89,66 @@ assert.equal(service.deleteData(subject, { subjectId: 'account-a', requestId: 'd
 const audit = service.auditLog(operator);
 assert(audit.length > 0, 'authorized operator must read audit records');
 assert(audit.every((event) => !JSON.stringify(event).includes('a@example.com') && !JSON.stringify(event).includes('account-a')), 'audit must not expose sensitive fields or raw subject IDs');
+assert(audit.every((event) => /^req_[0-9a-f]+$/.test(event.requestId)), 'audit request IDs must be normalized');
+assert.equal(JSON.stringify(audit).includes('consent-1'), false, 'audit must not expose raw request IDs');
 expectCode('subject cannot read global audit log', () => service.auditLog(subject), 'PERMISSION_DENIED');
+
+const foreignRecord = { subjectId: 'account-b', data: { email: 'b@example.com' }, updatedAt: 1, retentionUntil: 10_000 };
+const foreignRecordStore = { read() { return structuredClone(foreignRecord); }, replace() {}, remove() {}, list() { return [structuredClone(foreignRecord)]; } };
+const foreignRecordService = new ComplianceService({ store: foreignRecordStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+expectCode('cross-subject read fails closed when storage returns a foreign record', () => foreignRecordService.accessData(subject, { subjectId: 'account-a', requestId: 'foreign-read' }), 'STORE_FAILURE');
+expectCode('cross-subject export fails closed when storage returns a foreign record', () => foreignRecordService.exportData(subject, { subjectId: 'account-a', requestId: 'foreign-export' }), 'STORE_FAILURE');
+expectCode('cross-subject delete fails closed before removing a foreign record', () => foreignRecordService.deleteData(subject, { subjectId: 'account-a', requestId: 'foreign-delete' }), 'STORE_FAILURE');
+assert.equal(foreignRecordService.auditLog(operator).length, 0, 'foreign storage records must not create misleading audit events');
+
+let exportNow = 10;
+const replayExportStore = new InMemoryPrivacyDataStore([{ subjectId: 'export-subject', data: { safe: true }, updatedAt: 1, retentionUntil: 20 }]);
+const replayExportService = new ComplianceService({ store: replayExportStore, operatorToken: OPERATOR_TOKEN, now: () => exportNow });
+const replayExportActor = { kind: 'subject', subjectId: 'export-subject' };
+replayExportService.exportData(replayExportActor, { subjectId: 'export-subject', requestId: 'export-replay-retention' });
+exportNow = 20;
+expectCode('expired export replay cannot return a prior export', () => replayExportService.exportData(replayExportActor, { subjectId: 'export-subject', requestId: 'export-replay-retention' }), 'SUBJECT_EXPIRED');
+
+let residualRecord = { subjectId: 'delete-subject', data: { safe: true }, updatedAt: 1, retentionUntil: 10_000 };
+const residualStore = {
+  read() { return structuredClone(residualRecord); },
+  replace(record) { residualRecord = structuredClone(record); },
+  remove() {},
+  list() { return [structuredClone(residualRecord)]; },
+};
+const residualService = new ComplianceService({ store: residualStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+expectCode('delete fails closed when remove leaves residual data', () => residualService.deleteData({ kind: 'subject', subjectId: 'delete-subject' }, { subjectId: 'delete-subject', requestId: 'delete-residual' }), 'STORE_FAILURE');
+assert.deepEqual(residualStore.read(), residualRecord, 'failed delete must leave the original record intact');
+assert.equal(residualService.auditLog(operator).length, 0, 'failed delete must not leave an accepted audit event');
+
+const removeFailureStore = {
+  read() { return { subjectId: 'delete-failure', data: { safe: true }, updatedAt: 1, retentionUntil: 10_000 }; },
+  replace() {},
+  remove() { throw new Error('remove failed'); },
+  list() { return []; },
+};
+const removeFailureService = new ComplianceService({ store: removeFailureStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+expectCode('delete fails closed when remove throws', () => removeFailureService.deleteData({ kind: 'subject', subjectId: 'delete-failure' }, { subjectId: 'delete-failure', requestId: 'delete-error' }), 'STORE_FAILURE');
+assert.equal(removeFailureService.auditLog(operator).length, 0, 'remove failure must not leave an accepted audit event');
+
+let auditClockCalls = 0;
+const auditClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'audit-clock', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }]);
+const auditClockFailureService = new ComplianceService({ store: auditClockStore, operatorToken: OPERATOR_TOKEN, now: () => { auditClockCalls += 1; if (auditClockCalls === 3) throw new Error('audit clock offline'); return 100 + auditClockCalls; } });
+expectCode('audit clock failure prevents correction side effects', () => auditClockFailureService.correctData({ kind: 'subject', subjectId: 'audit-clock' }, { subjectId: 'audit-clock', requestId: 'audit-clock-correction', data: { value: 2 } }), 'STORE_FAILURE');
+assert.deepEqual(auditClockStore.read('audit-clock').data, { value: 1 }, 'audit clock failure must not write corrected data');
+assert.equal(auditClockFailureService.auditLog(operator).length, 0, 'audit clock failure must not persist an audit event');
+
+const auditPersistenceService = new ComplianceService({ store: new InMemoryPrivacyDataStore([{ subjectId: 'audit-persistence', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }]), operatorToken: OPERATOR_TOKEN, now: () => 100 });
+auditPersistenceService.audits.push = () => { throw new Error('audit persistence offline'); };
+expectCode('audit persistence failure prevents correction side effects', () => auditPersistenceService.correctData({ kind: 'subject', subjectId: 'audit-persistence' }, { subjectId: 'audit-persistence', requestId: 'audit-persistence-correction', data: { value: 2 } }), 'STORE_FAILURE');
+assert.deepEqual(auditPersistenceService.store.read('audit-persistence').data, { value: 1 }, 'audit persistence failure must not write corrected data');
+
+let purgeNow = 9;
+const changingPurgeStore = new InMemoryPrivacyDataStore([{ subjectId: 'purge-changing-time', data: { safe: true }, updatedAt: 1, retentionUntil: 10 }]);
+const changingPurgeService = new ComplianceService({ store: changingPurgeStore, operatorToken: OPERATOR_TOKEN, now: () => purgeNow });
+assert.equal(changingPurgeService.purgeExpired(operator, 'purge-changing-time').purgedSubjects, 0);
+purgeNow = 10;
+assert.equal(changingPurgeService.purgeExpired(operator, 'purge-changing-time').replayed, true, 'purge replay must remain idempotent when time changes');
+assert.equal(changingPurgeStore.list().length, 1, 'stable purge replay must not apply a second time-dependent purge');
 
 console.log(`T264 privacy compliance PASS: consent, age-gate, access, deterministic-export, correction, deletion, retention, audit-redaction, permission-isolation, sensitive-fields, idempotency, invalid-input and fail-closed=${audit.length}`);
