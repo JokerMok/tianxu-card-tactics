@@ -36,33 +36,33 @@
     },
     "bands": [
       { "id": "ENTRY", "minScore": 0, "maxScore": 419 },
-      { "id": "STANDARD", "minScore": 420, "maxScore": 459 },
+      { "id": "CORE", "minScore": 420, "maxScore": 459 },
       { "id": "ADVANCED", "minScore": 460, "maxScore": 499 },
-      { "id": "ELITE", "minScore": 500, "maxScore": 999 }
+      { "id": "EXPERT", "minScore": 500, "maxScore": 999 }
     ],
     "builds": [
-      { "buildId": "P01-B01", "strengthScore": 453, "band": "STANDARD" },
-      { "buildId": "P01-B02", "strengthScore": 434, "band": "STANDARD" },
-      { "buildId": "P02-B01", "strengthScore": 531, "band": "ELITE" },
-      { "buildId": "P02-B02", "strengthScore": 432, "band": "STANDARD" },
+      { "buildId": "P01-B01", "strengthScore": 453, "band": "CORE" },
+      { "buildId": "P01-B02", "strengthScore": 434, "band": "CORE" },
+      { "buildId": "P02-B01", "strengthScore": 531, "band": "EXPERT" },
+      { "buildId": "P02-B02", "strengthScore": 432, "band": "CORE" },
       { "buildId": "P03-B01", "strengthScore": 495, "band": "ADVANCED" },
       { "buildId": "P03-B02", "strengthScore": 498, "band": "ADVANCED" },
       { "buildId": "P04-B01", "strengthScore": 414, "band": "ENTRY" },
       { "buildId": "P04-B02", "strengthScore": 485, "band": "ADVANCED" },
-      { "buildId": "R01-B01", "strengthScore": 440, "band": "STANDARD" },
-      { "buildId": "R01-B02", "strengthScore": 532, "band": "ELITE" },
+      { "buildId": "R01-B01", "strengthScore": 440, "band": "CORE" },
+      { "buildId": "R01-B02", "strengthScore": 532, "band": "EXPERT" },
       { "buildId": "R02-B01", "strengthScore": 491, "band": "ADVANCED" },
       { "buildId": "R02-B02", "strengthScore": 498, "band": "ADVANCED" },
-      { "buildId": "R03-B01", "strengthScore": 440, "band": "STANDARD" },
-      { "buildId": "R03-B02", "strengthScore": 457, "band": "STANDARD" },
+      { "buildId": "R03-B01", "strengthScore": 440, "band": "CORE" },
+      { "buildId": "R03-B02", "strengthScore": 457, "band": "CORE" },
       { "buildId": "R04-B01", "strengthScore": 490, "band": "ADVANCED" },
       { "buildId": "R04-B02", "strengthScore": 485, "band": "ADVANCED" },
-      { "buildId": "R05-B01", "strengthScore": 520, "band": "ELITE" },
+      { "buildId": "R05-B01", "strengthScore": 520, "band": "EXPERT" },
       { "buildId": "R05-B02", "strengthScore": 499, "band": "ADVANCED" },
       { "buildId": "R06-B01", "strengthScore": 498, "band": "ADVANCED" },
       { "buildId": "R06-B02", "strengthScore": 480, "band": "ADVANCED" },
-      { "buildId": "R07-B01", "strengthScore": 500, "band": "ELITE" },
-      { "buildId": "R07-B02", "strengthScore": 449, "band": "STANDARD" }
+      { "buildId": "R07-B01", "strengthScore": 500, "band": "EXPERT" },
+      { "buildId": "R07-B02", "strengthScore": 449, "band": "CORE" }
     ]
   },
   "modeProfiles": [
@@ -83,13 +83,13 @@
         { "id": "L03", "strategyId": "ES_L03", "requiredBuildScore": 380, "requiredBand": "ENTRY" },
         { "id": "L04", "strategyId": "ES_L04", "requiredBuildScore": 395, "requiredBand": "ENTRY" },
         { "id": "L05", "strategyId": "ES_L05", "requiredBuildScore": 405, "requiredBand": "ENTRY" },
-        { "id": "L06", "strategyId": "ES_L06", "requiredBuildScore": 420, "requiredBand": "STANDARD" },
-        { "id": "L07", "strategyId": "ES_L07", "requiredBuildScore": 430, "requiredBand": "STANDARD" },
-        { "id": "L08", "strategyId": "ES_L08", "requiredBuildScore": 440, "requiredBand": "STANDARD" },
-        { "id": "L09", "strategyId": "ES_L09", "requiredBuildScore": 455, "requiredBand": "STANDARD" },
+        { "id": "L06", "strategyId": "ES_L06", "requiredBuildScore": 420, "requiredBand": "CORE" },
+        { "id": "L07", "strategyId": "ES_L07", "requiredBuildScore": 430, "requiredBand": "CORE" },
+        { "id": "L08", "strategyId": "ES_L08", "requiredBuildScore": 440, "requiredBand": "CORE" },
+        { "id": "L09", "strategyId": "ES_L09", "requiredBuildScore": 455, "requiredBand": "CORE" },
         { "id": "L10", "strategyId": "ES_L10", "requiredBuildScore": 465, "requiredBand": "ADVANCED" },
         { "id": "L11", "strategyId": "ES_L11", "requiredBuildScore": 480, "requiredBand": "ADVANCED" },
-        { "id": "L12", "strategyId": "ES_L12", "requiredBuildScore": 500, "requiredBand": "ELITE" }
+        { "id": "L12", "strategyId": "ES_L12", "requiredBuildScore": 500, "requiredBand": "EXPERT" }
       ]
     },
     {
@@ -104,8 +104,8 @@
         "minTotalMaxHp": 42
       },
       "entries": [
-        { "id": "NORMAL", "stageCount": 3, "requiredBuildScore": 430, "requiredBand": "STANDARD" },
-        { "id": "HARD", "stageCount": 3, "requiredBuildScore": 500, "requiredBand": "ELITE", "minEffectApplications": 2, "minDeployedUnits": 9, "minTotalMaxHp": 45 }
+        { "id": "NORMAL", "stageCount": 3, "requiredBuildScore": 430, "requiredBand": "CORE" },
+        { "id": "HARD", "stageCount": 3, "requiredBuildScore": 500, "requiredBand": "EXPERT", "minEffectApplications": 2, "minDeployedUnits": 9, "minTotalMaxHp": 45 }
       ]
     },
     {
@@ -120,16 +120,16 @@
         "minTotalMaxHp": 42
       },
       "entries": [
-        { "id": "STAGE_01", "floorStart": 1, "floorEnd": 5, "requiredBuildScore": 430, "requiredBand": "STANDARD" },
-        { "id": "STAGE_02", "floorStart": 6, "floorEnd": 10, "requiredBuildScore": 440, "requiredBand": "STANDARD" },
-        { "id": "STAGE_03", "floorStart": 11, "floorEnd": 15, "requiredBuildScore": 455, "requiredBand": "STANDARD" },
+        { "id": "STAGE_01", "floorStart": 1, "floorEnd": 5, "requiredBuildScore": 430, "requiredBand": "CORE" },
+        { "id": "STAGE_02", "floorStart": 6, "floorEnd": 10, "requiredBuildScore": 440, "requiredBand": "CORE" },
+        { "id": "STAGE_03", "floorStart": 11, "floorEnd": 15, "requiredBuildScore": 455, "requiredBand": "CORE" },
         { "id": "STAGE_04", "floorStart": 16, "floorEnd": 20, "requiredBuildScore": 465, "requiredBand": "ADVANCED" },
         { "id": "STAGE_05", "floorStart": 21, "floorEnd": 25, "requiredBuildScore": 475, "requiredBand": "ADVANCED" },
         { "id": "STAGE_06", "floorStart": 26, "floorEnd": 30, "requiredBuildScore": 485, "requiredBand": "ADVANCED" },
         { "id": "STAGE_07", "floorStart": 31, "floorEnd": 35, "requiredBuildScore": 495, "requiredBand": "ADVANCED" },
-        { "id": "STAGE_08", "floorStart": 36, "floorEnd": 40, "requiredBuildScore": 505, "requiredBand": "ELITE" },
-        { "id": "STAGE_09", "floorStart": 41, "floorEnd": 45, "requiredBuildScore": 515, "requiredBand": "ELITE" },
-        { "id": "STAGE_10", "floorStart": 46, "floorEnd": 50, "requiredBuildScore": 525, "requiredBand": "ELITE" }
+        { "id": "STAGE_08", "floorStart": 36, "floorEnd": 40, "requiredBuildScore": 505, "requiredBand": "EXPERT" },
+        { "id": "STAGE_09", "floorStart": 41, "floorEnd": 45, "requiredBuildScore": 515, "requiredBand": "EXPERT" },
+        { "id": "STAGE_10", "floorStart": 46, "floorEnd": 50, "requiredBuildScore": 525, "requiredBand": "EXPERT" }
       ]
     },
     {
@@ -144,7 +144,7 @@
         "minTotalMaxHp": 50
       },
       "entries": [
-        { "id": "BOSS-T225-IRON-ROOT", "maxHp": 100, "phaseCount": 1, "requiredBuildScore": 520, "requiredBand": "ELITE" }
+        { "id": "BOSS-T225-IRON-ROOT", "maxHp": 100, "phaseCount": 1, "requiredBuildScore": 520, "requiredBand": "EXPERT" }
       ]
     }
   ]
