@@ -76,6 +76,13 @@ const server = new CommerceService({
       priceCurrency: 'CNY',
       grant: { freeCurrency: 2, paidCurrency: 200 },
     },
+    {
+      productId: 'other-provider-pack',
+      provider: 'other-store',
+      priceMinor: 499,
+      priceCurrency: 'CNY',
+      grant: { freeCurrency: 3, paidCurrency: 30 },
+    },
   ],
   orderId: () => `order-${++orderSequence}`,
   paymentVerifier: (raw) => paymentRecords.get(raw) ?? null,
@@ -115,7 +122,7 @@ function registerPayment(receipt, order, overrides = {}) {
   return record;
 }
 
-assert.deepEqual(server.catalog().map(({ productId }) => productId), ['paid-pack', 'free-pack', 'callback-pack']);
+assert.deepEqual(server.catalog().map(({ productId }) => productId), ['paid-pack', 'free-pack', 'callback-pack', 'other-provider-pack']);
 const catalogProbe = server.catalog();
 catalogProbe[0].grant.paidCurrency = 1;
 assert.equal(server.catalog()[0].grant.paidCurrency, 1_000, 'catalog must be detached from server state');
@@ -177,6 +184,16 @@ assert.equal(freeResult.delivered, true);
 assert.equal(freeResult.wallet.freeCurrency, 75, 'free currency must be credited to its own balance');
 assert.equal(freeResult.wallet.paidCurrency, 1_000, 'free grants must never alter paid currency');
 
+const otherProviderCreated = clientA.createOrder('other-provider-pack', 'create-other-provider');
+registerPayment('receipt:other-provider', otherProviderCreated.order, {
+  provider: 'other-store',
+  transactionId: valid.order.transactionId,
+  receiptId: 'receipt:other-provider',
+});
+const otherProviderResult = clientA.verifyOrder(otherProviderCreated.order.orderId, 'receipt:other-provider', 'verify-other-provider');
+assert.equal(otherProviderResult.delivered, true, 'the same transactionId may be used by a different provider');
+assert.equal(otherProviderResult.wallet.paidCurrency, 1_030);
+
 const restoreCreated = clientA.createOrder('paid-pack', 'create-restore');
 const restoreReceipt = 'receipt:restore-1';
 registerPayment(restoreReceipt, restoreCreated.order, { transactionId: 'transaction-restore-1', receiptId: restoreReceipt });
@@ -205,6 +222,42 @@ const paidBeforeConflictingBatch = clientA.wallet().paidCurrency;
 expectCode('one restore batch cannot plan two transactions for one order', () => clientA.restoreOrders(['receipt:conflicting-batch-a', 'receipt:conflicting-batch-b'], 'restore-conflicting-batch'), 'PAYMENT_MISMATCH');
 assert.equal(clientA.wallet().paidCurrency, paidBeforeConflictingBatch, 'a rejected restore batch must not partially grant currency');
 assert.equal(clientA.orders().find((order) => order.orderId === conflictingBatchCreated.order.orderId).status, 'CREATED');
+
+const overflowReceipts = new Map();
+let overflowOrderSequence = 0;
+const overflowServer = new CommerceService({
+  now: () => 1,
+  authenticateSession: (token) => token === 'overflow-session' ? 'overflow-account' : null,
+  orderId: () => `overflow-order-${++overflowOrderSequence}`,
+  products: [
+    { productId: 'overflow-first', provider: 'overflow-store', priceMinor: 1, priceCurrency: 'CNY', grant: { freeCurrency: 1, paidCurrency: 1 } },
+    { productId: 'overflow-second', provider: 'overflow-store', priceMinor: 2, priceCurrency: 'CNY', grant: { freeCurrency: Number.MAX_SAFE_INTEGER, paidCurrency: 0 } },
+  ],
+  paymentVerifier: (raw) => overflowReceipts.get(raw) ?? null,
+  adminDiagnosticToken: 'overflow-admin',
+});
+const overflowClient = new CommerceClientService(overflowServer, { sessionToken: 'overflow-session' });
+const overflowFirst = overflowClient.createOrder('overflow-first', 'overflow-create-first');
+const overflowSecond = overflowClient.createOrder('overflow-second', 'overflow-create-second');
+overflowReceipts.set('overflow-receipt-first', paymentFor({
+  accountId: 'overflow-account', orderId: overflowFirst.order.orderId, productId: overflowFirst.order.productId,
+  provider: 'overflow-store', transactionId: 'overflow-transaction-first', receiptId: 'overflow-receipt-first', amountMinor: 1,
+}));
+overflowReceipts.set('overflow-receipt-second', paymentFor({
+  accountId: 'overflow-account', orderId: overflowSecond.order.orderId, productId: overflowSecond.order.productId,
+  provider: 'overflow-store', transactionId: 'overflow-transaction-second', receiptId: 'overflow-receipt-second', amountMinor: 2,
+}));
+const overflowBefore = overflowServer.snapshot('overflow-admin');
+expectCode('restore overflow must abort the entire batch', () => overflowClient.restoreOrders(['overflow-receipt-first', 'overflow-receipt-second'], 'overflow-restore'), 'CURRENCY_OVERFLOW');
+assert.deepEqual(overflowServer.snapshot('overflow-admin'), overflowBefore, 'restore overflow must roll back orders, wallet and transaction state');
+const overflowOtherOrder = overflowClient.createOrder('overflow-first', 'overflow-create-other');
+overflowReceipts.set('overflow-receipt-other', paymentFor({
+  accountId: 'overflow-account', orderId: overflowOtherOrder.order.orderId, productId: overflowOtherOrder.order.productId,
+  provider: 'overflow-store', transactionId: 'overflow-transaction-first', receiptId: 'overflow-receipt-other', amountMinor: 1,
+}));
+assert.equal(overflowClient.verifyOrder(overflowOtherOrder.order.orderId, 'overflow-receipt-other', 'overflow-verify-other').delivered, true, 'failed restore must not retain a partial transaction reservation');
+assert.equal(overflowClient.orders().find((order) => order.orderId === overflowFirst.order.orderId).status, 'CREATED');
+assert.equal(overflowClient.orders().find((order) => order.orderId === overflowSecond.order.orderId).status, 'CREATED');
 
 const callbackCreated = clientA.createOrder('callback-pack', 'create-callback');
 const callbackPayment = paymentFor({

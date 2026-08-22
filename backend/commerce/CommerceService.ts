@@ -142,6 +142,12 @@ interface DeliveryPlan {
   readonly payment: TrustedPaymentVerification;
 }
 
+interface CommerceMutationSnapshot {
+  readonly orders: ReadonlyMap<string, CommerceOrder>;
+  readonly wallets: ReadonlyMap<string, CurrencyWallet>;
+  readonly transactions: ReadonlyMap<string, string>;
+}
+
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
     && (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null);
@@ -334,6 +340,7 @@ export class CommerceService {
     const ledger = this.ledgerFor(this.restoreLedgers, accountId);
     const replay = this.replay<RestoreOrdersResult>(ledger, requestId, fingerprint);
     if (replay !== undefined) return replay;
+    const mutationSnapshot = this.captureMutationSnapshot();
     try {
       const payments = request.receipts.map((receipt) => this.requirePaymentVerification(receipt, { action: 'restore', accountId }));
       const plans: Array<DeliveryPlan | { readonly kind: 'duplicate-local'; readonly orderId: string }> = [];
@@ -342,7 +349,8 @@ export class CommerceService {
       for (const payment of payments) {
         const order = localOrders.get(payment.orderId) ?? this.requireOrderForAccount(payment.orderId, accountId);
         this.assertPaymentMatches(order, payment);
-        const previousTransaction = localTransactions.get(payment.transactionId);
+        const transactionKey = this.transactionKey(payment.provider, payment.transactionId);
+        const previousTransaction = localTransactions.get(transactionKey);
         if (previousTransaction !== undefined) {
           if (previousTransaction.orderId !== order.orderId) throw new CommerceError('PAYMENT_ALREADY_USED', 'one transaction was supplied for multiple orders');
           if (payment.status === 'REFUNDED') {
@@ -355,7 +363,7 @@ export class CommerceService {
           plans.push({ kind: 'duplicate-local', orderId: order.orderId });
           continue;
         }
-        localTransactions.set(payment.transactionId, { orderId: order.orderId, receiptId: payment.receiptId });
+        localTransactions.set(transactionKey, { orderId: order.orderId, receiptId: payment.receiptId });
         const plan = this.planPayment(order, payment);
         plans.push(plan);
         if (plan.kind === 'deliver') {
@@ -385,6 +393,7 @@ export class CommerceService {
       return cloneResult(result);
     } catch (error) {
       const commerceError = errorFromUnknown(error, 'PAYMENT_VERIFICATION_FAILED', 'purchase restore failed');
+      this.restoreMutationSnapshot(mutationSnapshot);
       this.storeError(ledger, requestId, fingerprint, commerceError);
       throw commerceError;
     }
@@ -545,9 +554,30 @@ export class CommerceService {
     return wallet;
   }
 
+  private transactionKey(provider: string, transactionId: string): string {
+    return stable([provider, transactionId]);
+  }
+
+  private captureMutationSnapshot(): CommerceMutationSnapshot {
+    const orders = new Map<string, CommerceOrder>();
+    for (const [orderId, order] of this.orders) orders.set(orderId, copyOrder(order));
+    const wallets = new Map<string, CurrencyWallet>();
+    for (const [accountId, wallet] of this.wallets) wallets.set(accountId, copyWallet(wallet));
+    return { orders, wallets, transactions: new Map(this.transactions) };
+  }
+
+  private restoreMutationSnapshot(snapshot: CommerceMutationSnapshot): void {
+    this.orders.clear();
+    for (const [orderId, order] of snapshot.orders) this.orders.set(orderId, copyOrder(order));
+    this.wallets.clear();
+    for (const [accountId, wallet] of snapshot.wallets) this.wallets.set(accountId, copyWallet(wallet));
+    this.transactions.clear();
+    for (const [key, orderId] of snapshot.transactions) this.transactions.set(key, orderId);
+  }
+
   private planPayment(order: CommerceOrder, payment: TrustedPaymentVerification): DeliveryPlan {
     if (order.status === 'REFUNDED') return { kind: 'blocked-refunded', order, payment };
-    const usedBy = this.transactions.get(payment.transactionId);
+    const usedBy = this.transactions.get(this.transactionKey(payment.provider, payment.transactionId));
     if (usedBy !== undefined && usedBy !== order.orderId) throw new CommerceError('PAYMENT_ALREADY_USED', 'transaction was already used by another order');
     if (order.status === 'PAID') {
       if (payment.status === 'REFUNDED') {
@@ -613,7 +643,7 @@ export class CommerceService {
       verifiedAt: now,
       updatedAt: Math.max(now, order.updatedAt),
     };
-    this.transactions.set(payment.transactionId, order.orderId);
+    this.transactions.set(this.transactionKey(payment.provider, payment.transactionId), order.orderId);
     this.wallets.set(order.accountId, nextWallet);
     this.orders.set(order.orderId, nextOrder);
     return { accepted: true, delivered: true, replayed, order: copyOrder(nextOrder), wallet: copyWallet(nextWallet) };
@@ -629,7 +659,7 @@ export class CommerceService {
 
   private applyRefund(order: CommerceOrder, refund: TrustedRefundVerification, replayed: boolean): RefundResult {
     if (order.status === 'REFUNDED') return this.alreadyRefunded(order, order.accountId);
-    const usedBy = this.transactions.get(refund.transactionId);
+    const usedBy = this.transactions.get(this.transactionKey(refund.provider, refund.transactionId));
     if (usedBy !== undefined && usedBy !== order.orderId) throw new CommerceError('PAYMENT_ALREADY_USED', 'refund transaction was already used by another order');
     const now = validNow(this.clock());
     const wallet = this.walletFor(order.accountId);
@@ -650,7 +680,7 @@ export class CommerceService {
       refundedAt: now,
       updatedAt: Math.max(now, order.updatedAt),
     };
-    this.transactions.set(refund.transactionId, order.orderId);
+    this.transactions.set(this.transactionKey(refund.provider, refund.transactionId), order.orderId);
     this.wallets.set(order.accountId, nextWallet);
     this.orders.set(order.orderId, nextOrder);
     return { accepted: true, refunded: true, replayed, order: copyOrder(nextOrder), wallet: copyWallet(nextWallet), revoked: cloneResult(revoked) };
