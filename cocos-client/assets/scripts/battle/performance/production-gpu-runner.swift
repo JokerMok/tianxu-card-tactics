@@ -28,10 +28,35 @@ func dictionaryValue(_ value: Any?, _ label: String) throws -> [String: Any] {
 }
 
 func integerValue(_ value: Any?, _ label: String) throws -> Int {
-    guard let value = value as? Int else {
+    if let value = value as? Int { return value }
+    if let value = value as? NSNumber, value.doubleValue.rounded() == value.doubleValue { return value.intValue }
+    throw RunnerError(description: "\(label) is missing")
+}
+
+func booleanValue(_ value: Any?, _ label: String) throws -> Bool {
+    guard let value = value as? Bool else {
         throw RunnerError(description: "\(label) is missing")
     }
     return value
+}
+
+func numberValue(_ value: Any?, _ label: String) throws -> Double {
+    guard let value = value as? NSNumber else {
+        throw RunnerError(description: "\(label) is missing")
+    }
+    let number = value.doubleValue
+    guard number.isFinite else {
+        throw RunnerError(description: "\(label) is not finite")
+    }
+    return number
+}
+
+func exactPixelValue(_ value: Any?, _ label: String, expected: Double) throws -> Int {
+    let actual = try numberValue(value, label)
+    guard actual == expected else {
+        throw RunnerError(description: "\(label) must be exactly \(Int(expected)), received \(actual)")
+    }
+    return Int(expected)
 }
 
 func jsonObject(_ value: Any?, _ label: String) throws -> Any {
@@ -232,6 +257,43 @@ func readJSON(_ data: Data, _ label: String) throws -> [String: Any] {
         throw error
     } catch {
         throw RunnerError(description: "\(label) is not valid JSON: \(error.localizedDescription)")
+    }
+}
+
+func forbiddenArtMetricValue(_ value: Any) -> String? {
+    let forbiddenTokens = ["preview", "pose", "placeholder", "dummy", "stub", "synthetic", "emulated", "fallback"]
+    if let string = value as? String {
+        let normalized = string.lowercased()
+        return forbiddenTokens.contains(where: { normalized.contains($0) }) ? string : nil
+    }
+    if let dictionary = value as? [String: Any] {
+        for nested in dictionary.values {
+            if let found = forbiddenArtMetricValue(nested) { return found }
+        }
+    }
+    if let array = value as? [Any] {
+        for nested in array {
+            if let found = forbiddenArtMetricValue(nested) { return found }
+        }
+    }
+    return nil
+}
+
+func requireFormalRuntimeMetrics(_ metrics: [String: Any], label: String) throws {
+    guard try booleanValue(metrics["ready"], "\(label).ready") else {
+        throw RunnerError(description: "\(label) did not report ready=true")
+    }
+    guard try booleanValue(metrics["assetsReady"], "\(label).assetsReady") else {
+        throw RunnerError(description: "\(label) did not report assetsReady=true")
+    }
+    let artMode = try stringValue(metrics["artMode"], "\(label).artMode")
+    let previewPoseAssets = try integerValue(metrics["previewPoseAssets"], "\(label).previewPoseAssets")
+    let artIntegrationComplete = (metrics["artIntegrationComplete"] as? Bool) ?? false
+    if artMode != "formal-runtime" || previewPoseAssets != 0 || !artIntegrationComplete {
+        throw RunnerError(description: "\(label) formal runtime missing: artMode=\(artMode), previewPoseAssets=\(previewPoseAssets), artIntegrationComplete=\(artIntegrationComplete); preview-pose and placeholder resources are rejected")
+    }
+    if let forbidden = forbiddenArtMetricValue(metrics) {
+        throw RunnerError(description: "\(label) contains a preview/placeholder resource metric: \(forbidden)")
     }
 }
 
@@ -529,6 +591,10 @@ func run() throws -> [String: Any] {
     try pollBoolean(pageClient, expression: "Boolean(globalThis.__A0_METRICS__?.ready === true)", label: "Cocos A0 ready", timeout: 45)
     try pollBoolean(pageClient, expression: "Boolean(globalThis.__A0_METRICS__?.assetsReady === true)", label: "Cocos A0 assets", timeout: 45)
     let initial = try pageClient.evaluate("globalThis.__A0_METRICS__")
+    guard let initialObject = initial as? [String: Any] else {
+        throw RunnerError(description: "Cocos A0 metrics result is not an object")
+    }
+    try requireFormalRuntimeMetrics(initialObject, label: "Cocos A0 initial metrics")
     let canvas = try pageClient.evaluate("(() => { const node = document.querySelector('canvas'); if (!node) throw new Error('Cocos canvas is missing'); const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height, bufferWidth: node.width, bufferHeight: node.height }; })()")
 
     _ = try pageClient.evaluate("(() => { globalThis.__A0_ENABLE_STRESS__(); return true; })()")
@@ -600,17 +666,19 @@ func run() throws -> [String: Any] {
         throw RunnerError(description: "rAF sampler returned a non-numeric frame interval")
     }
     guard frameTimesMs.count >= 120 else { throw RunnerError(description: "rAF sampler returned fewer than 120 samples") }
-    guard let initialObject = initial as? [String: Any], let finalObject = final as? [String: Any], let canvasObject = canvas as? [String: Any] else {
-        throw RunnerError(description: "Cocos metrics or canvas result is not an object")
+    guard let finalObject = final as? [String: Any], let canvasObject = canvas as? [String: Any] else {
+        throw RunnerError(description: "Cocos final metrics or canvas result is not an object")
     }
-    guard (initialObject["ready"] as? Bool) == true, (initialObject["assetsReady"] as? Bool) == true else {
-        throw RunnerError(description: "Cocos page did not expose ready/assetsReady metrics")
-    }
-    guard (finalObject["activeUnits"] as? Int) == 24, (finalObject["runtimeUnitSprites"] as? Int) == 24, (finalObject["hitCount"] as? Int) == 1 else {
+    try requireFormalRuntimeMetrics(finalObject, label: "Cocos A0 final metrics")
+    let canvasCssWidth = try exactPixelValue(canvasObject["width"], "Cocos canvas CSS width", expected: 1920)
+    let canvasCssHeight = try exactPixelValue(canvasObject["height"], "Cocos canvas CSS height", expected: 1080)
+    let canvasBufferWidth = try exactPixelValue(canvasObject["bufferWidth"], "Cocos canvas buffer width", expected: 1920)
+    let canvasBufferHeight = try exactPixelValue(canvasObject["bufferHeight"], "Cocos canvas buffer height", expected: 1080)
+    guard try booleanValue(finalObject["stressMode"], "Cocos A0 final metrics stressMode"),
+          try integerValue(finalObject["activeUnits"], "Cocos A0 final metrics activeUnits") == 24,
+          try integerValue(finalObject["runtimeUnitSprites"], "Cocos A0 final metrics runtimeUnitSprites") == 24,
+          try integerValue(finalObject["hitCount"], "Cocos A0 final metrics hitCount") == 1 else {
         throw RunnerError(description: "Cocos page metrics did not confirm the required 24-unit hit scenario")
-    }
-    guard (canvasObject["bufferWidth"] as? Int ?? 0) >= 1918, (canvasObject["bufferHeight"] as? Int ?? 0) >= 1078 else {
-        throw RunnerError(description: "Cocos canvas does not cover the 1920x1080 output")
     }
     guard (webgl as? [String: Any])?["contextLost"] as? Bool == false else { throw RunnerError(description: "live WebGL context was lost") }
     if !pageClient.consoleErrors.isEmpty || !pageClient.exceptions.isEmpty {
@@ -620,9 +688,6 @@ func run() throws -> [String: Any] {
     guard let resolution = scenario["resolution"] as? [Int], resolution.count == 2 else {
         throw RunnerError(description: "production scenario resolution is invalid")
     }
-    let scenarioWidth = try integerValue(resolution[0], "scenario width")
-    let scenarioHeight = try integerValue(resolution[1], "scenario height")
-    let scenarioUnits = try integerValue(scenario["units"], "scenario units")
     let scenarioLayers = try integerValue(scenario["sceneLayers"], "scenario sceneLayers")
     let scenarioEffects = try integerValue(scenario["basicEffects"], "scenario basicEffects")
     let scenarioAudio = try integerValue(scenario["audioFeedbacks"], "scenario audioFeedbacks")
@@ -635,9 +700,15 @@ func run() throws -> [String: Any] {
         "gpuContextId": gpuContextID,
         "gpuFeatureStatus": ["webgl": webglFeatureStatus, "webgl2": webgl2FeatureStatus],
         "gpuContextType": contextType,
-        "width": scenarioWidth,
-        "height": scenarioHeight,
-        "units": scenarioUnits,
+        "width": canvasBufferWidth,
+        "height": canvasBufferHeight,
+        "canvasCssWidth": canvasCssWidth,
+        "canvasCssHeight": canvasCssHeight,
+        "canvasBufferWidth": canvasBufferWidth,
+        "canvasBufferHeight": canvasBufferHeight,
+        "a0Metrics": finalObject,
+        "a0InitialMetrics": initialObject,
+        "units": try integerValue(finalObject["activeUnits"], "Cocos A0 final metrics activeUnits"),
         "sceneLayers": scenarioLayers,
         "basicEffects": scenarioEffects,
         "audioFeedbacks": scenarioAudio,

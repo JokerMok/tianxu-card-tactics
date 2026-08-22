@@ -74,6 +74,39 @@ function isRecord(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+function findForbiddenArtMetricValue(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    return /(?:preview|pose|placeholder|dummy|stub|synthetic|emulated|fallback)/i.test(value) ? value : undefined;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const found = findForbiddenArtMetricValue(entry);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (isRecord(value)) {
+    for (const entry of Object.values(value)) {
+      const found = findForbiddenArtMetricValue(entry);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
+
+function validateFormalA0Metrics(metrics: Record<string, any>, label: string): void {
+  if (metrics.ready !== true || metrics.assetsReady !== true) fail(`${label} did not confirm a ready runtime with loaded assets`);
+  if (metrics.artMode !== 'formal-runtime') {
+    fail(`${label} formal runtime missing: artMode=${String(metrics.artMode)}; preview-pose and placeholder resources are rejected`);
+  }
+  if (metrics.previewPoseAssets !== 0) {
+    fail(`${label} formal runtime missing: previewPoseAssets=${String(metrics.previewPoseAssets)}; expected 0`);
+  }
+  if (metrics.artIntegrationComplete !== true) fail(`${label} formal runtime missing: artIntegrationComplete must be true`);
+  const forbiddenArtMetric = findForbiddenArtMetricValue(metrics);
+  if (forbiddenArtMetric) fail(`${label} contains a preview/placeholder resource metric: ${forbiddenArtMetric}`);
+}
+
 function requireRecord(value: unknown, label: string): Record<string, any> {
   if (!isRecord(value)) fail(`${label} must be an object`);
   return value;
@@ -391,9 +424,10 @@ export function validatePerformanceSample(sample: PerformanceSample, limits = PE
 }
 
 // Runner protocol: stdin is the scenario JSON; stdout is JSON containing runtimeAvailable,
-// renderer, GPU identity, gpuDriverVersion, gpuContextId, every scenario contract field,
-// and raw frameTimesMs samples. The verifier launches only an absolute, directly executable
-// regular file; interpreter/script paths are rejected by verify-production-performance.mjs.
+// renderer, GPU identity, gpuDriverVersion, gpuContextId, actual canvas dimensions, the
+// observed A0 metrics, every scenario contract field, and raw frameTimesMs samples. The
+// verifier launches only an absolute, directly executable regular file; interpreter/script
+// paths are rejected by verify-production-performance.mjs.
 // gpuDriverVersion must be the observed driver/version string and include a numeric version;
 // gpuContextId must identify the live GPU context and be at least eight characters. All four
 // identity fields must be non-placeholder values.
@@ -445,6 +479,27 @@ export function validateGpuRunnerResult(result: unknown, scenario: ProductionSce
   if (mismatchedField) {
     fail(`GPU runner measured a scenario different from the production contract (${mismatchedField[0]} mismatch)`);
   }
+
+  const canvasDimensions = [
+    ['canvasCssWidth', runner.canvasCssWidth, PERFORMANCE_LIMITS.width],
+    ['canvasCssHeight', runner.canvasCssHeight, PERFORMANCE_LIMITS.height],
+    ['canvasBufferWidth', runner.canvasBufferWidth, PERFORMANCE_LIMITS.width],
+    ['canvasBufferHeight', runner.canvasBufferHeight, PERFORMANCE_LIMITS.height],
+  ] as const;
+  canvasDimensions.forEach(([label, actual, expected]) => {
+    const measured = requireFiniteNumber(actual, `GPU runner ${label}`);
+    if (measured !== expected) fail(`GPU runner ${label} must be exactly ${expected}, received ${measured}`);
+  });
+
+  const a0Metrics = requireRecord(runner.a0Metrics, 'GPU runner a0Metrics');
+  validateFormalA0Metrics(a0Metrics, 'GPU runner A0 metrics');
+  const a0InitialMetrics = requireRecord(runner.a0InitialMetrics, 'GPU runner a0InitialMetrics');
+  validateFormalA0Metrics(a0InitialMetrics, 'GPU runner initial A0 metrics');
+  if (a0Metrics.stressMode !== true || a0Metrics.activeUnits !== scenario.units || a0Metrics.runtimeUnitSprites !== scenario.units) {
+    fail('GPU runner A0 metrics did not confirm the required 24-unit stress runtime');
+  }
+  if (a0Metrics.hitCount !== 1) fail('GPU runner A0 metrics did not confirm the hit scenario');
+
   if (!Array.isArray(runner.frameTimesMs) || runner.frameTimesMs.length < 120) fail('GPU runner must provide at least 120 raw frame-time samples');
   const frameTimesMs = runner.frameTimesMs.map((value: unknown, index: number) => {
     const frameTimeMs = requireFiniteNumber(value, `GPU runner frameTimesMs[${index}]`);
