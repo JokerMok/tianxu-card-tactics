@@ -42,7 +42,7 @@ cd cocos-client && node --experimental-strip-types tools/release/final/verify-re
 T327 live GPU gate: PASS (T203 exit code 0; GPU/WebGL2 runtime <non-empty vendor> / <non-empty renderer>; FPS <number>; P95 <number>ms)
 ```
 
-解析器校验 GPU vendor/renderer 非空、FPS `>=55`、P95 `<=22ms`；不接受 pass sample、旧 artifact、固定文本或宽泛 PASS marker 替代 live GPU 输出。T326、T328、T329 仍要求子进程退出码 `0` 且精确结论 marker 完整存在。脚本内负例覆盖缺少 T327 BLOCKED marker、非零退出上的伪造 live PASS，以及 formal-runtime/历史 artifact 替代 live evidence。
+解析器校验 GPU vendor/renderer 非空、FPS `>=55`、P95 `<=22ms`；不接受 pass sample、旧 artifact、固定文本或宽泛 PASS marker 替代 live GPU 输出。T326、T328、T329 仍要求子进程退出码 `0` 且精确结论 marker 完整存在。脚本内负例覆盖缺少 T327 BLOCKED marker、非零退出上的伪造 live PASS、formal-runtime/历史 artifact 替代 live evidence、GREEN 与正式 BLOCKED 矛盾输出，以及退出码 `2` 的完整 BLOCKED 输出。
 
 ## 当前总门结论
 
@@ -70,12 +70,13 @@ T265 final release gate: BLOCKED
 ## 回退步骤
 
 1. 停止发布，保留总汇验证器、总门报告、四个子验证器输出和失败证据。
-2. 合入后由协调器将当前父基线 `8161b9489798b342a4c4e920fb6b763a74b4a110` 替换为实际 T265 merge SHA，执行 `git revert -m 1 <T265 merge SHA>`。
-3. 回退后重新执行复验命令；退出码不是 `0` 时不得恢复发布，也不得更新共享台账。
-4. 仅在确认没有并行改动、确需恢复工作树时，执行：
+2. 合入后由协调器将当前父基线 `8161b9489798b342a4c4e920fb6b763a74b4a110` 替换为实际集成 SHA；可用 `git log -1 --format=%H -- cocos-client/tools/release/final/verify-release-final.mjs documentation/release/final/T265-release-final.md` 取得该 SHA。
+3. 用 `git rev-list --parents -n 1 <T265 SHA>` 判断提交形态：输出为提交 SHA 加一个父 SHA 时，普通 cherry-pick/fast-forward 集成执行 `git revert <T265 commit SHA>`；输出为提交 SHA 加两个或更多父 SHA 时，才是实际 merge commit，执行 `git revert -m 1 <T265 merge SHA>`。
+4. 回退后重新执行复验命令；退出码不是 `0` 时不得恢复发布，也不得更新共享台账。
+5. 仅在确认没有并行改动、确需恢复工作树时，执行：
 
    ```sh
-   git restore --source=<T265 merge SHA>^ -- cocos-client/tools/release/final documentation/release/final
+   git restore --source=<T265 SHA>^ -- cocos-client/tools/release/final documentation/release/final
    ```
 
-5. 性能缺口修复必须重新采集正式设备原始帧时间、GPU/WebGL2、正式运行时资产和压力状态证据，不降低既定 FPS、P95、分辨率、24 单位、六层场景及正式资产门槛。
+6. 性能缺口修复必须重新采集正式设备原始帧时间、GPU/WebGL2、正式运行时资产和压力状态证据，不降低既定 FPS、P95、分辨率、24 单位、六层场景及正式资产门槛。

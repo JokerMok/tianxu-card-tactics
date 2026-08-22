@@ -46,6 +46,11 @@ const T327_PRODUCTION_CONTRACT_RE = /^T327 production contract: PASS(?: \(.+\))?
 const T327_PASS_SAMPLE_RE = /^T327 pass sample: .+$/m;
 const T327_LIVE_GPU_RE = /^T327 live GPU gate: PASS \(T203 exit code 0; GPU\/WebGL2 runtime ([^/;]+?) \/ ([^;]+?); FPS (\d+(?:\.\d+)?); P95 (\d+(?:\.\d+)?)ms\)$/m;
 const T327_FORMAL_BLOCKED_MARKER = 'T327 formal performance gate: BLOCKED';
+const T327_FORMAL_BLOCKED_MARKERS = Object.freeze([
+  'T327 formal performance gate: BLOCKED',
+  'T327 verifier: FAIL',
+  'T327 final release gate: BLOCKED',
+]);
 const T327_HISTORICAL_NOT_CONSULTED_MARKER = 'historical artifact was not consulted';
 const T327_GREEN_MARKER_RES = Object.freeze([
   /^T327 live GPU gate: PASS\b/m,
@@ -69,6 +74,10 @@ function hasT327GreenMarker(output) {
   return T327_GREEN_MARKER_RES.some((marker) => marker.test(output));
 }
 
+function hasT327FormalBlockedMarker(output) {
+  return T327_FORMAL_BLOCKED_MARKERS.some((marker) => output.includes(marker));
+}
+
 function parseT327ChildResult(result) {
   const output = result.output ?? '';
   const reasons = [];
@@ -77,6 +86,7 @@ function parseT327ChildResult(result) {
   const liveMatch = T327_LIVE_GPU_RE.exec(output);
   const formalGreen = output.includes(T327_FORMAL_GREEN_MARKER);
   const blocked = output.includes(T327_FORMAL_BLOCKED_MARKER);
+  const formalBlockedMarker = blocked || hasT327FormalBlockedMarker(output);
   const historicalNotConsulted = output.includes(T327_HISTORICAL_NOT_CONSULTED_MARKER);
   const greenMarker = hasT327GreenMarker(output);
 
@@ -85,6 +95,7 @@ function parseT327ChildResult(result) {
     if (!liveMatch) reasons.push('missing exact T327 live GPU gate PASS marker');
     if (!formalGreen) reasons.push('missing exact T327 formal GREEN verifier marker');
     if (greenMarker && !liveMatch) reasons.push('T327 GREEN text is not backed by the exact live GPU PASS line');
+    if (formalBlockedMarker) reasons.push('T327 GREEN output contains a formal BLOCKED/FAIL marker');
     if (liveMatch) {
       const gpuVendor = liveMatch[1].trim();
       const gpuRenderer = liveMatch[2].trim();
@@ -114,7 +125,7 @@ function parseT327ChildResult(result) {
     };
   }
 
-  if (result.status !== null && result.status !== 0
+  if (result.status === 1
     && contractPass && passSample && blocked && historicalNotConsulted && !greenMarker) {
     return {
       passed: false,
@@ -145,7 +156,7 @@ function parseT327ChildResult(result) {
 
 function expectT327Abnormal(label, result) {
   const parsed = parseT327ChildResult(result);
-  if (parsed.classification !== 'ABNORMAL' || parsed.passed || parsed.formalPassed) {
+  if (parsed.classification !== 'ABNORMAL' || parsed.passed || parsed.rehearsalPassed || parsed.formalPassed) {
     throw new Error(`${label} was accepted unexpectedly`);
   }
   console.log(`  negative PASS: ${label}`);
@@ -173,7 +184,20 @@ function runT327ParserCounterexamples() {
       'historical artifact: formal-runtime; GPU Vendor FakeVendor; FPS 60; P95 18ms',
     ].join('\n'),
   });
-  console.log('T327 parser counterexamples: PASS (missing BLOCKED marker, forged live PASS, historical/formal-runtime substitution)');
+  expectT327Abnormal('contradictory T327 GREEN plus formal BLOCKED output', {
+    status: 0,
+    output: [
+      'T327 production contract: PASS (E104 6 layers; T251 7 effects/7 audio)',
+      'T327 live GPU gate: PASS (T203 exit code 0; GPU/WebGL2 runtime FakeVendor / FakeRenderer; FPS 60; P95 18ms)',
+      T327_FORMAL_GREEN_MARKER,
+      T327_FORMAL_BLOCKED_MARKER,
+    ].join('\n'),
+  });
+  expectT327Abnormal('complete T327 BLOCKED output with unexpected exit code 2', {
+    status: 2,
+    output: blockedOutput,
+  });
+  console.log('T327 parser counterexamples: PASS (missing BLOCKED marker, forged live PASS, historical/formal-runtime substitution, contradictory GREEN+BLOCKED, status-2 BLOCKED output)');
 }
 
 function runChildVerifier(child) {
@@ -244,7 +268,7 @@ function printChildEvidence(result) {
 }
 
 function printRollback() {
-  console.log('\nT265 rollback: stop release; preserve this verifier, final report, child outputs, and failure evidence; after merge run git revert -m 1 <T265 merge SHA (parent baseline 8161b9489798b342a4c4e920fb6b763a74b4a110)>; rerun the specified T265 command; only after a real GREEN result may the coordinator update the shared ledger. If worktree restoration is required and there are no parallel changes, use git restore --source=<T265 merge SHA>^ -- cocos-client/tools/release/final documentation/release/final.');
+  console.log('\nT265 rollback: stop release; preserve this verifier, final report, child outputs, and failure evidence; identify the integrated SHA with git log -1 --format=%H -- cocos-client/tools/release/final/verify-release-final.mjs documentation/release/final/T265-release-final.md, then inspect git rev-list --parents -n 1 <T265 SHA>. For ordinary cherry-pick/fast-forward integration (one parent SHA), run git revert <T265 commit SHA>; only for an actual merge commit (two or more parent SHAs), run git revert -m 1 <T265 merge SHA>. Rerun the specified T265 command; only after a real GREEN result may the coordinator update the shared ledger. If worktree restoration is required and there are no parallel changes, use git restore --source=<T265 SHA>^ -- cocos-client/tools/release/final documentation/release/final.');
 }
 
 function main() {
