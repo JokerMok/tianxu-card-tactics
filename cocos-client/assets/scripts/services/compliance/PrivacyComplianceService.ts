@@ -410,25 +410,27 @@ export class PrivacyComplianceService {
     safeActor(actor); this.validateCorrectionRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('correct', request.requestId, request.subjectId, request, () => {
       this.ensureOperational();
-      const before = this.listStoredRecords();
-      const trustedNow = this.now();
-      const current = this.readLiveRecord(request.subjectId, trustedNow);
-      const snapshotCurrent = before.find((record) => record.subjectId === request.subjectId);
-      if (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store changed while taking the correction snapshot');
-      const updatedAt = trustedNow;
-      if (updatedAt >= current.retentionUntil) fail('SUBJECT_EXPIRED', 'subject data retention has expired');
-      const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, corrected: true, updatedAt, retentionUntil: current.retentionUntil } as const;
-      const replacement = { subjectId: request.subjectId, data: clone(request.data), updatedAt, retentionUntil: current.retentionUntil };
-      const expected = before.map((record) => record.subjectId === request.subjectId ? replacement : record);
-      return this.withAudit({ action: 'correct', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: countSensitiveFields(request.data) }, () => {
-        try { this.store.replace(replacement); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store replace failed', false); }
-        const after = this.listStoredRecords();
-        if (!this.sameStoreSnapshot(after, expected)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace changed the storage snapshot');
-        const stored = this.readStoredRecord(request.subjectId);
-        if (!stored || canonicalPrivacyJson(stored) !== canonicalPrivacyJson(replacement)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace was not verified');
-        return result;
-      }, () => {
-        this.restoreStoreSnapshot(before);
+      return this.withGlobalStoreSnapshot((before) => {
+        const current = this.readStoredRecord(request.subjectId);
+        this.assertTargetMatchesSnapshot(before, request.subjectId, current, 'correction');
+        if (current === null) fail('SUBJECT_NOT_FOUND', 'subject data is not available');
+        this.assertStoreSnapshot(before, 'privacy store changed while reading the correction target');
+        const trustedNow = this.now();
+        if (trustedNow >= current.retentionUntil) fail('SUBJECT_EXPIRED', 'subject data retention has expired');
+        const updatedAt = trustedNow;
+        const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, corrected: true, updatedAt, retentionUntil: current.retentionUntil } as const;
+        const replacement = { subjectId: request.subjectId, data: clone(request.data), updatedAt, retentionUntil: current.retentionUntil };
+        const expected = before.map((record) => record.subjectId === request.subjectId ? replacement : record);
+        return this.withAudit({ action: 'correct', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: countSensitiveFields(request.data) }, () => {
+          try { this.store.replace(replacement); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store replace failed', false); }
+          this.assertStoreSnapshot(expected, 'privacy store replace changed the storage snapshot');
+          const stored = this.readStoredRecord(request.subjectId);
+          if (!stored || canonicalPrivacyJson(stored) !== canonicalPrivacyJson(replacement)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace was not verified');
+          this.assertStoreSnapshot(expected, 'privacy store changed while verifying the correction');
+          return result;
+        }, () => {
+          this.restoreStoreSnapshot(before);
+        });
       });
     });
   }
@@ -437,26 +439,27 @@ export class PrivacyComplianceService {
     safeActor(actor); this.validateSubjectRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('delete', request.requestId, request.subjectId, request, () => {
       this.ensureOperational();
-      const current = this.readStoredRecord(request.subjectId);
-      const before = this.listStoredRecords();
-      const snapshotCurrent = before.find((record) => record.subjectId === request.subjectId);
-      if ((current === null && snapshotCurrent) || (current && (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)))) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store changed while taking the deletion snapshot');
-      const hadData = current !== null;
-      const previousConsent = this.consents.get(request.subjectId); const previousAge = this.ages.get(request.subjectId); const previousLedger = [...this.ledger.entries()];
-      const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, deleted: true, hadData } as const;
-      return this.withAudit({ action: 'delete', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: 0 }, () => {
-        try { this.store.remove(request.subjectId); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store remove failed', false); }
-        const expected = before.filter((record) => record.subjectId !== request.subjectId);
-        const after = this.listStoredRecords();
-        if (!this.sameStoreSnapshot(after, expected)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store remove changed the storage snapshot');
-        if (this.readStoredRecord(request.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store remove was not verified');
-        this.consents.delete(request.subjectId); this.ages.delete(request.subjectId); this.removeReplayableSubjectResults(request.subjectId);
-        return result;
-      }, () => {
-        this.restoreStoreSnapshot(before);
-        if (previousConsent) this.consents.set(request.subjectId, previousConsent); else this.consents.delete(request.subjectId);
-        if (previousAge) this.ages.set(request.subjectId, previousAge); else this.ages.delete(request.subjectId);
-        this.ledger.clear(); for (const [requestId, entry] of previousLedger) this.ledger.set(requestId, entry);
+      return this.withGlobalStoreSnapshot((before) => {
+        const current = this.readStoredRecord(request.subjectId);
+        this.assertTargetMatchesSnapshot(before, request.subjectId, current, 'deletion');
+        this.assertStoreSnapshot(before, 'privacy store changed while reading the deletion target');
+        const hadData = current !== null;
+        const previousConsent = this.consents.get(request.subjectId); const previousAge = this.ages.get(request.subjectId); const previousLedger = [...this.ledger.entries()];
+        const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, deleted: true, hadData } as const;
+        return this.withAudit({ action: 'delete', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: 0 }, () => {
+          try { this.store.remove(request.subjectId); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store remove failed', false); }
+          const expected = before.filter((record) => record.subjectId !== request.subjectId);
+          this.assertStoreSnapshot(expected, 'privacy store remove changed the storage snapshot');
+          if (this.readStoredRecord(request.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store remove was not verified');
+          this.assertStoreSnapshot(expected, 'privacy store changed while verifying the deletion');
+          this.consents.delete(request.subjectId); this.ages.delete(request.subjectId); this.removeReplayableSubjectResults(request.subjectId);
+          return result;
+        }, () => {
+          this.restoreStoreSnapshot(before);
+          if (previousConsent) this.consents.set(request.subjectId, previousConsent); else this.consents.delete(request.subjectId);
+          if (previousAge) this.ages.set(request.subjectId, previousAge); else this.ages.delete(request.subjectId);
+          this.ledger.clear(); for (const [requestId, entry] of previousLedger) this.ledger.set(requestId, entry);
+        });
       });
     });
   }
@@ -465,50 +468,51 @@ export class PrivacyComplianceService {
     safeActor(actor); validateRequestId(requestId); if (actor.kind !== 'operator' || actor.token !== this.operatorToken) fail('PERMISSION_DENIED', 'only an authorized operator may purge retention data');
     return this.runRequest('retention_purge', requestId, '__retention__', { requestId }, () => {
       this.ensureOperational();
-      const now = this.now();
-      const records = this.listStoredRecords();
-      const expired = records.filter((record) => record.retentionUntil <= now);
-      const unexpired = records.filter((record) => record.retentionUntil > now);
-      const previousConsents = new Map(expired.map((record) => [record.subjectId, this.consents.get(record.subjectId)] as const));
-      const previousAges = new Map(expired.map((record) => [record.subjectId, this.ages.get(record.subjectId)] as const));
-      const previousLedger = [...this.ledger.entries()];
-      const specs = expired.map((record) => ({ action: 'retention_purge' as const, subjectId: record.subjectId, requestId, outcome: 'accepted' as const, sensitiveFieldCount: 0, occurredAt: now }));
-      return this.withAudits(specs, () => {
-        try {
-          if (this.store.purgeExpired) {
-            const removed = this.store.purgeExpired(now);
-            if (!Array.isArray(removed)) this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned an invalid result');
-            let removedRecords: PrivacyDataRecord[];
-            try { removedRecords = removed.map(safeStoreRecord); } catch { this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned invalid records'); }
-            const expiredKeys = new Set(expired.map((record) => record.subjectId));
-            const removedKeys = new Set<string>();
-            for (const record of removedRecords) {
-              if (!expiredKeys.has(record.subjectId) || removedKeys.has(record.subjectId)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge returned an unexpected record');
-              removedKeys.add(record.subjectId);
+      return this.withGlobalStoreSnapshot((records) => {
+        const now = this.now();
+        const expired = records.filter((record) => record.retentionUntil <= now);
+        const unexpired = records.filter((record) => record.retentionUntil > now);
+        const previousConsents = new Map(expired.map((record) => [record.subjectId, this.consents.get(record.subjectId)] as const));
+        const previousAges = new Map(expired.map((record) => [record.subjectId, this.ages.get(record.subjectId)] as const));
+        const previousLedger = [...this.ledger.entries()];
+        const specs = expired.map((record) => ({ action: 'retention_purge' as const, subjectId: record.subjectId, requestId, outcome: 'accepted' as const, sensitiveFieldCount: 0, occurredAt: now }));
+        return this.withAudits(specs, () => {
+          try {
+            if (this.store.purgeExpired) {
+              const removed = this.store.purgeExpired(now);
+              if (!Array.isArray(removed)) this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned an invalid result');
+              let removedRecords: PrivacyDataRecord[];
+              try { removedRecords = removed.map(safeStoreRecord); } catch { this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned invalid records'); }
+              const expiredKeys = new Set(expired.map((record) => record.subjectId));
+              const removedKeys = new Set<string>();
+              for (const record of removedRecords) {
+                if (!expiredKeys.has(record.subjectId) || removedKeys.has(record.subjectId)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge returned an unexpected record');
+                removedKeys.add(record.subjectId);
+              }
+            } else {
+              for (const record of expired) this.store.remove(record.subjectId);
             }
-          } else {
-            for (const record of expired) this.store.remove(record.subjectId);
+            const expected = unexpired;
+            this.assertStoreSnapshot(expected, 'privacy retention purge changed the storage snapshot');
+            for (const record of unexpired) {
+              const readBack = this.readStoredRecord(record.subjectId);
+              if (!readBack || readBack.subjectId !== record.subjectId || canonicalPrivacyJson(readBack) !== canonicalPrivacyJson(record)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge failed to preserve unexpired data');
+              this.assertStoreSnapshot(expected, 'privacy retention purge changed the storage snapshot while verifying unexpired data');
+            }
+            for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge was not verified');
+            this.assertStoreSnapshot(expected, 'privacy retention purge changed the storage snapshot while verifying expired data');
+          } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
+          for (const record of expired) { this.consents.delete(record.subjectId); this.ages.delete(record.subjectId); this.removeReplayableSubjectResults(record.subjectId); }
+          const purgedAuditEvents = this.pruneAudits(now); return { accepted: true, replayed: false, requestId, purgedSubjects: expired.length, purgedAuditEvents };
+        }, () => {
+          this.restoreStoreSnapshot(records);
+          for (const record of expired) {
+            const consent = previousConsents.get(record.subjectId); const age = previousAges.get(record.subjectId);
+            if (consent) this.consents.set(record.subjectId, consent); else this.consents.delete(record.subjectId);
+            if (age) this.ages.set(record.subjectId, age); else this.ages.delete(record.subjectId);
           }
-          const after = this.listStoredRecords();
-          if (!this.sameStoreSnapshot(after, unexpired)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge changed the storage snapshot');
-          for (const record of unexpired) {
-            const listed = after.find((candidate) => candidate.subjectId === record.subjectId);
-            if (!listed || canonicalPrivacyJson(listed) !== canonicalPrivacyJson(record)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge removed or changed unexpired data');
-            const readBack = this.readStoredRecord(record.subjectId);
-            if (!readBack || readBack.subjectId !== record.subjectId || canonicalPrivacyJson(readBack) !== canonicalPrivacyJson(record)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge failed to preserve unexpired data');
-          }
-          for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge was not verified');
-        } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
-        for (const record of expired) { this.consents.delete(record.subjectId); this.ages.delete(record.subjectId); this.removeReplayableSubjectResults(record.subjectId); }
-        const purgedAuditEvents = this.pruneAudits(now); return { accepted: true, replayed: false, requestId, purgedSubjects: expired.length, purgedAuditEvents };
-      }, () => {
-        this.restoreStoreSnapshot(records);
-        for (const record of expired) {
-          const consent = previousConsents.get(record.subjectId); const age = previousAges.get(record.subjectId);
-          if (consent) this.consents.set(record.subjectId, consent); else this.consents.delete(record.subjectId);
-          if (age) this.ages.set(record.subjectId, age); else this.ages.delete(record.subjectId);
-        }
-        this.ledger.clear(); for (const [ledgerRequestId, entry] of previousLedger) this.ledger.set(ledgerRequestId, entry);
+          this.ledger.clear(); for (const [ledgerRequestId, entry] of previousLedger) this.ledger.set(ledgerRequestId, entry);
+        });
       });
     });
   }
@@ -549,6 +553,27 @@ export class PrivacyComplianceService {
       if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_OPERATION', 'trusted time changed during privacy read');
     }
     return result;
+  }
+  private withGlobalStoreSnapshot<T>(action: (before: readonly PrivacyDataRecord[]) => T): T {
+    const execute = () => {
+      const before = this.listStoredRecords();
+      return action(before);
+    };
+    try {
+      const transaction = this.store.withTransaction;
+      return typeof transaction === 'function' ? transaction.call(this.store, execute) : execute();
+    } catch (error) {
+      if (error instanceof PrivacyComplianceError) throw error;
+      this.failStore('STORE_TRANSACTION_FAILED', 'privacy store transaction failed');
+    }
+  }
+  private assertTargetMatchesSnapshot(snapshot: readonly PrivacyDataRecord[], subjectId: string, current: PrivacyDataRecord | null, operation: string): void {
+    const expected = snapshot.find((record) => record.subjectId === subjectId);
+    if ((expected === undefined) !== (current === null) || (expected && current && canonicalPrivacyJson(expected) !== canonicalPrivacyJson(current))) this.failStore('STORE_SNAPSHOT_MISMATCH', `privacy store changed while reading the ${operation} target`);
+  }
+  private assertStoreSnapshot(expected: readonly PrivacyDataRecord[], message: string): void {
+    const actual = this.listStoredRecords();
+    if (!this.sameStoreSnapshot(actual, expected)) this.failStore('STORE_SNAPSHOT_MISMATCH', message);
   }
   private authorize(actor: PrivacyActor, subjectId: string): void {
     if (actor.kind === 'subject' && actor.subjectId !== subjectId) fail('PERMISSION_DENIED', 'subject may access only its own data');

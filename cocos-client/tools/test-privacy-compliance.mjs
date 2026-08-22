@@ -196,6 +196,34 @@ for (const mode of ['delete-other', 'change-other', 'unknown-addition']) {
   assertQuarantined(faultyCorrectionService, `failed correction on ${mode} must quarantine the service`);
 }
 
+class MutatingOtherDuringTargetReadStore extends InMemoryPrivacyDataStore {
+  mutated = false;
+  read(subjectId) {
+    if (subjectId === 'read-target' && !this.mutated) {
+      this.mutated = true;
+      super.replace({ subjectId: 'read-other', data: { value: 99 }, updatedAt: 1, retentionUntil: 10_000 });
+    }
+    return super.read(subjectId);
+  }
+}
+
+const targetReadBefore = [
+  { subjectId: 'read-target', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 },
+  { subjectId: 'read-other', data: { value: 2 }, updatedAt: 1, retentionUntil: 10_000 },
+];
+for (const operation of ['deleteData', 'correctData']) {
+  const targetReadStore = new MutatingOtherDuringTargetReadStore(targetReadBefore);
+  const targetReadService = new ComplianceService({ store: targetReadStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+  const request = operation === 'deleteData'
+    ? { subjectId: 'read-target', requestId: 'target-read-delete' }
+    : { subjectId: 'read-target', requestId: 'target-read-correct', data: { value: 3 } };
+  const actor = operation === 'deleteData' ? operator : { kind: 'subject', subjectId: 'read-target' };
+  expectCode(`${operation} must fail when another subject changes during target read`, () => targetReadService[operation](actor, request), 'STORE_FAILURE');
+  assert.equal(targetReadStore.read('read-target')?.data.value, 1, `${operation} must not mutate the target after a concurrent target-read change`);
+  assert.equal(targetReadStore.read('read-other')?.data.value, 99, `${operation} must detect the other-subject change during target read`);
+  assertQuarantined(targetReadService, `${operation} target-read race must quarantine the service`);
+}
+
 let purgeClockShouldFail = true;
 const purgeClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'purge-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 10 }]);
 const purgeClockFailureService = new ComplianceService({ store: purgeClockStore, operatorToken: OPERATOR_TOKEN, now: () => {
