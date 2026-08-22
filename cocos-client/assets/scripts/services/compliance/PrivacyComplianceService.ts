@@ -23,6 +23,7 @@ export interface PrivacyDataStore {
   remove(subjectId: string): void;
   list(): readonly PrivacyDataRecord[];
   purgeExpired?(now: number): readonly PrivacyDataRecord[];
+  withTransaction?<T>(action: () => T): T;
 }
 
 export interface PrivacyActorSubject { readonly kind: 'subject'; readonly subjectId: string; }
@@ -119,7 +120,7 @@ export interface PrivacyPurgeResult {
   readonly purgedAuditEvents: number;
 }
 
-export type PrivacyAuditAction = 'consent' | 'age_status' | 'access' | 'export' | 'correct' | 'delete' | 'retention_purge';
+export type PrivacyAuditAction = 'consent' | 'age_status' | 'access' | 'export' | 'correct' | 'delete' | 'retention_purge' | 'store_quarantine';
 export interface PrivacyAuditEvent {
   readonly sequence: number;
   readonly action: PrivacyAuditAction;
@@ -289,6 +290,7 @@ export class InMemoryPrivacyDataStore implements PrivacyDataStore {
   replace(record: PrivacyDataRecord): void { const safe = safeRecord(record); this.records.set(safe.subjectId, clone(safe)); }
   remove(subjectId: string): void { this.records.delete(subjectId); }
   list(): readonly PrivacyDataRecord[] { return [...this.records.values()].map((record) => clone(record)); }
+  withTransaction<T>(action: () => T): T { return action(); }
   purgeExpired(now: number): readonly PrivacyDataRecord[] {
     const removed: PrivacyDataRecord[] = [];
     for (const record of this.records.values()) if (record.retentionUntil <= now) { removed.push(clone(record)); this.records.delete(record.subjectId); }
@@ -307,6 +309,8 @@ export class PrivacyComplianceService {
   private readonly ledger = new Map<string, LedgerEntry>();
   private readonly audits: PrivacyAuditEvent[] = [];
   private auditSequence = 0;
+  private observedNow: number | undefined;
+  private quarantined = false;
 
   constructor(options: PrivacyComplianceOptions) {
     if (!options || !options.store || typeof options.store.read !== 'function' || typeof options.store.replace !== 'function' || typeof options.store.remove !== 'function' || typeof options.store.list !== 'function') fail('STORE_FAILURE', 'privacy store is incomplete', false);
@@ -371,30 +375,47 @@ export class PrivacyComplianceService {
   accessData(actor: PrivacyActor, request: SubjectRequest): PrivacyAccessResult {
     safeActor(actor); this.validateSubjectRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('access', request.requestId, request.subjectId, request, () => {
-      const record = this.readLiveRecord(request.subjectId);
-      const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: record.subjectId, data: clone(record.data), updatedAt: record.updatedAt, retentionUntil: record.retentionUntil, sensitiveFieldCount: countSensitiveFields(record.data) } as const;
-      return this.withAudit({ action: 'access', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: result.sensitiveFieldCount }, () => result);
-    }, () => { this.readLiveRecord(request.subjectId); });
+      this.ensureOperational();
+      const trustedNow = this.now();
+      return this.withStoreBoundary(trustedNow, () => {
+        const record = this.readLiveRecord(request.subjectId, trustedNow);
+        const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: record.subjectId, data: clone(record.data), updatedAt: record.updatedAt, retentionUntil: record.retentionUntil, sensitiveFieldCount: countSensitiveFields(record.data) } as const;
+        return this.withAudit({ action: 'access', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: result.sensitiveFieldCount, occurredAt: trustedNow }, () => result);
+      });
+    }, () => {
+      this.ensureOperational();
+      const trustedNow = this.now();
+      this.withStoreBoundary(trustedNow, () => { this.readLiveRecord(request.subjectId, trustedNow); });
+    });
   }
 
   exportData(actor: PrivacyActor, request: SubjectRequest): PrivacyExportResult {
     safeActor(actor); this.validateSubjectRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('export', request.requestId, request.subjectId, request, () => {
-      const record = this.readLiveRecord(request.subjectId);
-      const content = canonicalPrivacyJson({ schemaVersion: PRIVACY_SCHEMA_VERSION, subjectId: record.subjectId, data: record.data, updatedAt: record.updatedAt, retentionUntil: record.retentionUntil });
-      return this.withAudit({ action: 'export', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: countSensitiveFields(record.data) }, () => ({ accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, format: 'application/json', content }));
-    }, () => { this.readLiveRecord(request.subjectId); });
+      this.ensureOperational();
+      const trustedNow = this.now();
+      return this.withStoreBoundary(trustedNow, () => {
+        const record = this.readLiveRecord(request.subjectId, trustedNow);
+        const content = canonicalPrivacyJson({ schemaVersion: PRIVACY_SCHEMA_VERSION, subjectId: record.subjectId, data: record.data, updatedAt: record.updatedAt, retentionUntil: record.retentionUntil });
+        return this.withAudit({ action: 'export', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: countSensitiveFields(record.data), occurredAt: trustedNow }, () => ({ accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, format: 'application/json', content }));
+      });
+    }, () => {
+      this.ensureOperational();
+      const trustedNow = this.now();
+      this.withStoreBoundary(trustedNow, () => { this.readLiveRecord(request.subjectId, trustedNow); });
+    });
   }
 
   correctData(actor: PrivacyActor, request: CorrectionRequest): PrivacyCorrectionResult {
     safeActor(actor); this.validateCorrectionRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('correct', request.requestId, request.subjectId, request, () => {
+      this.ensureOperational();
       const before = this.listStoredRecords();
-      const current = this.readLiveRecord(request.subjectId);
+      const trustedNow = this.now();
+      const current = this.readLiveRecord(request.subjectId, trustedNow);
       const snapshotCurrent = before.find((record) => record.subjectId === request.subjectId);
-      if (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)) fail('STORE_FAILURE', 'privacy store changed while taking the correction snapshot', false);
-      const updatedAt = this.now();
-      if (updatedAt < current.updatedAt) fail('STORE_FAILURE', 'clock moved backwards', false);
+      if (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store changed while taking the correction snapshot');
+      const updatedAt = trustedNow;
       if (updatedAt >= current.retentionUntil) fail('SUBJECT_EXPIRED', 'subject data retention has expired');
       const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, corrected: true, updatedAt, retentionUntil: current.retentionUntil } as const;
       const replacement = { subjectId: request.subjectId, data: clone(request.data), updatedAt, retentionUntil: current.retentionUntil };
@@ -402,9 +423,9 @@ export class PrivacyComplianceService {
       return this.withAudit({ action: 'correct', subjectId: request.subjectId, requestId: request.requestId, outcome: 'accepted', sensitiveFieldCount: countSensitiveFields(request.data) }, () => {
         try { this.store.replace(replacement); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store replace failed', false); }
         const after = this.listStoredRecords();
-        if (!this.sameStoreSnapshot(after, expected)) fail('STORE_FAILURE', 'privacy store replace changed the storage snapshot', false);
+        if (!this.sameStoreSnapshot(after, expected)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace changed the storage snapshot');
         const stored = this.readStoredRecord(request.subjectId);
-        if (!stored || canonicalPrivacyJson(stored) !== canonicalPrivacyJson(replacement)) fail('STORE_FAILURE', 'privacy store replace was not verified', false);
+        if (!stored || canonicalPrivacyJson(stored) !== canonicalPrivacyJson(replacement)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace was not verified');
         return result;
       }, () => {
         this.restoreStoreSnapshot(before);
@@ -415,10 +436,11 @@ export class PrivacyComplianceService {
   deleteData(actor: PrivacyActor, request: SubjectRequest): PrivacyDeleteResult {
     safeActor(actor); this.validateSubjectRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('delete', request.requestId, request.subjectId, request, () => {
+      this.ensureOperational();
       const current = this.readStoredRecord(request.subjectId);
       const before = this.listStoredRecords();
       const snapshotCurrent = before.find((record) => record.subjectId === request.subjectId);
-      if ((current === null && snapshotCurrent) || (current && (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)))) fail('STORE_FAILURE', 'privacy store changed while taking the deletion snapshot', false);
+      if ((current === null && snapshotCurrent) || (current && (!snapshotCurrent || canonicalPrivacyJson(snapshotCurrent) !== canonicalPrivacyJson(current)))) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store changed while taking the deletion snapshot');
       const hadData = current !== null;
       const previousConsent = this.consents.get(request.subjectId); const previousAge = this.ages.get(request.subjectId); const previousLedger = [...this.ledger.entries()];
       const result = { accepted: true, replayed: false, requestId: request.requestId, subjectId: request.subjectId, deleted: true, hadData } as const;
@@ -426,8 +448,8 @@ export class PrivacyComplianceService {
         try { this.store.remove(request.subjectId); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store remove failed', false); }
         const expected = before.filter((record) => record.subjectId !== request.subjectId);
         const after = this.listStoredRecords();
-        if (!this.sameStoreSnapshot(after, expected)) fail('STORE_FAILURE', 'privacy store remove changed the storage snapshot', false);
-        if (this.readStoredRecord(request.subjectId) !== null) fail('STORE_FAILURE', 'privacy store remove was not verified', false);
+        if (!this.sameStoreSnapshot(after, expected)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store remove changed the storage snapshot');
+        if (this.readStoredRecord(request.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store remove was not verified');
         this.consents.delete(request.subjectId); this.ages.delete(request.subjectId); this.removeReplayableSubjectResults(request.subjectId);
         return result;
       }, () => {
@@ -442,6 +464,7 @@ export class PrivacyComplianceService {
   purgeExpired(actor: PrivacyActor, requestId: string): PrivacyPurgeResult {
     safeActor(actor); validateRequestId(requestId); if (actor.kind !== 'operator' || actor.token !== this.operatorToken) fail('PERMISSION_DENIED', 'only an authorized operator may purge retention data');
     return this.runRequest('retention_purge', requestId, '__retention__', { requestId }, () => {
+      this.ensureOperational();
       const now = this.now();
       const records = this.listStoredRecords();
       const expired = records.filter((record) => record.retentionUntil <= now);
@@ -454,26 +477,27 @@ export class PrivacyComplianceService {
         try {
           if (this.store.purgeExpired) {
             const removed = this.store.purgeExpired(now);
-            if (!Array.isArray(removed)) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge returned an invalid result', false);
-            const removedRecords = removed.map(safeStoreRecord);
+            if (!Array.isArray(removed)) this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned an invalid result');
+            let removedRecords: PrivacyDataRecord[];
+            try { removedRecords = removed.map(safeStoreRecord); } catch { this.failStore('STORE_PURGE_INVALID', 'privacy retention purge returned invalid records'); }
             const expiredKeys = new Set(expired.map((record) => record.subjectId));
             const removedKeys = new Set<string>();
             for (const record of removedRecords) {
-              if (!expiredKeys.has(record.subjectId) || removedKeys.has(record.subjectId)) fail('STORE_FAILURE', 'privacy retention purge returned an unexpected record', false);
+              if (!expiredKeys.has(record.subjectId) || removedKeys.has(record.subjectId)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge returned an unexpected record');
               removedKeys.add(record.subjectId);
             }
           } else {
             for (const record of expired) this.store.remove(record.subjectId);
           }
           const after = this.listStoredRecords();
-          if (!this.sameStoreSnapshot(after, unexpired)) fail('STORE_FAILURE', 'privacy retention purge changed the storage snapshot', false);
+          if (!this.sameStoreSnapshot(after, unexpired)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge changed the storage snapshot');
           for (const record of unexpired) {
             const listed = after.find((candidate) => candidate.subjectId === record.subjectId);
-            if (!listed || canonicalPrivacyJson(listed) !== canonicalPrivacyJson(record)) fail('STORE_FAILURE', 'privacy retention purge removed or changed unexpired data', false);
+            if (!listed || canonicalPrivacyJson(listed) !== canonicalPrivacyJson(record)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge removed or changed unexpired data');
             const readBack = this.readStoredRecord(record.subjectId);
-            if (!readBack || readBack.subjectId !== record.subjectId || canonicalPrivacyJson(readBack) !== canonicalPrivacyJson(record)) fail('STORE_FAILURE', 'privacy retention purge failed to preserve unexpired data', false);
+            if (!readBack || readBack.subjectId !== record.subjectId || canonicalPrivacyJson(readBack) !== canonicalPrivacyJson(record)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge failed to preserve unexpired data');
           }
-          for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) fail('STORE_FAILURE', 'privacy retention purge was not verified', false);
+          for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge was not verified');
         } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
         for (const record of expired) { this.consents.delete(record.subjectId); this.ages.delete(record.subjectId); this.removeReplayableSubjectResults(record.subjectId); }
         const purgedAuditEvents = this.pruneAudits(now); return { accepted: true, replayed: false, requestId, purgedSubjects: expired.length, purgedAuditEvents };
@@ -495,10 +519,33 @@ export class PrivacyComplianceService {
   }
 
   private now(): number {
+    this.ensureOperational();
     let value: unknown;
-    try { value = this.clock(); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'clock read failed', false); }
-    if (!Number.isSafeInteger(value) || value < 0) fail('STORE_FAILURE', 'clock returned an invalid timestamp', false);
+    try { value = this.clock(); } catch { return this.failStore('CLOCK_UNAVAILABLE', 'trusted clock read failed'); }
+    if (!Number.isSafeInteger(value) || value < 0) return this.failStore('CLOCK_INVALID', 'trusted clock returned an invalid timestamp');
+    if (this.observedNow !== undefined && value < this.observedNow) this.failStore('CLOCK_ROLLBACK', 'trusted clock moved backwards');
+    this.observedNow = value;
     return value;
+  }
+  private ensureOperational(): void {
+    if (this.quarantined) fail('STORE_FAILURE', 'privacy service is quarantined', false);
+  }
+  private failStore(reason: string, message: string): never {
+    if (!this.quarantined) {
+      this.quarantined = true;
+      try {
+        this.appendAudit({ action: 'store_quarantine', subjectId: '__service__', requestId: `quarantine-${reason}`, outcome: 'rejected', reasonCode: `STORE_QUARANTINED:${reason}`, occurredAt: this.observedNow ?? 0 });
+      } catch { /* quarantine remains fail-closed even if audit persistence is unavailable */ }
+    }
+    throw new PrivacyComplianceError('STORE_FAILURE', message, false);
+  }
+  private withStoreBoundary<T>(trustedNow: number, action: () => T): T {
+    const transaction = this.store.withTransaction;
+    if (typeof transaction === 'function') return transaction.call(this.store, action);
+    const result = action();
+    const afterNow = this.now();
+    if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_OPERATION', 'trusted time changed during privacy read');
+    return result;
   }
   private authorize(actor: PrivacyActor, subjectId: string): void {
     if (actor.kind === 'subject' && actor.subjectId !== subjectId) fail('PERMISSION_DENIED', 'subject may access only its own data');
@@ -506,16 +553,17 @@ export class PrivacyComplianceService {
   }
   private readStoredRecord(subjectId: string): PrivacyDataRecord | null {
     let raw: PrivacyDataRecord | null;
-    try { raw = this.store.read(subjectId); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store read failed', false); }
+    try { raw = this.store.read(subjectId); } catch { return this.failStore('STORE_READ_FAILED', 'privacy store read failed'); }
     if (raw === null) return null;
-    const record = safeStoreRecord(raw);
-    if (record.subjectId !== subjectId) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store returned a record for another subject', false);
+    let record: PrivacyDataRecord;
+    try { record = safeStoreRecord(raw); } catch { return this.failStore('STORE_RECORD_INVALID', 'privacy store returned an invalid record'); }
+    if (record.subjectId !== subjectId) return this.failStore('STORE_SUBJECT_MISMATCH', 'privacy store returned a record for another subject');
     return record;
   }
   private listStoredRecords(): readonly PrivacyDataRecord[] {
     let raw: unknown;
-    try { raw = this.store.list(); } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing failed', false); }
-    if (!Array.isArray(raw)) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing returned an invalid result', false);
+    try { raw = this.store.list(); } catch { return this.failStore('STORE_LIST_FAILED', 'privacy retention listing failed'); }
+    if (!Array.isArray(raw)) return this.failStore('STORE_LIST_INVALID', 'privacy retention listing returned an invalid result');
     try {
       const records = raw.map(safeStoreRecord);
       const subjects = new Set<string>();
@@ -524,10 +572,7 @@ export class PrivacyComplianceService {
         subjects.add(record.subjectId);
       }
       return records;
-    } catch (error) {
-      if (error instanceof PrivacyComplianceError) throw error;
-      throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention listing returned invalid records', false);
-    }
+    } catch { return this.failStore('STORE_LIST_INVALID', 'privacy retention listing returned invalid records'); }
   }
   private sameStoreSnapshot(left: readonly PrivacyDataRecord[], right: readonly PrivacyDataRecord[]): boolean {
     if (left.length !== right.length) return false;
@@ -550,11 +595,11 @@ export class PrivacyComplianceService {
       const restored = this.listStoredRecords();
       if (!this.sameStoreSnapshot(restored, snapshot)) failure ??= new Error('privacy store snapshot could not be restored');
     } catch (error) { failure ??= error; }
-    if (failure) throw new PrivacyComplianceError('STORE_FAILURE', 'privacy store rollback failed; store must be quarantined', false);
+    if (failure) this.failStore('STORE_ROLLBACK_FAILED', 'privacy store rollback failed; store is quarantined');
   }
-  private readLiveRecord(subjectId: string): PrivacyDataRecord {
+  private readLiveRecord(subjectId: string, trustedNow = this.now()): PrivacyDataRecord {
     const record = this.readStoredRecord(subjectId); if (record === null) fail('SUBJECT_NOT_FOUND', 'subject data is not available');
-    if (record.retentionUntil <= this.now()) fail('SUBJECT_EXPIRED', 'subject data retention has expired'); return record;
+    if (record.retentionUntil <= trustedNow) fail('SUBJECT_EXPIRED', 'subject data retention has expired'); return record;
   }
   private validateConsentRequest(request: unknown): asserts request is ConsentRequest {
     if (!isPlainRecord(request)) fail('INVALID_INPUT', 'consent request is invalid'); validateSubjectId(request.subjectId); validateRequestId(request.requestId);

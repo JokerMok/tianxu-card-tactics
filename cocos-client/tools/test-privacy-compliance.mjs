@@ -18,6 +18,9 @@ const operator = { kind: 'operator', token: OPERATOR_TOKEN };
 function expectCode(label, action, code) {
   assert.throws(action, (error) => error instanceof PrivacyComplianceError && error.code === code, label);
 }
+function assertQuarantined(service, label) {
+  assert(service.auditLog(operator).some((event) => event.action === 'store_quarantine' && event.reasonCode?.startsWith('STORE_QUARANTINED:')), label);
+}
 
 assert.deepEqual(service.getConsent(subject, 'account-a'), [], 'optional consent must default to denied');
 assert.equal(service.canProcess('account-a', 'analytics'), false, 'unknown age must fail closed');
@@ -72,10 +75,10 @@ const failingStore = {
 const failingService = new ComplianceService({ store: failingStore, operatorToken: OPERATOR_TOKEN, now: () => 2000 });
 expectCode('store read failure fails closed', () => failingService.accessData({ kind: 'subject', subjectId: 'account-a' }, { subjectId: 'account-a', requestId: 'store-failure' }), 'STORE_FAILURE');
 expectCode('store failure is retryable and not a false success', () => failingService.accessData({ kind: 'subject', subjectId: 'account-a' }, { subjectId: 'account-a', requestId: 'store-failure' }), 'STORE_FAILURE');
-assert.equal(failingService.auditLog(operator).length, 0, 'store failures must not write success or misleading audit records');
+assertQuarantined(failingService, 'store failures must leave an explicit quarantine audit');
 const malformedStore = new ComplianceService({ store: { read() { return { subjectId: 'account-a', data: { email: 'a@example.com' }, updatedAt: -1, retentionUntil: 2 }; }, replace() {}, remove() {}, list() { return []; } }, operatorToken: OPERATOR_TOKEN, now: () => 2000 });
 expectCode('malformed store records fail closed', () => malformedStore.accessData(subject, { subjectId: 'account-a', requestId: 'malformed-store' }), 'STORE_FAILURE');
-assert.equal(malformedStore.auditLog(operator).length, 0, 'malformed store records must not be recorded as request failures');
+assertQuarantined(malformedStore, 'malformed store records must quarantine the service');
 
 const deleteResult = service.deleteData(subject, { subjectId: 'account-a', requestId: 'delete-1' });
 assert.equal(deleteResult.deleted, true);
@@ -99,7 +102,7 @@ const foreignRecordService = new ComplianceService({ store: foreignRecordStore, 
 expectCode('cross-subject read fails closed when storage returns a foreign record', () => foreignRecordService.accessData(subject, { subjectId: 'account-a', requestId: 'foreign-read' }), 'STORE_FAILURE');
 expectCode('cross-subject export fails closed when storage returns a foreign record', () => foreignRecordService.exportData(subject, { subjectId: 'account-a', requestId: 'foreign-export' }), 'STORE_FAILURE');
 expectCode('cross-subject delete fails closed before removing a foreign record', () => foreignRecordService.deleteData(subject, { subjectId: 'account-a', requestId: 'foreign-delete' }), 'STORE_FAILURE');
-assert.equal(foreignRecordService.auditLog(operator).length, 0, 'foreign storage records must not create misleading audit events');
+assertQuarantined(foreignRecordService, 'foreign storage records must quarantine the service');
 
 let exportNow = 10;
 const replayExportStore = new InMemoryPrivacyDataStore([{ subjectId: 'export-subject', data: { safe: true }, updatedAt: 1, retentionUntil: 20 }]);
@@ -119,7 +122,7 @@ const residualStore = {
 const residualService = new ComplianceService({ store: residualStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
 expectCode('delete fails closed when remove leaves residual data', () => residualService.deleteData({ kind: 'subject', subjectId: 'delete-subject' }, { subjectId: 'delete-subject', requestId: 'delete-residual' }), 'STORE_FAILURE');
 assert.deepEqual(residualStore.read(), residualRecord, 'failed delete must leave the original record intact');
-assert.equal(residualService.auditLog(operator).length, 0, 'failed delete must not leave an accepted audit event');
+assertQuarantined(residualService, 'failed delete must quarantine the service');
 
 const sortRecords = (records) => [...records].sort((left, right) => left.subjectId.localeCompare(right.subjectId));
 const assertStoreSnapshot = (store, expected, message) => assert.deepEqual(sortRecords(store.list()), sortRecords(expected), message);
@@ -152,7 +155,7 @@ for (const mode of ['wrong-subject', 'unknown-addition']) {
   const faultyDeleteService = new ComplianceService({ store: faultyDeleteStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
   expectCode(`delete fails closed on ${mode}`, () => faultyDeleteService.deleteData({ kind: 'subject', subjectId: 'delete-target' }, { subjectId: 'delete-target', requestId: `delete-global-${mode}` }), 'STORE_FAILURE');
   assertStoreSnapshot(faultyDeleteStore, deleteBefore, `failed delete on ${mode} must restore the complete store snapshot`);
-  assert.equal(faultyDeleteService.auditLog(operator).length, 0, `failed delete on ${mode} must not leave an accepted audit event`);
+  assertQuarantined(faultyDeleteService, `failed delete on ${mode} must quarantine the service`);
 }
 
 const removeFailureStore = {
@@ -163,7 +166,7 @@ const removeFailureStore = {
 };
 const removeFailureService = new ComplianceService({ store: removeFailureStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
 expectCode('delete fails closed when remove throws', () => removeFailureService.deleteData({ kind: 'subject', subjectId: 'delete-failure' }, { subjectId: 'delete-failure', requestId: 'delete-error' }), 'STORE_FAILURE');
-assert.equal(removeFailureService.auditLog(operator).length, 0, 'remove failure must not leave an accepted audit event');
+assertQuarantined(removeFailureService, 'remove failure must quarantine the service');
 
 class CorruptingCorrectionStore extends InMemoryPrivacyDataStore {
   constructor(initial, mode) {
@@ -192,7 +195,7 @@ for (const mode of ['delete-other', 'change-other', 'unknown-addition']) {
   const faultyCorrectionService = new ComplianceService({ store: faultyCorrectionStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
   expectCode(`correction fails closed on ${mode}`, () => faultyCorrectionService.correctData({ kind: 'subject', subjectId: 'correct-target' }, { subjectId: 'correct-target', requestId: `correct-global-${mode}`, data: { value: 3 } }), 'STORE_FAILURE');
   assertStoreSnapshot(faultyCorrectionStore, correctionBefore, `failed correction on ${mode} must restore the complete store snapshot`);
-  assert.equal(faultyCorrectionService.auditLog(operator).length, 0, `failed correction on ${mode} must not leave an accepted audit event`);
+  assertQuarantined(faultyCorrectionService, `failed correction on ${mode} must quarantine the service`);
 }
 
 let purgeClockShouldFail = true;
@@ -202,9 +205,9 @@ const purgeClockFailureService = new ComplianceService({ store: purgeClockStore,
   return 10;
 } });
 expectCode('purge clock exceptions are normalized to store failure', () => purgeClockFailureService.purgeExpired(operator, 'purge-clock-failure'), 'STORE_FAILURE');
-assert.equal(purgeClockFailureService.auditLog(operator).length, 0, 'purge clock failure must not write audit or ledger state');
+assertQuarantined(purgeClockFailureService, 'clock read failure must quarantine the service');
 purgeClockShouldFail = false;
-assert.equal(purgeClockFailureService.purgeExpired(operator, 'purge-clock-failure').purgedSubjects, 1, 'a non-recorded purge failure must be retryable with the same request ID');
+expectCode('quarantined clock failure must reject retry', () => purgeClockFailureService.purgeExpired(operator, 'purge-clock-failure'), 'STORE_FAILURE');
 
 class OverPurgingStore extends InMemoryPrivacyDataStore {
   purgeCalls = 0;
@@ -223,9 +226,9 @@ const unsafePurgeService = new ComplianceService({ store: unsafePurgeStore, oper
 expectCode('purge must fail closed when the store deletes an unexpired subject', () => unsafePurgeService.purgeExpired(operator, 'purge-overreach'), 'STORE_FAILURE');
 assert.deepEqual(unsafePurgeStore.read('purge-live'), { subjectId: 'purge-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 }, 'over-deletion must be restored where possible');
 assert.deepEqual(unsafePurgeStore.read('purge-expired'), { subjectId: 'purge-expired', data: { safe: true }, updatedAt: 1, retentionUntil: 100 }, 'failed purge must restore the expired snapshot too');
-assert.equal(unsafePurgeService.auditLog(operator).length, 0, 'over-deletion must not leave accepted audit events');
+assertQuarantined(unsafePurgeService, 'over-deletion must quarantine the service');
 expectCode('over-deletion must not become a false-success replay', () => unsafePurgeService.purgeExpired(operator, 'purge-overreach'), 'STORE_FAILURE');
-assert.equal(unsafePurgeStore.purgeCalls, 2, 'failed purge requests must be retried rather than replayed as success');
+assert.equal(unsafePurgeStore.purgeCalls, 1, 'quarantined purge requests must not touch storage again');
 
 class PurgeAddingUnknownStore extends InMemoryPrivacyDataStore {
   constructor(initial, failUnknownRemoval = false) {
@@ -252,12 +255,12 @@ const purgeUnknownStore = new PurgeAddingUnknownStore(purgeUnknownBefore);
 const purgeUnknownService = new ComplianceService({ store: purgeUnknownStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
 expectCode('purge fails closed when the store adds an unknown subject', () => purgeUnknownService.purgeExpired(operator, 'purge-unknown-addition'), 'STORE_FAILURE');
 assertStoreSnapshot(purgeUnknownStore, purgeUnknownBefore, 'failed purge must remove unknown additions and restore the exact original snapshot');
-assert.equal(purgeUnknownService.auditLog(operator).length, 0, 'unknown purge additions must not leave accepted audit events');
+assertQuarantined(purgeUnknownService, 'unknown purge additions must quarantine the service');
 
 const unrecoverablePurgeStore = new PurgeAddingUnknownStore(purgeUnknownBefore, true);
 const unrecoverablePurgeService = new ComplianceService({ store: unrecoverablePurgeStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
 expectCode('purge rollback failure must remain an explicit store failure', () => unrecoverablePurgeService.purgeExpired(operator, 'purge-rollback-failure'), 'STORE_FAILURE');
-assert.equal(unrecoverablePurgeService.auditLog(operator).length, 0, 'unrecoverable purge rollback must not leave accepted audit events');
+assertQuarantined(unrecoverablePurgeService, 'unrecoverable purge rollback must quarantine the service');
 
 class CountingPurgeStore extends InMemoryPrivacyDataStore {
   purgeCalls = 0;
@@ -278,15 +281,41 @@ assert.equal(legalPurgeStore.purgeCalls, 1, 'idempotent purge replay must not ca
 
 let auditClockCalls = 0;
 const auditClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'audit-clock', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }]);
-const auditClockFailureService = new ComplianceService({ store: auditClockStore, operatorToken: OPERATOR_TOKEN, now: () => { auditClockCalls += 1; if (auditClockCalls === 3) throw new Error('audit clock offline'); return 100 + auditClockCalls; } });
+const auditClockFailureService = new ComplianceService({ store: auditClockStore, operatorToken: OPERATOR_TOKEN, now: () => { auditClockCalls += 1; if (auditClockCalls === 2) throw new Error('audit clock offline'); return 100 + auditClockCalls; } });
 expectCode('audit clock failure prevents correction side effects', () => auditClockFailureService.correctData({ kind: 'subject', subjectId: 'audit-clock' }, { subjectId: 'audit-clock', requestId: 'audit-clock-correction', data: { value: 2 } }), 'STORE_FAILURE');
 assert.deepEqual(auditClockStore.read('audit-clock').data, { value: 1 }, 'audit clock failure must not write corrected data');
-assert.equal(auditClockFailureService.auditLog(operator).length, 0, 'audit clock failure must not persist an audit event');
+assertQuarantined(auditClockFailureService, 'audit clock failure must quarantine the service');
 
 const auditPersistenceService = new ComplianceService({ store: new InMemoryPrivacyDataStore([{ subjectId: 'audit-persistence', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }]), operatorToken: OPERATOR_TOKEN, now: () => 100 });
 auditPersistenceService.audits.push = () => { throw new Error('audit persistence offline'); };
 expectCode('audit persistence failure prevents correction side effects', () => auditPersistenceService.correctData({ kind: 'subject', subjectId: 'audit-persistence' }, { subjectId: 'audit-persistence', requestId: 'audit-persistence-correction', data: { value: 2 } }), 'STORE_FAILURE');
 assert.deepEqual(auditPersistenceService.store.read('audit-persistence').data, { value: 1 }, 'audit persistence failure must not write corrected data');
+
+const rollbackStore = new InMemoryPrivacyDataStore([{ subjectId: 'clock-rollback', data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }]);
+let rollbackTick = 100;
+const rollbackService = new ComplianceService({ store: rollbackStore, operatorToken: OPERATOR_TOKEN, now: () => rollbackTick });
+assert.equal(rollbackService.accessData({ kind: 'subject', subjectId: 'clock-rollback' }, { subjectId: 'clock-rollback', requestId: 'clock-forward' }).data.safe, true);
+rollbackTick = 99;
+expectCode('clock rollback must fail closed', () => rollbackService.accessData({ kind: 'subject', subjectId: 'clock-rollback' }, { subjectId: 'clock-rollback', requestId: 'clock-backward' }), 'STORE_FAILURE');
+assertQuarantined(rollbackService, 'clock rollback must be audited as quarantine');
+
+let toctouTick = 99;
+const toctouStore = {
+  read(subjectId) { return subjectId === 'time-of-check' ? { subjectId, data: { safe: true }, updatedAt: 1, retentionUntil: 100 } : null; },
+  replace() {}, remove() {}, list() { return [{ subjectId: 'time-of-check', data: { safe: true }, updatedAt: 1, retentionUntil: 100 }]; },
+};
+const toctouService = new ComplianceService({ store: toctouStore, operatorToken: OPERATOR_TOKEN, now: () => toctouTick++ });
+expectCode('time-forward TOCTOU must not return data', () => toctouService.accessData({ kind: 'subject', subjectId: 'time-of-check' }, { subjectId: 'time-of-check', requestId: 'time-forward-toctou' }), 'STORE_FAILURE');
+assertQuarantined(toctouService, 'time-forward TOCTOU must quarantine the service');
+
+for (const [label, action] of [
+  ['quarantined read', () => unrecoverablePurgeService.accessData(operator, { subjectId: 'purge-unknown-live', requestId: 'quarantine-read' })],
+  ['quarantined export', () => unrecoverablePurgeService.exportData(operator, { subjectId: 'purge-unknown-live', requestId: 'quarantine-export' })],
+  ['quarantined delete', () => unrecoverablePurgeService.deleteData(operator, { subjectId: 'purge-unknown-live', requestId: 'quarantine-delete' })],
+  ['quarantined correction', () => unrecoverablePurgeService.correctData(operator, { subjectId: 'purge-unknown-live', requestId: 'quarantine-correct', data: { safe: false } })],
+  ['quarantined purge', () => unrecoverablePurgeService.purgeExpired(operator, 'quarantine-purge')],
+]) expectCode(`${label} must fail closed`, action, 'STORE_FAILURE');
+assert.notEqual(unrecoverablePurgeStore.read('purge-unknown'), null, 'the fixture retains the unknown residual to prove quarantine blocks access');
 
 let purgeNow = 9;
 const changingPurgeStore = new InMemoryPrivacyDataStore([{ subjectId: 'purge-changing-time', data: { safe: true }, updatedAt: 1, retentionUntil: 10 }]);
