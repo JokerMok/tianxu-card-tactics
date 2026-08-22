@@ -719,7 +719,11 @@ export class EconomyService {
             const input = command.day === 3
                 ? ['starter:blade:1', 'starter:armor:1']
                 : ['starter:blade:2', 'starter:armor:2', 'starter:scope:1'];
-            const result = crafting.craft({ recipeId: recipe, inputInstanceIds: input });
+            const result = crafting.craft({
+                requestId: `economy:craft:${command.day}`,
+                recipeId: recipe,
+                inputInstanceIds: input,
+            } as Parameters<typeof crafting.craft>[0]);
             this.syncCraftingResult(crafting);
             events.push(`craft:${result.success ? 'success' : result.reason}`);
             if (result.success) this.completeTask('shop_refresh', command.day, events);
