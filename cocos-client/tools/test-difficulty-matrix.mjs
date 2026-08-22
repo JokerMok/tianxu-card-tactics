@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import {
   BUILD_TARGETS,
@@ -10,10 +11,16 @@ import {
 import { DEFAULT_DUNGEON_DIFFICULTY_CONFIG } from '../assets/scripts/pve/dungeon/difficulty/DungeonDifficulty.ts';
 import { loadTowerConfig, towerConfig } from '../assets/scripts/pve/tower/TowerConfig.ts';
 import { validateBossConfig } from '../assets/scripts/core/boss/index.ts';
-import { DIFFICULTY_MATRIX, getDifficultyEntry, getDifficultyProfile } from '../assets/resources/config/balance/difficulty-matrix.mjs';
+import {
+  DIFFICULTY_MATRIX,
+  getDifficultyEntry,
+  getDifficultyProfile,
+  loadDifficultyMatrix,
+  parseJsonWithUniqueKeys,
+} from '../assets/resources/config/balance/difficulty-matrix.mjs';
 
 const projectRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(projectRoot, relativePath), 'utf8'));
+const readJson = (relativePath) => parseJsonWithUniqueKeys(fs.readFileSync(path.join(projectRoot, relativePath), 'utf8'), relativePath);
 const matrix = DIFFICULTY_MATRIX;
 
 const EXPECTED_ROOT_KEYS = [
@@ -429,6 +436,30 @@ expectRejected('mainline threshold regression', (candidate) => { candidate.modeP
 expectRejected('hard dungeon threshold regression', (candidate) => { candidate.modeProfiles[1].entries[1].requiredBuildScore = 429; });
 expectRejected('tower threshold regression', (candidate) => { candidate.modeProfiles[2].entries[5].requiredBuildScore = 470; });
 
+const temporaryMatrixDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 't256-difficulty-matrix-'));
+const temporaryMatrixPath = path.join(temporaryMatrixDirectory, 'difficulty-matrix.json');
+const matrixSource = fs.readFileSync(path.join(projectRoot, 'assets/resources/config/balance/difficulty-matrix.json'), 'utf8');
+try {
+  fs.copyFileSync(path.join(projectRoot, 'assets/resources/config/balance/difficulty-matrix.json'), temporaryMatrixPath);
+  assert.deepEqual(loadDifficultyMatrix(temporaryMatrixPath), matrix, 'a valid temporary matrix copy must load unchanged');
+  const duplicateJsonCases = [
+    ['duplicate table key', matrixSource.replace('  "table": "difficulty-matrix",', '  "table": "difficulty-matrix",\n  "table": "difficulty-matrix",')],
+    ['duplicate entry key', matrixSource.replace('"id": "L01", "strategyId"', '"id": "L01", "id": "L01", "strategyId"')],
+    ['duplicate nested field', matrixSource.replace('        "totalAttack": 8,', '        "totalAttack": 8,\n        "totalAttack": 8,')],
+  ];
+  for (const [label, duplicateSource] of duplicateJsonCases) {
+    fs.writeFileSync(temporaryMatrixPath, duplicateSource);
+    assert.throws(
+      () => loadDifficultyMatrix(temporaryMatrixPath),
+      /Duplicate JSON object key/,
+      `${label} must be rejected before JSON key overwrite`,
+    );
+  }
+  negativeCases += duplicateJsonCases.length;
+} finally {
+  fs.rmSync(temporaryMatrixDirectory, { force: true, recursive: true });
+}
+
 const standardEntry = mainline.entries[5];
 const exactBoundary = { score: standardEntry.requiredBuildScore, band: 'CORE', metrics: { ...mainline.minimumMetrics, unitCards: 24, uniqueCardCount: 10, deployedUnits: 8, effectApplications: 0, totalMaxHp: 35 } };
 const belowBoundary = { ...exactBoundary, score: exactBoundary.score - 1 };
@@ -441,5 +472,5 @@ assert.equal(isEligible(exactBoundary, mainline, { ...standardEntry, requiredBan
 assert.equal(isEligible({ ...exactBoundary, band: 'ENTRY' }, mainline, standardEntry), false, 'build band below requiredBand must be rejected');
 negativeCases += 5;
 
-assert.equal(negativeCases, 24, 'all negative and regression cases must execute');
+assert.equal(negativeCases, 27, 'all negative and regression cases must execute');
 console.log(`T256 difficulty matrix PASS: modes=${MODES.length}, mainline=${mainline.entries.length}, dungeon=${dungeon.entries.length}, towerStages=${tower.entries.length}, bosses=${boss.entries.length}, builds=${scoredBuilds.size}, eligibility=${JSON.stringify(eligibilityCounts)}, negative-cases=${negativeCases}, deterministic-seeds=${calibration.simulation.seeds.length}`);
