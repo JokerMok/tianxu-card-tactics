@@ -2,54 +2,54 @@
 
 ## 1. 验收范围
 
-本演练验证发布性能门禁及反例处理，不修改正式运行时资产、共享台账或结果文件。
+本任务只验证发布性能门禁、证据顺序和失败样本处理，不修改正式运行时资产、`test-artifacts`、T203/T265、共享台账或结果文件。
 
-正式门禁：1920×1080 Web Desktop、GPU 渲染、24 个单位、6 层场景、7 类战斗效果及 7 类音频反馈；FPS 不低于 55，P95 帧时间不高于 22ms。
+正式门禁为 1920×1080 Web Desktop、GPU 渲染、24 个单位、6 层场景、7 类战斗效果和 7 类音频反馈；FPS 不低于 55，P95 帧时间不高于 22ms。
 
-## 2. 本次提交实际修改文件
+T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且证据包含 GPU、WebGL2、FPS、P95 和 formal-runtime 标记时，才可进入 T327 正式性能判定。确定性模型和契约夹具不能替代 live GPU 运行证据。
 
-T327 提交 `c857da72addc1d3714225549b22b9871718bcb92` 实际修改以下文件：
+## 2. 实际修改文件
 
-- `cocos-client/tools/release/perf/samples/pass-raw-frame-times.json`
 - `cocos-client/tools/release/perf/verify-perf.mjs`
 - `documentation/release/perf/T327-performance-rehearsal.md`
 
-验证器读取并校验以下真实文件：
+保留未修改的契约通过夹具 `cocos-client/tools/release/perf/samples/pass-raw-frame-times.json`、历史 `cocos-client/test-artifacts/BattleA0-performance.json` 和现有负例。历史 artifact 只作可选拒绝样本：缺失、删除、损坏或不再符合旧 headless/preview 结构时记录 `SKIPPED`，不能阻塞 T327。
 
-- `cocos-client/assets/a0-manifest.json`
-- `cocos-client/assets/scripts/battle/performance/production-performance.ts`
-- `cocos-client/assets/resources/art/battle/scenes/E104/scene-contract.json`
-- `cocos-client/assets/resources/art/battle/effects/battle-effects-audio-contract.json`
-- `cocos-client/test-artifacts/BattleA0-performance.json`
+## 3. 验证顺序
 
-## 3. 复验命令
+1. 读取并校验 A0 manifest、E104 场景契约、T251 效果/音频契约、生产性能模块和契约通过夹具。
+2. 执行现有 T327 缺失、非法、越界和原始样本不足负例，并校验 T203 live GPU 证据缺失、越界和 marker 缺失反例。
+3. 执行 `tools/verify-production-performance.mjs`。
+4. T203 非零或缺少 GPU、WebGL2、FPS、P95、formal-runtime 任一标记时，T327 输出 `T327 formal performance gate: BLOCKED` 并返回非零；在此之前不读取历史 `BattleA0-performance.json`。
+5. 只有 T203 live gate 通过后，才检查历史 artifact；该文件仍保持旧 headless/preview 失败样本时，验证器继续断言其被拒绝。
+
+## 4. 样本与门禁结果
+
+| 样本或门禁 | 预期结果 | 说明 |
+|---|---:|---|
+| 契约通过夹具 | PASS | 120 个原始帧时间；FPS 61.350；P95 16.300ms；`evidenceClass=contract-rehearsal-fixture` |
+| 缺失文件、缺失字段、非法 renderer | 拒绝 | 保留原有断言 |
+| FPS 54.99、P95 22.01ms、119 个原始样本 | 拒绝 | 不降低阈值和采样要求 |
+| T203 GPU/WebGL2/FPS/P95/formal-runtime marker 缺失或越界 | 拒绝 | T327 明确报告 `BLOCKED` |
+| 历史 `BattleA0-performance.json` | 可选拒绝 | 当前样本为 headless、`preview-pose`、24 单位压力 FPS 26.278、P95 50ms；不作为 live gate |
+| 当前正式资产 | BLOCKED | 当前正式资产仍为 `preview-pose`，不能形成 formal-runtime 证据 |
+
+## 5. 复验命令
 
 ```sh
 cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs
+cd cocos-client && node --experimental-strip-types tools/verify-production-performance.mjs
+git diff --check
 ```
 
-退出码为 `0` 表示验证器自身、正式契约、通过样本和预期失败反例均按要求完成断言；不表示当前真实运行时性能已经放行。
+预期：第一条命令非零，原因是 T203 live/formal runtime 证据缺失；第二条命令非零，真实 runner 拒绝当前 `preview-pose` 正式资产。两条命令均不得报告 GREEN。
 
-## 4. 样本与结果
+## 6. 结论
 
-| 样本 | 输入 | 结果 | 结论 |
-|---|---|---|---|
-| 通过样本 `tools/release/perf/samples/pass-raw-frame-times.json` | 120 个原始帧时间，16.3ms/帧 | FPS 61.350，P95 16.300ms | 通过算术门禁 |
-| 真实失败样本 `test-artifacts/BattleA0-performance.json` | 1920×1080；24 单位；headless；preview-pose；stress FPS 26.277，P95 50ms | 拒绝 | 不得作为发布证据 |
-| 缺失文件 | `samples/does-not-exist.json` | 拒绝 | 文件读取失败被断言 |
-| 缺失字段 | 删除 manifest 的 `maximumP95FrameTimeMs` | 拒绝 | 正式阈值完整性被断言 |
-| 非法值 | `renderer=software` | 拒绝 | GPU 渲染约束被断言 |
-| 越界值 | FPS 54.99；P95 22.01ms | 拒绝 | 两条性能阈值分别被断言 |
-| 原始样本不足 | 仅 119 个帧时间 | 拒绝 | 采样数量被断言 |
+当前 T327 预期为 `BLOCKED`。契约通过夹具只证明门禁计算和字段校验有效；历史 headless/preview artifact 只证明拒绝逻辑有效。当前正式资产仍为 `preview-pose`，未形成可放行的有头 GPU/WebGL2、formal-runtime、FPS 和 P95 证据，不能解除发布阻塞。
 
-## 5. 结论
+## 7. 回退步骤
 
-T327 验证器复验通过，正式配置与反例门禁有效。
-
-当前发布性能结论为：**不放行**。真实 `BattleA0-performance.json` 为 headless、preview-pose，且压力样本低于 FPS 门槛并超过 P95 门槛；通过样本属于契约演练夹具，不替代有头硬件加速 GPU 运行证据。当前证据还未覆盖战斗 Draw Call、纹理显存、首个 Bundle 压缩体积和缓存场景切换时长，不能据此签署完整发布性能。
-
-## 6. 回退步骤
-
-1. 若 T327 验证器变更造成发布流水线异常，回退本次提交：`git revert c857da72addc1d3714225549b22b9871718bcb92`，再执行本记录中的复验命令。
-2. 若真实 GPU 复验仍不达标，保留当前发布候选不放行；按既定顺序减少透明覆盖、骨骼数量、图集尺寸、序列帧数量和粒子数量，每次改动后重新采集原始帧时间及 GPU 证据。
-3. 回退优化时恢复最近一次通过的正式资产版本，不降低 55 FPS、22ms、24 单位、6 层场景或正式资产门槛，也不以 headless、相对性能或 preview-pose 样本替代硬件运行结果。
+1. 若本次 T327 修订造成流水线异常，回退本次 T327 提交，并重新执行 T327 与 T203 复验命令。
+2. 若 T203 live runner 不可用、退出码非零、marker 不完整或性能越界，保留发布阻塞；不得使用确定性模型、契约夹具或历史 JSON 解除阻塞。
+3. 正式性能修复必须重新采集有头 GPU 原始帧时间和运行时资产证据，不降低 55 FPS、22ms、24 个单位、6 层场景或正式资产门槛。
