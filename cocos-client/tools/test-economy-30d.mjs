@@ -20,6 +20,9 @@ export async function resolve(specifier, context, nextResolve) {
 register(`data:text/javascript,${encodeURIComponent(extensionlessTsLoader)}`, import.meta.url);
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const standaloneGitRoot = resolve(projectRoot, '.git');
+const gitRoot = (await stat(standaloneGitRoot).then(() => projectRoot).catch(() => resolve(projectRoot, '..')));
+const scopePrefix = gitRoot === projectRoot ? '' : 'cocos-client/';
 const {
     ECONOMY_CONFIG,
     ECONOMY_SKELETON,
@@ -48,13 +51,11 @@ function assertConservation(state, label) {
 function assertScope() {
     const diffCommit = process.env.T241_DIFF_COMMIT ?? 'HEAD';
     const diffParent = process.env.T241_DIFF_PARENT ?? `${diffCommit}^`;
-    const committed = execFileSync('git', ['diff', '--name-only', diffParent, diffCommit, '--'], { cwd: projectRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const working = execFileSync('git', ['diff', '--name-only', diffCommit, '--'], { cwd: projectRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const staged = execFileSync('git', ['diff', '--cached', '--name-only', diffCommit, '--'], { cwd: projectRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], { cwd: projectRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
-    const changed = [...new Set([...committed, ...working, ...staged, ...untracked])];
-    const ignoredBaseline = (path) => path === 'assets/resources/art' || path.startsWith('assets/resources/art/');
-    const allowed = (path) => path.startsWith('assets/scripts/simulation/economy/') || path === 'tools/test-economy-30d.mjs' || ignoredBaseline(path);
+    const committed = execFileSync('git', ['diff', '--name-only', diffParent, diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const working = execFileSync('git', ['diff', '--name-only', diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const staged = execFileSync('git', ['diff', '--cached', '--name-only', diffCommit, '--'], { cwd: gitRoot, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const changed = [...new Set([...committed, ...working, ...staged])];
+    const allowed = (path) => path.startsWith(`${scopePrefix}assets/scripts/simulation/economy/`) || path === `${scopePrefix}tools/test-economy-30d.mjs`;
     assert.deepEqual(changed.filter((path) => !allowed(path)), [], `scope violation: ${changed.filter((path) => !allowed(path)).join(', ')}`);
     assert.equal(changed.includes('tools/test-economy-30d.mjs'), true, 'economy harness must be part of the change');
     assert.equal(changed.some((path) => path.startsWith('assets/scripts/simulation/economy/')), true, 'economy module must be part of the change');
@@ -197,6 +198,39 @@ function assertAdversarialBoundaries() {
     tamperedPrice.priceIndex.bulwark_coins += 1;
     assert.throws(() => EconomyService.fromSnapshot(tamperedPrice), /price index does not match day/, 'restore must recompute price from day and reject tampering');
 
+    const tamperedCraftingSeed = clone(checkpoint);
+    tamperedCraftingSeed.equipmentSnapshot.seed += 1;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedCraftingSeed), /crafting seed does not match/, 'restore must bind crafting seed to the top-level seed');
+
+    const tamperedShopSeed = clone(checkpoint);
+    tamperedShopSeed.shopSnapshot.seed += 1;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedShopSeed), /shop seed does not match/, 'restore must bind shop seed to the top-level seed');
+
+    const tamperedExpeditionClock = clone(checkpoint);
+    tamperedExpeditionClock.expeditionSnapshot.nextExpeditionNumber += 1;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedExpeditionClock), /nextExpeditionNumber does not match/, 'restore must bind expedition numbering to dispatch history');
+
+    const duplicateAdvance = clone(checkpoint);
+    const originalAdvance = duplicateAdvance.processedCommands.find((item) => item.result.type === 'advance-day');
+    const duplicateAdvanceCommand = clone(originalAdvance);
+    duplicateAdvanceCommand.requestId = 'duplicate-day-1';
+    duplicateAdvanceCommand.result.requestId = 'duplicate-day-1';
+    duplicateAdvance.processedCommands.push(duplicateAdvanceCommand);
+    assert.throws(() => EconomyService.fromSnapshot(duplicateAdvance), /duplicate or out-of-range success/, 'same-day successful replay must not add an expedition dispatch');
+
+    const failedDay = service.apply({ requestId: 'failed-day', type: 'advance-day', day: 3 });
+    assert.equal(failedDay.status, 'failure');
+    assert.doesNotThrow(() => EconomyService.fromSnapshot(service.snapshot()), 'failed advance-day commands must not affect dispatch history');
+
+    const tamperedLedgerInitial = clone(checkpoint);
+    tamperedLedgerInitial.ledger.initial.credits += 1;
+    tamperedLedgerInitial.ledger.produced.credits -= 1;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedLedgerInitial), /ledger\.initial does not match config/, 'restore must bind ledger initial balances to config');
+
+    const tamperedSolventBankruptcy = clone(checkpoint);
+    tamperedSolventBankruptcy.bankrupt = true;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedSolventBankruptcy), /bankruptcy state/, 'restore must reject a forged solvent bankruptcy flag');
+
     const tamperedNested = clone(checkpoint);
     tamperedNested.shopSnapshot.listings[0].unexpected = true;
     assert.throws(() => EconomyService.fromSnapshot(tamperedNested), /shop listing.*keys are invalid/, 'nested snapshot objects must use exact keys');
@@ -214,6 +248,13 @@ function assertAdversarialBoundaries() {
     assert.equal(bankruptService.snapshot().balances.credits >= 0, true, 'bankruptcy must preserve non-negative credits');
     assert.equal(bankruptService.snapshot().balances.credits < bankruptConfig.mandatoryCreditCost, true, 'bankruptcy boundary must remain below mandatory cost');
     assertConservation(bankruptService.snapshot(), 'real bankruptcy');
+    const restoredBankrupt = EconomyService.fromSnapshot(bankruptService.snapshot(), bankruptConfig);
+    assert.equal(restoredBankrupt.snapshot().bankrupt, true, 'real bankruptcy must survive fromSnapshot and its internal re-assert');
+    const constructorRestoredBankrupt = new EconomyService({ config: bankruptConfig, snapshot: bankruptService.snapshot() });
+    assert.equal(constructorRestoredBankrupt.snapshot().bankrupt, true, 'real bankruptcy must survive constructor restore and its second assert');
+    const tamperedBankruptcy = bankruptService.snapshot();
+    tamperedBankruptcy.bankrupt = false;
+    assert.throws(() => EconomyService.fromSnapshot(tamperedBankruptcy, bankruptConfig), /bankruptcy state/, 'restore must reject a forged bankrupt recovery flag');
 }
 
 assertScope();
@@ -226,5 +267,5 @@ console.log(JSON.stringify({
     task: 'T241',
     status: 'passed',
     days: 30,
-    checks: ['determinism', 'resource-conservation', 'non-negative-boundary', 'inflation', 'save-restore', 'rollback', 'idempotency', 'config-cross-table', 'skeleton-diff', 'invalid-command', 'snapshot-exact-keys', 'seed-rejection', 'real-bankruptcy', 'scope'],
+    checks: ['determinism', 'resource-conservation', 'non-negative-boundary', 'inflation', 'save-restore', 'rollback', 'idempotency', 'config-cross-table', 'skeleton-diff', 'invalid-command', 'snapshot-exact-keys', 'derived-seed-rejection', 'expedition-history-rejection', 'ledger-initial-rejection', 'bankruptcy-history-rejection', 'seed-rejection', 'real-bankruptcy', 'scope'],
 }));

@@ -129,6 +129,23 @@ function commandFingerprint(command: EconomyCommand): string {
         : canonicalJson({ type: command.type, productId: command.productId });
 }
 
+function stableHash(value: string): number {
+    let hash = 2_166_136_261;
+    for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16_777_619);
+    }
+    return hash >>> 0;
+}
+
+function derivedServiceSeed(seed: number, service: 'crafting' | 'shop'): number {
+    return stableHash(`economy:${service}:${seed}`);
+}
+
+function initialExpeditionNumber(seed: number): number {
+    return (seed % 10) + 1;
+}
+
 function expectedPriceIndex(config: EconomyConfig, day: number): Record<string, number> {
     return Object.fromEntries(config.shopProducts.map((product) => {
         const price = BigInt(product.basePrice)
@@ -170,6 +187,14 @@ function validateLedger(raw: unknown, ids: readonly string[]): EconomyLedger {
     const produced = validateResourceMap(raw.produced, ids, 'ledger.produced');
     const consumed = validateResourceMap(raw.consumed, ids, 'ledger.consumed');
     return { initial, produced, consumed };
+}
+
+function assertLedgerInitial(ledger: EconomyLedger, config: EconomyConfig): void {
+    for (const resource of config.resources) {
+        if (ledger.initial[resource.id] !== resource.initial) {
+            throw new Error(`ledger.initial does not match config: ${resource.id}`);
+        }
+    }
 }
 
 function validateCraftingSnapshot(raw: unknown): void {
@@ -268,7 +293,7 @@ function invalidCommandResult(raw: unknown, day: number): EconomyCommandResult {
 function initialEquipment(seed: number): CraftingServiceSnapshot {
     const service = new EquipmentCraftingService({
         config: CRAFTING_CONFIG,
-        seed,
+        seed: derivedServiceSeed(seed, 'crafting'),
         inventory: [
             { instanceId: 'starter:blade:1', equipmentId: 'scrap_blade', locked: false },
             { instanceId: 'starter:blade:2', equipmentId: 'scrap_blade', locked: false },
@@ -296,14 +321,14 @@ function initialExpedition(seed: number, balances: Readonly<Record<string, numbe
                 field_ration: balances.field_ration,
             },
         },
-        nextExpeditionNumber: Math.max(1, (seed % 10) + 1),
+        nextExpeditionNumber: initialExpeditionNumber(seed),
     }).snapshot();
 }
 
 function initialShop(seed: number, balances: Readonly<Record<string, number>>, cards: Readonly<Record<string, number>>): CardShopServiceSnapshot {
     return new CardShopService({
         config: CARD_SHOP_CONFIG,
-        seed,
+        seed: derivedServiceSeed(seed, 'shop'),
         balances: { coins: balances.coins, crystals: balances.crystal },
         inventory: cards,
     }).snapshot();
@@ -346,6 +371,7 @@ function assertState(raw: unknown, config: EconomyConfig): EconomyState {
     const balances = validateResourceMap(raw.balances, resourceIds, 'economy balances');
     const ledger = validateLedger(raw.ledger, resourceIds);
     if (!isSafeInteger(raw.seed) || !isSafeInteger(raw.day) || raw.day > config.simulationDays) throw new Error('economy snapshot clock is invalid');
+    assertLedgerInitial(ledger, config);
     const cards = validateResourceMap(raw.cards, CARD_SHOP_CONFIG.cards.map((card) => card.id), 'economy cards');
     const expectedBuildings = new Set(config.buildings.map((building) => building.id));
     if (!isRecord(raw.buildings) || Object.keys(raw.buildings).length !== expectedBuildings.size || Object.keys(raw.buildings).some((id) => !expectedBuildings.has(id))) throw new Error('economy snapshot buildings are invalid');
@@ -391,6 +417,58 @@ function assertState(raw: unknown, config: EconomyConfig): EconomyState {
     validateCraftingSnapshot(raw.equipmentSnapshot);
     validateExpeditionSnapshot(raw.expeditionSnapshot);
     validateShopSnapshot(raw.shopSnapshot);
+    if (raw.equipmentSnapshot.seed !== derivedServiceSeed(raw.seed, 'crafting')) throw new Error('crafting seed does not match top-level economy seed');
+    if (raw.shopSnapshot.seed !== derivedServiceSeed(raw.seed, 'shop')) throw new Error('shop seed does not match top-level economy seed');
+    const initialExpedition = initialExpeditionNumber(raw.seed);
+    const claimedExpeditionNumbers = raw.expeditionSnapshot.claimedExpeditionIds
+        .map((id: string) => Number(id.slice('expedition-'.length)))
+        .sort((left: number, right: number) => left - right);
+    const activeExpeditionNumbers = raw.expeditionSnapshot.expedition === null
+        ? []
+        : [Number(raw.expeditionSnapshot.expedition.id.slice('expedition-'.length))];
+    const expeditionNumbers = [...claimedExpeditionNumbers, ...activeExpeditionNumbers].sort((left, right) => left - right);
+    const dispatchCount = expeditionNumbers.length;
+    if (raw.expeditionSnapshot.nextExpeditionNumber !== initialExpedition + dispatchCount) {
+        throw new Error('expedition nextExpeditionNumber does not match top-level dispatch history');
+    }
+    for (let index = 0; index < expeditionNumbers.length; index += 1) {
+        if (expeditionNumbers[index] !== initialExpedition + index) throw new Error('expedition dispatch history is not contiguous');
+    }
+    const successfulAdvances = raw.processedCommands
+        .filter((item: any) => item.result.type === 'advance-day' && item.result.status === 'success')
+        .sort((left: any, right: any) => left.result.day - right.result.day);
+    const successfulAdvanceDays = new Set<number>();
+    for (const item of successfulAdvances) {
+        if (!isSafeInteger(item.result.day, 1) || item.result.day > raw.day || successfulAdvanceDays.has(item.result.day)) {
+            throw new Error('advance-day history contains a duplicate or out-of-range success');
+        }
+        successfulAdvanceDays.add(item.result.day);
+    }
+    if (successfulAdvanceDays.size !== raw.day || [...successfulAdvanceDays].some((day, index) => day !== index + 1)) {
+        throw new Error('advance-day history is not contiguous');
+    }
+    const historyDispatchCount = successfulAdvances.reduce((count: number, item: any) => (
+        count + (item.result.events.includes('expedition:claimed') ? 1 : 0)
+    ), 0);
+    if (historyDispatchCount !== claimedExpeditionNumbers.length) throw new Error('expedition dispatch history does not match processed commands');
+    if (taskCounts.expedition_claim !== claimedExpeditionNumbers.length) throw new Error('expedition dispatch history does not match task history');
+    const latestAdvance = successfulAdvances[successfulAdvances.length - 1];
+    if (raw.day === 0) {
+        if (raw.bankrupt !== false || raw.lastEvents.length !== 0 || latestAdvance !== undefined) throw new Error('bankruptcy state is invalid at day 0');
+    } else {
+        if (latestAdvance === undefined || latestAdvance.result.day !== raw.day || canonicalJson(raw.lastEvents) !== canonicalJson(latestAdvance.result.events)) {
+            throw new Error('bankruptcy state does not match the latest economy history');
+        }
+        const mandatoryCostEvent = `consume:credits:${config.mandatoryCreditCost}`;
+        const paidMandatoryCost = raw.lastEvents.includes(mandatoryCostEvent);
+        const expectedBankrupt = !paidMandatoryCost;
+        if (raw.bankrupt !== expectedBankrupt || (expectedBankrupt && !raw.lastEvents.includes('bankruptcy-boundary'))) {
+            throw new Error('bankruptcy state does not match the mandatory-cost boundary');
+        }
+        if (paidMandatoryCost && ledger.consumed.credits < config.mandatoryCreditCost) {
+            throw new Error('bankruptcy state is inconsistent with the credit ledger');
+        }
+    }
     const equipment = EquipmentCraftingService.fromSnapshot(raw.equipmentSnapshot as CraftingServiceSnapshot, CRAFTING_CONFIG);
     const expedition = new ExpeditionService({ config: EXPEDITION_CONFIG, snapshot: raw.expeditionSnapshot as ExpeditionServiceSnapshot });
     const shop = new CardShopService({ config: CARD_SHOP_CONFIG, ...(raw.shopSnapshot as CardShopServiceSnapshot) as any });
