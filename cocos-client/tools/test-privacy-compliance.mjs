@@ -250,8 +250,79 @@ for (const operation of ['deleteData', 'correctData']) {
   const actor = operation === 'deleteData' ? operator : { kind: 'subject', subjectId: 'read-target' };
   expectCode(`${operation} must fail when another subject changes during target read`, () => targetReadService[operation](actor, request), 'STORE_FAILURE');
   assert.equal(targetReadStore.read('read-target')?.data.value, 1, `${operation} must not mutate the target after a concurrent target-read change`);
-  assert.equal(targetReadStore.read('read-other')?.data.value, 99, `${operation} must detect the other-subject change during target read`);
+  assert.equal(targetReadStore.read('read-other')?.data.value, 2, `${operation} must restore the complete snapshot after a target-read race`);
   assertQuarantined(targetReadService, `${operation} target-read race must quarantine the service`);
+}
+
+class ThrowAfterTransactionStore extends InMemoryPrivacyDataStore {
+  withTransaction(action) {
+    const result = action();
+    throw new Error('adapter failed after transaction callback');
+  }
+}
+
+const postCallbackCases = [
+  {
+    operation: 'delete',
+    subjectId: 'post-callback-delete',
+    before: [{ subjectId: 'post-callback-delete', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
+    requestId: 'post-callback-delete',
+    invoke(service) { return service.deleteData(operator, { subjectId: this.subjectId, requestId: this.requestId }); },
+  },
+  {
+    operation: 'correct',
+    subjectId: 'post-callback-correct',
+    before: [{ subjectId: 'post-callback-correct', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
+    requestId: 'post-callback-correct',
+    invoke(service) { return service.correctData({ kind: 'subject', subjectId: this.subjectId }, { subjectId: this.subjectId, requestId: this.requestId, data: { value: 2 } }); },
+  },
+  {
+    operation: 'purge',
+    subjectId: 'post-callback-purge',
+    before: [{ subjectId: 'post-callback-purge', data: { value: 1 }, updatedAt: 1, retentionUntil: 100 }],
+    requestId: 'post-callback-purge',
+    invoke(service) { return service.purgeExpired(operator, this.requestId); },
+  },
+];
+
+for (const testCase of postCallbackCases) {
+  const postCallbackStore = new ThrowAfterTransactionStore(testCase.before);
+  const postCallbackService = new ComplianceService({ store: postCallbackStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+  postCallbackService.recordConsent({ kind: 'subject', subjectId: testCase.subjectId }, { subjectId: testCase.subjectId, purpose: 'analytics', granted: true, policyVersion: PRIVACY_POLICY_VERSION, source: 'settings', requestId: `${testCase.requestId}-consent` });
+  postCallbackService.setAgeStatus(operator, { subjectId: testCase.subjectId, status: 'adult', guardianVerified: false, requestId: `${testCase.requestId}-age` });
+  expectCode(`${testCase.operation} must rollback when the adapter throws after callback completion`, () => testCase.invoke(postCallbackService), 'STORE_FAILURE');
+  assertStoreSnapshot(postCallbackStore, testCase.before, `${testCase.operation} post-callback failure must restore the complete store snapshot`);
+  assert.equal(postCallbackService.getConsent({ kind: 'subject', subjectId: testCase.subjectId }, testCase.subjectId, 'analytics').length, 1, `${testCase.operation} post-callback failure must restore consent state`);
+  assert.equal(postCallbackService.getAgeStatus(operator, testCase.subjectId).status, 'adult', `${testCase.operation} post-callback failure must restore age state`);
+  assert.equal(postCallbackService.auditLog(operator).some((event) => event.action === testCase.operation && event.outcome === 'accepted'), false, `${testCase.operation} post-callback failure must remove its accepted audit`);
+  assertQuarantined(postCallbackService, `${testCase.operation} post-callback failure must quarantine the service`);
+  expectCode(`${testCase.operation} post-callback failure must not leave a replayable success`, () => testCase.invoke(postCallbackService), 'STORE_FAILURE');
+}
+
+class ClockChangingAfterTransactionStore extends InMemoryPrivacyDataStore {
+  constructor(initial, afterTransaction) {
+    super(initial);
+    this.afterTransaction = afterTransaction;
+  }
+  withTransaction(action) {
+    const result = action();
+    this.afterTransaction();
+    return result;
+  }
+}
+
+for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
+  for (const operation of ['correct', 'purge']) {
+    let tick = 100;
+    const clockBefore = [{ subjectId: `post-return-clock-${operation}`, data: { safe: true }, updatedAt: 1, retentionUntil: operation === 'correct' ? 1_000 : 100 }];
+    const postReturnClockStore = new ClockChangingAfterTransactionStore(clockBefore, () => { tick = transactionTick; });
+    const postReturnClockService = new ComplianceService({ store: postReturnClockStore, operatorToken: OPERATOR_TOKEN, now: () => tick });
+    expectCode(`${operation} must check the clock after the transaction adapter returns (${label})`, () => operation === 'correct'
+      ? postReturnClockService.correctData({ kind: 'subject', subjectId: clockBefore[0].subjectId }, { subjectId: clockBefore[0].subjectId, requestId: `post-return-clock-${operation}-${label}`, data: { safe: false } })
+      : postReturnClockService.purgeExpired(operator, `post-return-clock-${operation}-${label}`), 'STORE_FAILURE');
+    assertStoreSnapshot(postReturnClockStore, clockBefore, `${operation} post-return clock failure must restore the complete snapshot (${label})`);
+    assertQuarantined(postReturnClockService, `${operation} post-return clock failure must quarantine (${label})`);
+  }
 }
 
 let purgeClockShouldFail = true;

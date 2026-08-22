@@ -174,6 +174,14 @@ interface AuditSpec {
   readonly occurredAt?: number;
 }
 
+interface PrivacyServiceSnapshot {
+  readonly consents: readonly (readonly [string, readonly (readonly [PrivacyPurpose, ConsentRecord])[]])[];
+  readonly ages: readonly (readonly [string, AgeStatusRecord])[];
+  readonly ledger: readonly (readonly [string, LedgerEntry])[];
+  readonly audits: readonly PrivacyAuditEvent[];
+  readonly auditSequence: number;
+}
+
 const PURPOSE_SET = new Set<string>(PRIVACY_PURPOSES);
 const SOURCE_SET = new Set<string>(PRIVACY_CONSENT_SOURCES);
 const AGE_STATUS_SET = new Set<string>(PRIVACY_AGE_STATUSES);
@@ -410,7 +418,7 @@ export class PrivacyComplianceService {
     safeActor(actor); this.validateCorrectionRequest(request); this.authorize(actor, request.subjectId);
     return this.runRequest('correct', request.requestId, request.subjectId, request, () => {
       this.ensureOperational();
-      return this.withMutationBoundary((before, trustedNow, assertStableNow) => {
+      return this.withMutationBoundary((before, trustedNow) => {
         const current = this.readStoredRecord(request.subjectId);
         this.assertTargetMatchesSnapshot(before, request.subjectId, current, 'correction');
         if (current === null) fail('SUBJECT_NOT_FOUND', 'subject data is not available');
@@ -426,7 +434,6 @@ export class PrivacyComplianceService {
           const stored = this.readStoredRecord(request.subjectId);
           if (!stored || canonicalPrivacyJson(stored) !== canonicalPrivacyJson(replacement)) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy store replace was not verified');
           this.assertStoreSnapshot(expected, 'privacy store changed while verifying the correction');
-          assertStableNow();
           return result;
         }, () => {
           this.restoreStoreSnapshot(before);
@@ -468,7 +475,7 @@ export class PrivacyComplianceService {
     safeActor(actor); validateRequestId(requestId); if (actor.kind !== 'operator' || actor.token !== this.operatorToken) fail('PERMISSION_DENIED', 'only an authorized operator may purge retention data');
     return this.runRequest('retention_purge', requestId, '__retention__', { requestId }, () => {
       this.ensureOperational();
-      return this.withMutationBoundary((records, now, assertStableNow) => {
+      return this.withMutationBoundary((records, now) => {
         const expired = records.filter((record) => record.retentionUntil <= now);
         const unexpired = records.filter((record) => record.retentionUntil > now);
         const expiredBySubject = new Map(expired.map((record) => [record.subjectId, record] as const));
@@ -511,7 +518,6 @@ export class PrivacyComplianceService {
             }
             for (const record of expired) if (this.readStoredRecord(record.subjectId) !== null) this.failStore('STORE_SNAPSHOT_MISMATCH', 'privacy retention purge was not verified');
             this.assertStoreSnapshot(expected, 'privacy retention purge changed the storage snapshot while verifying expired data');
-            assertStableNow();
           } catch { throw new PrivacyComplianceError('STORE_FAILURE', 'privacy retention purge failed', false); }
           for (const record of expired) { this.consents.delete(record.subjectId); this.ages.delete(record.subjectId); this.removeReplayableSubjectResults(record.subjectId); }
           const purgedAuditEvents = this.pruneAudits(now); return { accepted: true, replayed: false, requestId, purgedSubjects: expired.length, purgedAuditEvents };
@@ -565,27 +571,32 @@ export class PrivacyComplianceService {
     }
     return result;
   }
-  private withGlobalStoreSnapshot<T>(action: (before: readonly PrivacyDataRecord[]) => T): T {
+  private withGlobalStoreSnapshot<T>(action: (before: readonly PrivacyDataRecord[]) => T, afterTransaction: () => void = () => undefined): T {
+    const serviceBefore = this.captureServiceSnapshot();
+    let before: readonly PrivacyDataRecord[] | undefined;
     const execute = () => {
-      const before = this.listStoredRecords();
+      before = this.listStoredRecords();
       return action(before);
     };
     try {
       const transaction = this.store.withTransaction;
-      return typeof transaction === 'function' ? transaction.call(this.store, execute) : execute();
+      const result = typeof transaction === 'function' ? transaction.call(this.store, execute) : execute();
+      afterTransaction();
+      return result;
     } catch (error) {
+      let rollbackFailure: unknown;
+      if (before) try { this.restoreStoreSnapshot(before); } catch (failure) { rollbackFailure = failure; }
+      try { this.restoreServiceSnapshot(serviceBefore); } catch (failure) { rollbackFailure ??= failure; }
+      if (rollbackFailure) this.failStore('STORE_ROLLBACK_FAILED', 'privacy transaction rollback failed; store is quarantined');
       if (error instanceof PrivacyComplianceError) throw error;
       this.failStore('STORE_TRANSACTION_FAILED', 'privacy store transaction failed');
     }
   }
-  private withMutationBoundary<T>(action: (before: readonly PrivacyDataRecord[], trustedNow: number, assertStableNow: () => void) => T): T {
+  private withMutationBoundary<T>(action: (before: readonly PrivacyDataRecord[], trustedNow: number) => T): T {
     const trustedNow = this.now();
-    return this.withGlobalStoreSnapshot((before) => {
-      const assertStableNow = () => {
-        const afterNow = this.now();
-        if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_MUTATION', 'trusted time changed while finalizing privacy mutation');
-      };
-      return action(before, trustedNow, assertStableNow);
+    return this.withGlobalStoreSnapshot((before) => action(before, trustedNow), () => {
+      const afterNow = this.now();
+      if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_MUTATION', 'trusted time changed while finalizing privacy mutation');
     });
   }
   private assertTargetMatchesSnapshot(snapshot: readonly PrivacyDataRecord[], subjectId: string, current: PrivacyDataRecord | null, operation: string): void {
@@ -627,6 +638,31 @@ export class PrivacyComplianceService {
     if (left.length !== right.length) return false;
     const rightBySubject = new Map(right.map((record) => [record.subjectId, canonicalPrivacyJson(record)] as const));
     return left.every((record) => rightBySubject.get(record.subjectId) === canonicalPrivacyJson(record));
+  }
+  private captureServiceSnapshot(): PrivacyServiceSnapshot {
+    return {
+      consents: [...this.consents.entries()].map(([subjectId, subjectConsents]) => [subjectId, [...subjectConsents.entries()].map(([purpose, record]) => [purpose, clone(record)] as const)] as const),
+      ages: [...this.ages.entries()].map(([subjectId, record]) => [subjectId, clone(record)] as const),
+      ledger: [...this.ledger.entries()].map(([requestId, entry]) => [requestId, clone(entry)] as const),
+      audits: this.audits.slice(),
+      auditSequence: this.auditSequence,
+    };
+  }
+  private restoreServiceSnapshot(snapshot: PrivacyServiceSnapshot): void {
+    const quarantineEvents = this.audits.filter((event) => event.action === 'store_quarantine' && !snapshot.audits.includes(event));
+    this.consents.clear();
+    for (const [subjectId, entries] of snapshot.consents) this.consents.set(subjectId, new Map(entries.map(([purpose, record]) => [purpose, clone(record)] as const)));
+    this.ages.clear();
+    for (const [subjectId, record] of snapshot.ages) this.ages.set(subjectId, clone(record));
+    this.ledger.clear();
+    for (const [requestId, entry] of snapshot.ledger) this.ledger.set(requestId, clone(entry));
+    this.audits.splice(0, this.audits.length, ...snapshot.audits);
+    this.auditSequence = snapshot.auditSequence;
+    for (const event of quarantineEvents) {
+      const restored = freeze({ ...event, sequence: this.auditSequence + 1 });
+      this.audits.push(restored);
+      this.auditSequence = restored.sequence;
+    }
   }
   private restoreStoreSnapshot(snapshot: readonly PrivacyDataRecord[]): void {
     let failure: unknown;
