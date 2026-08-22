@@ -51,8 +51,28 @@ function saveCollector(saved, writes, key) {
   };
 }
 
+function readSavedPayload(saved, key) {
+  const serialized = saved.get(key);
+  assert.equal(typeof serialized, 'string', `${key} save callback must capture a payload`);
+  return { serialized, parsed: JSON.parse(serialized) };
+}
+
+function saveAndReadPayload(service, saved, key) {
+  const returned = service.save();
+  const persisted = readSavedPayload(saved, key);
+  assert.equal(persisted.serialized, returned, `${key}.save() must write its returned payload`);
+  return persisted;
+}
+
+function writeDataPayload(saved, writes, key, value) {
+  const serialized = JSON.stringify(value);
+  saved.set(key, serialized);
+  writes[key].push(serialized);
+  return readSavedPayload(saved, key);
+}
+
 const saved = new Map();
-const writes = { shell: [], campaign: [], cards: [] };
+const writes = { home: [], shell: [], campaign: [], cards: [] };
 const shell = new ShellService({ persist: saveCollector(saved, writes, 'shell') });
 
 const baseHomeData = createDefaultHomePageData();
@@ -132,6 +152,15 @@ assert.equal(component(homeInitial, 'mission').stage, homeData.mission.stage);
 assert.equal(component(homeInitial, 'mission').title, homeData.mission.title);
 assert.equal(component(homeInitial, 'mission').target, 'campaign');
 
+// HOME has no save/serialize API: only its input data crosses the persistence boundary; selection is transient.
+assert.equal(typeof home.save, 'undefined', 'HOME must not claim a page-state save API it does not expose');
+const homeDataSaved = writeDataPayload(saved, writes, 'home', homeData);
+homeData.player.name = '内存态改名';
+const restoredHome = new HomePageService(homeDataSaved.parsed);
+assert.equal(component(restoredHome.snapshot(), 'hero').title, '集成主将', 'HOME must reconstruct from the parsed data payload');
+assert.equal(restoredHome.snapshot().selectedComponentId, null, 'HOME transient selection must not be invented during data rehydration');
+assert.equal(component(home.snapshot(), 'hero').title, '集成主将', 'HOME service must isolate its input data');
+
 const homeMissionResult = home.interact({ type: 'activateMission' });
 assert.deepEqual(homeMissionResult, {
   accepted: true,
@@ -198,8 +227,11 @@ assert.deepEqual(campaign.interact({ type: 'selectLevel', levelId: 'L02' }), {
 const campaignBeforeLeave = campaign.snapshot();
 assert.equal(campaignBeforeLeave.selectedLevelId, 'L02');
 assert.equal(component(campaignBeforeLeave, 'detail').levelId, 'L02');
-const campaignSerialized = campaign.serialize();
-saved.set('campaign', campaignSerialized);
+const campaignSaved = saveAndReadPayload(campaign, saved, 'campaign');
+campaign.startLevel();
+assert.equal(campaign.snapshot().activeLevelId, 'L02', 'in-memory campaign state must diverge after the save payload is captured');
+assert.equal(campaignSaved.parsed.activeLevelId, null, 'saved campaign payload must retain the pre-mutation state');
+assert.notEqual(campaignSaved.serialized, campaign.serialize(), 'campaign rehydration input must not be the current in-memory serialization');
 
 // CARDS: real registry metadata, ownership, quality detail, and filtering remain structured after navigation.
 assert.deepEqual(shell.navigate('cards'), {
@@ -261,8 +293,11 @@ assert.deepEqual(cards.selectCard(u004.id), {
   selectedCardId: u004.id,
 });
 assert.equal(writes.cards.length, cardsWritesBeforeSameSelection, 'same card selection must not create a duplicate save');
-const cardsSerialized = cards.serialize();
-saved.set('cards', cardsSerialized);
+const cardsSaved = saveAndReadPayload(cards, saved, 'cards');
+cards.clearFilter();
+assert.equal(component(cards.snapshot(), 'header').visibleCards, cardsPageData.cards.length, 'in-memory cards state must diverge after the save payload is captured');
+assert.deepEqual(JSON.parse(cardsSaved.parsed.inventory).filter.cardIds, [u004.id], 'saved cards payload must retain the pre-mutation filter');
+assert.notEqual(cardsSaved.serialized, cards.serialize(), 'cards rehydration input must not be the current in-memory serialization');
 
 // Leave and re-enter pages through the shell, reconstructing each service from the persisted page state.
 assert.deepEqual(shell.back(), {
@@ -274,7 +309,7 @@ assert.deepEqual(shell.back(), {
 campaign = new CampaignPageService({
   data: campaignData,
   config: campaignIndex,
-  initialState: campaignSerialized,
+  initialState: JSON.stringify(campaignSaved.parsed),
   persist: saveCollector(saved, writes, 'campaign'),
 });
 assert.deepEqual(campaign.snapshot(), campaignBeforeLeave, 'campaign state must survive cards navigation and restore');
@@ -287,7 +322,7 @@ assert.deepEqual(shell.navigate('cards'), {
 });
 cards = new CardsPageService({
   data: cardsPageData,
-  initialState: cardsSerialized,
+  initialState: JSON.stringify(cardsSaved.parsed),
   persist: saveCollector(saved, writes, 'cards'),
 });
 assert.deepEqual(cards.snapshot(), cardsBeforeLeave, 'cards selection, quality, filter, and inventory must survive re-entry');
@@ -313,9 +348,16 @@ assert.deepEqual(shell.back(), {
 assert.equal(home.snapshot().selectedComponentId, 'mission');
 assert.equal(home.snapshot().components.find((entry) => entry.id === 'mission').title, homeData.mission.title);
 
-const shellSerialized = shell.serialize();
-const restoredShell = ShellService.fromSerialized(shellSerialized);
-assert.deepEqual(restoredShell.snapshot(), shell.snapshot(), 'shell page and resource state must round-trip');
+const shellBeforeSave = shell.snapshot();
+const shellSaved = saveAndReadPayload(shell, saved, 'shell');
+shell.navigate('campaign');
+shell.setResource('silver', 1);
+assert.notEqual(shell.snapshot().page, shellSaved.parsed.page, 'in-memory shell state must diverge after the save payload is captured');
+assert.notEqual(shellSaved.serialized, shell.serialize(), 'shell rehydration input must not be the current in-memory serialization');
+const restoredShell = ShellService.fromSerialized(JSON.stringify(shellSaved.parsed));
+assert.deepEqual(restoredShell.snapshot(), shellBeforeSave, 'shell must reconstruct from the parsed saved payload');
+shell.restore(JSON.stringify(shellSaved.parsed));
+assert.deepEqual(shell.snapshot(), shellBeforeSave, 'shell restore must put the live service back on the saved state');
 assert.deepEqual(
   shell.snapshot().resources.map(({ id, value, max }) => ({ id, value, max })),
   initialResources,
@@ -325,5 +367,5 @@ assert.deepEqual(
 console.log(
   `T245 home-campaign-cards integration PASS: pages=3, campaign-clears=${component(campaignBeforeLeave, 'header').clearedLevels}, `
   + `cards=${cardsPageData.cards.length}, visible-after-filter=${component(cardsBeforeLeave, 'header').visibleCards}, `
-  + `shell-history-round-trip=true, page-state-restore=true, resource-state-preserved=true`,
+  + `shell-history-round-trip=true, saved-payload-rehydrate=true, resource-state-preserved=true`,
 );
