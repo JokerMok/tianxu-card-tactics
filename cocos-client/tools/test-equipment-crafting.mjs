@@ -93,7 +93,9 @@ function checkSkeletonAndDiff() {
     assert.match(indexSource, /crafting-config/);
     assert.match(indexSource, /crafting-service/);
 
-    const trackedDiff = execFileSync('git', ['diff', '--name-only', 'HEAD^', 'HEAD', '--'], { cwd: projectRoot, encoding: 'utf8' })
+    const diffBase = process.env.T233_BASE_COMMIT ?? 'HEAD^';
+    const diffTarget = process.env.T233_TARGET_COMMIT ?? 'HEAD';
+    const trackedDiff = execFileSync('git', ['diff', '--name-only', diffBase, diffTarget, '--'], { cwd: projectRoot, encoding: 'utf8' })
         .split('\n').map((file) => file.trim()).filter(Boolean);
     const disallowed = trackedDiff.filter((file) => !allowedPaths.some((allowed) => allowed.endsWith('/') ? file.startsWith(allowed) : file === allowed));
     assert.deepEqual(disallowed, [], `tracked diff contains files outside T233 scope: ${disallowed.join(', ')}`);
