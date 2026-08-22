@@ -23,6 +23,9 @@ expectCode('SENSITIVE_FIELD', () => event('economy', 'currency_earned', 5, { res
 for (const key of ['socialSecurityNumber', 'SOCIAL_SECURITY_NUMBER', 'social-security-number', 'dob', 'DOB', 'date_of_birth', 'credit_card', 'creditCard', 'user_id', 'UserId', 'email', 'PHONE', 'street-address']) expectCode('SENSITIVE_FIELD', () => event('battle', 'battle_started', 5, { [key]: 'opaque-value' }));
 expectCode('SENSITIVE_FIELD', () => event('battle', 'battle_started', 5, { metadata: { contact: { phone_number: 'opaque-value' } } }));
 expectCode('SENSITIVE_FIELD', () => event('battle', 'battle_started', 5, { metadata: [{ identity: { social_security_number: 'opaque-value' } }] }));
+const legalFieldEvent = event('battle', 'battle_started', 5, { equipmentId: 'E001', equipment: 'sword', apiVersion: 'v1' });
+assert.deepEqual(legalFieldEvent.payload, { equipmentId: 'E001', equipment: 'sword', apiVersion: 'v1' });
+for (const key of ['email', 'EMAIL', 'e_mail', 'e-mail', 'phone', 'PHONE', 'phone_number', 'phoneNumber', 'phone-number', 'address', 'ADDRESS', 'street_address', 'streetAddress', 'street-address', 'socialSecurityNumber', 'SOCIAL_SECURITY_NUMBER', 'social_security_number', 'social-security-number', 'dob', 'DOB', 'date_of_birth', 'dateOfBirth', 'date-of-birth', 'credit_card', 'creditCard', 'credit-card', 'user_id', 'UserId', 'user-id', 'ssn', 'access_token', 'accessToken', 'access-token', 'api', 'API', 'api_key', 'apiKey', 'api-key']) expectCode('SENSITIVE_FIELD', () => event('battle', 'battle_started', 5, { [key]: 'opaque-value' }));
 expectCode('INVALID_FIELD', () => event('battle', 'battle_started', 5, { value: Number.NaN }));
 expectCode('UNSUPPORTED_EVENT_TYPE', () => event('battle', 'currency_earned', 5, { resourceId: 'credits', amount: 1 }));
 assert.notEqual(validateAnalyticsEvent({ ...battleStarted, type: 'changed_type' }).length, 0);

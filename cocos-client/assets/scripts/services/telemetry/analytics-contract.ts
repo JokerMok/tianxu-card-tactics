@@ -12,7 +12,6 @@ export const ANALYTICS_EVENT_TYPES: Readonly<Record<AnalyticsCategory, readonly 
 
 const CATEGORY_SET = new Set<string>(ANALYTICS_CATEGORIES);
 const TYPE_SETS = Object.fromEntries(ANALYTICS_CATEGORIES.map((category) => [category, new Set(ANALYTICS_EVENT_TYPES[category])])) as Readonly<Record<AnalyticsCategory, ReadonlySet<string>>>;
-const SENSITIVE_KEY = /(email|phone|mobile|address|name|nickname|realname|userid|playerid|account|token|secret|password|passwd|credential|authorization|cookie|ip|device|advertising|idfa|gaid|private|api|socialsecuritynumber|ssn|dob|dateofbirth|birthdate|creditcard|cardnumber|cardno|cvv|cvc|bankaccount)/i;
 const EMAIL_VALUE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_VALUE = /^\+?[0-9][0-9\s().-]{7,}$/;
 const UNSAFE_STRING = /[\u0000-\u001f\u007f]/;
@@ -45,6 +44,14 @@ function fail(code: string, message: string): never { throw new AnalyticsEventVa
 function isRecord(value: unknown): value is Record<string, unknown> { return value !== null && typeof value === 'object' && !Array.isArray(value); }
 function isPlainRecord(value: unknown): value is Record<string, unknown> { return isRecord(value) && (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null); }
 function normalizedKey(key: string): string { return key.replace(/[^a-z0-9]/gi, '').toLowerCase(); }
+const SENSITIVE_KEYS = new Set([
+  'email', 'emailaddress', 'useremail', 'contactemail', 'phone', 'phonenumber', 'contactphone', 'mobile', 'mobilephone', 'mobilenumber',
+  'address', 'streetaddress', 'homeaddress', 'mailingaddress', 'useraddress', 'name', 'nickname', 'username', 'realname', 'userid', 'playerid', 'account',
+  'token', 'accesstoken', 'refreshtoken', 'secret', 'password', 'passwd', 'credential', 'authorization', 'cookie',
+  'ip', 'api', 'device', 'deviceid', 'advertising', 'advertisingid', 'idfa', 'gaid', 'private', 'apikey',
+  'socialsecuritynumber', 'ssn', 'dob', 'dateofbirth', 'birthdate', 'creditcard', 'creditcardnumber', 'cardnumber',
+  'cardno', 'cvv', 'cvc', 'securitycode', 'bankaccount', 'bankaccountnumber',
+]);
 function safeString(value: unknown, label: string): asserts value is string {
   if (typeof value !== 'string' || value.length === 0 || value.length > 96 || value !== value.trim() || UNSAFE_STRING.test(value)) fail('INVALID_FIELD', `${label} is invalid`);
   if (EMAIL_VALUE.test(value) || PHONE_VALUE.test(value)) fail('SENSITIVE_FIELD', `${label} contains sensitive data`);
@@ -62,7 +69,7 @@ function safeValue(value: unknown, label: string, depth: number, seen: Set<objec
     if (Object.keys(value).length > 64) fail('INVALID_FIELD', `${label} has too many fields`);
     for (const [key, child] of Object.entries(value)) {
       if (key === '__proto__' || key === 'constructor' || key === 'prototype') fail('INVALID_FIELD', `${label}.${key} is not allowed`);
-      if (SENSITIVE_KEY.test(normalizedKey(key))) fail('SENSITIVE_FIELD', `${label}.${key} is not allowed`);
+      if (SENSITIVE_KEYS.has(normalizedKey(key))) fail('SENSITIVE_FIELD', `${label}.${key} is not allowed`);
       safeValue(child, `${label}.${key}`, depth + 1, seen);
     }
   } finally { seen.delete(value); }
