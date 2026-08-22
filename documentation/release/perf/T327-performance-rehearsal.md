@@ -18,7 +18,7 @@ T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且
 ## 3. 验证顺序
 
 1. 读取并校验 A0 manifest、E104 场景契约、T251 效果/音频契约、生产性能模块和契约通过夹具。
-2. 执行现有 T327 缺失、非法、越界和原始样本不足负例，并校验 T203 live GPU 证据缺失、越界和 marker 缺失反例。
+2. 执行现有 T327 缺失、非法、越界和原始样本不足负例，校验 T203 精确成功行解析，以及结构化 WebGL2/formal-runtime 证据缺失反例。
 3. 执行 `tools/verify-production-performance.mjs`。
 4. T203 非零或缺少任一实际成功行时，T327 输出 `T327 formal performance gate: BLOCKED` 并返回非零；在此之前不读取历史 `BattleA0-performance.json`。
 5. 只有 T203 live gate 通过后，才检查历史 artifact；该文件仍保持旧 headless/preview 失败样本时，验证器继续断言其被拒绝。
@@ -31,7 +31,8 @@ T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且
 | 缺失文件、缺失字段、非法 renderer | 拒绝 | 保留原有断言 |
 | FPS 54.99、P95 22.01ms、119 个原始样本 | 拒绝 | 不降低阈值和采样要求 |
 | T203 GPU runtime 或 measured FPS/P95 成功行缺失、伪造或越界 | 拒绝 | T327 只接受精确成功行，并明确报告 `BLOCKED` |
-| T203 WebGL2/formal-runtime/正式资产真实性 | 由 T203 拒绝 | T203 verifier/runner 强制检查，不由 T327 放宽 |
+| T203 WebGL2/formal-runtime 结构化证据缺失 | 拒绝 | 负例直接调用 T203 的结构化 evidence validator，不依赖文本搜索 |
+| T203 正式资产真实性 | 由 T203 拒绝 | T203 verifier/runner 强制检查，不由 T327 放宽 |
 | 历史 `BattleA0-performance.json` | 可选拒绝 | 当前样本为 headless、`preview-pose`、24 单位压力 FPS 26.278、P95 50ms；不作为 live gate |
 | 当前正式资产 | BLOCKED | 当前正式资产仍为 `preview-pose`，不能形成 formal-runtime 证据 |
 

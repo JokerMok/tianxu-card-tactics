@@ -227,6 +227,53 @@ function runLiveEvidenceCounterexamples(scenario, performance) {
   expectFailure('T203 live P95 above release threshold', () => validateT203LiveEvidence(validOutput.replace('P95 18ms', 'P95 22.01ms'), scenario, performance), /exceeds 22/);
 }
 
+function buildValidT203RunnerEvidence(scenario) {
+  const formalRuntime = {
+    ready: true,
+    assetsReady: true,
+    artMode: 'formal-runtime',
+    previewPoseAssets: 0,
+    artIntegrationComplete: true,
+  };
+  return {
+    runtimeAvailable: true,
+    renderer: 'gpu',
+    gpuVendor: 'Apple',
+    gpuRenderer: 'Apple M5 Pro',
+    gpuDriverVersion: 'Apple GPU Driver 1.0',
+    gpuContextId: 'webgl2-context-01',
+    gpuFeatureStatus: { webgl: 'hardware accelerated', webgl2: 'hardware accelerated' },
+    gpuContextType: 'webgl2',
+    width: scenario.resolution[0],
+    height: scenario.resolution[1],
+    canvasCssWidth: scenario.resolution[0],
+    canvasCssHeight: scenario.resolution[1],
+    canvasBufferWidth: scenario.resolution[0],
+    canvasBufferHeight: scenario.resolution[1],
+    a0Metrics: { ...formalRuntime, stressMode: true, activeUnits: scenario.units, runtimeUnitSprites: scenario.units, hitCount: 1 },
+    a0InitialMetrics: formalRuntime,
+    units: scenario.units,
+    sceneLayers: scenario.sceneLayers,
+    basicEffects: scenario.basicEffects,
+    audioFeedbacks: scenario.audioFeedbacks,
+    sceneContractVersion: scenario.sceneContractVersion,
+    effectsAudioContractVersion: scenario.effectsAudioContractVersion,
+    frameTimesMs: Array.from({ length: 120 }, () => 16),
+  };
+}
+
+function runT203StructuredEvidenceCounterexamples(scenario, performance) {
+  const validEvidence = buildValidT203RunnerEvidence(scenario);
+  const missingWebgl2 = { ...validEvidence, gpuContextType: 'webgl' };
+  expectFailure('missing T203 live WebGL2 evidence', () => performance.validateGpuRunnerResult(missingWebgl2, scenario), /WebGL2/);
+
+  const missingFormalRuntime = structuredClone(validEvidence);
+  missingFormalRuntime.a0Metrics.artMode = 'preview-pose';
+  missingFormalRuntime.a0Metrics.previewPoseAssets = 2;
+  missingFormalRuntime.a0Metrics.artIntegrationComplete = false;
+  expectFailure('missing T203 live formal-runtime evidence', () => performance.validateGpuRunnerResult(missingFormalRuntime, scenario), /formal runtime missing|preview-pose/);
+}
+
 function assertExpectedFailureArtifact(artifact, performance) {
   const value = requireRecord(artifact, 'real failure artifact');
   const final = requireRecord(value.final, 'real failure artifact final state');
@@ -301,11 +348,12 @@ async function main() {
   expectFailure('P95 above release threshold', () => performance.validatePerformanceSample({ fps: 60, p95FrameTimeMs: performance.PERFORMANCE_LIMITS.maxP95FrameTimeMs + 0.01 }), /exceeds 22/);
   expectFailure('short raw frame sample', () => validatePassSample({ ...passSample, frameTimesMs: passSample.frameTimesMs.slice(0, 119) }, scenario, performance), /at least 120 raw samples/);
   runLiveEvidenceCounterexamples(scenario, performance);
+  runT203StructuredEvidenceCounterexamples(scenario, performance);
 
   const liveEvidence = runT203LiveGate(scenario, performance);
   console.log(`T327 live GPU gate: PASS (T203 exit code 0; GPU/WebGL2 runtime ${liveEvidence.gpuVendor} / ${liveEvidence.gpuRenderer}; FPS ${liveEvidence.fps}; P95 ${liveEvidence.p95FrameTimeMs}ms)`);
   inspectOptionalHistoricalArtifact(scenario, performance);
-  console.log('T327 counterexamples: PASS (missing file, missing field, illegal renderer, FPS/P95 bounds, short raw sample, missing/invalid live GPU and measured FPS/P95 success lines)');
+  console.log('T327 counterexamples: PASS (missing file, missing field, illegal renderer, FPS/P95 bounds, short raw sample, exact live success lines, structured WebGL2/formal-runtime evidence)');
   console.log('T327 verifier: PASS (contract rehearsal and optional historical rejection sample retained; live formal performance gate accepted)');
 }
 
