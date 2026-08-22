@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
+import path from 'node:path';
 import {
   ContentTemplateError,
   TOWER_FLOOR_MAX,
@@ -13,12 +16,51 @@ import {
 } from './content-templates/index.mjs';
 import { validateDungeonDifficultyConfig } from '../assets/scripts/pve/dungeon/difficulty/DungeonDifficulty.ts';
 import { validateBossConfig } from '../assets/scripts/core/boss/index.ts';
+import { createTowerConfig, loadTowerConfig } from '../assets/scripts/pve/tower/TowerConfig.ts';
+
+const projectRoot = path.resolve(import.meta.dirname, '..');
+const configRoot = path.join(projectRoot, 'assets/resources/config');
+const loaderSource = fs.readFileSync(path.join(projectRoot, 'assets/scripts/config/ConfigLoader.ts'), 'utf8');
+const contractSource = fs.readFileSync(path.join(projectRoot, 'assets/scripts/config/levels/ChapterLevelContract.ts'), 'utf8');
+const levelProductionSource = stripTypeScriptTypes(
+  `${loaderSource.replace("import { JsonAsset, resources } from 'cc';", "const JsonAsset=class {}; const resources={load(){throw new Error('not used')}};")}\nexport { assertChapterLevelRuleSchemas };\n${contractSource.replace("import { assertConfigManifest, ConfigLoadError, type ConfigManifest } from '../ConfigLoader';", '')}`,
+  { mode: 'transform' },
+);
+const {
+  assertChapterLevelContract,
+  assertChapterLevelRuleSchemas,
+  ConfigLoadError,
+} = await import(`data:text/javascript;base64,${Buffer.from(levelProductionSource).toString('base64')}`);
+
+const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(configRoot, relativePath), 'utf8'));
+const productionManifest = readJson('manifest.json');
+const productionDecks = readJson('decks.json');
+const productionCards = readJson('cards.json');
+const productionUnits = readJson('units.json');
+const productionSkills = readJson('skills.json');
+const productionLevelIndex = readJson('levels/chapter01/index.json');
+const productionEnumCoverage = JSON.parse(fs.readFileSync(path.join(projectRoot, 'assets/scripts/config/levels/chapter-level-enum-coverage.fixture.json'), 'utf8'));
+const productionUnitIds = new Set(productionUnits.units.filter((unit) => unit.enabled !== false).map((unit) => unit.id));
+const productionSkillIds = new Set(productionSkills.skills.filter((skill) => skill.enabled !== false).map((skill) => skill.id));
+const productionCardsById = new Map(productionCards.cards.filter((card) => card.enabled !== false).map((card) => [card.id, {
+  cardType: card.cardType,
+  copyLimit: card.copyLimit,
+  ...(card.unitId ? { unitId: card.unitId } : {}),
+  ...(card.skillId ? { skillId: card.skillId } : {}),
+}]));
+const productionRewardIds = (type) => new Set(productionEnumCoverage.chapterLevels.flatMap((entry) => entry.rewards.filter((reward) => reward.type === type).map((reward) => reward.id)));
 
 const levelContext = {
-  levelIds: new Set(['L12']),
-  deckIds: new Set(['D002']),
-  targetIds: new Set(['BOSS-EMBER-LORD']),
-  rewardIds: new Set(['GOLD', 'EMBER-CHEST']),
+  levelIds: new Set(['L11']),
+  chapterLevelIds: new Set(productionLevelIndex.levels.map((entry) => entry.id)),
+  deckIds: new Set(['D001']),
+  targetIds: new Set(['C010', ...productionUnitIds]),
+  unitIds: productionUnitIds,
+  skillIds: productionSkillIds,
+  cards: productionCardsById,
+  unlockIds: productionRewardIds('UNLOCK'),
+  chestIds: productionRewardIds('CHEST'),
+  flagIds: productionRewardIds('FLAG'),
 };
 
 const dungeonContext = {
@@ -30,18 +72,22 @@ const dungeonContext = {
 };
 
 const towerContext = {
-  enemyUnitIds: new Set(['U001', 'U002', 'U003', 'U004', 'U005', 'U006']),
+  enemyUnitIds: new Set(Array.from({ length: 28 }, (_item, index) => `U${String(index + 1).padStart(3, '0')}`)),
+  stageIds: new Set(Array.from({ length: 10 }, (_item, index) => `STAGE_${String(index + 1).padStart(2, '0')}`)),
+  enemyPoolIds: new Set(Array.from({ length: 10 }, (_item, index) => `POOL_${String(index + 1).padStart(2, '0')}`)),
+  stages: createTowerConfig().stages,
+  enemyPools: createTowerConfig().enemyPools,
   previousFloor: {
     floor: 12,
     stageId: 'STAGE_03',
     enemyPoolId: 'POOL_03',
-    enemyIds: ['U001', 'U002'],
+    enemyIds: ['U014', 'U009', 'U010'],
     rules: {
       threatMultiplierPercent: 150,
-      maxEnemyUnits: 2,
-      enemyActionInterval: 3,
+      maxEnemyUnits: 3,
+      enemyActionInterval: 4,
       maxRounds: 42,
-      randomness: 240,
+      randomness: 423,
       environmentElement: 'WOOD',
       specialRule: 'ELEMENTAL_SURGE',
     },
@@ -53,7 +99,8 @@ const allContext = {
   levelIds: levelContext.levelIds,
   deckIds: levelContext.deckIds,
   targetIds: levelContext.targetIds,
-  rewardIds: new Set([...levelContext.rewardIds, ...dungeonContext.rewardIds]),
+  rewardIds: new Set([...dungeonContext.rewardIds]),
+  ...levelContext,
   enemyIds: dungeonContext.enemyIds,
   enemyUnitIds: towerContext.enemyUnitIds,
   unitIds: bossContext.unitIds,
@@ -61,20 +108,42 @@ const allContext = {
 };
 
 const levelInput = {
-  id: 'L13',
-  resource: 'config/levels/generated/L13',
-  prerequisiteLevelId: 'L12',
-  enemyDeckId: 'D002',
-  environmentElement: 'FIRE',
+  id: 'L12',
+  prerequisiteLevelId: 'L11',
+  enemyDeckId: 'D001',
+  environmentElement: 'NONE',
   objectives: [
     { type: 'DEFEAT_ENEMY_HERO' },
     { type: 'SURVIVE_ROUNDS', rounds: 12 },
   ],
   rewards: [
-    { type: 'CARD', id: 'GOLD', quantity: 2, cardType: 'UNIT' },
-    { type: 'CHEST', id: 'EMBER-CHEST', quantity: 1 },
+    { type: 'CARD', id: 'U001', quantity: 2 },
+    { type: 'CHEST', id: 'CHAPTER-CHEST', quantity: 1 },
   ],
-  failureConditions: [{ type: 'PLAYER_HERO_DEFEATED' }],
+  failureConditions: [
+    { type: 'PLAYER_HERO_DEFEATED' },
+    { type: 'ROUND_LIMIT_REACHED', rounds: 80 },
+  ],
+  scenarioRules: {
+    sceneId: 'E112',
+    bossCharacterId: 'C010',
+    roundLimit: 80,
+    pointBookRule: {
+      enemyActionInterval: 3,
+      summonUnitId: 'U009',
+      occupiedSlotPolicy: 'SKIP',
+      overwriteUnits: false,
+    },
+    phaseTransition: {
+      triggerBossHpPercent: 50,
+      bossEntersBattle: true,
+      bossRole: 'HIGH_HP_ELITE',
+      nameLockAffects: ['SKILL_CARD'],
+      unitCardPreparationNormal: true,
+    },
+    victoryPolicy: 'DEFEAT_BOSS_AND_KEEP_PLAYER_HERO_ALIVE',
+    rewardRegistryIds: ['CHAPTER-CHEST', 'OUTCAST-CAMP'],
+  },
 };
 
 const dungeonInput = {
@@ -116,16 +185,13 @@ const towerInput = {
   floor: 13,
   stageId: 'STAGE_03',
   enemyPoolId: 'POOL_03',
-  enemyIds: null,
-  enemyPoolUnitIds: ['U001', 'U002', 'U003', 'U004', 'U005', 'U006'],
-  enemyCount: 3,
-  seed: 20260822,
+  enemyIds: ['U009', 'U010', 'U011'],
   rules: {
-    threatMultiplierPercent: 155,
+    threatMultiplierPercent: 160,
     maxEnemyUnits: 3,
-    enemyActionInterval: 2,
-    maxRounds: 40,
-    randomness: 220,
+    enemyActionInterval: 4,
+    maxRounds: 42,
+    randomness: 416,
     environmentElement: 'WOOD',
     specialRule: 'ELEMENTAL_SURGE',
   },
@@ -170,14 +236,11 @@ const boss = generateBoss(bossInput, bossContext);
 
 assert.equal(level.type, 'level');
 assert.deepEqual(level.config.chapterLevels[0], (({ resource: _resource, ...config }) => config)(levelInput), 'level output must not leak template metadata');
+assert.equal(level.resource, 'config/levels/generated/L12', 'omitted level resource must use the production-safe default');
 assert.equal(dungeon.config.length, 2);
 assert.equal(tower.config.floor, 13);
-assert.deepEqual(tower.config.enemyIds, generateTowerFloor(towerInput, towerContext).config.enemyIds, 'same seed must produce the same enemy selection');
-assert.notDeepEqual(
-  tower.config.enemyIds,
-  generateTowerFloor({ ...towerInput, seed: towerInput.seed + 1 }, towerContext).config.enemyIds,
-  'different seeds must not collapse to one fixed enemy selection',
-);
+assert.deepEqual(tower.config.enemyIds, ['U009', 'U010', 'U011'], 'tower output must use the production fixed progression sequence');
+assert.deepEqual(tower.config.enemyIds, generateTowerFloor(towerInput, towerContext).config.enemyIds, 'explicit tower enemy selection must be deterministic');
 assert.equal(boss.config.id, 'BOSS-EMBER-LORD');
 assert(Object.isFrozen(level) && Object.isFrozen(level.config.chapterLevels[0]), 'generated entries must be deeply frozen');
 assert.equal(canonicalJson(level), canonicalJson(generateLevel(levelInput, levelContext)), 'canonical serialization must be stable');
@@ -188,6 +251,26 @@ validateContentEntry(level, levelContext);
 validateContentEntry(dungeon, dungeonContext);
 validateContentEntry(tower, towerContext);
 validateContentEntry(boss, bossContext);
+
+assertChapterLevelRuleSchemas(level.config.chapterLevels[0], level.id, 'config/levels/generated/L12.chapterLevels[0]');
+assert.doesNotThrow(
+  () => assertChapterLevelContract(level.config, productionManifest, productionDecks, {
+    chapterLevelIds: levelContext.chapterLevelIds,
+    targetIds: levelContext.targetIds,
+    unitIds: productionUnitIds,
+    skillIds: productionSkillIds,
+    cards: productionCardsById,
+    unlockIds: levelContext.unlockIds,
+    chestIds: levelContext.chestIds,
+    flagIds: levelContext.flagIds,
+  }, 'config/levels/generated/L12'),
+  'generated level must satisfy the production chapter-level contract',
+);
+assert.doesNotThrow(() => {
+  const productionTower = structuredClone(createTowerConfig());
+  productionTower.floors[tower.config.floor - 1] = tower.config;
+  loadTowerConfig(productionTower);
+}, 'generated tower floor must be accepted by the production tower loader');
 
 const pack = generateContentPack([
   { type: 'boss', input: bossInput },
@@ -208,15 +291,30 @@ expectRejected('level missing deck reference', () => generateLevel({ ...levelInp
 expectRejected('level self prerequisite', () => generateLevel({ ...levelInput, id: 'L12', prerequisiteLevelId: 'L12' }, levelContext), 'REFERENCE_CYCLE');
 expectRejected('level invalid target reference', () => generateLevel({ ...levelInput, objectives: [{ type: 'DESTROY_TARGET', targetId: 'TARGET-999' }] }, levelContext), 'MISSING_REFERENCE');
 expectRejected('level invalid objective boundary', () => generateLevel({ ...levelInput, objectives: [{ type: 'SURVIVE_ROUNDS', rounds: 0 }] }, levelContext), 'BOUNDARY');
+expectRejected('level card type reference mismatch', () => generateLevel({ ...levelInput, rewards: [{ type: 'CARD', id: 'U001', quantity: 1, cardType: 'SKILL' }] }, levelContext), 'MISMATCHED_REFERENCE');
+expectRejected('level card copy limit', () => generateLevel({ ...levelInput, rewards: [{ type: 'CARD', id: 'U001', quantity: 5 }] }, levelContext), 'BOUNDARY');
+expectRejected('level untyped reward registry', () => {
+  const context = { ...levelContext };
+  delete context.cards;
+  delete context.chestIds;
+  generateLevel(levelInput, { ...context, rewardIds: new Set(['U001', 'CHAPTER-CHEST']) });
+}, 'INVALID_CONTEXT');
+expectRejected('level round failure requires rounds', () => generateLevel({ ...levelInput, failureConditions: [{ type: 'ROUND_LIMIT_REACHED' }] }, levelContext), 'MISSING_FIELD');
+expectRejected('level nested rule unknown field', () => generateLevel({ ...levelInput, scenarioRules: { ...levelInput.scenarioRules, phaseTransition: { ...levelInput.scenarioRules.phaseTransition, cheat: true } } }, levelContext), 'UNKNOWN_FIELD');
 expectRejected('level unknown field', () => generateLevel({ ...levelInput, cheat: true }, levelContext), 'UNKNOWN_FIELD');
 expectRejected('dungeon must contain three stages', () => generateDungeon({ ...dungeonInput, difficulties: dungeonInput.difficulties.map((item) => ({ ...item, stages: item.stages.slice(0, 2) })) }, dungeonContext), 'BOUNDARY');
 expectRejected('dungeon duplicate enemy reference', () => generateDungeon({ ...dungeonInput, difficulties: dungeonInput.difficulties.map((item) => ({ ...item, stages: item.stages.map((stage, index) => index === 1 ? { ...stage, enemy: { ...stage.enemy, id: item.stages[0].enemy.id } } : stage) })) }, dungeonContext), 'DUPLICATE_ID');
 expectRejected('dungeon self unlock', () => generateDungeon({ ...dungeonInput, difficulties: dungeonInput.difficulties.map((item) => item.id === 'HARD' ? { ...item, unlock: { type: 'clearCount', difficultyId: 'HARD', minimumClears: 1 } } : item) }, dungeonContext), 'REFERENCE_CYCLE');
 expectRejected('tower floor below boundary', () => generateTowerFloor({ ...towerInput, floor: 0 }, towerContext), 'BOUNDARY');
 expectRejected('tower floor above boundary', () => generateTowerFloor({ ...towerInput, floor: TOWER_FLOOR_MAX + 1 }, towerContext), 'BOUNDARY');
-expectRejected('tower unknown enemy reference', () => generateTowerFloor({ ...towerInput, enemyIds: ['U999'] }, towerContext), 'MISSING_REFERENCE');
+expectRejected('tower unknown enemy reference', () => generateTowerFloor({ ...towerInput, enemyIds: ['U999', 'U998', 'U009'] }, towerContext), 'MISSING_REFERENCE');
+expectRejected('tower stage context reference', () => generateTowerFloor(towerInput, { ...towerContext, stageIds: new Set(['STAGE_01']) }), 'MISSING_REFERENCE');
+expectRejected('tower pool context reference', () => generateTowerFloor(towerInput, { ...towerContext, enemyPoolIds: new Set(['POOL_01']) }), 'MISSING_REFERENCE');
+expectRejected('tower floor and stage mismatch', () => generateTowerFloor({ ...towerInput, stageId: 'STAGE_02', enemyPoolId: 'POOL_02' }, towerContext), 'MISMATCHED_REFERENCE');
+expectRejected('tower enemy quantity lower boundary', () => generateTowerFloor({ ...towerInput, enemyIds: ['U009'] }, towerContext), 'BOUNDARY');
+expectRejected('tower fixed sequence mismatch', () => generateTowerFloor({ ...towerInput, enemyIds: ['U010', 'U011', 'U012'] }, towerContext), 'PROGRESSION');
 expectRejected('tower progression regression', () => generateTowerFloor({ ...towerInput, rules: { ...towerInput.rules, threatMultiplierPercent: 150 } }, towerContext), 'PROGRESSION');
-expectRejected('tower seed boundary', () => generateTowerFloor({ ...towerInput, seed: -1 }, towerContext), 'BOUNDARY');
+expectRejected('tower random seed is fail-closed', () => generateTowerFloor({ ...towerInput, seed: 1 }, towerContext), 'UNKNOWN_FIELD');
 expectRejected('boss unknown skill reference', () => generateBoss({ ...bossInput, phases: [{ ...bossInput.phases[0], skillIds: ['forged'] }, bossInput.phases[1]] }, bossContext), 'MISSING_REFERENCE');
 expectRejected('boss unknown summon reference', () => generateBoss({ ...bossInput, skills: [{ ...bossInput.skills[2], effect: { type: 'SUMMON', summonId: 'forged' } }, ...bossInput.skills.slice(0, 2)] }, bossContext), 'MISSING_REFERENCE');
 expectRejected('boss phase boundary', () => generateBoss({ ...bossInput, phases: [{ ...bossInput.phases[0], hpPercentAtMost: 101 }, bossInput.phases[1]] }, bossContext), 'BOUNDARY');
@@ -242,4 +340,5 @@ expectRejected('Object.prototype pollution', () => {
   }
 }, 'INJECTION');
 
+assert(negativeCases >= 26, `negative case coverage must remain at least 26, got ${negativeCases}`);
 console.log(`T254 content templates PASS: entries=${pack.entries.length}, tower-floor=${tower.config.floor}, boss-phases=${boss.config.phases.length}, negative-cases=${negativeCases}`);

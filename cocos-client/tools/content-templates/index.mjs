@@ -8,6 +8,7 @@ const ENVIRONMENTS = new Set(['NONE', 'METAL', 'WOOD', 'WATER', 'FIRE', 'EARTH']
 const LEVEL_OBJECTIVES = new Set(['DEFEAT_ENEMY_HERO', 'DESTROY_TARGET', 'PROTECT_TARGET', 'SURVIVE_ROUNDS']);
 const LEVEL_REWARDS = new Set(['CARD', 'UNLOCK', 'CHEST', 'FLAG']);
 const LEVEL_FAILURES = new Set(['PLAYER_HERO_DEFEATED', 'ROUND_LIMIT_REACHED', 'TARGET_DESTROYED']);
+const CHAPTER_LEVEL_ID_PATTERN = /^L(?:0[1-9]|1[0-2])$/;
 const TOWER_SPECIAL_RULES = new Set([
   'NONE', 'PRESSURE_LANES', 'ELEMENTAL_SURGE', 'REINFORCED_FRONT', 'SKILL_LOCK',
   'ESCALATING_THREAT', 'NO_SAFE_LANE', 'REVIVAL_WINDOW', 'BOSS_AURA', 'ASCENSION_TEST',
@@ -16,6 +17,105 @@ const TOWER_SPECIAL_RULES = new Set([
 export const CONTENT_TYPES = Object.freeze(['level', 'dungeon', 'tower-floor', 'boss']);
 export const TOWER_FLOOR_MIN = 1;
 export const TOWER_FLOOR_MAX = 50;
+
+const LEVEL_RULE_SCHEMAS = Object.freeze({
+  L01: { key: 'scenarioRules', fields: ['playerHeroHp', 'activeLaneCount', 'playerSummonSlots', 'unlockSecondLaneOnFirstDeployment', 'openingSkillCardsAllowed', 'enemyOpeningCardFilter'] },
+  L02: {
+    key: 'battleRules',
+    fields: ['enemyDeploymentOrder', 'combatPreview', 'forbiddenSceneTargetActions'],
+    nested: {
+      combatPreview: ['counterMultiplier', 'showDamageBreakdown'],
+    },
+    objectArrays: {
+      enemyDeploymentOrder: ['phase', 'kind', 'cardId', 'unitId'],
+      forbiddenSceneTargetActions: ['targetId', 'action'],
+    },
+  },
+  L03: {
+    key: 'battleRules',
+    fields: ['fastUnitIds', 'guardUnitIds', 'interceptUnitIds', 'movementTrigger', 'temporaryAid', 'requiredResponses'],
+    nested: { movementTrigger: ['distance', 'responseUnitId'], temporaryAid: ['targetId', 'mode'] },
+    arrays: ['fastUnitIds', 'guardUnitIds', 'interceptUnitIds', 'requiredResponses'],
+  },
+  L04: {
+    key: 'scenarioRules',
+    fields: ['playerHeroHp', 'enemyHeroHp', 'laneCount', 'laneLength', 'summonZone', 'deckSize', 'controlModes', 'canToggleAuto', 'roundLimit', 'seed', 'specialRules'],
+    nested: { summonZone: ['laneCount', 'depth'] },
+    arrays: ['controlModes'],
+  },
+  L05: {
+    key: 'scenarioRules',
+    fields: ['enemyFireUnitIds', 'burnStatus', 'waterCounterMultiplier', 'purifyAid', 'allowAlternateResponses', 'preserveControlledBeast'],
+    nested: { purifyAid: ['characterId', 'uses'] },
+    arrays: ['enemyFireUnitIds', 'allowAlternateResponses'],
+  },
+  L06: { key: 'scenarioRules', fields: ['rewardPolicy', 'environmentElement', 'sameElementEffectBonusPercent', 'fireEffectPenaltyPercent', 'freezeStatus', 'purifyAvailable', 'preBattleEnvironmentReadRequired', 'alternateSolutions'], arrays: ['alternateSolutions'] },
+  L07: {
+    key: 'scenarioRules',
+    fields: ['environmentElement', 'enemyHeavyUnitIds', 'enemyGiantUnitIds', 'impactCounter', 'pierceCounter', 'knockbackRule', 'temporaryAid', 'alternateSolutions'],
+    nested: {
+      impactCounter: ['targetDefenseType', 'requiredOffenseType', 'availableUnitIds'],
+      pierceCounter: ['targetDefenseType', 'requiredOffenseType', 'availableUnitIds'],
+      knockbackRule: ['sourceUnitId', 'distance'],
+      temporaryAid: ['characterId', 'mode', 'durationRounds'],
+    },
+    arrays: ['enemyHeavyUnitIds', 'enemyGiantUnitIds', 'alternateSolutions'],
+  },
+  L08: { key: 'scenarioRules', fields: ['protectedTargetId', 'roundLimit', 'playerHeroNamingImmune', 'namingTargetPolicy', 'prepareIncrease', 'shortControlDurationRounds', 'professionSkillPolicy', 'professionSkillIdForP001', 'recordProfessionAfterVictory', 'professionSwitchPreview'] },
+  L09: {
+    key: 'scenarioRules',
+    fields: ['enemySpiritUnitIds', 'spiritDefenseType', 'physicalDamageMultiplier', 'spellDamageMultiplier', 'reviveRule', 'temporarySpellAid', 'purifySkillId', 'alternateSolutions'],
+    nested: { reviveRule: ['unitIds', 'maxRevives', 'reviveHp', 'trigger'], temporarySpellAid: ['sourceCharacterId', 'cardId', 'uses'] },
+    arrays: ['enemySpiritUnitIds', 'alternateSolutions'],
+    nestedArrays: { reviveRule: ['unitIds'] },
+  },
+  L10: {
+    key: 'scenarioRules',
+    fields: ['sceneId', 'laneCount', 'keyTargetIds', 'laneTargetMapping', 'objectivePolicy', 'failureTargetPolicy', 'heroKillDoesNotEnd', 'outpostUnlockId'],
+    objectArrays: { laneTargetMapping: ['lane', 'targetId', 'role'] },
+    arrays: ['keyTargetIds'],
+  },
+  L11: {
+    key: 'scenarioRules',
+    fields: ['professionSkillPolicy', 'professionSkillIdByProfession', 'nameCheckRule', 'professionAdvantageRules'],
+    nested: {
+      professionSkillIdByProfession: ['P001', 'P002', 'P003', 'P004'],
+      nameCheckRule: ['enemyActionInterval', 'prepareIncrease', 'tieBreak', 'seed'],
+      professionAdvantageRules: ['P001', 'P002', 'P003', 'P004'],
+    },
+    nestedMaps: {
+      professionAdvantageRules: {
+        P001: ['counterRole', 'targetUnitIds'],
+        P002: ['counterDefenseType', 'targetUnitIds'],
+        P003: ['counterStatuses', 'targetUnitIds'],
+        P004: ['minPrepare', 'targetUnitIds'],
+      },
+    },
+  },
+  L12: {
+    key: 'scenarioRules',
+    fields: ['sceneId', 'bossCharacterId', 'roundLimit', 'pointBookRule', 'phaseTransition', 'victoryPolicy', 'rewardRegistryIds'],
+    nested: {
+      pointBookRule: ['enemyActionInterval', 'summonUnitId', 'occupiedSlotPolicy', 'overwriteUnits'],
+      phaseTransition: ['triggerBossHpPercent', 'bossEntersBattle', 'bossRole', 'nameLockAffects', 'unitCardPreparationNormal'],
+    },
+    arrays: ['rewardRegistryIds'],
+    nestedArrays: { phaseTransition: ['nameLockAffects'] },
+  },
+});
+
+const TOWER_ENEMY_POOL_BLUEPRINTS = Object.freeze([
+  ['U001', 'U002', 'U003', 'U004', 'U005', 'U006'],
+  ['U005', 'U006', 'U007', 'U008', 'U009', 'U010'],
+  ['U009', 'U010', 'U011', 'U012', 'U013', 'U014'],
+  ['U013', 'U014', 'U015', 'U016', 'U017', 'U018'],
+  ['U017', 'U018', 'U019', 'U020', 'U021', 'U022'],
+  ['U021', 'U022', 'U023', 'U024', 'U025', 'U026'],
+  ['U023', 'U024', 'U025', 'U026', 'U027', 'U028'],
+  ['U004', 'U010', 'U012', 'U018', 'U024', 'U027'],
+  ['U007', 'U011', 'U015', 'U019', 'U020', 'U028'],
+  ['U008', 'U019', 'U020', 'U023', 'U026', 'U028'],
+]);
 
 export class ContentTemplateError extends Error {
   constructor(code, configPath, message) {
@@ -92,13 +192,13 @@ function freezeDeep(value) {
   return value;
 }
 
-function exactKeys(value, expected, configPath) {
+function exactKeys(value, required, configPath, optional = []) {
   if (!isRecord(value)) fail('INVALID_INPUT', configPath, '必须是 object');
-  const allowed = new Set(expected);
+  const allowed = new Set([...required, ...optional]);
   for (const key of Object.keys(value)) {
     if (!allowed.has(key)) fail('UNKNOWN_FIELD', `${configPath}.${key}`, '不允许未知字段');
   }
-  for (const key of expected) {
+  for (const key of required) {
     if (!Object.prototype.hasOwnProperty.call(value, key)) fail('MISSING_FIELD', `${configPath}.${key}`, '缺少必需字段');
   }
 }
@@ -141,6 +241,19 @@ function registry(context, name) {
   return new Set(value);
 }
 
+function objectIdRegistry(context, directName, objectName) {
+  const direct = registry(context, directName);
+  if (direct) return direct;
+  const value = context?.[objectName];
+  if (value === undefined) return null;
+  if (value instanceof Map) return new Set(value.keys());
+  if (Array.isArray(value)) {
+    if (value.some((item) => !isRecord(item) || typeof item.id !== 'string')) fail('INVALID_CONTEXT', `context.${objectName}`, '必须是包含 id 的 array');
+    return new Set(value.map((item) => item.id));
+  }
+  fail('INVALID_CONTEXT', `context.${objectName}`, '必须是 array 或 Map');
+}
+
 function referenced(value, configPath, context, registryName) {
   const ids = registry(context, registryName);
   if (ids && !ids.has(value)) fail('MISSING_REFERENCE', configPath, `缺失 ${registryName} 引用: ${value}`);
@@ -166,11 +279,92 @@ function optionalResource(input, type, id) {
       : type === 'tower-floor'
         ? `config/tower/floors/${id}`
         : `config/bosses/${id}`;
-  return safeResource(input.resource ?? defaultResource, 'content.resource');
+  return safeResource(input.resource === undefined ? defaultResource : input.resource, 'content.resource');
+}
+
+function validateLevelRules(config, id, configPath) {
+  if (!CHAPTER_LEVEL_ID_PATTERN.test(id)) fail('INVALID_ID', `${configPath}.id`, '仅允许章节内 L01 至 L12');
+  const schema = LEVEL_RULE_SCHEMAS[id];
+  if (!schema) fail('INVALID_VALUE', `${configPath}.id`, `未知章节关卡规则: ${id}`);
+  const ruleKey = schema.key;
+  const unexpectedKey = ruleKey === 'scenarioRules' ? 'battleRules' : 'scenarioRules';
+  if (Object.prototype.hasOwnProperty.call(config, unexpectedKey)) fail('UNKNOWN_FIELD', `${configPath}.${unexpectedKey}`, `不允许 ${id} 使用该规则容器`);
+  if (!Object.prototype.hasOwnProperty.call(config, ruleKey)) fail('MISSING_FIELD', `${configPath}.${ruleKey}`, '缺少必需字段');
+  const rulePath = `${configPath}.${ruleKey}`;
+  const rules = config[ruleKey];
+  exactKeys(rules, [], rulePath, schema.fields);
+  for (const key of schema.arrays ?? []) {
+    if (Object.prototype.hasOwnProperty.call(rules, key) && !Array.isArray(rules[key])) fail('INVALID_INPUT', `${rulePath}.${key}`, '必须是 array');
+  }
+  for (const [key, fields] of Object.entries(schema.nested ?? {})) {
+    if (!Object.prototype.hasOwnProperty.call(rules, key)) continue;
+    exactKeys(rules[key], [], `${rulePath}.${key}`, fields);
+  }
+  for (const [key, fields] of Object.entries(schema.objectArrays ?? {})) {
+    if (!Object.prototype.hasOwnProperty.call(rules, key)) continue;
+    if (!Array.isArray(rules[key])) fail('INVALID_INPUT', `${rulePath}.${key}`, '必须是 array');
+    rules[key].forEach((item, index) => exactKeys(item, [], `${rulePath}.${key}[${index}]`, fields));
+  }
+  for (const [key, fields] of Object.entries(schema.nestedArrays ?? {})) {
+    const nested = rules[key];
+    if (!nested) continue;
+    for (const field of fields) {
+      if (Object.prototype.hasOwnProperty.call(nested, field) && !Array.isArray(nested[field])) fail('INVALID_INPUT', `${rulePath}.${key}.${field}`, '必须是 array');
+    }
+  }
+  for (const [key, fields] of Object.entries(schema.nestedMaps ?? {})) {
+    const mapValue = rules[key];
+    if (mapValue === undefined) continue;
+    exactKeys(mapValue, [], `${rulePath}.${key}`, Object.keys(fields));
+    for (const [mapKey, mapFields] of Object.entries(fields)) {
+      if (mapValue[mapKey] !== undefined) exactKeys(mapValue[mapKey], [], `${rulePath}.${key}.${mapKey}`, mapFields);
+    }
+  }
+  return rules;
+}
+
+function rewardRegistry(context, type, configPath) {
+  const registryName = type === 'UNLOCK' ? 'unlockIds' : type === 'CHEST' ? 'chestIds' : 'flagIds';
+  const ids = registry(context, registryName);
+  if (ids) return ids;
+  if (context?.rewardIds !== undefined) fail('INVALID_CONTEXT', `context.${registryName}`, '奖励引用必须按类型提供，不能只提供无类型 rewardIds');
+  return null;
+}
+
+function assertRewardTypeReference(context, type, id, configPath) {
+  const cardIds = context?.cards instanceof Map ? context.cards : null;
+  if (type !== 'CARD' && cardIds?.has(id)) fail('MISMATCHED_REFERENCE', configPath, `不得将卡牌 ID作为 ${type} 奖励: ${id}`);
+  for (const otherType of ['UNLOCK', 'CHEST', 'FLAG']) {
+    if (otherType === type) continue;
+    const otherIds = registry(context, otherType === 'UNLOCK' ? 'unlockIds' : otherType === 'CHEST' ? 'chestIds' : 'flagIds');
+    if (otherIds?.has(id)) fail('MISMATCHED_REFERENCE', configPath, `奖励 ID 不得跨类型注册: ${id}`);
+  }
+}
+
+function cardReference(context, id, configPath) {
+  const cards = context?.cards;
+  if (cards === undefined) {
+    if (context?.rewardIds !== undefined) fail('INVALID_CONTEXT', 'context.cards', 'CARD 奖励必须提供带 cardType/copyLimit 的 cards 注册表');
+    return null;
+  }
+  if (!(cards instanceof Map)) fail('INVALID_CONTEXT', 'context.cards', '必须是 Map');
+  const card = cards.get(id);
+  if (!isRecord(card)) fail('MISSING_REFERENCE', configPath, `缺失卡牌奖励引用: ${id}`);
+  if (card.cardType !== 'UNIT' && card.cardType !== 'SKILL') fail('INVALID_CONTEXT', `context.cards.${id}.cardType`, '必须是 UNIT 或 SKILL');
+  positiveInteger(card.copyLimit, `context.cards.${id}.copyLimit`);
+  return card;
+}
+
+function validateRuleRoundLimit(config, configPath) {
+  const failure = config.failureConditions.find((condition) => condition.type === 'ROUND_LIMIT_REACHED');
+  if (!failure) return;
+  const ruleKey = config.scenarioRules ? 'scenarioRules' : 'battleRules';
+  const roundLimit = config[ruleKey]?.roundLimit;
+  if (roundLimit !== undefined && roundLimit !== failure.rounds) fail('MISMATCHED_REFERENCE', `${configPath}.${ruleKey}.roundLimit`, '必须与 ROUND_LIMIT_REACHED.rounds 一致');
 }
 
 function validateLevelConfig(config, context, configPath = 'level.config.chapterLevels[0]') {
-  exactKeys(config, ['id', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'], configPath);
+  exactKeys(config, ['id', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'], configPath, ['scenarioRules', 'battleRules']);
   const id = localId(config.id, `${configPath}.id`);
   if (config.prerequisiteLevelId !== null) {
     const prerequisite = localId(config.prerequisiteLevelId, `${configPath}.prerequisiteLevelId`);
@@ -199,11 +393,22 @@ function validateLevelConfig(config, context, configPath = 'level.config.chapter
   config.rewards.forEach((reward, index) => {
     const path = `${configPath}.rewards[${index}]`;
     if (!isRecord(reward) || !LEVEL_REWARDS.has(reward.type)) fail('INVALID_VALUE', path, '奖励类型不受支持');
-    const allowed = reward.type === 'CARD' ? ['type', 'id', 'quantity', 'cardType'] : ['type', 'id', 'quantity'];
-    exactKeys(reward, allowed, path);
-    referenced(localId(reward.id, `${path}.id`), `${path}.id`, context, 'rewardIds');
+    exactKeys(reward, ['type', 'id', 'quantity'], path, reward.type === 'CARD' ? ['cardType'] : []);
+    const rewardId = localId(reward.id, `${path}.id`);
     positiveInteger(reward.quantity, `${path}.quantity`);
-    if (reward.type === 'CARD' && reward.cardType !== 'UNIT' && reward.cardType !== 'SKILL') fail('INVALID_VALUE', `${path}.cardType`, '必须是 UNIT 或 SKILL');
+    if (reward.type === 'CARD') {
+      const card = cardReference(context, rewardId, `${path}.id`);
+      assertRewardTypeReference(context, reward.type, rewardId, `${path}.id`);
+      if (reward.cardType !== undefined && reward.cardType !== 'UNIT' && reward.cardType !== 'SKILL') fail('INVALID_VALUE', `${path}.cardType`, '必须是 UNIT 或 SKILL');
+      if (card) {
+        if (reward.cardType !== undefined && reward.cardType !== card.cardType) fail('MISMATCHED_REFERENCE', `${path}.cardType`, `与卡牌注册表不匹配: ${rewardId}`);
+        if (reward.quantity > card.copyLimit) fail('BOUNDARY', `${path}.quantity`, `不得超过卡牌 copyLimit ${card.copyLimit}`);
+      }
+    } else {
+      const ids = rewardRegistry(context, reward.type, `${path}.id`);
+      assertRewardTypeReference(context, reward.type, rewardId, `${path}.id`);
+      if (ids && !ids.has(rewardId)) fail('MISSING_REFERENCE', `${path}.id`, `缺失 ${reward.type} 奖励引用: ${rewardId}`);
+    }
   });
 
   if (!Array.isArray(config.failureConditions) || config.failureConditions.length === 0) fail('INVALID_VALUE', `${configPath}.failureConditions`, '必须是非空 array');
@@ -213,10 +418,15 @@ function validateLevelConfig(config, context, configPath = 'level.config.chapter
     if (condition.type === 'TARGET_DESTROYED') {
       exactKeys(condition, ['type', 'targetId'], path);
       referenced(localId(condition.targetId, `${path}.targetId`), `${path}.targetId`, context, 'targetIds');
+    } else if (condition.type === 'ROUND_LIMIT_REACHED') {
+      exactKeys(condition, ['type', 'rounds'], path);
+      positiveInteger(condition.rounds, `${path}.rounds`);
     } else if (Object.keys(condition).length !== 1) {
       fail('UNKNOWN_FIELD', path, '该失败条件不得带额外字段');
     }
   });
+  validateLevelRules(config, id, configPath);
+  validateRuleRoundLimit(config, configPath);
   return id;
 }
 
@@ -280,36 +490,44 @@ function validateDungeonConfig(config, context, configPath = 'dungeon.config') {
   return config;
 }
 
-function seededRandom(seed) {
-  let state = seed >>> 0;
-  return () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-    return state / 0x100000000;
-  };
-}
-
-function deterministicSample(pool, count, seed, configPath) {
-  if (!Array.isArray(pool) || pool.length === 0) fail('INVALID_VALUE', `${configPath}.enemyPoolUnitIds`, '必须是非空 array');
-  uniqueIds(pool, `${configPath}.enemyPoolUnitIds`);
-  boundedInteger(count, `${configPath}.enemyCount`, 2, 6);
-  boundedInteger(seed, `${configPath}.seed`, 0, 0xffffffff);
-  if (count > pool.length) fail('BOUNDARY', `${configPath}.enemyCount`, '不得超过敌人池大小');
-  const random = seededRandom(seed);
-  const shuffled = [...pool];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(random() * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-  }
-  return shuffled.slice(0, count);
+function expectedTowerEnemyIds(floor) {
+  const floorIndex = floor - 1;
+  const pool = TOWER_ENEMY_POOL_BLUEPRINTS[Math.floor(floorIndex / 5)];
+  const count = Math.min(6, 2 + Math.floor(floorIndex / 10));
+  const offset = floorIndex % pool.length;
+  return Array.from({ length: count }, (_item, index) => pool[(offset + index) % pool.length]);
 }
 
 function validateTowerFloor(config, context, configPath = 'tower-floor.config') {
   exactKeys(config, ['floor', 'stageId', 'enemyPoolId', 'enemyIds', 'rules'], configPath);
   boundedInteger(config.floor, `${configPath}.floor`, TOWER_FLOOR_MIN, TOWER_FLOOR_MAX);
-  localId(config.stageId, `${configPath}.stageId`);
-  localId(config.enemyPoolId, `${configPath}.enemyPoolId`);
+  const expectedStageId = `STAGE_${String(Math.floor((config.floor - 1) / 5) + 1).padStart(2, '0')}`;
+  const expectedPoolId = `POOL_${String(Math.floor((config.floor - 1) / 5) + 1).padStart(2, '0')}`;
+  if (localId(config.stageId, `${configPath}.stageId`) !== expectedStageId) fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, `必须与 floor ${config.floor} 一致: ${expectedStageId}`);
+  if (localId(config.enemyPoolId, `${configPath}.enemyPoolId`) !== expectedPoolId) fail('MISMATCHED_REFERENCE', `${configPath}.enemyPoolId`, `必须与 stageId 一致: ${expectedPoolId}`);
+  const stageIds = objectIdRegistry(context, 'stageIds', 'stages');
+  const poolIds = objectIdRegistry(context, 'enemyPoolIds', 'enemyPools');
+  if (stageIds && !stageIds.has(config.stageId)) fail('MISSING_REFERENCE', `${configPath}.stageId`, `缺失 stageIds 引用: ${config.stageId}`);
+  if (poolIds && !poolIds.has(config.enemyPoolId)) fail('MISSING_REFERENCE', `${configPath}.enemyPoolId`, `缺失 enemyPoolIds 引用: ${config.enemyPoolId}`);
+  const stages = context?.stages;
+  if (Array.isArray(stages)) {
+    const stage = stages.find((candidate) => isRecord(candidate) && candidate.id === config.stageId);
+    if (!stage) fail('MISSING_REFERENCE', `${configPath}.stageId`, `缺失 stages 引用: ${config.stageId}`);
+    if (stage.enemyPoolId !== config.enemyPoolId || config.floor < stage.floorStart || config.floor > stage.floorEnd) fail('MISMATCHED_REFERENCE', `${configPath}.stageId`, '楼层、阶段与敌方池引用不一致');
+  }
   uniqueIds(config.enemyIds, `${configPath}.enemyIds`);
+  if (config.enemyIds.length < 2 || config.enemyIds.length > 6) fail('BOUNDARY', `${configPath}.enemyIds`, '必须是 2 到 6 个敌人');
   config.enemyIds.forEach((enemyId, index) => referenced(enemyId, `${configPath}.enemyIds[${index}]`, context, 'enemyUnitIds'));
+  const expectedEnemyIds = expectedTowerEnemyIds(config.floor);
+  if (config.enemyIds.length !== expectedEnemyIds.length || config.enemyIds.some((id, index) => id !== expectedEnemyIds[index])) {
+    fail('PROGRESSION', `${configPath}.enemyIds`, '楼层敌人必须使用生产配置的固定递进序列；随机种子不受支持');
+  }
+  const pools = context?.enemyPools;
+  if (Array.isArray(pools)) {
+    const pool = pools.find((candidate) => isRecord(candidate) && candidate.id === config.enemyPoolId);
+    if (!pool) fail('MISSING_REFERENCE', `${configPath}.enemyPoolId`, `缺失 enemyPools 引用: ${config.enemyPoolId}`);
+    if (!config.enemyIds.every((enemyId) => Array.isArray(pool.unitIds) && pool.unitIds.includes(enemyId))) fail('MISSING_REFERENCE', `${configPath}.enemyIds`, '敌人必须来自引用的敌方池');
+  }
   exactKeys(config.rules, [
     'threatMultiplierPercent', 'maxEnemyUnits', 'enemyActionInterval', 'maxRounds', 'randomness',
     'environmentElement', 'specialRule',
@@ -324,6 +542,7 @@ function validateTowerFloor(config, context, configPath = 'tower-floor.config') 
   if (config.enemyIds.length > config.rules.maxEnemyUnits) fail('BOUNDARY', `${configPath}.enemyIds`, '敌人数不得超过该层上限');
   const previous = context?.previousFloor;
   if (previous) {
+    if (!isRecord(previous) || previous.floor >= config.floor) fail('PROGRESSION', `${configPath}.floor`, '当前楼层必须高于 context.previousFloor');
     const { previousFloor: _previousFloor, ...previousContext } = context;
     validateTowerFloor(previous, previousContext, 'context.previousFloor');
     if (config.rules.threatMultiplierPercent <= previous.rules.threatMultiplierPercent) fail('PROGRESSION', `${configPath}.rules.threatMultiplierPercent`, '威胁倍率必须递增');
@@ -423,7 +642,7 @@ function makeEntry(type, id, resource, config) {
 
 export function generateLevel(input, context = {}) {
   const source = cloneSafe(input, 'level');
-  exactKeys(source, ['id', 'resource', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'], 'level');
+  exactKeys(source, ['id', 'prerequisiteLevelId', 'enemyDeckId', 'environmentElement', 'objectives', 'rewards', 'failureConditions'], 'level', ['resource', 'scenarioRules', 'battleRules']);
   const id = contentId(source.id, 'level.id');
   const resource = optionalResource(source, 'level', id);
   const { resource: _resource, ...config } = source;
@@ -433,7 +652,7 @@ export function generateLevel(input, context = {}) {
 
 export function generateDungeon(input, context = {}) {
   const source = cloneSafe(input, 'dungeon');
-  exactKeys(source, ['id', 'resource', 'difficulties'], 'dungeon');
+  exactKeys(source, ['id', 'difficulties'], 'dungeon', ['resource']);
   const id = contentId(source.id, 'dungeon.id');
   const resource = optionalResource(source, 'dungeon', id);
   validateDungeonConfig(source.difficulties, context);
@@ -442,11 +661,10 @@ export function generateDungeon(input, context = {}) {
 
 export function generateTowerFloor(input, context = {}) {
   const source = cloneSafe(input, 'tower-floor');
-  exactKeys(source, ['id', 'resource', 'floor', 'stageId', 'enemyPoolId', 'enemyIds', 'enemyPoolUnitIds', 'enemyCount', 'seed', 'rules'], 'tower-floor');
+  exactKeys(source, ['id', 'floor', 'stageId', 'enemyPoolId', 'enemyIds', 'rules'], 'tower-floor', ['resource']);
   const id = contentId(source.id, 'tower-floor.id');
   const resource = optionalResource(source, 'tower-floor', id);
-  if (source.enemyIds === null) source.enemyIds = deterministicSample(source.enemyPoolUnitIds, source.enemyCount, source.seed, 'tower-floor');
-  if (!Array.isArray(source.enemyIds)) fail('INVALID_VALUE', 'tower-floor.enemyIds', '必须是 array；无指定敌人时使用 enemyIds: null 并提供种子');
+  if (!Array.isArray(source.enemyIds)) fail('INVALID_VALUE', 'tower-floor.enemyIds', '必须是显式 array；不支持 enemyPoolUnitIds/enemyCount/seed 随机采样');
   const config = {
     floor: source.floor,
     stageId: source.stageId,
@@ -460,7 +678,7 @@ export function generateTowerFloor(input, context = {}) {
 
 export function generateBoss(input, context = {}) {
   const source = cloneSafe(input, 'boss');
-  exactKeys(source, ['id', 'resource', 'maxHp', 'phases', 'skills', 'summons', 'flags', 'outcome'], 'boss');
+  exactKeys(source, ['id', 'maxHp', 'phases', 'skills', 'summons', 'flags', 'outcome'], 'boss', ['resource']);
   const id = contentId(source.id, 'boss.id');
   const resource = optionalResource(source, 'boss', id);
   const { resource: _resource, ...config } = source;
