@@ -44,7 +44,7 @@
 - `deleteData`、`correctData` 与 `purgeExpired` 必须在同一 `withTransaction` 或统一全局快照边界内先捕获完整主体快照，再读取或校验目标；目标读取前后及业务操作前后发现任一主体被修改、删除、新增或返回的 `subjectId` 不一致时，必须返回 `STORE_FAILURE` 并隔离存储，不得报告成功。`purgeExpired` 对删除返回的每个到期主体必须逐字段比对 `subjectId`、`data`、`updatedAt` 与 `retentionUntil`；删除期间内容发生变化即使主体最终已删除，也必须失败关闭并恢复快照。
 - 业务状态写入前必须完成审计时钟和审计持久化准备；任一审计失败不得留下业务写入、成功请求账本或接受状态的审计记录。`purgeExpired` 的请求指纹只包含稳定请求语义，不包含动态执行时间。
 - 保留判断使用服务维护的单调可信时间水印 `observedNow`；时钟回拨、可信时间不可用或时间在读操作的前后校验中变化，必须返回 `STORE_FAILURE` 并将服务置于 quarantine，禁止接受回拨后的时间。
-- `accessData` 与 `exportData` 的授权、保留判断和读取必须在同一可信时间/事务边界内。无论存储适配器是否提供 `withTransaction`，读取前后都必须复核可信时间；时间变化即失败关闭且不得返回事务结果。
+- `accessData` 与 `exportData` 的授权、保留判断和读取必须在同一可信时间/事务边界内。无论存储适配器是否提供 `withTransaction`，读取前后都必须复核可信时间；时间变化即失败关闭并 quarantine。事务回调完成后适配器抛错时，必须回滚存储、请求账本、审计和服务元状态的调用前快照，随后进入 quarantine，禁止返回事务结果。
 - `correctData` 与 `purgeExpired` 必须在统一 mutation boundary 的收尾再次读取可信时间，并与开始时的 `observedNow` 严格相等；时钟回拨或前进都必须失败关闭、回滚业务写入并隔离服务。
 - 存储快照不一致、回滚失败或未知主体残留必须产生 `store_quarantine` 审计事件并阻断服务。quarantine 后 `accessData`、`exportData`、`deleteData`、`correctData` 和 `purgeExpired`（包括已有成功请求的账本重放）均只能返回 `STORE_FAILURE`，不得继续访问、导出、删除或更正任何主体数据；未隔离时的合法幂等重放仍须保留。
 

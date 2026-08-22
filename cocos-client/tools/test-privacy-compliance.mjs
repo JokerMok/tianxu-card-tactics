@@ -264,6 +264,7 @@ class ThrowAfterTransactionStore extends InMemoryPrivacyDataStore {
 const postCallbackCases = [
   {
     operation: 'delete',
+    auditAction: 'delete',
     subjectId: 'post-callback-delete',
     before: [{ subjectId: 'post-callback-delete', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
     requestId: 'post-callback-delete',
@@ -271,6 +272,7 @@ const postCallbackCases = [
   },
   {
     operation: 'correct',
+    auditAction: 'correct',
     subjectId: 'post-callback-correct',
     before: [{ subjectId: 'post-callback-correct', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
     requestId: 'post-callback-correct',
@@ -278,10 +280,27 @@ const postCallbackCases = [
   },
   {
     operation: 'purge',
+    auditAction: 'retention_purge',
     subjectId: 'post-callback-purge',
     before: [{ subjectId: 'post-callback-purge', data: { value: 1 }, updatedAt: 1, retentionUntil: 100 }],
     requestId: 'post-callback-purge',
     invoke(service) { return service.purgeExpired(operator, this.requestId); },
+  },
+  {
+    operation: 'access',
+    auditAction: 'access',
+    subjectId: 'post-callback-access',
+    before: [{ subjectId: 'post-callback-access', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
+    requestId: 'post-callback-access',
+    invoke(service) { return service.accessData({ kind: 'subject', subjectId: this.subjectId }, { subjectId: this.subjectId, requestId: this.requestId }); },
+  },
+  {
+    operation: 'export',
+    auditAction: 'export',
+    subjectId: 'post-callback-export',
+    before: [{ subjectId: 'post-callback-export', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 }],
+    requestId: 'post-callback-export',
+    invoke(service) { return service.exportData({ kind: 'subject', subjectId: this.subjectId }, { subjectId: this.subjectId, requestId: this.requestId }); },
   },
 ];
 
@@ -294,7 +313,8 @@ for (const testCase of postCallbackCases) {
   assertStoreSnapshot(postCallbackStore, testCase.before, `${testCase.operation} post-callback failure must restore the complete store snapshot`);
   assert.equal(postCallbackService.getConsent({ kind: 'subject', subjectId: testCase.subjectId }, testCase.subjectId, 'analytics').length, 1, `${testCase.operation} post-callback failure must restore consent state`);
   assert.equal(postCallbackService.getAgeStatus(operator, testCase.subjectId).status, 'adult', `${testCase.operation} post-callback failure must restore age state`);
-  assert.equal(postCallbackService.auditLog(operator).some((event) => event.action === testCase.operation && event.outcome === 'accepted'), false, `${testCase.operation} post-callback failure must remove its accepted audit`);
+  assert.equal(postCallbackService.auditLog(operator).some((event) => event.action === testCase.auditAction && event.outcome === 'accepted'), false, `${testCase.operation} post-callback failure must remove its accepted audit`);
+  assert.equal(postCallbackService.ledger.has(testCase.requestId), false, `${testCase.operation} post-callback failure must remove its request ledger entry`);
   assertQuarantined(postCallbackService, `${testCase.operation} post-callback failure must quarantine the service`);
   expectCode(`${testCase.operation} post-callback failure must not leave a replayable success`, () => testCase.invoke(postCallbackService), 'STORE_FAILURE');
 }
@@ -317,11 +337,40 @@ for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
     const clockBefore = [{ subjectId: `post-return-clock-${operation}`, data: { safe: true }, updatedAt: 1, retentionUntil: operation === 'correct' ? 1_000 : 100 }];
     const postReturnClockStore = new ClockChangingAfterTransactionStore(clockBefore, () => { tick = transactionTick; });
     const postReturnClockService = new ComplianceService({ store: postReturnClockStore, operatorToken: OPERATOR_TOKEN, now: () => tick });
+    const requestId = `post-return-clock-${operation}-${label}`;
     expectCode(`${operation} must check the clock after the transaction adapter returns (${label})`, () => operation === 'correct'
-      ? postReturnClockService.correctData({ kind: 'subject', subjectId: clockBefore[0].subjectId }, { subjectId: clockBefore[0].subjectId, requestId: `post-return-clock-${operation}-${label}`, data: { safe: false } })
-      : postReturnClockService.purgeExpired(operator, `post-return-clock-${operation}-${label}`), 'STORE_FAILURE');
+      ? postReturnClockService.correctData({ kind: 'subject', subjectId: clockBefore[0].subjectId }, { subjectId: clockBefore[0].subjectId, requestId, data: { safe: false } })
+      : postReturnClockService.purgeExpired(operator, requestId), 'STORE_FAILURE');
     assertStoreSnapshot(postReturnClockStore, clockBefore, `${operation} post-return clock failure must restore the complete snapshot (${label})`);
+    const auditAction = operation === 'correct' ? 'correct' : 'retention_purge';
+    assert.equal(postReturnClockService.auditLog(operator).some((event) => event.action === auditAction && event.outcome === 'accepted'), false, `${operation} post-return clock failure must remove its accepted audit (${label})`);
+    assert.equal(postReturnClockService.ledger.has(requestId), false, `${operation} post-return clock failure must remove its request ledger entry (${label})`);
     assertQuarantined(postReturnClockService, `${operation} post-return clock failure must quarantine (${label})`);
+    expectCode(`${operation} post-return clock failure must reject a follow-up request (${label})`, () => operation === 'correct'
+      ? postReturnClockService.correctData({ kind: 'subject', subjectId: clockBefore[0].subjectId }, { subjectId: clockBefore[0].subjectId, requestId: `${requestId}-retry`, data: { safe: false } })
+      : postReturnClockService.purgeExpired(operator, `${requestId}-retry`), 'STORE_FAILURE');
+  }
+}
+
+for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
+  for (const operation of ['access', 'export']) {
+    let tick = 100;
+    const subjectId = `post-return-clock-${operation}`;
+    const clockBefore = [{ subjectId, data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }];
+    const postReturnClockStore = new ClockChangingAfterTransactionStore(clockBefore, () => { tick = transactionTick; });
+    const postReturnClockService = new ComplianceService({ store: postReturnClockStore, operatorToken: OPERATOR_TOKEN, now: () => tick });
+    const requestId = `post-return-clock-${operation}-${label}`;
+    const invoke = () => operation === 'access'
+      ? postReturnClockService.accessData({ kind: 'subject', subjectId }, { subjectId, requestId })
+      : postReturnClockService.exportData({ kind: 'subject', subjectId }, { subjectId, requestId });
+    expectCode(`${operation} must fail on clock drift after the transaction returns (${label})`, invoke, 'STORE_FAILURE');
+    assertStoreSnapshot(postReturnClockStore, clockBefore, `${operation} post-return clock failure must restore the complete snapshot (${label})`);
+    assert.equal(postReturnClockService.auditLog(operator).some((event) => event.action === operation && event.outcome === 'accepted'), false, `${operation} post-return clock failure must remove its accepted audit (${label})`);
+    assert.equal(postReturnClockService.ledger.has(requestId), false, `${operation} post-return clock failure must remove its request ledger entry (${label})`);
+    assertQuarantined(postReturnClockService, `${operation} post-return clock failure must quarantine (${label})`);
+    expectCode(`${operation} post-return clock failure must reject a follow-up request (${label})`, () => operation === 'access'
+      ? postReturnClockService.accessData({ kind: 'subject', subjectId }, { subjectId, requestId: `${requestId}-retry` })
+      : postReturnClockService.exportData({ kind: 'subject', subjectId }, { subjectId, requestId: `${requestId}-retry` }), 'STORE_FAILURE');
   }
 }
 

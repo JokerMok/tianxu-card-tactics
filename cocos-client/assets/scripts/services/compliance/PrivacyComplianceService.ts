@@ -145,11 +145,11 @@ export type PrivacyErrorCode =
 export class PrivacyComplianceError extends Error {
   readonly code: PrivacyErrorCode;
   readonly recordable: boolean;
-  constructor(code: PrivacyErrorCode, message: string, recordable = true) {
+  readonly storeReason?: string;
+  constructor(code: PrivacyErrorCode, message: string, recordable = true, storeReason?: string) {
     super(message);
     this.name = 'PrivacyComplianceError';
-    this.code = code;
-    this.recordable = recordable;
+    this.code = code; this.recordable = recordable; this.storeReason = storeReason;
   }
 }
 
@@ -180,6 +180,8 @@ interface PrivacyServiceSnapshot {
   readonly ledger: readonly (readonly [string, LedgerEntry])[];
   readonly audits: readonly PrivacyAuditEvent[];
   readonly auditSequence: number;
+  readonly observedNow: number | undefined;
+  readonly quarantined: boolean;
 }
 
 const PURPOSE_SET = new Set<string>(PRIVACY_PURPOSES);
@@ -558,18 +560,13 @@ export class PrivacyComplianceService {
         this.appendAudit({ action: 'store_quarantine', subjectId: '__service__', requestId: `quarantine-${reason}`, outcome: 'rejected', reasonCode: `STORE_QUARANTINED:${reason}`, occurredAt: this.observedNow ?? 0 });
       } catch { /* quarantine remains fail-closed even if audit persistence is unavailable */ }
     }
-    throw new PrivacyComplianceError('STORE_FAILURE', message, false);
+    throw new PrivacyComplianceError('STORE_FAILURE', message, false, reason);
   }
   private withStoreBoundary<T>(trustedNow: number, action: () => T): T {
-    const transaction = this.store.withTransaction;
-    let result!: T;
-    try {
-      result = typeof transaction === 'function' ? transaction.call(this.store, action) : action();
-    } finally {
+    return this.withGlobalStoreSnapshot(() => action(), () => {
       const afterNow = this.now();
       if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_OPERATION', 'trusted time changed during privacy read');
-    }
-    return result;
+    });
   }
   private withGlobalStoreSnapshot<T>(action: (before: readonly PrivacyDataRecord[]) => T, afterTransaction: () => void = () => undefined): T {
     const serviceBefore = this.captureServiceSnapshot();
@@ -585,9 +582,14 @@ export class PrivacyComplianceService {
       return result;
     } catch (error) {
       let rollbackFailure: unknown;
+      const failureObservedNow = this.observedNow;
       if (before) try { this.restoreStoreSnapshot(before); } catch (failure) { rollbackFailure = failure; }
       try { this.restoreServiceSnapshot(serviceBefore); } catch (failure) { rollbackFailure ??= failure; }
       if (rollbackFailure) this.failStore('STORE_ROLLBACK_FAILED', 'privacy transaction rollback failed; store is quarantined');
+      if (error instanceof PrivacyComplianceError && error.code === 'STORE_FAILURE') {
+        if (error.storeReason?.startsWith('CLOCK_')) this.observedNow = failureObservedNow;
+        this.failStore(error.storeReason ?? 'STORE_TRANSACTION_FAILED', error.message);
+      }
       if (error instanceof PrivacyComplianceError) throw error;
       this.failStore('STORE_TRANSACTION_FAILED', 'privacy store transaction failed');
     }
@@ -646,10 +648,11 @@ export class PrivacyComplianceService {
       ledger: [...this.ledger.entries()].map(([requestId, entry]) => [requestId, clone(entry)] as const),
       audits: this.audits.slice(),
       auditSequence: this.auditSequence,
+      observedNow: this.observedNow,
+      quarantined: this.quarantined,
     };
   }
   private restoreServiceSnapshot(snapshot: PrivacyServiceSnapshot): void {
-    const quarantineEvents = this.audits.filter((event) => event.action === 'store_quarantine' && !snapshot.audits.includes(event));
     this.consents.clear();
     for (const [subjectId, entries] of snapshot.consents) this.consents.set(subjectId, new Map(entries.map(([purpose, record]) => [purpose, clone(record)] as const)));
     this.ages.clear();
@@ -658,11 +661,8 @@ export class PrivacyComplianceService {
     for (const [requestId, entry] of snapshot.ledger) this.ledger.set(requestId, clone(entry));
     this.audits.splice(0, this.audits.length, ...snapshot.audits);
     this.auditSequence = snapshot.auditSequence;
-    for (const event of quarantineEvents) {
-      const restored = freeze({ ...event, sequence: this.auditSequence + 1 });
-      this.audits.push(restored);
-      this.auditSequence = restored.sequence;
-    }
+    this.observedNow = snapshot.observedNow;
+    this.quarantined = snapshot.quarantined;
   }
   private restoreStoreSnapshot(snapshot: readonly PrivacyDataRecord[]): void {
     let failure: unknown;
