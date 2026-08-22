@@ -121,6 +121,40 @@ expectCode('delete fails closed when remove leaves residual data', () => residua
 assert.deepEqual(residualStore.read(), residualRecord, 'failed delete must leave the original record intact');
 assert.equal(residualService.auditLog(operator).length, 0, 'failed delete must not leave an accepted audit event');
 
+const sortRecords = (records) => [...records].sort((left, right) => left.subjectId.localeCompare(right.subjectId));
+const assertStoreSnapshot = (store, expected, message) => assert.deepEqual(sortRecords(store.list()), sortRecords(expected), message);
+
+class WrongSubjectDeleteStore extends InMemoryPrivacyDataStore {
+  constructor(initial, mode) {
+    super();
+    this.mode = mode;
+    this.injected = false;
+    for (const record of initial) super.replace(record);
+  }
+  remove(subjectId) {
+    if (subjectId === 'delete-target' && !this.injected) {
+      this.injected = true;
+      if (this.mode === 'wrong-subject') { super.remove('delete-other'); return; }
+      super.remove(subjectId);
+      super.replace({ subjectId: 'delete-injected', data: { injected: true }, updatedAt: 1, retentionUntil: 10_000 });
+      return;
+    }
+    super.remove(subjectId);
+  }
+}
+
+for (const mode of ['wrong-subject', 'unknown-addition']) {
+  const deleteBefore = [
+    { subjectId: 'delete-target', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 },
+    { subjectId: 'delete-other', data: { value: 2 }, updatedAt: 1, retentionUntil: 10_000 },
+  ];
+  const faultyDeleteStore = new WrongSubjectDeleteStore(deleteBefore, mode);
+  const faultyDeleteService = new ComplianceService({ store: faultyDeleteStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+  expectCode(`delete fails closed on ${mode}`, () => faultyDeleteService.deleteData({ kind: 'subject', subjectId: 'delete-target' }, { subjectId: 'delete-target', requestId: `delete-global-${mode}` }), 'STORE_FAILURE');
+  assertStoreSnapshot(faultyDeleteStore, deleteBefore, `failed delete on ${mode} must restore the complete store snapshot`);
+  assert.equal(faultyDeleteService.auditLog(operator).length, 0, `failed delete on ${mode} must not leave an accepted audit event`);
+}
+
 const removeFailureStore = {
   read() { return { subjectId: 'delete-failure', data: { safe: true }, updatedAt: 1, retentionUntil: 10_000 }; },
   replace() {},
@@ -130,6 +164,36 @@ const removeFailureStore = {
 const removeFailureService = new ComplianceService({ store: removeFailureStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
 expectCode('delete fails closed when remove throws', () => removeFailureService.deleteData({ kind: 'subject', subjectId: 'delete-failure' }, { subjectId: 'delete-failure', requestId: 'delete-error' }), 'STORE_FAILURE');
 assert.equal(removeFailureService.auditLog(operator).length, 0, 'remove failure must not leave an accepted audit event');
+
+class CorruptingCorrectionStore extends InMemoryPrivacyDataStore {
+  constructor(initial, mode) {
+    super();
+    this.mode = mode;
+    this.injected = false;
+    for (const record of initial) super.replace(record);
+  }
+  replace(record) {
+    if (record.subjectId === 'correct-target' && !this.injected) {
+      this.injected = true;
+      if (this.mode === 'delete-other') super.remove('correct-other');
+      if (this.mode === 'change-other') super.replace({ subjectId: 'correct-other', data: { value: 99 }, updatedAt: 1, retentionUntil: 10_000 });
+      if (this.mode === 'unknown-addition') super.replace({ subjectId: 'correct-injected', data: { injected: true }, updatedAt: 1, retentionUntil: 10_000 });
+    }
+    super.replace(record);
+  }
+}
+
+for (const mode of ['delete-other', 'change-other', 'unknown-addition']) {
+  const correctionBefore = [
+    { subjectId: 'correct-target', data: { value: 1 }, updatedAt: 1, retentionUntil: 10_000 },
+    { subjectId: 'correct-other', data: { value: 2 }, updatedAt: 1, retentionUntil: 10_000 },
+  ];
+  const faultyCorrectionStore = new CorruptingCorrectionStore(correctionBefore, mode);
+  const faultyCorrectionService = new ComplianceService({ store: faultyCorrectionStore, operatorToken: OPERATOR_TOKEN, now: () => 2 });
+  expectCode(`correction fails closed on ${mode}`, () => faultyCorrectionService.correctData({ kind: 'subject', subjectId: 'correct-target' }, { subjectId: 'correct-target', requestId: `correct-global-${mode}`, data: { value: 3 } }), 'STORE_FAILURE');
+  assertStoreSnapshot(faultyCorrectionStore, correctionBefore, `failed correction on ${mode} must restore the complete store snapshot`);
+  assert.equal(faultyCorrectionService.auditLog(operator).length, 0, `failed correction on ${mode} must not leave an accepted audit event`);
+}
 
 let purgeClockShouldFail = true;
 const purgeClockStore = new InMemoryPrivacyDataStore([{ subjectId: 'purge-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 10 }]);
@@ -162,6 +226,38 @@ assert.deepEqual(unsafePurgeStore.read('purge-expired'), { subjectId: 'purge-exp
 assert.equal(unsafePurgeService.auditLog(operator).length, 0, 'over-deletion must not leave accepted audit events');
 expectCode('over-deletion must not become a false-success replay', () => unsafePurgeService.purgeExpired(operator, 'purge-overreach'), 'STORE_FAILURE');
 assert.equal(unsafePurgeStore.purgeCalls, 2, 'failed purge requests must be retried rather than replayed as success');
+
+class PurgeAddingUnknownStore extends InMemoryPrivacyDataStore {
+  constructor(initial, failUnknownRemoval = false) {
+    super();
+    this.failUnknownRemoval = failUnknownRemoval;
+    for (const record of initial) super.replace(record);
+  }
+  purgeExpired(now) {
+    const removed = super.purgeExpired(now);
+    super.replace({ subjectId: 'purge-unknown', data: { injected: true }, updatedAt: 1, retentionUntil: 10_000 });
+    return removed;
+  }
+  remove(subjectId) {
+    if (this.failUnknownRemoval && subjectId === 'purge-unknown') throw new Error('unknown subject is quarantined');
+    super.remove(subjectId);
+  }
+}
+
+const purgeUnknownBefore = [
+  { subjectId: 'purge-unknown-live', data: { safe: true }, updatedAt: 1, retentionUntil: 200 },
+  { subjectId: 'purge-unknown-expired', data: { safe: true }, updatedAt: 1, retentionUntil: 100 },
+];
+const purgeUnknownStore = new PurgeAddingUnknownStore(purgeUnknownBefore);
+const purgeUnknownService = new ComplianceService({ store: purgeUnknownStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+expectCode('purge fails closed when the store adds an unknown subject', () => purgeUnknownService.purgeExpired(operator, 'purge-unknown-addition'), 'STORE_FAILURE');
+assertStoreSnapshot(purgeUnknownStore, purgeUnknownBefore, 'failed purge must remove unknown additions and restore the exact original snapshot');
+assert.equal(purgeUnknownService.auditLog(operator).length, 0, 'unknown purge additions must not leave accepted audit events');
+
+const unrecoverablePurgeStore = new PurgeAddingUnknownStore(purgeUnknownBefore, true);
+const unrecoverablePurgeService = new ComplianceService({ store: unrecoverablePurgeStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+expectCode('purge rollback failure must remain an explicit store failure', () => unrecoverablePurgeService.purgeExpired(operator, 'purge-rollback-failure'), 'STORE_FAILURE');
+assert.equal(unrecoverablePurgeService.auditLog(operator).length, 0, 'unrecoverable purge rollback must not leave accepted audit events');
 
 class CountingPurgeStore extends InMemoryPrivacyDataStore {
   purgeCalls = 0;
