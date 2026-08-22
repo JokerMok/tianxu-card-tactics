@@ -31,8 +31,9 @@ export interface DeleteResult { deleted: true; accountId: string; requestId: str
 export interface CloudSaveRecord {
   accountId: string;
   version: number;
+  stateRevision: number;
   updatedAt: number;
-  payload: Readonly<Record<string, unknown>>;
+  payload: Readonly<SaveData>;
   payloadHash: string;
 }
 export interface CloudSaveLoadResult { found: boolean; record: CloudSaveRecord | null }
@@ -45,7 +46,7 @@ export interface CloudSavePutRequest {
 export interface CloudSavePutResult {
   accepted: boolean;
   replayed: boolean;
-  code?: 'VERSION_CONFLICT';
+  code?: 'VERSION_CONFLICT' | 'SAVE_STALE';
   record?: CloudSaveRecord;
   current?: CloudSaveRecord | null;
 }

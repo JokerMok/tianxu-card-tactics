@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { validateSave } from '../../cocos-client/assets/scripts/services/SaveSchema.ts';
+import { validateSave, type SaveData } from '../../cocos-client/assets/scripts/services/SaveSchema.ts';
 
 export const ACCOUNT_STATUS = {
   ACTIVE: 'active',
@@ -12,8 +12,9 @@ export const ACCOUNT_ERROR_CODES = {
   ACCOUNT_DELETED: 'ACCOUNT_DELETED',
   BINDING_CONFLICT: 'BINDING_CONFLICT',
   NO_BINDING: 'NO_BINDING',
-  REQUEST_CONFLICT: 'REQUEST_CONFLICT',
+  REQUEST_ID_REUSED: 'REQUEST_ID_REUSED',
   VERSION_CONFLICT: 'VERSION_CONFLICT',
+  SAVE_STALE: 'SAVE_STALE',
   SAVE_INVALID: 'SAVE_INVALID',
   SESSION_REVOKED: 'SESSION_REVOKED',
   AUTH_PROOF_INVALID: 'AUTH_PROOF_INVALID',
@@ -91,8 +92,9 @@ export interface DeleteResult {
 export interface CloudSaveRecord {
   accountId: string;
   version: number;
+  stateRevision: number;
   updatedAt: number;
-  payload: Readonly<Record<string, unknown>>;
+  payload: Readonly<SaveData>;
   payloadHash: string;
 }
 
@@ -116,8 +118,8 @@ export interface CloudSavePutSuccess {
 
 export interface CloudSavePutConflict {
   accepted: false;
-  replayed: false;
-  code: 'VERSION_CONFLICT';
+  replayed: boolean;
+  code: 'VERSION_CONFLICT' | 'SAVE_STALE';
   current: CloudSaveRecord | null;
 }
 
@@ -129,8 +131,23 @@ interface StoredAccount {
 }
 
 interface StoredRequest {
+  kind: 'result';
   fingerprint: string;
-  result: CloudSavePutSuccess;
+  result: CloudSavePutResult;
+}
+
+interface StoredRequestError {
+  kind: 'error';
+  fingerprint: string;
+  code: AccountErrorCode;
+  message: string;
+}
+
+type StoredCloudRequest = StoredRequest | StoredRequestError;
+
+export interface AccountSnapshot {
+  accounts: AccountIdentity[];
+  cloudSaves: CloudSaveRecord[];
 }
 
 export interface AccountServiceOptions {
@@ -138,6 +155,7 @@ export interface AccountServiceOptions {
   accountId?: (kind: 'guest' | 'bound') => string;
   sessionToken?: () => string;
   identityVerifier?: (provider: string, subject: string, proof: string) => boolean;
+  adminDiagnosticToken?: string;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -186,7 +204,7 @@ function hashSave(save: Readonly<Record<string, unknown>>): string {
   return createHash('sha256').update(stable(save)).digest('hex');
 }
 
-function normalizeSave(accountId: string, value: unknown): Readonly<Record<string, unknown>> {
+function normalizeSave(accountId: string, value: unknown): SaveData {
   let parsed: unknown = value;
   if (typeof value === 'string') {
     try { parsed = JSON.parse(value); } catch { throw new AccountError(ACCOUNT_ERROR_CODES.SAVE_INVALID, 'save JSON is invalid'); }
@@ -194,7 +212,7 @@ function normalizeSave(accountId: string, value: unknown): Readonly<Record<strin
   if (!isRecord(parsed)) throw new AccountError(ACCOUNT_ERROR_CODES.SAVE_INVALID, 'save must be an object');
   if (parsed.playerId !== accountId) throw new AccountError(ACCOUNT_ERROR_CODES.SAVE_INVALID, 'save identity is invalid');
   try {
-    return clone(validateSave(parsed)) as Readonly<Record<string, unknown>>;
+    return clone(validateSave(parsed));
   } catch (error) {
     throw new AccountError(ACCOUNT_ERROR_CODES.SAVE_INVALID, `save is invalid: ${String(error)}`);
   }
@@ -209,11 +227,12 @@ export class AccountService {
   private readonly makeAccountId: (kind: 'guest' | 'bound') => string;
   private readonly makeSessionToken: () => string;
   private readonly verifyIdentity: (provider: string, subject: string, proof: string) => boolean;
+  private readonly adminDiagnosticToken: string | null;
   private readonly accounts = new Map<string, StoredAccount>();
   private readonly sessions = new Map<string, Session>();
   private readonly bindings = new Map<string, string>();
   private readonly cloudSaves = new Map<string, CloudSaveRecord>();
-  private readonly cloudRequests = new Map<string, Map<string, StoredRequest>>();
+  private readonly cloudRequests = new Map<string, Map<string, StoredCloudRequest>>();
   private accountSequence = 0;
   private sessionSequence = 0;
 
@@ -222,6 +241,9 @@ export class AccountService {
     this.makeAccountId = options.accountId ?? ((kind) => `${kind}_${++this.accountSequence}`);
     this.makeSessionToken = options.sessionToken ?? (() => `session_${++this.sessionSequence}_${randomBytes(12).toString('hex')}`);
     this.verifyIdentity = options.identityVerifier ?? (() => false);
+    this.adminDiagnosticToken = options.adminDiagnosticToken === undefined
+      ? null
+      : validId(options.adminDiagnosticToken, 'adminDiagnosticToken');
   }
 
   createGuest(request: GuestRequest): AccountAuthResult {
@@ -279,9 +301,15 @@ export class AccountService {
     const requestId = validId(request.requestId, 'requestId');
     const now = validNow(this.clock());
     const account = this.requireAccount(session.accountId);
-    const deletedIdentity: AccountIdentity = { ...account.identity, status: ACCOUNT_STATUS.DELETED, updatedAt: now };
-    account.identity = deletedIdentity;
     for (const key of account.bindingKeys) this.bindings.delete(key);
+    account.bindingKeys.clear();
+    const deletedIdentity: AccountIdentity = {
+      ...account.identity,
+      status: ACCOUNT_STATUS.DELETED,
+      bindings: [],
+      updatedAt: now,
+    };
+    account.identity = deletedIdentity;
     for (const [token, candidate] of this.sessions) if (candidate.accountId === session.accountId) this.sessions.delete(token);
     this.cloudSaves.delete(session.accountId);
     this.cloudRequests.delete(session.accountId);
@@ -296,42 +324,104 @@ export class AccountService {
   putCloudSave(request: CloudSavePutRequest): CloudSavePutResult {
     const session = this.requireSession(request.sessionToken);
     const requestId = validId(request.requestId, 'requestId');
+    const requestLedger = this.cloudRequests.get(session.accountId) ?? new Map<string, StoredCloudRequest>();
+    const rawFingerprint = stable({ expectedVersion: request.expectedVersion, payload: request.save });
+    const rawReplay = this.replayCloudRequest(requestLedger, requestId, rawFingerprint);
+    if (rawReplay !== undefined) return rawReplay;
     if (!Number.isSafeInteger(request.expectedVersion) || request.expectedVersion < 0) {
-      throw new AccountError(ACCOUNT_ERROR_CODES.INVALID_REQUEST, 'expectedVersion is invalid');
+      return this.storeCloudRequestError(
+        session.accountId,
+        requestLedger,
+        requestId,
+        rawFingerprint,
+        new AccountError(ACCOUNT_ERROR_CODES.INVALID_REQUEST, 'expectedVersion is invalid'),
+      );
     }
-    const payload = normalizeSave(session.accountId, request.save);
-    const now = validNow(this.clock());
+    let payload: SaveData;
+    try {
+      payload = normalizeSave(session.accountId, request.save);
+    } catch (error) {
+      const accountError = error instanceof AccountError
+        ? error
+        : new AccountError(ACCOUNT_ERROR_CODES.SAVE_INVALID, 'save is invalid');
+      return this.storeCloudRequestError(session.accountId, requestLedger, requestId, rawFingerprint, accountError);
+    }
     const fingerprint = stable({ expectedVersion: request.expectedVersion, payload });
-    const requestLedger = this.cloudRequests.get(session.accountId) ?? new Map<string, StoredRequest>();
-    const previous = requestLedger.get(requestId);
-    if (previous !== undefined) {
-      if (previous.fingerprint !== fingerprint) throw new AccountError(ACCOUNT_ERROR_CODES.REQUEST_CONFLICT, 'requestId was reused with different data');
-      return { ...clone(previous.result), replayed: true, record: copyRecord(previous.result.record) as CloudSaveRecord };
-    }
+    const replay = this.replayCloudRequest(requestLedger, requestId, fingerprint);
+    if (replay !== undefined) return replay;
+    const now = validNow(this.clock());
     const current = this.cloudSaves.get(session.accountId) ?? null;
     const currentVersion = current?.version ?? 0;
     if (request.expectedVersion !== currentVersion) {
-      return { accepted: false, replayed: false, code: 'VERSION_CONFLICT', current: copyRecord(current) };
+      const result: CloudSavePutConflict = { accepted: false, replayed: false, code: 'VERSION_CONFLICT', current: copyRecord(current) };
+      requestLedger.set(requestId, { kind: 'result', fingerprint, result: clone(result) });
+      this.cloudRequests.set(session.accountId, requestLedger);
+      return clone(result);
+    }
+    const payloadHash = hashSave(payload);
+    if (current !== null && payloadHash === current.payloadHash) {
+      const result: CloudSavePutSuccess = { accepted: true, replayed: true, record: copyRecord(current) as CloudSaveRecord };
+      requestLedger.set(requestId, { kind: 'result', fingerprint, result: clone(result) });
+      this.cloudRequests.set(session.accountId, requestLedger);
+      return clone(result);
+    }
+    if (current !== null && payload.updatedAt <= current.payload.updatedAt) {
+      const result: CloudSavePutConflict = { accepted: false, replayed: false, code: 'SAVE_STALE', current: copyRecord(current) };
+      requestLedger.set(requestId, { kind: 'result', fingerprint, result: clone(result) });
+      this.cloudRequests.set(session.accountId, requestLedger);
+      return clone(result);
     }
     const record: CloudSaveRecord = {
       accountId: session.accountId,
       version: currentVersion + 1,
-      updatedAt: now,
+      stateRevision: (current?.stateRevision ?? 0) + 1,
+      updatedAt: Math.max(now, current?.updatedAt ?? 0),
       payload,
-      payloadHash: hashSave(payload),
+      payloadHash,
     };
     const result: CloudSavePutSuccess = { accepted: true, replayed: false, record };
     this.cloudSaves.set(session.accountId, record);
-    requestLedger.set(requestId, { fingerprint, result: clone(result) });
+    requestLedger.set(requestId, { kind: 'result', fingerprint, result: clone(result) });
     this.cloudRequests.set(session.accountId, requestLedger);
     return clone(result);
   }
 
-  snapshot(): { accounts: AccountIdentity[]; cloudSaves: CloudSaveRecord[] } {
+  snapshot(adminDiagnosticToken?: string): AccountSnapshot {
+    if (this.adminDiagnosticToken === null || adminDiagnosticToken !== this.adminDiagnosticToken) {
+      throw new AccountError(ACCOUNT_ERROR_CODES.UNAUTHENTICATED, 'diagnostic snapshot is not authorized');
+    }
     return {
       accounts: [...this.accounts.values()].map(({ identity }) => publicIdentity(identity)),
       cloudSaves: [...this.cloudSaves.values()].map((record) => clone(record)),
     };
+  }
+
+  private replayCloudRequest(
+    requestLedger: Map<string, StoredCloudRequest>,
+    requestId: string,
+    fingerprint: string,
+  ): CloudSavePutResult | undefined {
+    const previous = requestLedger.get(requestId);
+    if (previous === undefined) return undefined;
+    if (previous.fingerprint !== fingerprint) {
+      throw new AccountError(ACCOUNT_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was reused with different data');
+    }
+    if (previous.kind === 'error') throw new AccountError(previous.code, previous.message);
+    const result = clone(previous.result);
+    if (result.accepted) return { ...result, replayed: true, record: copyRecord(result.record) as CloudSaveRecord };
+    return { ...result, replayed: true, current: copyRecord(result.current) };
+  }
+
+  private storeCloudRequestError(
+    accountId: string,
+    requestLedger: Map<string, StoredCloudRequest>,
+    requestId: string,
+    fingerprint: string,
+    error: AccountError,
+  ): never {
+    requestLedger.set(requestId, { kind: 'error', fingerprint, code: error.code, message: error.message });
+    this.cloudRequests.set(accountId, requestLedger);
+    throw new AccountError(error.code, error.message);
   }
 
   private issueSession(accountId: string, deviceId: string, issuedAt: number): Session {

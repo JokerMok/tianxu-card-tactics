@@ -4,12 +4,14 @@ import { AccountClientError, AccountClientService } from '../assets/scripts/serv
 import { createDefaultSave } from '../assets/scripts/services/SaveSchema.ts';
 
 const times = [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015];
+const ADMIN_DIAGNOSTIC_TOKEN = 't259-admin-diagnostic-token';
 let timeIndex = 0;
 const server = new BackendAccountService({
   now: () => times[Math.min(timeIndex++, times.length - 1)],
   accountId: (() => { let sequence = 0; return (kind) => `${kind}-deterministic-${++sequence}`; })(),
   sessionToken: (() => { let sequence = 0; return () => `token-${++sequence}`; })(),
   identityVerifier: (provider, subject, proof) => proof === `proof:${provider}:${subject}`,
+  adminDiagnosticToken: ADMIN_DIAGNOSTIC_TOKEN,
 });
 
 function expectCode(label, action, code) {
@@ -24,6 +26,7 @@ expectCode('missing identity verifier fails closed', () => failClosedServer.bind
   subject: 'user-1',
   proof: 'proof:apple:user-1',
 }), 'AUTH_PROOF_INVALID');
+expectCode('snapshot without configured admin token fails closed', () => failClosedServer.snapshot(), 'UNAUTHENTICATED');
 
 const deviceA = new AccountClientService(server, { deviceId: 'device-a', now: () => 2000 });
 const guest = deviceA.guest();
@@ -53,18 +56,34 @@ assert.equal(deviceB.loadCloudSave().version, 1, 'a second device reads the clou
 
 const saveV2 = structuredClone(save);
 saveV2.progress.clearedNodes.push('N001');
+saveV2.updatedAt = 2001;
 const secondWrite = deviceA.saveCloudSave(saveV2, 'save-2');
 assert.equal(secondWrite.record.version, 2);
-const beforeStale = JSON.stringify(server.snapshot());
+assert.equal(secondWrite.record.stateRevision, 2);
+expectCode('snapshot without admin token fails closed', () => server.snapshot(), 'UNAUTHENTICATED');
+expectCode('ordinary session cannot read diagnostic snapshot', () => server.snapshot(deviceA.session().token), 'UNAUTHENTICATED');
+assert.equal(server.snapshot(ADMIN_DIAGNOSTIC_TOKEN).cloudSaves.length, 1, 'authorized diagnostic snapshot may read cloud state');
+const beforeStale = JSON.stringify(server.snapshot(ADMIN_DIAGNOSTIC_TOKEN));
 const stale = deviceB.saveCloudSave(save, 'save-stale', 1);
 assert.deepEqual(stale, { accepted: false, replayed: false, code: 'VERSION_CONFLICT', current: secondWrite.record }, 'stale devices must receive a conflict');
-assert.equal(JSON.stringify(server.snapshot()), beforeStale, 'a version conflict must not mutate the server');
+const staleReplay = deviceB.saveCloudSave(save, 'save-stale', 1);
+assert.deepEqual(staleReplay, { accepted: false, replayed: true, code: 'VERSION_CONFLICT', current: secondWrite.record }, 'a version conflict must be replayed from the request ledger');
+expectCode('conflict requestId cannot become a success', () => deviceB.saveCloudSave(saveV2, 'save-stale', 2), 'REQUEST_ID_REUSED');
+assert.equal(JSON.stringify(server.snapshot(ADMIN_DIAGNOSTIC_TOKEN)), beforeStale, 'a version conflict must not mutate the server');
 
 const replay = deviceA.saveCloudSave(saveV2, 'save-2', 1);
 assert.equal(replay.accepted, true);
 assert.equal(replay.replayed, true, 'same request and payload must replay the original receipt');
 assert.deepEqual(replay.record, secondWrite.record, 'replay must return the original version');
-expectCode('reused requestId with changed payload is rejected', () => deviceA.saveCloudSave(save, 'save-2', 1), 'REQUEST_CONFLICT');
+expectCode('reused requestId with changed payload is rejected', () => deviceA.saveCloudSave(save, 'save-2', 1), 'REQUEST_ID_REUSED');
+
+const semanticStale = structuredClone(save);
+semanticStale.resources.gold = 1;
+const semanticStaleResult = deviceA.saveCloudSave(semanticStale, 'semantic-stale', 2);
+assert.deepEqual(semanticStaleResult, { accepted: false, replayed: false, code: 'SAVE_STALE', current: secondWrite.record }, 'old semantic state must be rejected even with the current expected version');
+const semanticStaleReplay = deviceA.saveCloudSave(semanticStale, 'semantic-stale', 2);
+assert.deepEqual(semanticStaleReplay, { accepted: false, replayed: true, code: 'SAVE_STALE', current: secondWrite.record }, 'semantic stale rejection must be idempotent');
+expectCode('semantic stale requestId cannot become a success', () => deviceA.saveCloudSave(saveV2, 'semantic-stale', 2), 'REQUEST_ID_REUSED');
 
 const malformed = structuredClone(saveV2);
 malformed.schemaVersion = 99;
@@ -74,6 +93,18 @@ expectCode('unsupported cloud save schema is rejected', () => server.putCloudSav
   expectedVersion: 2,
   save: malformed,
 }), 'SAVE_INVALID');
+expectCode('same invalid requestId replays the same rejection', () => server.putCloudSave({
+  sessionToken: deviceA.session().token,
+  requestId: 'malformed',
+  expectedVersion: 2,
+  save: malformed,
+}), 'SAVE_INVALID');
+expectCode('invalid requestId cannot become a success', () => server.putCloudSave({
+  sessionToken: deviceA.session().token,
+  requestId: 'malformed',
+  expectedVersion: 2,
+  save: saveV2,
+}), 'REQUEST_ID_REUSED');
 const malformedResource = structuredClone(saveV2);
 malformedResource.resources.gold = -1;
 expectCode('invalid nested save state is rejected', () => server.putCloudSave({
@@ -82,6 +113,24 @@ expectCode('invalid nested save state is rejected', () => server.putCloudSave({
   expectedVersion: 2,
   save: malformedResource,
 }), 'SAVE_INVALID');
+expectCode('invalid expectedVersion is recorded', () => server.putCloudSave({
+  sessionToken: deviceA.session().token,
+  requestId: 'invalid-version',
+  expectedVersion: -1,
+  save: saveV2,
+}), 'INVALID_REQUEST');
+expectCode('same invalid expectedVersion replays the same rejection', () => server.putCloudSave({
+  sessionToken: deviceA.session().token,
+  requestId: 'invalid-version',
+  expectedVersion: -1,
+  save: saveV2,
+}), 'INVALID_REQUEST');
+expectCode('invalid expectedVersion requestId cannot become a success', () => server.putCloudSave({
+  sessionToken: deviceA.session().token,
+  requestId: 'invalid-version',
+  expectedVersion: 2,
+  save: saveV2,
+}), 'REQUEST_ID_REUSED');
 assert.equal(server.loadCloudSave(deviceA.session().token).record.version, 2, 'invalid saves must leave the prior record intact');
 
 const canonicalReplay = structuredClone(saveV2);
@@ -89,6 +138,8 @@ canonicalReplay.resources = { essence: 0, gold: 0 };
 const canonicalSave = structuredClone(saveV2);
 canonicalSave.resources = { gold: 0, essence: 0 };
 const canonicalWrite = deviceA.saveCloudSave(canonicalSave, 'canonical', 2);
+assert.equal(canonicalWrite.replayed, true, 'equivalent payload must not create a new semantic revision');
+assert.equal(canonicalWrite.record.version, 2);
 const canonicalDuplicate = deviceA.saveCloudSave(canonicalReplay, 'canonical', 2);
 assert.equal(canonicalDuplicate.replayed, true, 'object key order must not change an idempotency fingerprint');
 assert.deepEqual(canonicalDuplicate.record, canonicalWrite.record);
@@ -107,9 +158,26 @@ expectCode('same external identity cannot bind two accounts', () => deviceC.bind
 
 const deletion = deviceA.deleteAccount('delete-1');
 assert.deepEqual(deletion, { deleted: true, accountId, requestId: 'delete-1' });
-assert.equal(server.snapshot().cloudSaves.length, 0, 'deletion must purge the cloud save');
+const deletedSnapshot = server.snapshot(ADMIN_DIAGNOSTIC_TOKEN);
+assert.equal(deletedSnapshot.cloudSaves.length, 0, 'deletion must purge the cloud save');
+assert.deepEqual(deletedSnapshot.accounts.find((account) => account.accountId === accountId).bindings, [], 'deletion must clear provider/subject bindings from the tombstone');
+assert.equal(JSON.stringify(deletedSnapshot).includes('user-1'), false, 'deleted subject must not be exposed by diagnostic snapshot');
 expectCode('deleted session is revoked', () => server.loadCloudSave(guest.session.token), 'UNAUTHENTICATED');
 expectCode('deleted account cannot log in', () => server.login({ provider: 'apple', subject: 'user-1', proof: 'proof:apple:user-1', deviceId: 'device-d', now: 2030 }), 'NO_BINDING');
+
+const ledgerProbe = new BackendAccountService({ accountId: () => 'ledger-probe', sessionToken: () => 'ledger-probe-token', now: () => 10 });
+const ledgerProbeGuest = ledgerProbe.createGuest({ deviceId: 'ledger-probe-device' });
+const ledgerProbeSave = createDefaultSave('ledger-probe', 1);
+const ledgerProbeNext = structuredClone(ledgerProbeSave);
+ledgerProbeNext.updatedAt = 2;
+ledgerProbeNext.resources.gold = 1;
+const ledgerProbeFirst = ledgerProbe.putCloudSave({ sessionToken: ledgerProbeGuest.session.token, requestId: 'first', expectedVersion: 0, save: ledgerProbeSave });
+const ledgerProbeConflict = ledgerProbe.putCloudSave({ sessionToken: ledgerProbeGuest.session.token, requestId: 'conflict', expectedVersion: 0, save: ledgerProbeNext });
+assert.equal(ledgerProbeConflict.code, 'VERSION_CONFLICT');
+const ledgerProbeLatest = ledgerProbe.putCloudSave({ sessionToken: ledgerProbeGuest.session.token, requestId: 'latest', expectedVersion: 1, save: ledgerProbeNext });
+assert.equal(ledgerProbeLatest.record.version, 2);
+const ledgerProbeReplay = ledgerProbe.putCloudSave({ sessionToken: ledgerProbeGuest.session.token, requestId: 'conflict', expectedVersion: 0, save: ledgerProbeNext });
+assert.deepEqual(ledgerProbeReplay.current, ledgerProbeFirst.record, 'a conflict replay must return its original receipt after the account advances');
 
 function deterministicRun() {
   let clock = 3000;
@@ -120,12 +188,13 @@ function deterministicRun() {
     accountId: (kind) => `${kind}-${++accountSequence}`,
     sessionToken: () => `session-${++tokenSequence}`,
     identityVerifier: (provider, subject, proof) => proof === `proof:${provider}:${subject}`,
+    adminDiagnosticToken: ADMIN_DIAGNOSTIC_TOKEN,
   });
   const client = new AccountClientService(isolated, { deviceId: 'fixed-device', now: () => 4000 });
   client.guest();
   client.bind('apple', 'deterministic-user', 'proof:apple:deterministic-user');
   client.saveCloudSave(client.newSave(), 'fixed-request', 0);
-  return isolated.snapshot();
+  return isolated.snapshot(ADMIN_DIAGNOSTIC_TOKEN);
 }
 
 assert.deepEqual(deterministicRun(), deterministicRun(), 'fixed inputs must produce a deterministic account/cloud snapshot');
