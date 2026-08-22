@@ -20,6 +20,8 @@ import {
 const { privateKey, publicKey } = generateKeyPairSync('ed25519');
 const { privateKey: rsaPrivateKey, publicKey: rsaPublicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 let now = 1_700_000_000_000;
+let fetchSessionState = { available: true, blocked: false };
+const externalVectorPublicKey = createPublicKey(`-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+j6Mwu1QGs+ruukpM+GgH/PQJWzN9vfe5ZNZ1uvyYdY=\n-----END PUBLIC KEY-----`);
 
 function unsigned(overrides = {}) {
   return {
@@ -37,13 +39,13 @@ const backend = new BackendConfigUpdateService({
   now: () => now,
   publicKeys: {
     'release-ed25519-dynamic-1': publicKey,
-    'release-ed25519-1': createPublicKey(`-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+j6Mwu1QGs+ruukpM+GgH/PQJWzN9vfe5ZNZ1uvyYdY=\n-----END PUBLIC KEY-----`),
+    'release-ed25519-1': externalVectorPublicKey,
   },
   resolveIdentity: (request) => ({
-    'auth:tenant-a:player-1': { tenantId: 'tenant-a', subjectId: 'player-1', clientVersion: '1.0.0' },
-    'auth:tenant-a:player-2': { tenantId: 'tenant-a', subjectId: 'player-2', clientVersion: '1.0.0' },
-    'auth:tenant-a:player-1:v2': { tenantId: 'tenant-a', subjectId: 'player-1', clientVersion: '2.0.0' },
-    'auth:tenant-b:player-1': { tenantId: 'tenant-b', subjectId: 'player-1', clientVersion: '1.0.0' },
+    'auth:tenant-a:player-1': { tenantId: 'tenant-a', subjectId: 'player-1', clientVersion: '1.0.0', ...fetchSessionState },
+    'auth:tenant-a:player-2': { tenantId: 'tenant-a', subjectId: 'player-2', clientVersion: '1.0.0', ...fetchSessionState },
+    'auth:tenant-a:player-1:v2': { tenantId: 'tenant-a', subjectId: 'player-1', clientVersion: '2.0.0', ...fetchSessionState },
+    'auth:tenant-b:player-1': { tenantId: 'tenant-b', subjectId: 'player-1', clientVersion: '1.0.0', ...fetchSessionState },
   })[request.authToken] ?? null,
 });
 const canonicalA = backendStableJson({ z: 1, a: { y: 2, x: 3 } });
@@ -57,7 +59,14 @@ const externalVectorUnsigned = {
 const externalVectorCanonical = '{"allowList":["player-1"],"bundleId":"external-vector","configKey":"combat.balance","createdAt":1700000000000,"keyId":"release-ed25519-1","minClientVersion":"1.0.0","payload":{"damageMultiplier":1.25,"source":"external-vector"},"rolloutPercent":100,"rolloutSalt":"salt-external","tenantId":"tenant-a","version":"2.0.0"}';
 const externalVector = { ...externalVectorUnsigned, signature: '9fEu2uAjNHaughl6klAdpV9i7G0LN0pjsknBj4RIgXHtpA1RaS4sckN0y6Yo8ypejf-9se4s-v3Ve0VRCVy6CA' };
 assert.equal(backendStableJson(externalVectorUnsigned), externalVectorCanonical, 'canonicalization must match the external vector bytes');
-assert.equal(verifyConfigSignature(externalVector, createPublicKey(`-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA+j6Mwu1QGs+ruukpM+GgH/PQJWzN9vfe5ZNZ1uvyYdY=\n-----END PUBLIC KEY-----`)), true, 'fixed external Ed25519 vector must verify');
+assert.equal(verifyConfigSignature(externalVector, externalVectorPublicKey), true, 'fixed external Ed25519 vector must verify');
+const externalVectorVerifier = {
+  algorithm: 'Ed25519',
+  trustedKeyIds: ['release-ed25519-1'],
+  verifyEd25519: (canonical, signature) => verify(null, Buffer.from(canonical), externalVectorPublicKey, Buffer.from(signature, 'base64url')),
+};
+const vectorClient = new ConfigUpdateClientService({ tenantId: 'tenant-a', clientId: 'player-1', clientVersion: '2.0.0', verifySignature: externalVectorVerifier });
+assert.deepEqual(vectorClient.apply('external-vector-apply', externalVector), { applied: true, replayed: false, rolledBack: false, configKey: externalVector.configKey, version: externalVector.version }, 'client must verify a fixed external Ed25519 vector without createConfigSignature');
 assert.equal(createConfigSignature(externalVectorUnsigned, privateKey).length, 86, 'Ed25519 signatures have the expected encoding length');
 const first = signed();
 assert.equal(verifyConfigSignature(first, publicKey), true);
@@ -104,6 +113,11 @@ const available = backend.fetch({ requestId: 'fetch-release', configKey: release
 assert.equal(available.available, true);
 assert.equal(available.bundle.version, '1.3.0');
 assert.deepEqual(backend.fetch({ requestId: 'fetch-release', configKey: release.configKey, clientId: 'player-1', clientVersion: '2.0.0', authToken: 'auth:tenant-a:player-1:v2' }), { ...available, replayed: true });
+fetchSessionState = { available: true, blocked: true };
+assert.deepEqual(backend.fetch({ requestId: 'fetch-release', configKey: release.configKey, clientId: 'player-1', clientVersion: '2.0.0', authToken: 'auth:tenant-a:player-1:v2' }), { available: false, replayed: false, bundle: null, reason: 'CLIENT_BLOCKED' }, 'quarantined session must not replay an available config');
+fetchSessionState = undefined;
+expectCode(() => backend.fetch({ requestId: 'fetch-missing-state', configKey: release.configKey, clientId: 'player-1', clientVersion: '2.0.0', authToken: 'auth:tenant-a:player-1:v2' }), BACKEND_CODES.AUTHENTICATION_REQUIRED);
+fetchSessionState = { available: true, blocked: false };
 assert.equal(backend.rollback({ requestId: 'rollback-1', actorId: 'ops', tenantId: 'tenant-a', configKey: release.configKey, targetVersion: '1.2.0' }).bundle.version, '1.2.0');
 expectCode(() => backend.rollback({ requestId: 'rollback-none', actorId: 'ops', tenantId: 'tenant-a', configKey: release.configKey, targetVersion: '0.9.0' }), BACKEND_CODES.ROLLBACK_UNAVAILABLE);
 
@@ -140,11 +154,15 @@ assert.equal(client.isBlocked(release.configKey), true, 'activation failure must
 expectCode(() => client.active(release.configKey), CLIENT_CODES.RUNTIME_INCONSISTENT);
 const activationCountAfterFailure = activations.length;
 expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.RUNTIME_INCONSISTENT);
+expectCode(() => client.apply('apply-1', release), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(activations.length, activationCountAfterFailure);
 expectCode(() => client.apply('apply-after-quarantine', signed({ bundleId: 'blocked-follow-up', version: '1.4.1', minClientVersion: '2.0.0' })), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(activations.at(-1).context.rollback, true);
+expectCode(() => client.recover('client-recover-old-version', clientBase), CLIENT_CODES.VERSION_CONFLICT);
+expectCode(() => client.recover('client-recover-old-min', signed({ bundleId: 'recover-old-min', version: '1.4.0', minClientVersion: '1.0.0' })), CLIENT_CODES.VERSION_CONFLICT);
 failActivation = false;
 assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: false, configKey: release.configKey, version: release.version });
+expectCode(() => client.recover('client-recover', release), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(client.isBlocked(release.configKey), false);
 assert.equal(client.active(release.configKey).version, release.version);
 assert.equal(client.apply('post-recovery-apply', signed({ bundleId: 'post-recovery', version: '1.5.0', minClientVersion: '2.0.0' })).version, '1.5.0');

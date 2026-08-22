@@ -67,11 +67,14 @@ export interface ConfigAuthenticatedIdentity {
   tenantId: string;
   subjectId: string;
   clientVersion: string;
+  /** Trusted session state; missing state must fail closed. */
+  available: boolean;
+  blocked: boolean;
 }
 
 export type ConfigIdentityResolver = (request: FetchConfigRequest) => ConfigAuthenticatedIdentity | null;
 
-export type FetchUnavailableReason = 'CONFIG_NOT_FOUND' | 'CLIENT_OUTDATED' | 'NOT_ELIGIBLE' | 'EXPIRED';
+export type FetchUnavailableReason = 'CONFIG_NOT_FOUND' | 'CLIENT_OUTDATED' | 'NOT_ELIGIBLE' | 'EXPIRED' | 'CLIENT_BLOCKED' | 'SESSION_UNAVAILABLE';
 
 export interface FetchConfigResult {
   available: boolean;
@@ -400,11 +403,14 @@ export class ConfigUpdateService {
       subjectId = validText(identity.subjectId, 'subjectId');
       resolvedClientVersion = validText(identity.clientVersion, 'clientVersion');
       parseVersion(resolvedClientVersion);
+      if (typeof identity.available !== 'boolean' || typeof identity.blocked !== 'boolean') throw new Error('trusted session state is missing');
     } catch {
       throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'authenticated identity is invalid');
     }
     if (clientId !== subjectId || clientVersion !== resolvedClientVersion) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'request identity does not match authenticated identity');
-    const requestFingerprint = fingerprint({ configKey, tenantId, subjectId, clientVersion: resolvedClientVersion });
+    const requestFingerprint = fingerprint({ configKey, tenantId, subjectId, clientVersion: resolvedClientVersion, available: identity.available, blocked: identity.blocked });
+    if (identity.blocked) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'CLIENT_BLOCKED' }, configKey, 'CLIENT_BLOCKED');
+    if (!identity.available) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'SESSION_UNAVAILABLE' }, configKey, 'SESSION_UNAVAILABLE');
     const replay = this.replay<FetchConfigResult>(requestId, requestFingerprint, 'fetch', configKey);
     if (replay) return replay;
     const scope = scopeKey(tenantId, configKey);

@@ -265,11 +265,11 @@ export class ConfigUpdateClientService {
     const id = validText(requestId, 'requestId');
     const bundle = validateBundle(value);
     const requestFingerprint = fingerprint({ configKey: bundle.configKey, bundle });
-    const replay = this.replay<ApplyConfigResult>(id, requestFingerprint);
-    if (replay) return replay;
     try {
-      this.validateCommon(bundle);
       this.assertUsable(bundle.configKey);
+      const replay = this.replay<ApplyConfigResult>(id, requestFingerprint);
+      if (replay) return replay;
+      this.validateCommon(bundle);
       const current = this.states.get(bundle.configKey)?.active ?? null;
       if (current && compareVersions(bundle.version, current.version) < 0) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version cannot move backwards without rollback');
       if (current && compareVersions(bundle.version, current.version) === 0) {
@@ -417,11 +417,18 @@ export class ConfigUpdateClientService {
     const id = validText(requestId, 'requestId');
     const bundle = validateBundle(value);
     const requestFingerprint = fingerprint({ configKey: bundle.configKey, bundle });
-    const replay = this.replay<RecoverConfigResult>(id, requestFingerprint);
-    if (replay) return replay;
     try {
       if (!this.isBlocked(bundle.configKey)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, 'config is not quarantined and cannot use recovery path');
+      const replay = this.replay<RecoverConfigResult>(id, requestFingerprint);
+      if (replay) return replay;
       this.validateCommon(bundle);
+      const current = this.states.get(bundle.configKey)?.active ?? null;
+      if (current && compareVersions(bundle.version, current.version) < 0) {
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version cannot move backwards during recovery');
+      }
+      if (current && compareVersions(bundle.version, current.version) === 0 && stableJson(current) !== stableJson(bundle)) {
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'same version has different content');
+      }
       const minClientVersionFloor = this.maxMinClientVersionByConfig.get(bundle.configKey);
       if (minClientVersionFloor && compareVersions(bundle.minClientVersion, minClientVersionFloor) < 0) {
         throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'minClientVersion cannot move backwards');
