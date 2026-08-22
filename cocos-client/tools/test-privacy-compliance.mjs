@@ -7,9 +7,7 @@ import {
 } from '../assets/scripts/services/compliance/index.ts';
 
 const OPERATOR_TOKEN = 't264-operator-token';
-const ticks = [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022];
-let tickIndex = 0;
-const now = () => ticks[Math.min(tickIndex++, ticks.length - 1)];
+const now = () => 1000;
 const store = new InMemoryPrivacyDataStore([{ subjectId: 'account-a', data: { email: 'a@example.com', phone: '+86 138 0000 0000', progress: { level: 3 }, settings: { language: 'zh-CN' } }, updatedAt: 900, retentionUntil: 1015 }]);
 const service = new ComplianceService({ store, operatorToken: OPERATOR_TOKEN, now, auditRetentionMs: 10_000 });
 const subject = { kind: 'subject', subjectId: 'account-a' };
@@ -307,6 +305,36 @@ const toctouStore = {
 const toctouService = new ComplianceService({ store: toctouStore, operatorToken: OPERATOR_TOKEN, now: () => toctouTick++ });
 expectCode('time-forward TOCTOU must not return data', () => toctouService.accessData({ kind: 'subject', subjectId: 'time-of-check' }, { subjectId: 'time-of-check', requestId: 'time-forward-toctou' }), 'STORE_FAILURE');
 assertQuarantined(toctouService, 'time-forward TOCTOU must quarantine the service');
+
+class TransactionClockStore extends InMemoryPrivacyDataStore {
+  constructor(initial, nextTick) {
+    super(initial);
+    this.nextTick = nextTick;
+  }
+  read(subjectId) {
+    const result = super.read(subjectId);
+    this.nextTick();
+    return result;
+  }
+  withTransaction(action) {
+    return action();
+  }
+}
+
+for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
+  for (const operation of ['accessData', 'exportData']) {
+    let tick = 100;
+    const transactionStore = new TransactionClockStore([{ subjectId: 'transaction-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }], () => { tick = transactionTick; });
+    const transactionService = new ComplianceService({ store: transactionStore, operatorToken: OPERATOR_TOKEN, now: () => tick });
+    const transactionSubject = { kind: 'subject', subjectId: 'transaction-clock' };
+    const request = { subjectId: 'transaction-clock', requestId: `transaction-${operation}-${label}` };
+    expectCode(`withTransaction clock ${label} must fail closed for ${operation}`, () => transactionService[operation](transactionSubject, request), 'STORE_FAILURE');
+    assertQuarantined(transactionService, `withTransaction clock ${label} must quarantine ${operation}`);
+    const quarantine = transactionService.auditLog(operator).find((event) => event.action === 'store_quarantine');
+    assert.equal(quarantine?.occurredAt, transactionTick === 99 ? 100 : 101, `withTransaction clock ${label} must preserve the monotonic observedNow watermark`);
+    expectCode(`quarantined ${operation} must not return a transaction result`, () => transactionService[operation](transactionSubject, { ...request, requestId: `${request.requestId}-retry` }), 'STORE_FAILURE');
+  }
+}
 
 for (const [label, action] of [
   ['quarantined read', () => unrecoverablePurgeService.accessData(operator, { subjectId: 'purge-unknown-live', requestId: 'quarantine-read' })],

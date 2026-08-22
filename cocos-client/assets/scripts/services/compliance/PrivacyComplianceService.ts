@@ -541,10 +541,13 @@ export class PrivacyComplianceService {
   }
   private withStoreBoundary<T>(trustedNow: number, action: () => T): T {
     const transaction = this.store.withTransaction;
-    if (typeof transaction === 'function') return transaction.call(this.store, action);
-    const result = action();
-    const afterNow = this.now();
-    if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_OPERATION', 'trusted time changed during privacy read');
+    let result!: T;
+    try {
+      result = typeof transaction === 'function' ? transaction.call(this.store, action) : action();
+    } finally {
+      const afterNow = this.now();
+      if (afterNow !== trustedNow) this.failStore('CLOCK_CHANGED_DURING_OPERATION', 'trusted time changed during privacy read');
+    }
     return result;
   }
   private authorize(actor: PrivacyActor, subjectId: string): void {
