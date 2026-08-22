@@ -6,7 +6,7 @@
 
 正式门禁为 1920×1080 Web Desktop、GPU 渲染、24 个单位、6 层场景、7 类战斗效果和 7 类音频反馈；FPS 不低于 55，P95 帧时间不高于 22ms。
 
-T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且证据包含 GPU、WebGL2、FPS、P95 和 formal-runtime 标记时，才可进入 T327 正式性能判定。确定性模型和契约夹具不能替代 live GPU 运行证据。
+T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且输出包含实际成功行 `T203 GPU runtime: PASS (...)` 和 `T203 measured performance: FPS ...; P95 ...ms PASS` 时，才可进入 T327 正式性能判定。WebGL2、formal-runtime、`previewPoseAssets=0`、`artIntegrationComplete=true`、1920×1080 和性能阈值仍由 T203 verifier/runner 强制校验，T327 不重复解析不存在的成功 marker。
 
 ## 2. 实际修改文件
 
@@ -20,7 +20,7 @@ T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且
 1. 读取并校验 A0 manifest、E104 场景契约、T251 效果/音频契约、生产性能模块和契约通过夹具。
 2. 执行现有 T327 缺失、非法、越界和原始样本不足负例，并校验 T203 live GPU 证据缺失、越界和 marker 缺失反例。
 3. 执行 `tools/verify-production-performance.mjs`。
-4. T203 非零或缺少 GPU、WebGL2、FPS、P95、formal-runtime 任一标记时，T327 输出 `T327 formal performance gate: BLOCKED` 并返回非零；在此之前不读取历史 `BattleA0-performance.json`。
+4. T203 非零或缺少任一实际成功行时，T327 输出 `T327 formal performance gate: BLOCKED` 并返回非零；在此之前不读取历史 `BattleA0-performance.json`。
 5. 只有 T203 live gate 通过后，才检查历史 artifact；该文件仍保持旧 headless/preview 失败样本时，验证器继续断言其被拒绝。
 
 ## 4. 样本与门禁结果
@@ -30,7 +30,8 @@ T327 必须先执行 T203 production verifier。只有 T203 退出码为 0，且
 | 契约通过夹具 | PASS | 120 个原始帧时间；FPS 61.350；P95 16.300ms；`evidenceClass=contract-rehearsal-fixture` |
 | 缺失文件、缺失字段、非法 renderer | 拒绝 | 保留原有断言 |
 | FPS 54.99、P95 22.01ms、119 个原始样本 | 拒绝 | 不降低阈值和采样要求 |
-| T203 GPU/WebGL2/FPS/P95/formal-runtime marker 缺失或越界 | 拒绝 | T327 明确报告 `BLOCKED` |
+| T203 GPU runtime 或 measured FPS/P95 成功行缺失、伪造或越界 | 拒绝 | T327 只接受精确成功行，并明确报告 `BLOCKED` |
+| T203 WebGL2/formal-runtime/正式资产真实性 | 由 T203 拒绝 | T203 verifier/runner 强制检查，不由 T327 放宽 |
 | 历史 `BattleA0-performance.json` | 可选拒绝 | 当前样本为 headless、`preview-pose`、24 单位压力 FPS 26.278、P95 50ms；不作为 live gate |
 | 当前正式资产 | BLOCKED | 当前正式资产仍为 `preview-pose`，不能形成 formal-runtime 证据 |
 
@@ -42,11 +43,11 @@ cd cocos-client && node --experimental-strip-types tools/verify-production-perfo
 git diff --check
 ```
 
-预期：第一条命令非零，原因是 T203 live/formal runtime 证据缺失；第二条命令非零，真实 runner 拒绝当前 `preview-pose` 正式资产。两条命令均不得报告 GREEN。
+预期：第一条命令非零，原因是 T203 live verifier 拒绝当前 `preview-pose` 正式资产；第二条命令非零，真实 runner 同样拒绝 `preview-pose`。两条命令均不得报告 GREEN。
 
 ## 6. 结论
 
-当前 T327 预期为 `BLOCKED`。契约通过夹具只证明门禁计算和字段校验有效；历史 headless/preview artifact 只证明拒绝逻辑有效。当前正式资产仍为 `preview-pose`，未形成可放行的有头 GPU/WebGL2、formal-runtime、FPS 和 P95 证据，不能解除发布阻塞。
+当前 T327 预期为 `BLOCKED`。契约通过夹具只证明门禁计算和字段校验有效；历史 headless/preview artifact 只证明拒绝逻辑有效。当前正式资产仍为 `preview-pose`，T203 未形成可放行的有头 GPU/WebGL2、formal-runtime、FPS 和 P95 证据，不能解除发布阻塞。
 
 ## 7. 回退步骤
 
