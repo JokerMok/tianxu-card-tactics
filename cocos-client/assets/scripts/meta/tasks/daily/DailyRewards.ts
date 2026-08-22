@@ -57,6 +57,7 @@ export interface DailyPeriodState {
   readonly dayKey: string;
   readonly taskIds: readonly string[];
   readonly tasks: Readonly<Record<string, DailyTaskProgress>>;
+  readonly eventKeys: readonly string[];
   readonly activePoints: number;
   readonly activeClaimedRewardIds: readonly string[];
   readonly onlineMinutes: number;
@@ -183,6 +184,10 @@ function exactKeys(value: Record<string, unknown>, expected: readonly string[], 
   }
 }
 
+function allowedKeys(value: Record<string, unknown>, allowed: readonly string[], label: string, code: DailyRewardErrorCode): void {
+  if (Object.keys(value).some((key) => !allowed.includes(key))) fail(code, `${label} contains unexpected fields`);
+}
+
 function identifier(value: unknown, label: string, code: DailyRewardErrorCode): string {
   if (typeof value !== 'string' || value.length === 0 || value.trim() !== value) fail(code, `${label} must be a non-empty trimmed string`);
   return value;
@@ -204,7 +209,10 @@ export function dayKeyFromTimestamp(timestamp: number, timezoneOffsetMinutes = 0
   safeInteger(timestamp, 'timestamp', 0, 'INVALID_ARGUMENT');
   safeInteger(timezoneOffsetMinutes, 'timezoneOffsetMinutes', -840, 'INVALID_ARGUMENT');
   if (timezoneOffsetMinutes > 840) fail('INVALID_ARGUMENT', 'timezoneOffsetMinutes must be between -840 and 840');
-  const date = new Date(timestamp + timezoneOffsetMinutes * 60_000);
+  const adjustedTimestamp = timestamp + timezoneOffsetMinutes * 60_000;
+  if (!Number.isSafeInteger(adjustedTimestamp)) fail('INVALID_ARGUMENT', 'timestamp adjustment is unsafe');
+  const date = new Date(adjustedTimestamp);
+  if (!Number.isFinite(date.getTime())) fail('INVALID_ARGUMENT', 'timestamp is outside the supported date range');
   return `${date.getUTCFullYear().toString().padStart(4, '0')}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}`;
 }
 
@@ -220,6 +228,15 @@ export function weekKeyFromDayKey(dayKey: string): string {
 
 function dayDistance(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00.000Z`) - Date.parse(`${from}T00:00:00.000Z`)) / 86_400_000);
+}
+
+function assertWeekKey(value: unknown, label = 'weekKey'): asserts value is string {
+  if (typeof value !== 'string' || !/^\d{4}-W\d{2}$/.test(value)) fail('INVALID_STATE', `${label} must be YYYY-WNN`);
+  const year = Number(value.slice(0, 4));
+  const week = Number(value.slice(6));
+  if (year < 100 || week < 1 || week > 53) fail('INVALID_STATE', `${label} is invalid`);
+  const lastWeek = weekKeyFromDayKey(`${year}-12-28`);
+  if (value > lastWeek) fail('INVALID_STATE', `${label} is not an ISO calendar week`);
 }
 
 function fnv1a(value: string): number {
@@ -366,12 +383,13 @@ function taskProgress(task: DailyTaskDefinition): MutableTaskProgress {
 function createPeriod(catalog: DailyRewardCatalog, dayKey: string, taskIds: readonly string[]): MutablePeriodState {
   const tasks: Record<string, MutableTaskProgress> = {};
   for (const taskId of taskIds) tasks[taskId] = taskProgress(catalog.task(taskId));
-  return { dayKey, taskIds: [...taskIds], tasks, activePoints: 0, activeClaimedRewardIds: [], onlineMinutes: 0, onlineClaimedRewardIds: [] };
+  return { dayKey, taskIds: [...taskIds], tasks, eventKeys: [], activePoints: 0, activeClaimedRewardIds: [], onlineMinutes: 0, onlineClaimedRewardIds: [] };
 }
 
 function freezeState(state: MutableState): DailyRewardState {
   for (const period of [state.daily, ...Object.values(state.expiredDays)]) {
     period.taskIds.sort();
+    period.eventKeys.sort();
     period.activeClaimedRewardIds.sort();
     period.onlineClaimedRewardIds.sort();
     for (const task of Object.values(period.tasks)) task.eventKeys.sort();
@@ -389,21 +407,25 @@ function assertTaskState(task: unknown, definition: DailyTaskDefinition, label: 
   exactKeys(task, ['id', 'cycle', 'target', 'progress', 'completed', 'claimed', 'eventKeys'], label, 'INVALID_STATE');
   if (task.id !== definition.id || task.cycle !== definition.cycle || task.target !== definition.target) fail('INVALID_STATE', `${label} does not match configured task`);
   safeInteger(task.progress, `${label}.progress`, 0, 'INVALID_STATE');
-  if ((task.progress as number) > definition.target || task.completed !== (task.progress === definition.target) || typeof task.claimed !== 'boolean') fail('INVALID_STATE', `${label} has invalid completion state`);
+  if ((task.progress as number) > definition.target || task.completed !== (task.progress === definition.target) || typeof task.claimed !== 'boolean' || (task.claimed && !task.completed)) fail('INVALID_STATE', `${label} has invalid completion state`);
   if (!Array.isArray(task.eventKeys) || task.eventKeys.some((key) => typeof key !== 'string' || key.length === 0)) fail('INVALID_STATE', `${label}.eventKeys is invalid`);
   sortedUnique(task.eventKeys as string[], `${label}.eventKeys`);
 }
 
-function assertPeriodState(catalog: DailyRewardCatalog, period: unknown, expectedTaskIds: readonly string[], label: string): asserts period is DailyPeriodState {
+function assertPeriodState(catalog: DailyRewardCatalog, period: unknown, expectedTaskIds: readonly string[], label: string, expectedDayKey: string): asserts period is DailyPeriodState {
   if (!isPlainRecord(period)) fail('INVALID_STATE', `${label} must be an object`);
-  exactKeys(period, ['dayKey', 'taskIds', 'tasks', 'activePoints', 'activeClaimedRewardIds', 'onlineMinutes', 'onlineClaimedRewardIds'], label, 'INVALID_STATE');
+  exactKeys(period, ['dayKey', 'taskIds', 'tasks', 'eventKeys', 'activePoints', 'activeClaimedRewardIds', 'onlineMinutes', 'onlineClaimedRewardIds'], label, 'INVALID_STATE');
   assertDayKey(period.dayKey as string, `${label}.dayKey`);
+  if (period.dayKey !== expectedDayKey) fail('INVALID_STATE', `${label}.dayKey does not match its owner`);
   if (!Array.isArray(period.taskIds) || JSON.stringify([...period.taskIds].sort()) !== JSON.stringify([...expectedTaskIds].sort())) fail('INVALID_STATE', `${label}.taskIds do not match deterministic selection`);
-  if (!isPlainRecord(period.tasks) || Object.keys(period.tasks).length !== expectedTaskIds.length) fail('INVALID_STATE', `${label}.tasks are incomplete`);
+  if (!isPlainRecord(period.tasks)) fail('INVALID_STATE', `${label}.tasks are incomplete`);
+  exactKeys(period.tasks, expectedTaskIds, `${label}.tasks`, 'INVALID_STATE');
   for (const taskId of expectedTaskIds) {
     const task = catalog.task(taskId);
     assertTaskState(period.tasks[taskId], task, `${label}.tasks.${taskId}`);
   }
+  if (!Array.isArray(period.eventKeys) || period.eventKeys.some((key) => typeof key !== 'string' || key.length === 0)) fail('INVALID_STATE', `${label}.eventKeys is invalid`);
+  sortedUnique(period.eventKeys as string[], `${label}.eventKeys`);
   safeInteger(period.activePoints, `${label}.activePoints`, 0, 'INVALID_STATE');
   safeInteger(period.onlineMinutes, `${label}.onlineMinutes`, 0, 'INVALID_STATE');
   for (const key of ['activeClaimedRewardIds', 'onlineClaimedRewardIds'] as const) {
@@ -420,8 +442,9 @@ function assertState(catalog: DailyRewardCatalog, value: unknown): asserts value
   if (value.schemaVersion !== DAILY_REWARDS_SCHEMA_VERSION) fail('INVALID_STATE', 'unsupported daily reward state schemaVersion');
   assertDayKey(value.dayKey as string);
   if (value.weekKey !== weekKeyFromDayKey(value.dayKey as string)) fail('INVALID_STATE', 'state weekKey does not match dayKey');
-  assertPeriodState(catalog, value.daily, catalog.dailyTaskIds(value.dayKey as string), 'daily');
-  if (!isPlainRecord(value.weeklyTasks) || Object.keys(value.weeklyTasks).length !== catalog.weeklyTaskIds().length) fail('INVALID_STATE', 'weeklyTasks are incomplete');
+  assertPeriodState(catalog, value.daily, catalog.dailyTaskIds(value.dayKey as string), 'daily', value.dayKey as string);
+  if (!isPlainRecord(value.weeklyTasks)) fail('INVALID_STATE', 'weeklyTasks are incomplete');
+  exactKeys(value.weeklyTasks, catalog.weeklyTaskIds(), 'weeklyTasks', 'INVALID_STATE');
   for (const taskId of catalog.weeklyTaskIds()) assertTaskState(value.weeklyTasks[taskId], catalog.task(taskId), `weeklyTasks.${taskId}`);
   safeInteger(value.makeupCredits, 'makeupCredits', 0, 'INVALID_STATE');
   if ((value.makeupCredits as number) > catalog.config.makeupCreditsPerWeek) fail('INVALID_STATE', 'makeupCredits exceeds the configured weekly allowance');
@@ -429,7 +452,7 @@ function assertState(catalog: DailyRewardCatalog, value: unknown): asserts value
   for (const [dayKey, period] of Object.entries(value.expiredDays)) {
     assertDayKey(dayKey, `expiredDays.${dayKey}`);
     if (dayKey >= value.dayKey) fail('INVALID_STATE', 'expiredDays must be before current day');
-    assertPeriodState(catalog, period, catalog.dailyTaskIds(dayKey), `expiredDays.${dayKey}`);
+    assertPeriodState(catalog, period, catalog.dailyTaskIds(dayKey), `expiredDays.${dayKey}`, dayKey);
   }
   if (!isPlainRecord(value.rewardOutbox)) fail('INVALID_STATE', 'rewardOutbox must be an object');
   for (const [key, entry] of Object.entries(value.rewardOutbox)) {
@@ -437,16 +460,47 @@ function assertState(catalog: DailyRewardCatalog, value: unknown): asserts value
     exactKeys(entry, ['businessKey', 'source', 'sourceId', 'periodKey', 'rewardId', 'status'], `rewardOutbox.${key}`, 'INVALID_STATE');
     if (entry.businessKey !== key || !['TASK', 'ACTIVE', 'ONLINE'].includes(entry.source as string) || !['PENDING', 'ACKNOWLEDGED'].includes(entry.status as string)) fail('INVALID_STATE', `rewardOutbox.${key} is invalid`);
     identifier(entry.sourceId, `rewardOutbox.${key}.sourceId`, 'INVALID_STATE');
-    assertDayKey(entry.periodKey, `rewardOutbox.${key}.periodKey`);
-    catalog.reward(entry.rewardId as string);
+    identifier(entry.periodKey, `rewardOutbox.${key}.periodKey`, 'INVALID_STATE');
+    identifier(entry.rewardId, `rewardOutbox.${key}.rewardId`, 'INVALID_STATE');
+    const source = entry.source as DailyRewardSource;
+    const sourceId = entry.sourceId as string;
+    const periodKey = entry.periodKey as string;
+    let expectedBusinessKey: string;
+    let expectedRewardId: string;
+    if (source === 'TASK') {
+      const taskDefinition = catalog.config.tasks.find((task) => task.id === sourceId);
+      if (!taskDefinition) fail('INVALID_STATE', `rewardOutbox.${key} references an unknown task`);
+      if (taskDefinition.cycle === 'WEEKLY') {
+        assertWeekKey(periodKey, `rewardOutbox.${key}.periodKey`);
+        if (periodKey > value.weekKey || (periodKey === value.weekKey && !value.weeklyTasks[sourceId].claimed)) fail('INVALID_STATE', `rewardOutbox.${key} is not owned by the weekly task state`);
+      } else {
+        assertDayKey(periodKey, `rewardOutbox.${key}.periodKey`);
+        if (!catalog.dailyTaskIds(periodKey).includes(sourceId)) fail('INVALID_STATE', `rewardOutbox.${key} task was not selected for its period`);
+        const period = periodKey === value.dayKey ? value.daily : value.expiredDays[periodKey];
+        if (periodKey > value.dayKey || (period && !period.tasks[sourceId]?.claimed)) fail('INVALID_STATE', `rewardOutbox.${key} is not owned by the daily task state`);
+      }
+      expectedBusinessKey = `task:${periodKey}:${sourceId}`;
+      expectedRewardId = taskDefinition.rewardId;
+    } else {
+      assertDayKey(periodKey, `rewardOutbox.${key}.periodKey`);
+      const period = periodKey === value.dayKey ? value.daily : value.expiredDays[periodKey];
+      if (periodKey > value.dayKey) fail('INVALID_STATE', `rewardOutbox.${key} period is in the future`);
+      const table = source === 'ACTIVE' ? catalog.config.activeRewards : catalog.config.onlineRewards;
+      const threshold = table.find((reward) => reward.id === sourceId);
+      const claimedIds = period ? source === 'ACTIVE' ? period.activeClaimedRewardIds : period.onlineClaimedRewardIds : undefined;
+      if (!threshold || (period && claimedIds?.includes(sourceId) !== true)) fail('INVALID_STATE', `rewardOutbox.${key} is not owned by the threshold state`);
+      expectedBusinessKey = `${source.toLowerCase()}:${periodKey}:${sourceId}`;
+      expectedRewardId = threshold.rewardId;
+    }
+    if (entry.businessKey !== expectedBusinessKey || entry.rewardId !== expectedRewardId) fail('INVALID_STATE', `rewardOutbox.${key} has invalid ownership`);
   }
 }
 
 function canonicalState(state: DailyRewardState): DailyRewardState {
   const next = mutableState(state);
-  next.daily = { ...next.daily, taskIds: [...next.daily.taskIds].sort(), tasks: Object.fromEntries(Object.entries(next.daily.tasks).sort()), activeClaimedRewardIds: [...next.daily.activeClaimedRewardIds].sort(), onlineClaimedRewardIds: [...next.daily.onlineClaimedRewardIds].sort() };
+  next.daily = { ...next.daily, taskIds: [...next.daily.taskIds].sort(), tasks: Object.fromEntries(Object.entries(next.daily.tasks).sort()), eventKeys: [...next.daily.eventKeys].sort(), activeClaimedRewardIds: [...next.daily.activeClaimedRewardIds].sort(), onlineClaimedRewardIds: [...next.daily.onlineClaimedRewardIds].sort() };
   next.weeklyTasks = Object.fromEntries(Object.entries(next.weeklyTasks).sort());
-  next.expiredDays = Object.fromEntries(Object.entries(next.expiredDays).sort().map(([key, period]) => [key, { ...period, taskIds: [...period.taskIds].sort(), tasks: Object.fromEntries(Object.entries(period.tasks).sort()), activeClaimedRewardIds: [...period.activeClaimedRewardIds].sort(), onlineClaimedRewardIds: [...period.onlineClaimedRewardIds].sort() }]));
+  next.expiredDays = Object.fromEntries(Object.entries(next.expiredDays).sort().map(([key, period]) => [key, { ...period, taskIds: [...period.taskIds].sort(), tasks: Object.fromEntries(Object.entries(period.tasks).sort()), eventKeys: [...period.eventKeys].sort(), activeClaimedRewardIds: [...period.activeClaimedRewardIds].sort(), onlineClaimedRewardIds: [...period.onlineClaimedRewardIds].sort() }]));
   next.rewardOutbox = Object.fromEntries(Object.entries(next.rewardOutbox).sort());
   return freezeState(next);
 }
@@ -519,6 +573,12 @@ export class DailyRewardService {
   snapshot(): DailyRewardState { return this.current; }
   serialize(): string { return serializeDailyRewardState(this.current); }
   task(id: string, dayKey = this.current.dayKey): DailyTaskProgress {
+    assertDayKey(dayKey);
+    const definition = this.catalog.task(id);
+    if (definition.cycle === 'WEEKLY') {
+      if (dayKey !== this.current.dayKey) fail('EXPIRED', `weekly task period is unavailable: ${dayKey}`);
+      return this.current.weeklyTasks[id];
+    }
     const period = dayKey === this.current.dayKey ? this.current.daily : this.current.expiredDays[dayKey];
     if (!period) fail('EXPIRED', `daily task period is unavailable: ${dayKey}`);
     const task = period.tasks[id];
@@ -527,10 +587,14 @@ export class DailyRewardService {
   }
 
   refresh(dayKey: string): DailyRewardState {
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
     assertDayKey(dayKey);
     if (dayKey === this.current.dayKey) return this.current;
     if (dayKey < this.current.dayKey) fail('TIME_REWIND', 'daily reward clock cannot move backwards');
-    const next = mutableState(this.current);
+    return this.transition(() => this.commit(this.refreshMutable(mutableState(this.current), dayKey)));
+  }
+
+  private refreshMutable(next: MutableState, dayKey: string): MutableState {
     let cursor = next.dayKey;
     while (cursor < dayKey) {
       next.expiredDays[cursor] = clone(next.daily);
@@ -547,48 +611,64 @@ export class DailyRewardService {
     }
     next.dayKey = dayKey;
     for (const oldDay of Object.keys(next.expiredDays)) if (dayDistance(oldDay, dayKey) > this.catalog.config.makeupWindowDays) delete next.expiredDays[oldDay];
-    return this.commit(next);
+    return next;
   }
 
   record(event: DailyRewardEvent, dayKey = this.current.dayKey): DailyProgressResult {
-    if (!isPlainRecord(event)) fail('INVALID_EVENT', 'daily reward event must be an object');
-    if (!['LOGIN', 'BATTLE_WON', 'LEVEL_CLEARED', 'DECK_UPDATED', 'ONLINE_MINUTES'].includes(event.type)) fail('INVALID_EVENT', 'unsupported daily reward event type');
-    if (event.key !== undefined) identifier(event.key, 'event.key', 'INVALID_EVENT');
-    const amount = event.amount === undefined ? 1 : safeInteger(event.amount, 'event.amount', 1, 'INVALID_EVENT');
-    if (event.sourceTable !== undefined) identifier(event.sourceTable, 'event.sourceTable', 'INVALID_EVENT');
-    if (event.sourceId !== undefined) identifier(event.sourceId, 'event.sourceId', 'INVALID_EVENT');
-    if ((event.sourceTable === undefined) !== (event.sourceId === undefined)) fail('INVALID_EVENT', 'event sourceTable/sourceId must be paired');
-    if (dayKey !== this.current.dayKey) {
-      this.refresh(dayKey);
-      if (dayKey !== this.current.dayKey) fail('INVALID_EVENT', 'event day cannot be in the past');
-    }
-    const next = mutableState(this.current);
-    let changed = false;
-    let duplicate = false;
-    const applyTo = (progress: MutableTaskProgress, task: DailyTaskDefinition): void => {
-      if (!matchTrigger(task, event)) return;
-      const eventKey = event.key;
-      if (eventKey !== undefined) {
-        if (progress.eventKeys.includes(eventKey)) { duplicate = true; return; }
-        progress.eventKeys.push(eventKey);
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
+    return this.transition(() => {
+      if (!isPlainRecord(event)) fail('INVALID_EVENT', 'daily reward event must be an object');
+      allowedKeys(event, ['type', 'amount', 'key', 'sourceTable', 'sourceId'], 'daily reward event', 'INVALID_EVENT');
+      if (!['LOGIN', 'BATTLE_WON', 'LEVEL_CLEARED', 'DECK_UPDATED', 'ONLINE_MINUTES'].includes(event.type)) fail('INVALID_EVENT', 'unsupported daily reward event type');
+      if (event.key !== undefined) identifier(event.key, 'event.key', 'INVALID_EVENT');
+      const amount = event.amount === undefined ? 1 : safeInteger(event.amount, 'event.amount', 1, 'INVALID_EVENT');
+      if (event.sourceTable !== undefined) identifier(event.sourceTable, 'event.sourceTable', 'INVALID_EVENT');
+      if (event.sourceId !== undefined) identifier(event.sourceId, 'event.sourceId', 'INVALID_EVENT');
+      if ((event.sourceTable === undefined) !== (event.sourceId === undefined)) fail('INVALID_EVENT', 'event sourceTable/sourceId must be paired');
+      assertDayKey(dayKey);
+      const next = mutableState(this.current);
+      const dayChanged = dayKey !== this.current.dayKey;
+      if (dayChanged) {
+        if (dayKey < this.current.dayKey) fail('INVALID_EVENT', 'event day cannot be in the past');
+        this.refreshMutable(next, dayKey);
       }
-      const before = progress.progress;
-      progress.progress = Math.min(progress.target, progress.progress + amount);
-      progress.completed = progress.progress >= progress.target;
-      changed = true;
-      if (!progress.completed || before >= progress.target) return;
-      if (task.cycle === 'DAILY') next.daily.activePoints += task.activePoints;
-      else next.daily.activePoints += task.activePoints;
-    };
-    for (const taskId of next.daily.taskIds) applyTo(next.daily.tasks[taskId], this.catalog.task(taskId));
-    for (const taskId of this.catalog.weeklyTaskIds()) applyTo(next.weeklyTasks[taskId], this.catalog.task(taskId));
-    if (event.type === 'ONLINE_MINUTES') {
-      if (next.daily.onlineMinutes > Number.MAX_SAFE_INTEGER - amount) fail('INVALID_EVENT', 'online minutes would overflow');
-      next.daily.onlineMinutes += amount;
-      changed = true;
-    }
-    if (!changed) return { applied: false, code: duplicate ? 'DUPLICATE_EVENT' : 'NOOP', state: this.current };
-    return { applied: true, code: 'APPLIED', state: this.commit(next) };
+      let changed = false;
+      let duplicate = false;
+      const eventKey = event.key;
+      if (eventKey !== undefined && next.daily.eventKeys.includes(eventKey)) return { applied: false, code: 'DUPLICATE_EVENT', state: this.current };
+      const applyTo = (progress: MutableTaskProgress, task: DailyTaskDefinition): void => {
+        if (!matchTrigger(task, event)) return;
+        if (eventKey !== undefined) {
+          if (progress.eventKeys.includes(eventKey)) { duplicate = true; return; }
+          progress.eventKeys.push(eventKey);
+        }
+        const before = progress.progress;
+        progress.progress = Math.min(progress.target, progress.progress + amount);
+        progress.completed = progress.progress >= progress.target;
+        changed = true;
+        if (!progress.completed || before >= progress.target) return;
+        next.daily.activePoints += task.activePoints;
+      };
+      for (const taskId of next.daily.taskIds) applyTo(next.daily.tasks[taskId], this.catalog.task(taskId));
+      for (const taskId of this.catalog.weeklyTaskIds()) applyTo(next.weeklyTasks[taskId], this.catalog.task(taskId));
+      if (event.type === 'ONLINE_MINUTES' && !duplicate) {
+        if (next.daily.onlineMinutes > Number.MAX_SAFE_INTEGER - amount) fail('INVALID_EVENT', 'online minutes would overflow');
+        next.daily.onlineMinutes += amount;
+        changed = true;
+      }
+      if (eventKey !== undefined && changed) next.daily.eventKeys.push(eventKey);
+      if (!changed) {
+        if (dayChanged) return { applied: false, code: duplicate ? 'DUPLICATE_EVENT' : 'NOOP', state: this.commit(next) };
+        return { applied: false, code: duplicate ? 'DUPLICATE_EVENT' : 'NOOP', state: this.current };
+      }
+      return { applied: true, code: 'APPLIED', state: this.commit(next) };
+    });
+  }
+
+  private transition<T>(operation: () => T): T {
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
+    this.inTransition = true;
+    try { return operation(); } finally { this.inTransition = false; }
   }
 
   private commit(next: MutableState): DailyRewardState {
@@ -600,54 +680,65 @@ export class DailyRewardService {
   }
 
   private claim(source: DailyRewardSource, sourceId: string, periodKey: string, sink?: DailyRewardSink): DailyClaimResult {
-    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
-    const next = mutableState(this.current);
-    const period = source === 'TASK' && periodKey !== next.dayKey ? next.expiredDays[periodKey] : next.daily;
-    if (!period) return { applied: false, code: 'EXPIRED', source, sourceId, businessKey: `${source.toLowerCase()}:${periodKey}:${sourceId}`, state: this.current };
-    const businessKey = `${source.toLowerCase()}:${periodKey}:${sourceId}`;
-    const existing = next.rewardOutbox[businessKey];
-    if (existing) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
-    const rewardId = source === 'TASK' ? this.catalog.task(sourceId).rewardId
-      : source === 'ACTIVE' ? this.catalog.config.activeRewards.find((entry) => entry.id === sourceId)?.rewardId
-        : this.catalog.config.onlineRewards.find((entry) => entry.id === sourceId)?.rewardId;
-    if (!rewardId) fail(source === 'TASK' ? 'UNKNOWN_TASK' : 'UNKNOWN_THRESHOLD', `unknown ${source.toLowerCase()} reward source: ${sourceId}`);
-    const task = source === 'TASK' ? period.tasks[sourceId] : undefined;
-    if (source === 'TASK') {
-      if (!task) return { applied: false, code: 'TASK_NOT_AVAILABLE', source, sourceId, businessKey, state: this.current };
-      if (task.claimed) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
-      if (!task.completed) return { applied: false, code: 'NOT_READY', source, sourceId, businessKey, state: this.current };
-      if (periodKey !== next.dayKey) {
-        if (next.makeupCredits <= 0) return { applied: false, code: 'MAKEUP_UNAVAILABLE', source, sourceId, businessKey, state: this.current };
-        next.makeupCredits -= 1;
+    return this.transition(() => {
+      const next = mutableState(this.current);
+      const taskDefinition = source === 'TASK' ? this.catalog.task(sourceId) : undefined;
+      const period = source === 'TASK'
+        ? taskDefinition!.cycle === 'WEEKLY' ? (periodKey === next.weekKey ? next.daily : undefined) : (periodKey !== next.dayKey ? next.expiredDays[periodKey] : next.daily)
+        : next.daily;
+      if (!period) return { applied: false, code: 'EXPIRED', source, sourceId, businessKey: `${source.toLowerCase()}:${periodKey}:${sourceId}`, state: this.current };
+      const businessKey = `${source.toLowerCase()}:${periodKey}:${sourceId}`;
+      const existing = next.rewardOutbox[businessKey];
+      if (existing) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
+      const rewardId = taskDefinition?.rewardId
+        ?? (source === 'ACTIVE' ? this.catalog.config.activeRewards.find((entry) => entry.id === sourceId)?.rewardId
+          : this.catalog.config.onlineRewards.find((entry) => entry.id === sourceId)?.rewardId);
+      if (!rewardId) fail(source === 'TASK' ? 'UNKNOWN_TASK' : 'UNKNOWN_THRESHOLD', `unknown ${source.toLowerCase()} reward source: ${sourceId}`);
+      const task = source === 'TASK' ? taskDefinition!.cycle === 'WEEKLY' ? next.weeklyTasks[sourceId] : period.tasks[sourceId] : undefined;
+      if (source === 'TASK') {
+        if (!task) return { applied: false, code: 'TASK_NOT_AVAILABLE', source, sourceId, businessKey, state: this.current };
+        if (task.claimed) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
+        if (!task.completed) return { applied: false, code: 'NOT_READY', source, sourceId, businessKey, state: this.current };
+        if (taskDefinition!.cycle === 'DAILY' && periodKey !== next.dayKey) {
+          if (next.makeupCredits <= 0) return { applied: false, code: 'MAKEUP_UNAVAILABLE', source, sourceId, businessKey, state: this.current };
+          next.makeupCredits -= 1;
+        }
+        task.claimed = true;
+      } else {
+        const table = source === 'ACTIVE' ? this.catalog.config.activeRewards : this.catalog.config.onlineRewards;
+        const threshold = table.find((entry) => entry.id === sourceId);
+        if (!threshold) fail('UNKNOWN_THRESHOLD', `unknown ${source.toLowerCase()} reward source: ${sourceId}`);
+        const claimedIds = source === 'ACTIVE' ? period.activeClaimedRewardIds : period.onlineClaimedRewardIds;
+        const currentValue = source === 'ACTIVE' ? period.activePoints : period.onlineMinutes;
+        if (claimedIds.includes(sourceId)) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
+        if (currentValue < threshold.threshold) return { applied: false, code: 'NOT_READY', source, sourceId, businessKey, state: this.current };
+        claimedIds.push(sourceId);
       }
-      task.claimed = true;
-    } else {
-      const table = source === 'ACTIVE' ? this.catalog.config.activeRewards : this.catalog.config.onlineRewards;
-      const threshold = table.find((entry) => entry.id === sourceId);
-      if (!threshold) fail('UNKNOWN_THRESHOLD', `unknown ${source.toLowerCase()} reward source: ${sourceId}`);
-      const claimedIds = source === 'ACTIVE' ? period.activeClaimedRewardIds : period.onlineClaimedRewardIds;
-      const currentValue = source === 'ACTIVE' ? period.activePoints : period.onlineMinutes;
-      if (claimedIds.includes(sourceId)) return { applied: false, code: 'DUPLICATE', source, sourceId, businessKey, state: this.current };
-      if (currentValue < threshold.threshold) return { applied: false, code: 'NOT_READY', source, sourceId, businessKey, state: this.current };
-      claimedIds.push(sourceId);
-    }
-    next.rewardOutbox[businessKey] = { businessKey, source, sourceId, periodKey, rewardId, status: 'PENDING' };
-    this.inTransition = true;
-    try {
+      next.rewardOutbox[businessKey] = { businessKey, source, sourceId, periodKey, rewardId, status: 'PENDING' };
       const state = this.commit(next);
       if (sink) {
         try { sink(this.catalog.reward(rewardId), state.rewardOutbox[businessKey]); }
         catch (error) { fail('REWARD_FAILED', 'daily reward delivery failed', error); }
       }
       return { applied: true, code: 'APPLIED', source, sourceId, businessKey, state: this.current };
-    } finally { this.inTransition = false; }
+    });
   }
 
   claimTask(taskId: string, optionsOrSink?: { readonly dayKey?: string; readonly makeup?: boolean } | DailyRewardSink, sink?: DailyRewardSink): DailyClaimResult {
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
+    if (optionsOrSink !== undefined && typeof optionsOrSink !== 'function' && !isPlainRecord(optionsOrSink)) fail('INVALID_ARGUMENT', 'claim options must be an object');
     const options = typeof optionsOrSink === 'function' ? {} : optionsOrSink ?? {};
+    if (typeof optionsOrSink !== 'function') allowedKeys(options as Record<string, unknown>, ['dayKey', 'makeup'], 'claim options', 'INVALID_ARGUMENT');
+    if (options.dayKey !== undefined) assertDayKey(options.dayKey);
+    if (options.makeup !== undefined && typeof options.makeup !== 'boolean') fail('INVALID_ARGUMENT', 'claim options.makeup must be a boolean');
     const delivery = typeof optionsOrSink === 'function' ? optionsOrSink : sink;
+    if (delivery !== undefined && typeof delivery !== 'function') fail('INVALID_ARGUMENT', 'reward sink must be a function');
+    const definition = this.catalog.task(taskId);
+    if (definition.cycle === 'WEEKLY') {
+      if (options.dayKey !== undefined && options.dayKey !== this.current.dayKey) return { applied: false, code: 'EXPIRED', source: 'TASK', sourceId: taskId, businessKey: `task:${this.current.weekKey}:${taskId}`, state: this.current };
+      return this.claim('TASK', taskId, this.current.weekKey, delivery);
+    }
     const periodKey = options.dayKey ?? this.current.dayKey;
-    assertDayKey(periodKey);
     if (periodKey !== this.current.dayKey) {
       if (!options.makeup) return { applied: false, code: 'EXPIRED', source: 'TASK', sourceId: taskId, businessKey: `task:${periodKey}:${taskId}`, state: this.current };
       if (dayDistance(periodKey, this.current.dayKey) > this.catalog.config.makeupWindowDays) return { applied: false, code: 'EXPIRED', source: 'TASK', sourceId: taskId, businessKey: `task:${periodKey}:${taskId}`, state: this.current };
@@ -664,24 +755,31 @@ export class DailyRewardService {
   }
 
   acknowledgeReward(businessKey: string): { readonly applied: boolean; readonly code: 'APPLIED' | 'DUPLICATE'; readonly state: DailyRewardState } {
-    identifier(businessKey, 'businessKey', 'INVALID_ARGUMENT');
-    const entry = this.current.rewardOutbox[businessKey];
-    if (!entry) fail('UNKNOWN_OUTBOX_ENTRY', `unknown daily reward outbox entry: ${businessKey}`);
-    if (entry.status === 'ACKNOWLEDGED') return { applied: false, code: 'DUPLICATE', state: this.current };
-    const next = mutableState(this.current);
-    next.rewardOutbox[businessKey].status = 'ACKNOWLEDGED';
-    return { applied: true, code: 'APPLIED', state: this.commit(next) };
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
+    return this.transition(() => {
+      identifier(businessKey, 'businessKey', 'INVALID_ARGUMENT');
+      const entry = this.current.rewardOutbox[businessKey];
+      if (!entry) fail('UNKNOWN_OUTBOX_ENTRY', `unknown daily reward outbox entry: ${businessKey}`);
+      if (entry.status === 'ACKNOWLEDGED') return { applied: false, code: 'DUPLICATE', state: this.current };
+      const next = mutableState(this.current);
+      next.rewardOutbox[businessKey].status = 'ACKNOWLEDGED';
+      return { applied: true, code: 'APPLIED', state: this.commit(next) };
+    });
   }
 
   flushRewards(sink: DailyRewardSink): readonly DailyRewardFlushResult[] {
+    if (this.inTransition) fail('REENTRANT', 'daily reward transition is reentrant');
     if (typeof sink !== 'function') fail('INVALID_ARGUMENT', 'reward sink must be a function');
-    const results: DailyRewardFlushResult[] = [];
-    for (const entry of Object.values(this.current.rewardOutbox).sort((left, right) => left.businessKey.localeCompare(right.businessKey))) {
-      if (entry.status === 'ACKNOWLEDGED') continue;
-      try { sink(this.catalog.reward(entry.rewardId), entry); results.push({ code: 'DELIVERED', businessKey: entry.businessKey, state: this.current }); }
-      catch { results.push({ code: 'FAILED', businessKey: entry.businessKey, state: this.current }); }
-    }
-    return Object.freeze(results);
+    return this.transition(() => {
+      const results: DailyRewardFlushResult[] = [];
+      const entries = Object.values(this.current.rewardOutbox).sort((left, right) => left.businessKey.localeCompare(right.businessKey));
+      for (const entry of entries) {
+        if (entry.status === 'ACKNOWLEDGED') continue;
+        try { sink(this.catalog.reward(entry.rewardId), entry); results.push({ code: 'DELIVERED', businessKey: entry.businessKey, state: this.current }); }
+        catch { results.push({ code: 'FAILED', businessKey: entry.businessKey, state: this.current }); }
+      }
+      return Object.freeze(results);
+    });
   }
 }
 

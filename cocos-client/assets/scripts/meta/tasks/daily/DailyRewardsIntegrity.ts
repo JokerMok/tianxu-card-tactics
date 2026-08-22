@@ -3,17 +3,25 @@ import type { DailyRewardCatalogConfig } from './DailyRewards.ts';
 
 function compare(left: string, right: string): number { return left < right ? -1 : left > right ? 1 : 0; }
 
+function stableValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stableValue);
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value as Record<string, unknown>).sort(compare).map((key) => [key, stableValue((value as Record<string, unknown>)[key])]));
+  }
+  return value;
+}
+
 function canonical(value: DailyRewardCatalogConfig): string {
-  return JSON.stringify({
+  return JSON.stringify(stableValue({
     schemaVersion: value.schemaVersion,
     dailySelectionCount: value.dailySelectionCount,
     makeupWindowDays: value.makeupWindowDays,
     makeupCreditsPerWeek: value.makeupCreditsPerWeek,
-    tasks: [...value.tasks].map((task) => ({ ...task, trigger: { ...task.trigger } })).sort((a, b) => compare(a.id, b.id)),
-    rewards: [...value.rewards].sort((a, b) => compare(a.id, b.id)),
-    activeRewards: [...value.activeRewards].sort((a, b) => compare(a.id, b.id)),
-    onlineRewards: [...value.onlineRewards].sort((a, b) => compare(a.id, b.id)),
-  });
+    tasks: [...value.tasks].sort((a, b) => compare(a.id, b.id)).map(stableValue),
+    rewards: [...value.rewards].sort((a, b) => compare(a.id, b.id)).map(stableValue),
+    activeRewards: [...value.activeRewards].sort((a, b) => compare(a.id, b.id)).map(stableValue),
+    onlineRewards: [...value.onlineRewards].sort((a, b) => compare(a.id, b.id)).map(stableValue),
+  }));
 }
 
 function fnv1a(value: string): string {
@@ -51,7 +59,7 @@ function skeletonOf(value: DailyRewardCatalogConfig): DailyRewardCatalogSkeleton
 }
 
 export const DAILY_REWARDS_PRODUCTION_SKELETON: DailyRewardCatalogSkeleton = Object.freeze(skeletonOf(DAILY_REWARDS_CONFIG));
-export const DAILY_REWARDS_PRODUCTION_DIGEST = 'f8997b66' as const;
+export const DAILY_REWARDS_PRODUCTION_DIGEST = '3eb87f24' as const;
 
 function listDiff(expected: readonly string[], actual: readonly string[]): { added: string[]; removed: string[] } {
   const expectedSet = new Set(expected);
@@ -70,8 +78,8 @@ export function diffDailyRewardConfig(expected: DailyRewardCatalogConfig, actual
     removed.push(...diff.removed.map((id) => `${key}:${id}`));
   }
   const changed: string[] = [];
-  const expectedById = new Map([...expected.tasks, ...expected.rewards, ...expected.activeRewards, ...expected.onlineRewards].map((item) => [item.id, JSON.stringify(item)]));
-  const actualById = new Map([...actual.tasks, ...actual.rewards, ...actual.activeRewards, ...actual.onlineRewards].map((item) => [item.id, JSON.stringify(item)]));
+  const expectedById = new Map([...expected.tasks, ...expected.rewards, ...expected.activeRewards, ...expected.onlineRewards].map((item) => [item.id, JSON.stringify(stableValue(item))]));
+  const actualById = new Map([...actual.tasks, ...actual.rewards, ...actual.activeRewards, ...actual.onlineRewards].map((item) => [item.id, JSON.stringify(stableValue(item))]));
   for (const id of [...expectedById.keys()].sort(compare)) if (expectedById.has(id) && actualById.has(id) && expectedById.get(id) !== actualById.get(id)) changed.push(id);
   return Object.freeze({ added: Object.freeze(added.sort(compare)), removed: Object.freeze(removed.sort(compare)), changed: Object.freeze(changed.sort(compare)) });
 }
