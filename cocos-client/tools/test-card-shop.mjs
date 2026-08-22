@@ -38,7 +38,7 @@ const {
 
 const toolsRoot = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(toolsRoot, '..');
-const allowedPaths = ['assets/scripts/meta/shop/', 'tools/test-card-shop.mjs'];
+const allowedPaths = ['cocos-client/assets/scripts/meta/shop/', 'cocos-client/tools/test-card-shop.mjs'];
 
 function clone(value) { return structuredClone(value); }
 
