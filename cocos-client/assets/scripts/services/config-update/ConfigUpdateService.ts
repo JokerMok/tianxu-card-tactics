@@ -26,6 +26,9 @@ export class ConfigUpdateError extends Error {
   }
 }
 
+class ConfigReplayError extends ConfigUpdateError {
+}
+
 export interface ConfigBundle {
   bundleId: string;
   tenantId: string;
@@ -276,9 +279,9 @@ export class ConfigUpdateClientService {
     const bundle = validateBundle(value);
     const requestFingerprint = fingerprint({ operation: 'apply', configKey: bundle.configKey, bundle });
     try {
-      this.assertUsable(bundle.configKey);
       const replay = this.replay<ApplyConfigResult>('apply', id, requestFingerprint, bundle.configKey);
       if (replay) return replay;
+      this.assertUsable(bundle.configKey);
       this.validateCommon(bundle);
       const current = this.states.get(bundle.configKey)?.active ?? null;
       if (current && compareVersions(bundle.version, current.version) < 0) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version cannot move backwards without rollback');
@@ -353,8 +356,10 @@ export class ConfigUpdateClientService {
       this.recordAudit({ event: 'apply', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'accepted' });
       return clone(result);
     } catch (error) {
-      if (error instanceof ConfigUpdateError) this.storeFailure('apply', id, requestFingerprint, error);
-      this.recordAudit({ event: 'apply', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
+      if (error instanceof ConfigUpdateError && !(error instanceof ConfigReplayError)) this.storeFailure('apply', id, requestFingerprint, error);
+      if (!(error instanceof ConfigReplayError)) {
+        this.recordAudit({ event: 'apply', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
+      }
       throw error;
     }
   }
@@ -362,11 +367,11 @@ export class ConfigUpdateClientService {
   rollback(requestId: string, configKeyInput: string): RollbackConfigResult {
     const requestIdValue = validText(requestId, 'requestId');
     const configKey = validConfigKey(configKeyInput);
-    this.assertUsable(configKey);
-    const state = this.states.get(configKey);
     const requestFingerprint = fingerprint({ operation: 'rollback', configKey });
     const replay = this.replay<RollbackConfigResult>('rollback', requestIdValue, requestFingerprint, configKey);
     if (replay) return replay;
+    this.assertUsable(configKey);
+    const state = this.states.get(configKey);
     if (!state?.previous) {
       const error = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ROLLBACK_UNAVAILABLE, 'no previous config is available');
       this.storeFailure('rollback', requestIdValue, requestFingerprint, error);
@@ -476,8 +481,10 @@ export class ConfigUpdateClientService {
       this.recordAudit({ event: 'recover', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'recovered' });
       return clone(result);
     } catch (error) {
-      if (error instanceof ConfigUpdateError) this.storeFailure('recover', id, requestFingerprint, error);
-      this.recordAudit({ event: 'recover', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
+      if (error instanceof ConfigUpdateError && !(error instanceof ConfigReplayError)) this.storeFailure('recover', id, requestFingerprint, error);
+      if (!(error instanceof ConfigReplayError)) {
+        this.recordAudit({ event: 'recover', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
+      }
       throw error;
     }
   }
@@ -547,17 +554,23 @@ export class ConfigUpdateClientService {
 
   private replay<T extends ApplyConfigResult | RollbackConfigResult | RecoverConfigResult>(operation: ConfigOperation, requestId: string, requestFingerprint: string, configKey: string): T | null {
     const existingOperation = this.requestOperations.get(requestId);
-    if (existingOperation !== undefined && existingOperation !== operation) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+    if (existingOperation !== undefined && existingOperation !== operation) {
+      const error = new ConfigReplayError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+      this.recordAudit({ event: operation, operation, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
+      throw error;
+    }
     const namespace = this.requestNamespace(operation, requestId);
     const stored = this.requests.get(namespace);
     const failed = this.failedRequests.get(namespace);
     if (!stored && !failed) return null;
     if ((stored !== undefined && stored.operation !== operation) || (failed !== undefined && failed.operation !== operation)
       || (stored?.fingerprint ?? failed?.fingerprint) !== requestFingerprint) {
-      throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used for another request');
+      const error = new ConfigReplayError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used for another request');
+      this.recordAudit({ event: operation, operation, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
+      throw error;
     }
     if (failed) {
-      const error = new ConfigUpdateError(failed.code, failed.message);
+      const error = new ConfigReplayError(failed.code, failed.message);
       this.recordAudit({ event: operation, operation, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason: error.message });
       throw error;
     }
