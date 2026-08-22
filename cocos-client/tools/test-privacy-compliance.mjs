@@ -196,6 +196,36 @@ for (const mode of ['delete-other', 'change-other', 'unknown-addition']) {
   assertQuarantined(faultyCorrectionService, `failed correction on ${mode} must quarantine the service`);
 }
 
+class MutatingExpiredDuringPurgeStore extends InMemoryPrivacyDataStore {
+  purgeExpired(now) {
+    const expired = super.read('purge-mutated-expired');
+    super.replace({ ...expired, data: { value: 99 }, updatedAt: 2, retentionUntil: 100 });
+    return super.purgeExpired(now);
+  }
+}
+
+const purgeMutationBefore = [
+  { subjectId: 'purge-mutated-expired', data: { value: 1 }, updatedAt: 1, retentionUntil: 100 },
+  { subjectId: 'purge-mutated-live', data: { value: 2 }, updatedAt: 1, retentionUntil: 200 },
+];
+const purgeMutationStore = new MutatingExpiredDuringPurgeStore(purgeMutationBefore);
+const purgeMutationService = new ComplianceService({ store: purgeMutationStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+expectCode('purge must compare the complete content of removed expired records', () => purgeMutationService.purgeExpired(operator, 'purge-mutated-content'), 'STORE_FAILURE');
+assertStoreSnapshot(purgeMutationStore, purgeMutationBefore, 'failed purge must restore the complete snapshot after an expired record mutation');
+assertQuarantined(purgeMutationService, 'expired record mutation during purge must quarantine the service');
+
+const unverifiablePurgeStore = {
+  records: new Map([['purge-unverifiable', { subjectId: 'purge-unverifiable', data: { value: 1 }, updatedAt: 1, retentionUntil: 100 }]]),
+  read(subjectId) { const record = this.records.get(subjectId); return record ? { ...record, data: { ...record.data } } : null; },
+  replace(record) { this.records.set(record.subjectId, { ...record, data: { ...record.data } }); },
+  remove(subjectId) { this.records.delete(subjectId); },
+  list() { return [...this.records.values()].map((record) => ({ ...record, data: { ...record.data } })); },
+};
+const unverifiablePurgeService = new ComplianceService({ store: unverifiablePurgeStore, operatorToken: OPERATOR_TOKEN, now: () => 100 });
+expectCode('purge must fail closed when fallback removal has no removed snapshot', () => unverifiablePurgeService.purgeExpired(operator, 'purge-unverifiable'), 'STORE_FAILURE');
+assert.deepEqual(unverifiablePurgeStore.read('purge-unverifiable'), { subjectId: 'purge-unverifiable', data: { value: 1 }, updatedAt: 1, retentionUntil: 100 }, 'unverifiable fallback purge must restore the original record');
+assertQuarantined(unverifiablePurgeService, 'unverifiable fallback purge must quarantine the service');
+
 class MutatingOtherDuringTargetReadStore extends InMemoryPrivacyDataStore {
   mutated = false;
   read(subjectId) {
@@ -361,6 +391,25 @@ for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
     const quarantine = transactionService.auditLog(operator).find((event) => event.action === 'store_quarantine');
     assert.equal(quarantine?.occurredAt, transactionTick === 99 ? 100 : 101, `withTransaction clock ${label} must preserve the monotonic observedNow watermark`);
     expectCode(`quarantined ${operation} must not return a transaction result`, () => transactionService[operation](transactionSubject, { ...request, requestId: `${request.requestId}-retry` }), 'STORE_FAILURE');
+  }
+}
+
+for (const [label, transactionTick] of [['rollback', 99], ['forward', 101]]) {
+  for (const operation of ['correct', 'purge']) {
+    let clockCalls = 0;
+    const mutationStore = operation === 'correct'
+      ? new InMemoryPrivacyDataStore([{ subjectId: 'mutation-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 1_000 }])
+      : new InMemoryPrivacyDataStore([{ subjectId: 'mutation-clock', data: { safe: true }, updatedAt: 1, retentionUntil: 100 }]);
+    const mutationService = new ComplianceService({
+      store: mutationStore,
+      operatorToken: OPERATOR_TOKEN,
+      now: () => { clockCalls += 1; return clockCalls === 1 ? 100 : transactionTick; },
+    });
+    expectCode(`mutation ${operation} must fail on ${label} during final clock check`, () => operation === 'correct'
+      ? mutationService.correctData({ kind: 'subject', subjectId: 'mutation-clock' }, { subjectId: 'mutation-clock', requestId: `mutation-clock-${operation}-${label}`, data: { safe: false } })
+      : mutationService.purgeExpired(operator, `mutation-clock-${operation}-${label}`), 'STORE_FAILURE');
+    assert.deepEqual(mutationStore.read('mutation-clock'), { subjectId: 'mutation-clock', data: { safe: true }, updatedAt: 1, retentionUntil: operation === 'correct' ? 1_000 : 100 }, `failed ${operation} on ${label} must restore its store snapshot`);
+    assertQuarantined(mutationService, `failed ${operation} on ${label} must quarantine the service`);
   }
 }
 
