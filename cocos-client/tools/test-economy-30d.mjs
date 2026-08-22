@@ -57,8 +57,8 @@ function assertScope() {
     const changed = [...new Set([...committed, ...working, ...staged])];
     const allowed = (path) => path.startsWith(`${scopePrefix}assets/scripts/simulation/economy/`) || path === `${scopePrefix}tools/test-economy-30d.mjs`;
     assert.deepEqual(changed.filter((path) => !allowed(path)), [], `scope violation: ${changed.filter((path) => !allowed(path)).join(', ')}`);
-    assert.equal(changed.includes('tools/test-economy-30d.mjs'), true, 'economy harness must be part of the change');
-    assert.equal(changed.some((path) => path.startsWith('assets/scripts/simulation/economy/')), true, 'economy module must be part of the change');
+    assert.equal(changed.includes(`${scopePrefix}tools/test-economy-30d.mjs`), true, 'economy harness must be part of the change');
+    assert.equal(changed.some((path) => path.startsWith(`${scopePrefix}assets/scripts/simulation/economy/`)), true, 'economy module must be part of the change');
 }
 
 function assertConfiguration() {
