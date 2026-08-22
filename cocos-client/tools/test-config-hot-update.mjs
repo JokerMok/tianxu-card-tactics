@@ -85,6 +85,10 @@ expectCode(() => backend.publish({ requestId: 'pub-1', actorId: 'ops', bundle: s
 backendReplayAudit = backend.auditLog().findLast((entry) => entry.requestId === 'pub-1');
 assert.deepEqual({ operation: backendReplayAudit.operation, requestId: backendReplayAudit.requestId, configKey: backendReplayAudit.configKey, replayed: backendReplayAudit.replayed, result: backendReplayAudit.result, outcome: backendReplayAudit.outcome }, { operation: 'publish', requestId: 'pub-1', configKey: 'other-config', replayed: true, result: 'rejected', outcome: 'rejected' }, 'backend cross-config replay conflict must be audited');
 assert.match(backendReplayAudit.reason, /another request/);
+expectCode(() => backend.publish({ requestId: 'pub-1', actorId: 'ops', bundle: { ...first, configKey: 'other-config', payload: null } }), BACKEND_CODES.REQUEST_ID_REUSED, 'malformed cross-config publish must be rejected by the request ledger');
+backendReplayAudit = backend.auditLog().findLast((entry) => entry.requestId === 'pub-1');
+assert.deepEqual({ operation: backendReplayAudit.operation, configKey: backendReplayAudit.configKey, replayed: backendReplayAudit.replayed, result: backendReplayAudit.result }, { operation: 'publish', configKey: 'other-config', replayed: true, result: 'rejected' }, 'malformed cross-config publish replay must be audited before bundle validation');
+assert.deepEqual(backend.publish({ requestId: 'pub-1', actorId: 'ops', bundle: first }), { ...published, replayed: true }, 'malformed replay conflict must not overwrite the original backend ledger');
 expectCode(() => backend.fetch({ requestId: 'pub-1', configKey: first.configKey, clientId: 'player-1', clientVersion: '1.0.0', authToken: 'auth:tenant-a:player-1' }), BACKEND_CODES.REQUEST_ID_REUSED);
 backendReplayAudit = backend.auditLog().findLast((entry) => entry.requestId === 'pub-1');
 assert.deepEqual({ operation: backendReplayAudit.operation, requestId: backendReplayAudit.requestId, configKey: backendReplayAudit.configKey, replayed: backendReplayAudit.replayed, result: backendReplayAudit.result, outcome: backendReplayAudit.outcome }, { operation: 'fetch', requestId: 'pub-1', configKey: first.configKey, replayed: true, result: 'rejected', outcome: 'rejected' }, 'backend cross-operation replay conflict must be audited');
@@ -166,6 +170,10 @@ expectCode(() => client.apply('apply-1', signed({ configKey: 'other-config', bun
 const applyCrossConfigReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'apply-1');
 assert.deepEqual({ operation: applyCrossConfigReplayAudit.operation, configKey: applyCrossConfigReplayAudit.configKey, replayed: applyCrossConfigReplayAudit.replayed, result: applyCrossConfigReplayAudit.result }, { operation: 'apply', configKey: 'other-config', replayed: true, result: 'rejected' }, 'client cross-config replay conflict must be audited');
 assert.match(applyCrossConfigReplayAudit.reason, /another request/);
+expectCode(() => client.apply('apply-1', { ...release, configKey: 'other-config', payload: null }), CLIENT_CODES.REQUEST_ID_REUSED, 'malformed cross-config apply must be rejected by the request ledger');
+const malformedApplyCrossReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'apply-1');
+assert.deepEqual({ operation: malformedApplyCrossReplayAudit.operation, configKey: malformedApplyCrossReplayAudit.configKey, replayed: malformedApplyCrossReplayAudit.replayed, result: malformedApplyCrossReplayAudit.result }, { operation: 'apply', configKey: 'other-config', replayed: true, result: 'rejected' }, 'malformed cross-config apply replay must be audited before bundle validation');
+assert.deepEqual(client.apply('apply-1', release), { ...clientApplied, replayed: true }, 'malformed apply replay conflict must not overwrite the original client ledger');
 expectCode(() => client.apply('apply-1', signed({ bundleId: 'other', version: '1.4.0' })), CLIENT_CODES.REQUEST_ID_REUSED);
 expectCode(() => client.apply('client-tamper', { ...release, payload: { damageMultiplier: 999 } }), CLIENT_CODES.SIGNATURE_INVALID);
 expectCode(() => client.apply('client-outdated', signed({ bundleId: 'old-client', version: '1.4.0', minClientVersion: '3.0.0' })), CLIENT_CODES.CLIENT_OUTDATED);
@@ -202,6 +210,10 @@ assert.deepEqual(client.recover('client-recover', release), { recovered: true, r
 assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: true, configKey: release.configKey, version: release.version });
 const recoverReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'client-recover');
 assert.deepEqual({ operation: recoverReplayAudit.operation, replayed: recoverReplayAudit.replayed, result: recoverReplayAudit.result }, { operation: 'recover', replayed: true, result: 'replayed' }, 'recover replay must remain auditable after quarantine clears');
+expectCode(() => client.recover('client-recover', { ...release, configKey: 'other-config', payload: null }), CLIENT_CODES.REQUEST_ID_REUSED, 'malformed cross-config recover must be rejected by the request ledger');
+const malformedRecoverCrossReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'client-recover');
+assert.deepEqual({ operation: malformedRecoverCrossReplayAudit.operation, configKey: malformedRecoverCrossReplayAudit.configKey, replayed: malformedRecoverCrossReplayAudit.replayed, result: malformedRecoverCrossReplayAudit.result }, { operation: 'recover', configKey: 'other-config', replayed: true, result: 'rejected' }, 'malformed cross-config recover replay must be audited before bundle validation');
+assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: true, configKey: release.configKey, version: release.version }, 'malformed recover replay conflict must not overwrite the original client ledger');
 expectCode(() => client.recover('client-recover', signed({ configKey: 'other-config', bundleId: 'recover-other-config-reuse', version: '1.0.0', minClientVersion: '1.0.0' })), CLIENT_CODES.REQUEST_ID_REUSED);
 const recoverCrossConfigReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'client-recover');
 assert.deepEqual({ operation: recoverCrossConfigReplayAudit.operation, configKey: recoverCrossConfigReplayAudit.configKey, replayed: recoverCrossConfigReplayAudit.replayed, result: recoverCrossConfigReplayAudit.result }, { operation: 'recover', configKey: 'other-config', replayed: true, result: 'rejected' }, 'client recover cross-config replay conflict must be audited');

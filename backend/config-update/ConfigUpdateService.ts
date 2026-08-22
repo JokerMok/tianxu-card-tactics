@@ -212,6 +212,11 @@ function validConfigKey(value: unknown): string {
   return key;
 }
 
+function requestConfigKeyHint(value: unknown): string {
+  if (typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(value)) return value;
+  return '<invalid-config-key>';
+}
+
 function validTimestamp(value: unknown, label: string): number {
   if (!Number.isSafeInteger(value) || (value as number) < 0) {
     throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, `${label} is invalid`);
@@ -300,6 +305,10 @@ function scopeKey(tenantId: string, configKey: string): string {
 
 function fingerprint(value: unknown): string { return stableJson(value); }
 
+function safeFingerprint(value: unknown): string {
+  try { return fingerprint(value); } catch { return '<unserializable-request>'; }
+}
+
 export function createConfigSignature(bundle: ConfigBundle | UnsignedConfigBundle, privateKey: string | object): string {
   try {
     const key = typeof privateKey === 'string' ? createPrivateKey(privateKey) : privateKey;
@@ -331,6 +340,8 @@ export class ConfigUpdateService {
   private readonly active = new Map<string, ConfigBundle>();
   private readonly requests = new Map<string, StoredRequest>();
   private readonly failedRequests = new Map<string, StoredError>();
+  private readonly requestOperations = new Map<string, ConfigAuditEvent['event']>();
+  private readonly requestConfigKeys = new Map<string, string>();
   private readonly audit: ConfigAuditEvent[] = [];
   private auditSequence = 0;
 
@@ -358,11 +369,14 @@ export class ConfigUpdateService {
 
   publish(request: PublishConfigRequest): PublishConfigResult {
     const requestId = validText(request?.requestId, 'requestId');
+    const rawBundle = (request as { bundle?: unknown } | null | undefined)?.bundle;
+    const configKeyHint = requestConfigKeyHint((rawBundle as { configKey?: unknown } | null | undefined)?.configKey);
+    this.beginRequest('publish', requestId, configKeyHint);
+    const replay = this.replay<PublishConfigResult>(requestId, safeFingerprint({ actorId: request?.actorId, bundle: rawBundle }), 'publish', configKeyHint);
+    if (replay) return replay;
     const actorId = validText(request?.actorId, 'actorId');
     const bundle = validateConfigBundle(request?.bundle);
     const requestFingerprint = fingerprint({ actorId, bundle });
-    const replay = this.replay<PublishConfigResult>(requestId, requestFingerprint, 'publish', bundle.configKey);
-    if (replay) return replay;
     try {
       const publicKey = this.publicKeys.get(bundle.keyId);
       if (!publicKey || !verifyConfigSignature(bundle, publicKey)) {
@@ -391,6 +405,7 @@ export class ConfigUpdateService {
 
   fetch(request: FetchConfigRequest): FetchConfigResult {
     const requestId = validText(request?.requestId, 'requestId');
+    this.beginRequest('fetch', requestId, requestConfigKeyHint((request as { configKey?: unknown } | null | undefined)?.configKey));
     const configKey = validConfigKey(request?.configKey);
     const clientId = validText(request?.clientId, 'clientId');
     const clientVersion = validText(request?.clientVersion, 'clientVersion');
@@ -435,14 +450,16 @@ export class ConfigUpdateService {
 
   rollback(request: RollbackConfigRequest): RollbackConfigResult {
     const requestId = validText(request?.requestId, 'requestId');
+    const configKeyHint = requestConfigKeyHint((request as { configKey?: unknown } | null | undefined)?.configKey);
+    this.beginRequest('rollback', requestId, configKeyHint);
+    const replay = this.replay<RollbackConfigResult>(requestId, safeFingerprint({ actorId: request?.actorId, tenantId: request?.tenantId, configKey: request?.configKey, targetVersion: request?.targetVersion }), 'rollback', configKeyHint);
+    if (replay) return replay;
     const actorId = validText(request?.actorId, 'actorId');
     const tenantId = validText(request?.tenantId, 'tenantId');
     const configKey = validConfigKey(request?.configKey);
     const targetVersion = request?.targetVersion === undefined ? undefined : validText(request.targetVersion, 'targetVersion');
     if (targetVersion !== undefined) parseVersion(targetVersion);
     const requestFingerprint = fingerprint({ actorId, tenantId, configKey, targetVersion });
-    const replay = this.replay<RollbackConfigResult>(requestId, requestFingerprint, 'rollback', configKey);
-    if (replay) return replay;
     const scope = scopeKey(tenantId, configKey);
     const versions = this.history.get(scope) ?? [];
     const current = this.active.get(scope);
@@ -473,6 +490,26 @@ export class ConfigUpdateService {
     this.requests.set(requestId, { operation: 'fetch', fingerprint: requestFingerprint, result });
     this.recordAudit({ event: 'fetch', requestId, configKey, outcome: result.available ? 'accepted' : 'unavailable', ...(reason ? { reason } : {}) });
     return clone(result);
+  }
+
+  private beginRequest(operation: ConfigAuditEvent['event'], requestId: string, configKey: string): void {
+    const existingOperation = this.requestOperations.get(requestId);
+    if (existingOperation !== undefined) {
+      const existingConfigKey = this.requestConfigKeys.get(requestId);
+      if (existingOperation !== operation || existingConfigKey !== configKey || (!this.requests.has(requestId) && !this.failedRequests.has(requestId))) {
+        const reason = existingOperation !== operation
+          ? 'requestId was already used by another config operation'
+          : existingConfigKey !== configKey
+            ? 'requestId was already used for another request (config key conflict)'
+            : 'requestId is already claimed by another config request';
+        const error = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, reason);
+        this.recordAudit({ event: operation, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason });
+        throw error;
+      }
+      return;
+    }
+    this.requestOperations.set(requestId, operation);
+    this.requestConfigKeys.set(requestId, configKey);
   }
 
   private replay<T extends PublishConfigResult | FetchConfigResult | RollbackConfigResult>(requestId: string, requestFingerprint: string, event: ConfigAuditEvent['event'], configKey: string): T | null {

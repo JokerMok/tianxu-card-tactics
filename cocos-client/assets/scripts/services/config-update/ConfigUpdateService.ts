@@ -177,6 +177,11 @@ function validConfigKey(value: unknown): string {
   return key;
 }
 
+function requestConfigKeyHint(value: unknown): string {
+  if (typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(value)) return value;
+  return '<invalid-config-key>';
+}
+
 function parseVersion(value: unknown): [number, number, number] {
   if (typeof value !== 'string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value)) {
     throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'version must be strict semver');
@@ -241,6 +246,10 @@ function validateBundle(value: unknown): ConfigBundle {
 
 function fingerprint(value: unknown): string { return stableJson(value); }
 
+function safeFingerprint(value: unknown): string {
+  try { return fingerprint(value); } catch { return '<unserializable-request>'; }
+}
+
 export class ConfigUpdateClientService {
   private readonly tenantId: string;
   private readonly clientId: string;
@@ -253,6 +262,7 @@ export class ConfigUpdateClientService {
   private readonly requests = new Map<string, StoredRequest>();
   private readonly failedRequests = new Map<string, StoredError>();
   private readonly requestOperations = new Map<string, ConfigOperation>();
+  private readonly requestConfigKeys = new Map<string, string>();
   private readonly activationLocks = new Set<string>();
   private readonly blocked = new Map<string, string>();
   private readonly revisionByConfig = new Map<string, number>();
@@ -276,11 +286,13 @@ export class ConfigUpdateClientService {
 
   apply(requestId: string, value: unknown): ApplyConfigResult {
     const id = validText(requestId, 'requestId');
+    const configKeyHint = requestConfigKeyHint((value as { configKey?: unknown } | null | undefined)?.configKey);
+    this.beginOperation('apply', id, configKeyHint);
+    const replay = this.replay<ApplyConfigResult>('apply', id, safeFingerprint({ operation: 'apply', configKey: (value as { configKey?: unknown } | null | undefined)?.configKey, bundle: value }), configKeyHint);
+    if (replay) return replay;
     const bundle = validateBundle(value);
     const requestFingerprint = fingerprint({ operation: 'apply', configKey: bundle.configKey, bundle });
     try {
-      const replay = this.replay<ApplyConfigResult>('apply', id, requestFingerprint, bundle.configKey);
-      if (replay) return replay;
       this.assertUsable(bundle.configKey);
       this.validateCommon(bundle);
       const current = this.states.get(bundle.configKey)?.active ?? null;
@@ -366,10 +378,12 @@ export class ConfigUpdateClientService {
 
   rollback(requestId: string, configKeyInput: string): RollbackConfigResult {
     const requestIdValue = validText(requestId, 'requestId');
+    const configKeyHint = requestConfigKeyHint(configKeyInput);
+    this.beginOperation('rollback', requestIdValue, configKeyHint);
+    const replay = this.replay<RollbackConfigResult>('rollback', requestIdValue, safeFingerprint({ operation: 'rollback', configKey: configKeyInput }), configKeyHint);
+    if (replay) return replay;
     const configKey = validConfigKey(configKeyInput);
     const requestFingerprint = fingerprint({ operation: 'rollback', configKey });
-    const replay = this.replay<RollbackConfigResult>('rollback', requestIdValue, requestFingerprint, configKey);
-    if (replay) return replay;
     this.assertUsable(configKey);
     const state = this.states.get(configKey);
     if (!state?.previous) {
@@ -430,11 +444,13 @@ export class ConfigUpdateClientService {
 
   recover(requestId: string, value: unknown): RecoverConfigResult {
     const id = validText(requestId, 'requestId');
+    const configKeyHint = requestConfigKeyHint((value as { configKey?: unknown } | null | undefined)?.configKey);
+    this.beginOperation('recover', id, configKeyHint);
+    const replay = this.replay<RecoverConfigResult>('recover', id, safeFingerprint({ operation: 'recover', configKey: (value as { configKey?: unknown } | null | undefined)?.configKey, bundle: value }), configKeyHint);
+    if (replay) return replay;
     const bundle = validateBundle(value);
     const requestFingerprint = fingerprint({ operation: 'recover', configKey: bundle.configKey, bundle });
     try {
-      const replay = this.replay<RecoverConfigResult>('recover', id, requestFingerprint, bundle.configKey);
-      if (replay) return replay;
       if (!this.isBlocked(bundle.configKey)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, 'config is not quarantined and cannot use recovery path');
       this.validateCommon(bundle);
       const current = this.states.get(bundle.configKey)?.active ?? null;
@@ -534,21 +550,44 @@ export class ConfigUpdateClientService {
 
   private requestNamespace(operation: ConfigOperation, requestId: string): string { return `${operation}\u0000${requestId}`; }
 
-  private claimOperation(operation: ConfigOperation, requestId: string): void {
+  private beginOperation(operation: ConfigOperation, requestId: string, configKey: string): void {
     const existing = this.requestOperations.get(requestId);
-    if (existing !== undefined && existing !== operation) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+    if (existing !== undefined) {
+      const existingConfigKey = this.requestConfigKeys.get(requestId);
+      if (existing !== operation || existingConfigKey !== configKey || (!this.requests.has(this.requestNamespace(operation, requestId)) && !this.failedRequests.has(this.requestNamespace(operation, requestId)))) {
+        const reason = existing !== operation
+          ? 'requestId was already used by another config operation'
+          : existingConfigKey !== configKey
+            ? 'requestId was already used for another request (config key conflict)'
+            : 'requestId is already claimed by another config request';
+        const error = new ConfigReplayError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, reason);
+        this.recordAudit({ event: operation, operation, requestId, configKey, replayed: true, result: 'rejected', outcome: 'rejected', reason });
+        throw error;
+      }
+      return;
+    }
     this.requestOperations.set(requestId, operation);
+    this.requestConfigKeys.set(requestId, configKey);
+  }
+
+  private claimOperation(operation: ConfigOperation, requestId: string, configKey: string): void {
+    const existing = this.requestOperations.get(requestId);
+    if (existing !== undefined && (existing !== operation || this.requestConfigKeys.get(requestId) !== configKey)) {
+      throw new ConfigReplayError(CONFIG_UPDATE_ERROR_CODES.REQUEST_ID_REUSED, 'requestId was already used by another config operation');
+    }
+    this.requestOperations.set(requestId, operation);
+    this.requestConfigKeys.set(requestId, configKey);
   }
 
   private storeRequest(operation: ConfigOperation, requestId: string, requestFingerprint: string, result: ApplyConfigResult | RollbackConfigResult | RecoverConfigResult): void {
-    this.claimOperation(operation, requestId);
+    this.claimOperation(operation, requestId, result.configKey);
     this.requests.set(this.requestNamespace(operation, requestId), { operation, fingerprint: requestFingerprint, result });
   }
 
   private storeFailure(operation: ConfigOperation, requestId: string, requestFingerprint: string, error: ConfigUpdateError): void {
     const existing = this.requestOperations.get(requestId);
     if (existing !== undefined && existing !== operation) return;
-    this.claimOperation(operation, requestId);
+    this.claimOperation(operation, requestId, this.requestConfigKeys.get(requestId) ?? '<invalid-config-key>');
     this.failedRequests.set(this.requestNamespace(operation, requestId), { operation, fingerprint: requestFingerprint, code: error.code, message: error.message });
   }
 
