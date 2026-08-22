@@ -135,16 +135,45 @@ deepBundle.payload = deepPayload;
 expectCode(() => client.apply('client-deep', deepBundle), CLIENT_CODES.INVALID_BUNDLE);
 failActivation = true;
 const failed = signed({ bundleId: 'bundle-5', version: '1.4.0', minClientVersion: '2.0.0', payload: { damageMultiplier: 1.4, source: 'new' } });
-expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.ACTIVATION_FAILED);
+expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.RUNTIME_INCONSISTENT);
+assert.equal(client.isBlocked(release.configKey), true, 'activation failure must quarantine even when the previous runtime is restored');
+expectCode(() => client.active(release.configKey), CLIENT_CODES.RUNTIME_INCONSISTENT);
 const activationCountAfterFailure = activations.length;
-expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.ACTIVATION_FAILED);
+expectCode(() => client.apply('apply-failed', failed), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(activations.length, activationCountAfterFailure);
-assert.equal(client.active(release.configKey).version, release.version);
+expectCode(() => client.apply('apply-after-quarantine', signed({ bundleId: 'blocked-follow-up', version: '1.4.1', minClientVersion: '2.0.0' })), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(activations.at(-1).context.rollback, true);
 failActivation = false;
+assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: false, configKey: release.configKey, version: release.version });
+assert.equal(client.isBlocked(release.configKey), false);
+assert.equal(client.active(release.configKey).version, release.version);
+assert.equal(client.apply('post-recovery-apply', signed({ bundleId: 'post-recovery', version: '1.5.0', minClientVersion: '2.0.0' })).version, '1.5.0');
 assert.equal(client.rollback('client-rollback', release.configKey).rolledBack, true);
-assert.equal(client.active(release.configKey).version, clientBase.version);
+assert.equal(client.active(release.configKey).version, release.version);
 expectCode(() => client.apply('client-min-regression-after-rollback', signed({ bundleId: 'min-regression-after-rollback', version: '1.4.0', minClientVersion: '1.0.0' })), CLIENT_CODES.VERSION_CONFLICT);
+
+let firstActivationMode = 'fail';
+const firstActivationClient = new ConfigUpdateClientService({
+  tenantId: 'tenant-a', clientId: 'player-1', clientVersion: '2.0.0', verifySignature: clientVerifier,
+  activate: (_configKey, _payload, context) => {
+    if (firstActivationMode === 'fail') throw new Error(context.recovery ? 'trusted recovery failed' : 'first activation failed');
+  },
+});
+const firstActivationBundle = signed({ bundleId: 'first-activation', version: '3.0.0', minClientVersion: '2.0.0' });
+expectCode(() => firstActivationClient.apply('first-activation-apply', firstActivationBundle), CLIENT_CODES.RUNTIME_INCONSISTENT);
+assert.equal(firstActivationClient.isBlocked(firstActivationBundle.configKey), true);
+expectCode(() => firstActivationClient.active(firstActivationBundle.configKey), CLIENT_CODES.RUNTIME_INCONSISTENT);
+expectCode(() => firstActivationClient.apply('first-activation-follow-up', signed({ bundleId: 'first-activation-follow-up', version: '3.1.0', minClientVersion: '2.0.0' })), CLIENT_CODES.RUNTIME_INCONSISTENT);
+expectCode(() => firstActivationClient.recover('first-activation-recovery-failed', signed({ bundleId: 'trusted-recovery', version: '2.0.0', minClientVersion: '2.0.0' })), CLIENT_CODES.RUNTIME_INCONSISTENT);
+assert.equal(firstActivationClient.isBlocked(firstActivationBundle.configKey), true);
+firstActivationMode = 'ok';
+assert.deepEqual(firstActivationClient.recover('first-activation-recovery', signed({ bundleId: 'trusted-recovery', version: '2.0.0', minClientVersion: '2.0.0' })), { recovered: true, replayed: false, configKey: firstActivationBundle.configKey, version: '2.0.0' });
+assert.equal(firstActivationClient.isBlocked(firstActivationBundle.configKey), false);
+assert.equal(firstActivationClient.active(firstActivationBundle.configKey).version, '2.0.0');
+const firstActivationAudit = firstActivationClient.auditLog();
+assert.ok(firstActivationAudit.some((entry) => entry.event === 'apply' && entry.outcome === 'rejected' && entry.reason.includes('no confirmed active config')));
+assert.ok(firstActivationAudit.some((entry) => entry.event === 'recover' && entry.outcome === 'rejected' && entry.reason.includes('trusted recovery failed')));
+assert.ok(firstActivationAudit.some((entry) => entry.event === 'apply' && entry.requestId === 'first-activation-follow-up' && entry.reason.includes('quarantined')));
 
 let nestedCode;
 let reentrantClient;
@@ -174,6 +203,7 @@ runtimeMode = 'fail-both';
 expectCode(() => inconsistentClient.apply('inconsistent-update', signed({ bundleId: 'inconsistent-update', version: '1.1.0', minClientVersion: '1.0.0' })), CLIENT_CODES.RUNTIME_INCONSISTENT);
 assert.equal(inconsistentClient.isBlocked('combat.balance'), true);
 expectCode(() => inconsistentClient.active('combat.balance'), CLIENT_CODES.RUNTIME_INCONSISTENT);
+assert.ok(inconsistentClient.auditLog().some((entry) => entry.reason?.includes('recovery failed')));
 
 const backendAudit = backend.auditLog();
 const clientAudit = client.auditLog();

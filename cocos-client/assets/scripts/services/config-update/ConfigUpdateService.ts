@@ -51,6 +51,7 @@ export interface ConfigActivationContext {
   configKey: string;
   version: string;
   rollback: boolean;
+  recovery?: boolean;
 }
 
 export interface ConfigUpdateClientOptions {
@@ -79,20 +80,27 @@ export interface RollbackConfigResult {
   version: string;
 }
 
+export interface RecoverConfigResult {
+  recovered: true;
+  replayed: boolean;
+  configKey: string;
+  version: string;
+}
+
 export interface ConfigClientAuditEvent {
   eventId: number;
-  event: 'apply' | 'rollback';
+  event: 'apply' | 'rollback' | 'recover';
   requestId: string;
   configKey: string;
   version?: string;
-  outcome: 'accepted' | 'replayed' | 'rejected' | 'rolled_back';
+  outcome: 'accepted' | 'replayed' | 'rejected' | 'rolled_back' | 'recovered';
   reason?: string;
   at: number;
 }
 
 interface StoredRequest {
   fingerprint: string;
-  result: ApplyConfigResult | RollbackConfigResult;
+  result: ApplyConfigResult | RollbackConfigResult | RecoverConfigResult;
 }
 
 interface StoredError {
@@ -276,24 +284,39 @@ export class ConfigUpdateClientService {
       const expectedRevision = this.revisions(bundle.configKey);
       this.beginActivation(bundle.configKey);
       let activationStarted = false;
+      let validationComplete = false;
       try {
         this.assertRevision(bundle.configKey, expectedRevision);
         this.validatePayload(bundle.configKey, bundle.payload);
+        validationComplete = true;
         activationStarted = true;
         this.activate(bundle.configKey, clone(bundle.payload), { configKey: bundle.configKey, version: bundle.version, rollback: false });
       } catch (error) {
+        const activationMessage = error instanceof Error ? error.message : 'config activation failed';
+        if (!validationComplete && !activationStarted) {
+          if (!(error instanceof ConfigUpdateError && error.code === CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT)) {
+            this.endActivation(bundle.configKey);
+            throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ACTIVATION_FAILED, activationMessage);
+          }
+          this.quarantine(bundle.configKey, `runtime state changed before activation: ${activationMessage}`);
+          this.endActivation(bundle.configKey);
+          throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
+        }
         if (activationStarted && current) {
           try {
             this.assertRevision(bundle.configKey, expectedRevision);
             this.activate(bundle.configKey, clone(current.payload), { configKey: bundle.configKey, version: current.version, rollback: true });
           } catch (rollbackError) {
-            this.quarantine(bundle.configKey, `activation failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+            this.quarantine(bundle.configKey, `activation failed: ${activationMessage}; recovery failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
             this.endActivation(bundle.configKey);
             throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
           }
+          this.quarantine(bundle.configKey, `activation failed: ${activationMessage}; previous active was restored but runtime updates remain blocked`);
+        } else {
+          this.quarantine(bundle.configKey, `activation failed: ${activationMessage}; no confirmed active config is available`);
         }
         this.endActivation(bundle.configKey);
-        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ACTIVATION_FAILED, error instanceof Error ? error.message : 'config activation failed');
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
       }
       try {
         this.assertRevision(bundle.configKey, expectedRevision);
@@ -304,15 +327,14 @@ export class ConfigUpdateClientService {
         if (current) {
           try { this.activate(bundle.configKey, clone(current.payload), { configKey: bundle.configKey, version: current.version, rollback: true }); } catch (rollbackError) {
             this.quarantine(bundle.configKey, `commit CAS failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
-            this.endActivation(bundle.configKey);
             throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
           }
+          this.quarantine(bundle.configKey, `commit CAS failed: ${error instanceof Error ? error.message : String(error)}; runtime state cannot be confirmed`);
         } else {
           this.quarantine(bundle.configKey, `commit CAS failed: ${error instanceof Error ? error.message : String(error)}`);
-          this.endActivation(bundle.configKey);
           throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
         }
-        throw error;
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
       } finally {
         this.endActivation(bundle.configKey);
       }
@@ -348,21 +370,22 @@ export class ConfigUpdateClientService {
       this.assertRevision(configKey, expectedRevision);
       this.activate(configKey, clone(target.payload), { configKey, version: target.version, rollback: true });
     } catch (error) {
+      const rollbackMessage = error instanceof Error ? error.message : 'rollback activation failed';
       try {
         this.assertRevision(configKey, expectedRevision);
         this.activate(configKey, clone(state.active.payload), { configKey, version: state.active.version, rollback: false });
       } catch (recoveryError) {
-        this.quarantine(configKey, `rollback activation failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`);
-        const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
-        this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
-        this.endActivation(configKey);
-        throw inconsistent;
+        const recoveryMessage = recoveryError instanceof Error ? recoveryError.message : String(recoveryError);
+        this.quarantine(configKey, `rollback activation failed: ${rollbackMessage}; recovery failed: ${recoveryMessage}`);
       }
-      const failure = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ACTIVATION_FAILED, error instanceof Error ? error.message : 'rollback activation failed');
-      this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: failure.code, message: failure.message });
-      this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rejected', reason: failure.message });
+      if (!this.isBlocked(configKey)) {
+        this.quarantine(configKey, `rollback activation failed: ${rollbackMessage}; previous active was restored but runtime updates remain blocked`);
+      }
+      const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
+      this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
+      this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rejected', reason: inconsistent.message });
       this.endActivation(configKey);
-      throw failure;
+      throw inconsistent;
     }
     try {
       this.assertRevision(configKey, expectedRevision);
@@ -373,19 +396,62 @@ export class ConfigUpdateClientService {
         this.activate(configKey, clone(state.active.payload), { configKey, version: state.active.version, rollback: false });
       } catch (recoveryError) {
         this.quarantine(configKey, `rollback commit CAS failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`);
-        const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
-        this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
-        this.endActivation(configKey);
-        throw inconsistent;
       }
+      if (!this.isBlocked(configKey)) {
+        this.quarantine(configKey, `rollback commit CAS failed: ${error instanceof Error ? error.message : String(error)}; runtime state cannot be confirmed`);
+      }
+      const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
+      this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
+      this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rejected', reason: inconsistent.message });
       this.endActivation(configKey);
-      throw error;
+      throw inconsistent;
     }
     this.endActivation(configKey);
     const result: RollbackConfigResult = { applied: false, replayed: false, rolledBack: true, configKey, version: target.version };
     this.storeRequest(requestIdValue, requestFingerprint, result);
     this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rolled_back' });
     return clone(result);
+  }
+
+  recover(requestId: string, value: unknown): RecoverConfigResult {
+    const id = validText(requestId, 'requestId');
+    const bundle = validateBundle(value);
+    const requestFingerprint = fingerprint({ configKey: bundle.configKey, bundle });
+    const replay = this.replay<RecoverConfigResult>(id, requestFingerprint);
+    if (replay) return replay;
+    try {
+      if (!this.isBlocked(bundle.configKey)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, 'config is not quarantined and cannot use recovery path');
+      this.validateCommon(bundle);
+      const minClientVersionFloor = this.maxMinClientVersionByConfig.get(bundle.configKey);
+      if (minClientVersionFloor && compareVersions(bundle.minClientVersion, minClientVersionFloor) < 0) {
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'minClientVersion cannot move backwards');
+      }
+      const expectedRevision = this.revisions(bundle.configKey);
+      this.beginActivation(bundle.configKey);
+      try {
+        this.assertRevision(bundle.configKey, expectedRevision);
+        this.validatePayload(bundle.configKey, bundle.payload);
+        this.activate(bundle.configKey, clone(bundle.payload), { configKey: bundle.configKey, version: bundle.version, rollback: false, recovery: true });
+        this.assertRevision(bundle.configKey, expectedRevision);
+      } catch (error) {
+        this.quarantine(bundle.configKey, `trusted recovery failed: ${error instanceof Error ? error.message : String(error)}; runtime remains blocked`);
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
+      } finally {
+        this.endActivation(bundle.configKey);
+      }
+      this.states.set(bundle.configKey, { active: clone(bundle), previous: null, revision: expectedRevision + 1 });
+      this.revisionByConfig.set(bundle.configKey, expectedRevision + 1);
+      if (!minClientVersionFloor || compareVersions(bundle.minClientVersion, minClientVersionFloor) > 0) this.maxMinClientVersionByConfig.set(bundle.configKey, bundle.minClientVersion);
+      this.blocked.delete(bundle.configKey);
+      const result: RecoverConfigResult = { recovered: true, replayed: false, configKey: bundle.configKey, version: bundle.version };
+      this.storeRequest(id, requestFingerprint, result);
+      this.recordAudit({ event: 'recover', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'recovered' });
+      return clone(result);
+    } catch (error) {
+      if (error instanceof ConfigUpdateError) this.failedRequests.set(id, { fingerprint: requestFingerprint, code: error.code, message: error.message });
+      this.recordAudit({ event: 'recover', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'rejected', reason: error instanceof Error ? error.message : String(error) });
+      throw error;
+    }
   }
 
   active(configKeyInput: string): ConfigBundle | null {
@@ -423,7 +489,7 @@ export class ConfigUpdateClientService {
   private endActivation(configKey: string): void { this.activationLocks.delete(configKey); }
 
   private quarantine(configKey: string, reason: string): void {
-    this.blocked.set(configKey, `config runtime is inconsistent and cannot continue: ${reason}`);
+    this.blocked.set(configKey, `config runtime is quarantined/blocked and cannot continue: ${reason}`);
   }
 
   private assertUsable(configKey: string): void {
@@ -431,11 +497,11 @@ export class ConfigUpdateClientService {
     if (reason) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, reason);
   }
 
-  private storeRequest(requestId: string, requestFingerprint: string, result: ApplyConfigResult | RollbackConfigResult): void {
+  private storeRequest(requestId: string, requestFingerprint: string, result: ApplyConfigResult | RollbackConfigResult | RecoverConfigResult): void {
     this.requests.set(requestId, { fingerprint: requestFingerprint, result });
   }
 
-  private replay<T extends ApplyConfigResult | RollbackConfigResult>(requestId: string, requestFingerprint: string): T | null {
+  private replay<T extends ApplyConfigResult | RollbackConfigResult | RecoverConfigResult>(requestId: string, requestFingerprint: string): T | null {
     const stored = this.requests.get(requestId);
     const failed = this.failedRequests.get(requestId);
     if (!stored && !failed) return null;
