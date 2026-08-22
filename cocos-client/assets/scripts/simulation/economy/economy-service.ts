@@ -199,7 +199,7 @@ function assertLedgerInitial(ledger: EconomyLedger, config: EconomyConfig): void
 
 function validateCraftingSnapshot(raw: unknown): void {
     if (!isRecord(raw)) throw new Error('crafting snapshot must be an object');
-    assertExactKeys(raw, ['schemaVersion', 'seed', 'attempt', 'equipment', 'materials'], 'crafting snapshot');
+    assertExactKeys(raw, ['schemaVersion', 'seed', 'attempt', 'equipment', 'materials', 'processedResults'], 'crafting snapshot');
     if (raw.schemaVersion !== 1 || !isSafeInteger(raw.seed) || !isSafeInteger(raw.attempt)) throw new Error('crafting snapshot clock is invalid');
     if (!Array.isArray(raw.equipment)) throw new Error('crafting snapshot equipment must be an array');
     const equipmentIds = new Set(CRAFTING_CONFIG.equipment.map((item) => item.id));
@@ -213,6 +213,7 @@ function validateCraftingSnapshot(raw: unknown): void {
         instanceIds.add(item.instanceId);
     }
     assertSafeIntegerMap(raw.materials, CRAFTING_CONFIG.materials.map((item) => item.id), 'crafting materials');
+    if (!Array.isArray(raw.processedResults)) throw new Error('crafting snapshot processedResults must be an array');
 }
 
 function validateExpeditionSnapshot(raw: unknown): void {
