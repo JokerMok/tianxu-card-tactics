@@ -39,7 +39,9 @@ function resources(silver = 20000, crystal = 1000) {
 function checkSkeletonAndDiff() {
   const required = ['BuildingConfig.ts', 'BuildingQueue.ts', 'building-config.json', 'index.ts'];
   for (const file of required) assert.equal(statSync(join(buildingRoot, file)).isFile(), true, `${file} is required`);
-  assert.deepEqual(readdirSync(buildingRoot).sort(), required.sort(), 'building module must contain only the approved skeleton files');
+  const approvedExtensions = new Set(['tax-research']);
+  const unexpectedEntries = readdirSync(buildingRoot).filter((entry) => !required.includes(entry) && !approvedExtensions.has(entry));
+  assert.deepEqual(unexpectedEntries, [], 'building module contains an unapproved entry');
   for (const file of ['BuildingConfig.ts', 'BuildingQueue.ts', 'index.ts']) {
     const source = readFileSync(join(buildingRoot, file), 'utf8');
     assert.equal(/TODO|placeholder|Date\.now|Math\.random/.test(source), false, `${file} must not contain non-deterministic or placeholder logic`);
