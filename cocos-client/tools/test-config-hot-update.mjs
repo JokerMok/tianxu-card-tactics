@@ -134,6 +134,8 @@ assert.equal(client.apply('apply-base', clientBase).version, '1.2.0');
 const clientApplied = client.apply('apply-1', release);
 assert.deepEqual(clientApplied, { applied: true, replayed: false, rolledBack: false, configKey: release.configKey, version: release.version });
 assert.deepEqual(client.apply('apply-1', release), { ...clientApplied, replayed: true });
+const applyReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'apply-1');
+assert.deepEqual({ operation: applyReplayAudit.operation, replayed: applyReplayAudit.replayed, result: applyReplayAudit.result }, { operation: 'apply', replayed: true, result: 'replayed' }, 'client replay must be recorded with operation, requestId and result');
 expectCode(() => client.apply('apply-1', signed({ bundleId: 'other', version: '1.4.0' })), CLIENT_CODES.REQUEST_ID_REUSED);
 expectCode(() => client.apply('client-tamper', { ...release, payload: { damageMultiplier: 999 } }), CLIENT_CODES.SIGNATURE_INVALID);
 expectCode(() => client.apply('client-outdated', signed({ bundleId: 'old-client', version: '1.4.0', minClientVersion: '3.0.0' })), CLIENT_CODES.CLIENT_OUTDATED);
@@ -160,15 +162,24 @@ expectCode(() => client.apply('apply-after-quarantine', signed({ bundleId: 'bloc
 assert.equal(activations.at(-1).context.rollback, true);
 expectCode(() => client.recover('client-recover-old-version', clientBase), CLIENT_CODES.VERSION_CONFLICT);
 expectCode(() => client.recover('client-recover-old-min', signed({ bundleId: 'recover-old-min', version: '1.4.0', minClientVersion: '1.0.0' })), CLIENT_CODES.VERSION_CONFLICT);
+expectCode(() => client.recover('apply-1', release), CLIENT_CODES.REQUEST_ID_REUSED);
 failActivation = false;
 assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: false, configKey: release.configKey, version: release.version });
-expectCode(() => client.recover('client-recover', release), CLIENT_CODES.RUNTIME_INCONSISTENT);
+assert.deepEqual(client.recover('client-recover', release), { recovered: true, replayed: true, configKey: release.configKey, version: release.version });
+const recoverReplayAudit = client.auditLog().findLast((entry) => entry.requestId === 'client-recover');
+assert.deepEqual({ operation: recoverReplayAudit.operation, replayed: recoverReplayAudit.replayed, result: recoverReplayAudit.result }, { operation: 'recover', replayed: true, result: 'replayed' }, 'recover replay must remain auditable after quarantine clears');
 assert.equal(client.isBlocked(release.configKey), false);
 assert.equal(client.active(release.configKey).version, release.version);
 assert.equal(client.apply('post-recovery-apply', signed({ bundleId: 'post-recovery', version: '1.5.0', minClientVersion: '2.0.0' })).version, '1.5.0');
 assert.equal(client.rollback('client-rollback', release.configKey).rolledBack, true);
 assert.equal(client.active(release.configKey).version, release.version);
 expectCode(() => client.apply('client-min-regression-after-rollback', signed({ bundleId: 'min-regression-after-rollback', version: '1.4.0', minClientVersion: '1.0.0' })), CLIENT_CODES.VERSION_CONFLICT);
+
+const historicalFloorClient = new ConfigUpdateClientService({ tenantId: 'tenant-a', clientId: 'player-1', clientVersion: '2.0.0', verifySignature: clientVerifier });
+historicalFloorClient.apply('historical-floor-apply', signed({ bundleId: 'historical-floor', version: '4.0.0', minClientVersion: '2.0.0' }));
+historicalFloorClient.blocked.set('combat.balance', 'test quarantine');
+historicalFloorClient.states.set('combat.balance', { active: null, previous: null, revision: historicalFloorClient.revisionByConfig.get('combat.balance') });
+expectCode(() => historicalFloorClient.recover('historical-floor-recover', signed({ bundleId: 'historical-floor-low', version: '3.0.0', minClientVersion: '2.0.0' })), CLIENT_CODES.VERSION_CONFLICT);
 
 let firstActivationMode = 'fail';
 const firstActivationClient = new ConfigUpdateClientService({
