@@ -40,8 +40,8 @@ const {
 const toolsRoot = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(toolsRoot, '..');
 const allowedPaths = [
-    'assets/scripts/meta/equipment/crafting/',
-    'tools/test-equipment-crafting.mjs',
+    'cocos-client/assets/scripts/meta/equipment/crafting/',
+    'cocos-client/tools/test-equipment-crafting.mjs',
 ];
 
 function clone(value) { return structuredClone(value); }
