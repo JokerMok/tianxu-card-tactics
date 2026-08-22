@@ -8,6 +8,8 @@ export const CONFIG_UPDATE_ERROR_CODES = {
   REQUEST_ID_REUSED: 'REQUEST_ID_REUSED',
   ACTIVATION_FAILED: 'ACTIVATION_FAILED',
   ROLLBACK_UNAVAILABLE: 'ROLLBACK_UNAVAILABLE',
+  REENTRANT: 'REENTRANT',
+  RUNTIME_INCONSISTENT: 'RUNTIME_INCONSISTENT',
 } as const;
 
 export type ConfigUpdateErrorCode = typeof CONFIG_UPDATE_ERROR_CODES[keyof typeof CONFIG_UPDATE_ERROR_CODES];
@@ -24,6 +26,7 @@ export class ConfigUpdateError extends Error {
 
 export interface ConfigBundle {
   bundleId: string;
+  tenantId: string;
   configKey: string;
   version: string;
   minClientVersion: string;
@@ -39,7 +42,9 @@ export interface ConfigBundle {
 }
 
 export interface ConfigSignatureVerifier {
-  (canonicalUnsignedBundle: string, signature: string, keyId: string): boolean;
+  readonly algorithm: 'Ed25519';
+  readonly trustedKeyIds: readonly string[];
+  verifyEd25519(canonicalUnsignedBundle: string, signature: string, keyId: string): boolean;
 }
 
 export interface ConfigActivationContext {
@@ -49,6 +54,7 @@ export interface ConfigActivationContext {
 }
 
 export interface ConfigUpdateClientOptions {
+  tenantId: string;
   clientId: string;
   clientVersion: string;
   verifySignature: ConfigSignatureVerifier;
@@ -98,6 +104,7 @@ interface StoredError {
 interface ConfigState {
   active: ConfigBundle;
   previous: ConfigBundle | null;
+  revision: number;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -187,7 +194,7 @@ function rolloutEligible(bundle: ConfigBundle, subject: string): boolean {
 
 function validateBundle(value: unknown): ConfigBundle {
   if (!isRecord(value)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle must be an object');
-  const allowedKeys = new Set(['bundleId', 'configKey', 'version', 'minClientVersion', 'rolloutPercent', 'rolloutSalt', 'allowList', 'denyList', 'payload', 'keyId', 'signature', 'createdAt', 'expiresAt']);
+  const allowedKeys = new Set(['bundleId', 'tenantId', 'configKey', 'version', 'minClientVersion', 'rolloutPercent', 'rolloutSalt', 'allowList', 'denyList', 'payload', 'keyId', 'signature', 'createdAt', 'expiresAt']);
   if (Object.keys(value).some((key) => !allowedKeys.has(key))) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle contains unknown fields');
   const version = validText(value.version, 'version');
   parseVersion(version);
@@ -206,7 +213,7 @@ function validateBundle(value: unknown): ConfigBundle {
   }
   if (allowList?.some((id) => denyList?.includes(id))) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'allowList and denyList overlap');
   return clone({
-    bundleId: validText(value.bundleId, 'bundleId'), configKey: validConfigKey(value.configKey), version, minClientVersion,
+    bundleId: validText(value.bundleId, 'bundleId'), tenantId: validText(value.tenantId, 'tenantId'), configKey: validConfigKey(value.configKey), version, minClientVersion,
     rolloutPercent: value.rolloutPercent as number, rolloutSalt: validText(value.rolloutSalt, 'rolloutSalt'),
     ...(allowList === undefined ? {} : { allowList: clone(allowList) }), ...(denyList === undefined ? {} : { denyList: clone(denyList) }),
     payload: clone(value.payload), keyId: validText(value.keyId, 'keyId'), signature: validText(value.signature, 'signature', 1024),
@@ -217,6 +224,7 @@ function validateBundle(value: unknown): ConfigBundle {
 function fingerprint(value: unknown): string { return stableJson(value); }
 
 export class ConfigUpdateClientService {
+  private readonly tenantId: string;
   private readonly clientId: string;
   private readonly clientVersion: string;
   private readonly verifySignature: ConfigSignatureVerifier;
@@ -226,14 +234,19 @@ export class ConfigUpdateClientService {
   private readonly states = new Map<string, ConfigState>();
   private readonly requests = new Map<string, StoredRequest>();
   private readonly failedRequests = new Map<string, StoredError>();
+  private readonly activationLocks = new Set<string>();
+  private readonly blocked = new Map<string, string>();
+  private readonly revisionByConfig = new Map<string, number>();
+  private readonly maxMinClientVersionByConfig = new Map<string, string>();
   private readonly audit: ConfigClientAuditEvent[] = [];
   private auditSequence = 0;
 
   constructor(options: ConfigUpdateClientOptions) {
+    this.tenantId = validText(options?.tenantId, 'tenantId');
     this.clientId = validText(options?.clientId, 'clientId');
     this.clientVersion = validText(options?.clientVersion, 'clientVersion');
     parseVersion(this.clientVersion);
-    if (typeof options?.verifySignature !== 'function') throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, 'verifySignature is required');
+    if (!options?.verifySignature || options.verifySignature.algorithm !== 'Ed25519' || !Array.isArray(options.verifySignature.trustedKeyIds) || typeof options.verifySignature.verifyEd25519 !== 'function') throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, 'an Ed25519 verifier with an explicit key policy is required');
     this.verifySignature = options.verifySignature;
     this.validatePayload = options.validatePayload ?? (() => undefined);
     this.activate = options.activate ?? (() => undefined);
@@ -248,6 +261,7 @@ export class ConfigUpdateClientService {
     if (replay) return replay;
     try {
       this.validateCommon(bundle);
+      this.assertUsable(bundle.configKey);
       const current = this.states.get(bundle.configKey)?.active ?? null;
       if (current && compareVersions(bundle.version, current.version) < 0) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version cannot move backwards without rollback');
       if (current && compareVersions(bundle.version, current.version) === 0) {
@@ -257,16 +271,51 @@ export class ConfigUpdateClientService {
         this.recordAudit({ event: 'apply', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'replayed' });
         return clone(result);
       }
+      const minClientVersionFloor = this.maxMinClientVersionByConfig.get(bundle.configKey) ?? current?.minClientVersion;
+      if (minClientVersionFloor && compareVersions(bundle.minClientVersion, minClientVersionFloor) < 0) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'minClientVersion cannot move backwards');
+      const expectedRevision = this.revisions(bundle.configKey);
+      this.beginActivation(bundle.configKey);
+      let activationStarted = false;
       try {
+        this.assertRevision(bundle.configKey, expectedRevision);
         this.validatePayload(bundle.configKey, bundle.payload);
+        activationStarted = true;
         this.activate(bundle.configKey, clone(bundle.payload), { configKey: bundle.configKey, version: bundle.version, rollback: false });
       } catch (error) {
-        if (current) {
-          try { this.activate(bundle.configKey, clone(current.payload), { configKey: bundle.configKey, version: current.version, rollback: true }); } catch { /* preserve original failure and state */ }
+        if (activationStarted && current) {
+          try {
+            this.assertRevision(bundle.configKey, expectedRevision);
+            this.activate(bundle.configKey, clone(current.payload), { configKey: bundle.configKey, version: current.version, rollback: true });
+          } catch (rollbackError) {
+            this.quarantine(bundle.configKey, `activation failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+            this.endActivation(bundle.configKey);
+            throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
+          }
         }
+        this.endActivation(bundle.configKey);
         throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ACTIVATION_FAILED, error instanceof Error ? error.message : 'config activation failed');
       }
-      this.states.set(bundle.configKey, { active: clone(bundle), previous: current ? clone(current) : null });
+      try {
+        this.assertRevision(bundle.configKey, expectedRevision);
+        this.states.set(bundle.configKey, { active: clone(bundle), previous: current ? clone(current) : null, revision: expectedRevision + 1 });
+        this.revisionByConfig.set(bundle.configKey, expectedRevision + 1);
+        if (!minClientVersionFloor || compareVersions(bundle.minClientVersion, minClientVersionFloor) > 0) this.maxMinClientVersionByConfig.set(bundle.configKey, bundle.minClientVersion);
+      } catch (error) {
+        if (current) {
+          try { this.activate(bundle.configKey, clone(current.payload), { configKey: bundle.configKey, version: current.version, rollback: true }); } catch (rollbackError) {
+            this.quarantine(bundle.configKey, `commit CAS failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+            this.endActivation(bundle.configKey);
+            throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
+          }
+        } else {
+          this.quarantine(bundle.configKey, `commit CAS failed: ${error instanceof Error ? error.message : String(error)}`);
+          this.endActivation(bundle.configKey);
+          throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(bundle.configKey));
+        }
+        throw error;
+      } finally {
+        this.endActivation(bundle.configKey);
+      }
       const result: ApplyConfigResult = { applied: true, replayed: false, rolledBack: false, configKey: bundle.configKey, version: bundle.version };
       this.storeRequest(id, requestFingerprint, result);
       this.recordAudit({ event: 'apply', requestId: id, configKey: bundle.configKey, version: bundle.version, outcome: 'accepted' });
@@ -281,6 +330,7 @@ export class ConfigUpdateClientService {
   rollback(requestId: string, configKeyInput: string): RollbackConfigResult {
     const requestIdValue = validText(requestId, 'requestId');
     const configKey = validConfigKey(configKeyInput);
+    this.assertUsable(configKey);
     const state = this.states.get(configKey);
     const requestFingerprint = fingerprint({ configKey });
     const replay = this.replay<RollbackConfigResult>(requestIdValue, requestFingerprint);
@@ -292,15 +342,46 @@ export class ConfigUpdateClientService {
       throw error;
     }
     const target = state.previous;
+    const expectedRevision = state.revision;
+    this.beginActivation(configKey);
     try {
+      this.assertRevision(configKey, expectedRevision);
       this.activate(configKey, clone(target.payload), { configKey, version: target.version, rollback: true });
     } catch (error) {
+      try {
+        this.assertRevision(configKey, expectedRevision);
+        this.activate(configKey, clone(state.active.payload), { configKey, version: state.active.version, rollback: false });
+      } catch (recoveryError) {
+        this.quarantine(configKey, `rollback activation failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`);
+        const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
+        this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
+        this.endActivation(configKey);
+        throw inconsistent;
+      }
       const failure = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.ACTIVATION_FAILED, error instanceof Error ? error.message : 'rollback activation failed');
       this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: failure.code, message: failure.message });
       this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rejected', reason: failure.message });
+      this.endActivation(configKey);
       throw failure;
     }
-    this.states.set(configKey, { active: clone(target), previous: null });
+    try {
+      this.assertRevision(configKey, expectedRevision);
+      this.states.set(configKey, { active: clone(target), previous: null, revision: expectedRevision + 1 });
+      this.revisionByConfig.set(configKey, expectedRevision + 1);
+    } catch (error) {
+      try {
+        this.activate(configKey, clone(state.active.payload), { configKey, version: state.active.version, rollback: false });
+      } catch (recoveryError) {
+        this.quarantine(configKey, `rollback commit CAS failed: ${error instanceof Error ? error.message : String(error)}; recovery failed: ${recoveryError instanceof Error ? recoveryError.message : String(recoveryError)}`);
+        const inconsistent = new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, this.blocked.get(configKey));
+        this.failedRequests.set(requestIdValue, { fingerprint: requestFingerprint, code: inconsistent.code, message: inconsistent.message });
+        this.endActivation(configKey);
+        throw inconsistent;
+      }
+      this.endActivation(configKey);
+      throw error;
+    }
+    this.endActivation(configKey);
     const result: RollbackConfigResult = { applied: false, replayed: false, rolledBack: true, configKey, version: target.version };
     this.storeRequest(requestIdValue, requestFingerprint, result);
     this.recordAudit({ event: 'rollback', requestId: requestIdValue, configKey, version: target.version, outcome: 'rolled_back' });
@@ -308,18 +389,46 @@ export class ConfigUpdateClientService {
   }
 
   active(configKeyInput: string): ConfigBundle | null {
-    return clone(this.states.get(validConfigKey(configKeyInput))?.active ?? null);
+    const configKey = validConfigKey(configKeyInput);
+    this.assertUsable(configKey);
+    return clone(this.states.get(configKey)?.active ?? null);
   }
+
+  isBlocked(configKeyInput: string): boolean { return this.blocked.has(validConfigKey(configKeyInput)); }
 
   auditLog(): readonly ConfigClientAuditEvent[] { return Object.freeze(this.audit.map((entry) => Object.freeze(clone(entry)))); }
 
   private validateCommon(bundle: ConfigBundle): void {
+    if (!this.verifySignature.trustedKeyIds.includes(bundle.keyId)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.SIGNATURE_INVALID, 'bundle keyId is not trusted');
     let verified = false;
-    try { verified = this.verifySignature(configBundleSigningBytes(bundle), bundle.signature, bundle.keyId); } catch { verified = false; }
+    try { verified = this.verifySignature.verifyEd25519(configBundleSigningBytes(bundle), bundle.signature, bundle.keyId); } catch { verified = false; }
     if (!verified) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.SIGNATURE_INVALID, 'bundle signature is invalid');
+    if (bundle.tenantId !== this.tenantId) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle tenant does not match client tenant');
     if (compareVersions(this.clientVersion, bundle.minClientVersion) < 0) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.CLIENT_OUTDATED, 'client version is below minimum');
     if (bundle.expiresAt !== undefined && this.clock() >= bundle.expiresAt) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle has expired');
     if (!rolloutEligible(bundle, this.clientId)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.NOT_ELIGIBLE, 'client is outside the rollout');
+  }
+
+  private revisions(configKey: string): number { return this.revisionByConfig.get(configKey) ?? 0; }
+
+  private assertRevision(configKey: string, expected: number): void {
+    if (this.revisions(configKey) !== expected) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, 'config state changed during activation');
+  }
+
+  private beginActivation(configKey: string): void {
+    if (this.activationLocks.has(configKey)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.REENTRANT, 'nested config activation is rejected');
+    this.activationLocks.add(configKey);
+  }
+
+  private endActivation(configKey: string): void { this.activationLocks.delete(configKey); }
+
+  private quarantine(configKey: string, reason: string): void {
+    this.blocked.set(configKey, `config runtime is inconsistent and cannot continue: ${reason}`);
+  }
+
+  private assertUsable(configKey: string): void {
+    const reason = this.blocked.get(configKey);
+    if (reason) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.RUNTIME_INCONSISTENT, reason);
   }
 
   private storeRequest(requestId: string, requestFingerprint: string, result: ApplyConfigResult | RollbackConfigResult): void {

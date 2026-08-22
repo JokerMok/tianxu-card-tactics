@@ -4,6 +4,7 @@ export const CONFIG_UPDATE_ERROR_CODES = {
   INVALID_REQUEST: 'INVALID_REQUEST',
   INVALID_BUNDLE: 'INVALID_BUNDLE',
   SIGNATURE_INVALID: 'SIGNATURE_INVALID',
+  AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
   VERSION_CONFLICT: 'VERSION_CONFLICT',
   REQUEST_ID_REUSED: 'REQUEST_ID_REUSED',
   CONFIG_NOT_FOUND: 'CONFIG_NOT_FOUND',
@@ -25,6 +26,7 @@ export class ConfigUpdateError extends Error {
 
 export interface ConfigBundle {
   bundleId: string;
+  tenantId: string;
   configKey: string;
   version: string;
   minClientVersion: string;
@@ -58,7 +60,16 @@ export interface FetchConfigRequest {
   configKey: string;
   clientId: string;
   clientVersion: string;
+  authToken: string;
 }
+
+export interface ConfigAuthenticatedIdentity {
+  tenantId: string;
+  subjectId: string;
+  clientVersion: string;
+}
+
+export type ConfigIdentityResolver = (request: FetchConfigRequest) => ConfigAuthenticatedIdentity | null;
 
 export type FetchUnavailableReason = 'CONFIG_NOT_FOUND' | 'CLIENT_OUTDATED' | 'NOT_ELIGIBLE' | 'EXPIRED';
 
@@ -72,6 +83,7 @@ export interface FetchConfigResult {
 export interface RollbackConfigRequest {
   requestId: string;
   actorId: string;
+  tenantId: string;
   configKey: string;
   targetVersion?: string;
 }
@@ -96,7 +108,8 @@ export interface ConfigAuditEvent {
 
 export interface ConfigUpdateServiceOptions {
   now?: () => number;
-  verifySignature?: (canonicalUnsignedBundle: string, signature: string, keyId: string) => boolean;
+  publicKeys?: Readonly<Record<string, string | object>>;
+  resolveIdentity?: ConfigIdentityResolver;
   maxAuditEvents?: number;
 }
 
@@ -211,7 +224,7 @@ function validList(value: unknown, label: string): readonly string[] | undefined
 
 export function validateConfigBundle(value: unknown): ConfigBundle {
   if (!isRecord(value)) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle must be an object');
-  const allowedKeys = new Set(['bundleId', 'configKey', 'version', 'minClientVersion', 'rolloutPercent', 'rolloutSalt', 'allowList', 'denyList', 'payload', 'keyId', 'signature', 'createdAt', 'expiresAt']);
+  const allowedKeys = new Set(['bundleId', 'tenantId', 'configKey', 'version', 'minClientVersion', 'rolloutPercent', 'rolloutSalt', 'allowList', 'denyList', 'payload', 'keyId', 'signature', 'createdAt', 'expiresAt']);
   if (Object.keys(value).some((key) => !allowedKeys.has(key))) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_BUNDLE, 'bundle contains unknown fields');
   const configKey = validConfigKey(value.configKey);
   const version = validText(value.version, 'version');
@@ -238,6 +251,7 @@ export function validateConfigBundle(value: unknown): ConfigBundle {
   }
   return clone({
     bundleId: validText(value.bundleId, 'bundleId'),
+    tenantId: validText(value.tenantId, 'tenantId'),
     configKey,
     version,
     minClientVersion,
@@ -271,17 +285,29 @@ export function isRolloutEligible(bundle: ConfigBundle, subject: string): boolea
   return rolloutBucket(bundle.configKey, subject, bundle.rolloutSalt) < bundle.rolloutPercent;
 }
 
+function scopeKey(tenantId: string, configKey: string): string {
+  return `${tenantId}\u0000${configKey}`;
+}
+
 function fingerprint(value: unknown): string { return stableJson(value); }
 
 export function createConfigSignature(bundle: ConfigBundle | UnsignedConfigBundle, privateKey: string | object): string {
-  const key = typeof privateKey === 'string' ? createPrivateKey(privateKey) : privateKey;
-  return sign(null, Buffer.from(configBundleSigningBytes(bundle), 'utf8'), key).toString('base64url');
+  try {
+    const key = typeof privateKey === 'string' ? createPrivateKey(privateKey) : privateKey;
+    if (key.asymmetricKeyType !== 'ed25519') throw new Error('only Ed25519 signing keys are supported');
+    return sign(null, Buffer.from(configBundleSigningBytes(bundle), 'utf8'), key).toString('base64url');
+  } catch (error) {
+    throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, error instanceof Error ? error.message : 'invalid Ed25519 private key');
+  }
 }
 
 export function verifyConfigSignature(bundle: ConfigBundle, publicKey: string | object): boolean {
   try {
     const key = typeof publicKey === 'string' ? createPublicKey(publicKey) : publicKey;
-    return verify(null, Buffer.from(configBundleSigningBytes(bundle), 'utf8'), key, Buffer.from(bundle.signature, 'base64url'));
+    if (key.asymmetricKeyType !== 'ed25519') return false;
+    const signature = Buffer.from(bundle.signature, 'base64url');
+    if (signature.length !== 64) return false;
+    return verify(null, Buffer.from(configBundleSigningBytes(bundle), 'utf8'), key, signature);
   } catch {
     return false;
   }
@@ -289,7 +315,8 @@ export function verifyConfigSignature(bundle: ConfigBundle, publicKey: string | 
 
 export class ConfigUpdateService {
   private readonly clock: () => number;
-  private readonly verifySignature: (canonicalUnsignedBundle: string, signature: string, keyId: string) => boolean;
+  private readonly publicKeys: ReadonlyMap<string, ReturnType<typeof createPublicKey>>;
+  private readonly resolveIdentity?: ConfigIdentityResolver;
   private readonly maxAuditEvents: number;
   private readonly history = new Map<string, ConfigBundle[]>();
   private readonly active = new Map<string, ConfigBundle>();
@@ -300,7 +327,22 @@ export class ConfigUpdateService {
 
   constructor(options: ConfigUpdateServiceOptions = {}) {
     this.clock = options.now ?? (() => Date.now());
-    this.verifySignature = options.verifySignature ?? (() => false);
+    this.resolveIdentity = options.resolveIdentity;
+    const keys = new Map<string, ReturnType<typeof createPublicKey>>();
+    if (options.publicKeys !== undefined) {
+      if (Object.getPrototypeOf(options.publicKeys) !== Object.prototype && Object.getPrototypeOf(options.publicKeys) !== null) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, 'publicKeys must be a plain object');
+      for (const [keyId, value] of Object.entries(options.publicKeys)) {
+        const validKeyId = validText(keyId, 'keyId');
+        try {
+          const key = typeof value === 'string' ? createPublicKey(value) : value;
+          if (key.asymmetricKeyType !== 'ed25519') throw new Error('only Ed25519 public keys are supported');
+          keys.set(validKeyId, key);
+        } catch (error) {
+          throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, error instanceof Error ? error.message : 'invalid Ed25519 public key');
+        }
+      }
+    }
+    this.publicKeys = keys;
     this.maxAuditEvents = options.maxAuditEvents ?? 10_000;
     if (!Number.isSafeInteger(this.maxAuditEvents) || this.maxAuditEvents < 1 || this.maxAuditEvents > 100_000) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.INVALID_REQUEST, 'maxAuditEvents is invalid');
   }
@@ -313,20 +355,20 @@ export class ConfigUpdateService {
     const replay = this.replay<PublishConfigResult>(requestId, requestFingerprint, 'publish', bundle.configKey);
     if (replay) return replay;
     try {
-      let verified = false;
-      try { verified = this.verifySignature(configBundleSigningBytes(bundle), bundle.signature, bundle.keyId); } catch { verified = false; }
-      if (!verified) {
+      const publicKey = this.publicKeys.get(bundle.keyId);
+      if (!publicKey || !verifyConfigSignature(bundle, publicKey)) {
         throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.SIGNATURE_INVALID, 'bundle signature is invalid');
       }
-      const versions = this.history.get(bundle.configKey) ?? [];
+      const scope = scopeKey(bundle.tenantId, bundle.configKey);
+      const versions = this.history.get(scope) ?? [];
       const latest = versions.at(-1);
-      if (latest && compareVersions(bundle.version, latest.version) <= 0) {
-        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version must increase monotonically');
+      if (latest && (compareVersions(bundle.version, latest.version) <= 0 || compareVersions(bundle.minClientVersion, latest.minClientVersion) < 0)) {
+        throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.VERSION_CONFLICT, 'version and minClientVersion must increase monotonically');
       }
       this.ensureAuditCapacity();
       versions.push(bundle);
-      this.history.set(bundle.configKey, versions);
-      this.active.set(bundle.configKey, bundle);
+      this.history.set(scope, versions);
+      this.active.set(scope, bundle);
       const result: PublishConfigResult = { accepted: true, replayed: false, bundle: clone(bundle) };
       this.requests.set(requestId, { fingerprint: requestFingerprint, result });
       this.recordAudit({ event: 'publish', requestId, actorId, configKey: bundle.configKey, version: bundle.version, outcome: 'accepted' });
@@ -344,17 +386,36 @@ export class ConfigUpdateService {
     const clientId = validText(request?.clientId, 'clientId');
     const clientVersion = validText(request?.clientVersion, 'clientVersion');
     parseVersion(clientVersion);
-    const requestFingerprint = fingerprint({ configKey, clientId, clientVersion });
+    try { validText(request?.authToken, 'authToken'); } catch {
+      throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'authenticated identity is required');
+    }
+    let identity: ConfigAuthenticatedIdentity | null = null;
+    try { identity = this.resolveIdentity?.(request) ?? null; } catch { identity = null; }
+    if (!identity) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'authenticated identity is required');
+    let tenantId: string;
+    let subjectId: string;
+    let resolvedClientVersion: string;
+    try {
+      tenantId = validText(identity.tenantId, 'tenantId');
+      subjectId = validText(identity.subjectId, 'subjectId');
+      resolvedClientVersion = validText(identity.clientVersion, 'clientVersion');
+      parseVersion(resolvedClientVersion);
+    } catch {
+      throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'authenticated identity is invalid');
+    }
+    if (clientId !== subjectId || clientVersion !== resolvedClientVersion) throw new ConfigUpdateError(CONFIG_UPDATE_ERROR_CODES.AUTHENTICATION_REQUIRED, 'request identity does not match authenticated identity');
+    const requestFingerprint = fingerprint({ configKey, tenantId, subjectId, clientVersion: resolvedClientVersion });
     const replay = this.replay<FetchConfigResult>(requestId, requestFingerprint, 'fetch', configKey);
     if (replay) return replay;
-    const bundle = this.active.get(configKey);
+    const scope = scopeKey(tenantId, configKey);
+    const bundle = this.active.get(scope);
     if (!bundle) return this.storeFetch(requestId, requestFingerprint, { available: false, replayed: false, bundle: null, reason: 'CONFIG_NOT_FOUND' }, configKey, 'CONFIG_NOT_FOUND');
     const now = validTimestamp(this.clock(), 'now');
     let result: FetchConfigResult;
     let reason: FetchUnavailableReason | undefined;
-    if (compareVersions(clientVersion, bundle.minClientVersion) < 0) reason = 'CLIENT_OUTDATED';
+    if (compareVersions(resolvedClientVersion, bundle.minClientVersion) < 0) reason = 'CLIENT_OUTDATED';
     else if (bundle.expiresAt !== undefined && now >= bundle.expiresAt) reason = 'EXPIRED';
-    else if (!isRolloutEligible(bundle, clientId)) reason = 'NOT_ELIGIBLE';
+    else if (!isRolloutEligible(bundle, subjectId)) reason = 'NOT_ELIGIBLE';
     if (reason) result = { available: false, replayed: false, bundle: null, reason };
     else result = { available: true, replayed: false, bundle: clone(bundle) };
     return this.storeFetch(requestId, requestFingerprint, result, configKey, reason);
@@ -363,14 +424,16 @@ export class ConfigUpdateService {
   rollback(request: RollbackConfigRequest): RollbackConfigResult {
     const requestId = validText(request?.requestId, 'requestId');
     const actorId = validText(request?.actorId, 'actorId');
+    const tenantId = validText(request?.tenantId, 'tenantId');
     const configKey = validConfigKey(request?.configKey);
     const targetVersion = request?.targetVersion === undefined ? undefined : validText(request.targetVersion, 'targetVersion');
     if (targetVersion !== undefined) parseVersion(targetVersion);
-    const requestFingerprint = fingerprint({ actorId, configKey, targetVersion });
+    const requestFingerprint = fingerprint({ actorId, tenantId, configKey, targetVersion });
     const replay = this.replay<RollbackConfigResult>(requestId, requestFingerprint, 'rollback', configKey);
     if (replay) return replay;
-    const versions = this.history.get(configKey) ?? [];
-    const current = this.active.get(configKey);
+    const scope = scopeKey(tenantId, configKey);
+    const versions = this.history.get(scope) ?? [];
+    const current = this.active.get(scope);
     const target = targetVersion === undefined
       ? versions.filter((bundle) => current === undefined || compareVersions(bundle.version, current.version) < 0).at(-1)
       : versions.find((bundle) => bundle.version === targetVersion);
@@ -381,7 +444,7 @@ export class ConfigUpdateService {
       throw error;
     }
     this.ensureAuditCapacity();
-    this.active.set(configKey, target);
+    this.active.set(scope, target);
     const result: RollbackConfigResult = { rolledBack: true, replayed: false, bundle: clone(target) };
     this.requests.set(requestId, { fingerprint: requestFingerprint, result });
     this.recordAudit({ event: 'rollback', requestId, actorId, configKey, version: target.version, outcome: 'accepted' });
