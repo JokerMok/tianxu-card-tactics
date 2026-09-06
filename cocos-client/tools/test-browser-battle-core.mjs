@@ -15,6 +15,11 @@ if (!vm.SourceTextModule) {
 const root = path.resolve(import.meta.dirname, '..');
 const entry = path.join(root, 'assets/scripts/battle/runtime/browser-battle-core.ts');
 assert(fs.existsSync(entry), 'browser battle core entry must exist');
+// Type-only imports disappear during execution; check this shared type's owner as well.
+const configSource = fs.readFileSync(path.join(path.dirname(entry), 'battle-config.ts'), 'utf8');
+const coreSource = fs.readFileSync(path.join(path.dirname(entry), 'battle-core.ts'), 'utf8');
+assert.match(configSource, /export\s+interface\s+ProfessionConfig\s*\{/, 'config must export its profession type');
+assert.doesNotMatch(coreSource, /\binterface\s+ProfessionConfig\s*\{/, 'core must use the shared config type');
 const context = vm.createContext({}); // No process, require, Buffer, or filesystem in the execution realm.
 const modules = new Map();
 function moduleFor(filename) {

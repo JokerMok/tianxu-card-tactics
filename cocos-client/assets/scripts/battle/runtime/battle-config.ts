@@ -31,6 +31,12 @@ export interface UnitConfig {
   readonly enabled?: boolean;
 }
 
+export interface ProfessionConfig {
+  readonly id: string;
+  readonly skillIds: readonly string[];
+  readonly enabled?: boolean;
+}
+
 export interface AuthorityConfig {
   readonly cards: readonly CardConfig[];
   readonly skills: readonly SkillConfig[];

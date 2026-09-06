@@ -41,12 +41,6 @@ export type HighLevelAction =
   | { readonly type: 'APPLY_DOT'; readonly side: Side; readonly targetIds: readonly string[]; readonly amount: number }
   | { readonly type: 'END_TURN' };
 
-export interface ProfessionConfig {
-  readonly id: string;
-  readonly skillIds: readonly string[];
-  readonly enabled?: boolean;
-}
-
 export interface ProfessionRuntimeState extends ProfessionState {
   readonly professionId: string;
   readonly barrierByUnit: Readonly<Record<string, number>>;
