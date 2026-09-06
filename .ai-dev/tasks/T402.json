@@ -1,0 +1,29 @@
+{
+  "id": "T402",
+  "dependencies": [
+    "T401"
+  ],
+  "depends_on": [
+    "T401"
+  ],
+  "wave": 2,
+  "executor": "cloud",
+  "risk": "high",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-campaign-session.mjs",
+    "cd cocos-client && node --experimental-strip-types tools/test-browser-battle-core.mjs"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/campaign/",
+    "cocos-client/assets/scripts/meta/GameState.ts",
+    "cocos-client/tools/test-campaign-session.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "web-prototype/dist/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}
+
