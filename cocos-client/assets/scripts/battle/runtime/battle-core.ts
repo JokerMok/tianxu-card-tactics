@@ -347,7 +347,8 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
         ? ['fixtureCardId', PEER_CARD_ID_KEY, 'cocosCardId']
         : ['fixtureCardId', PEER_CARD_ID_KEY, 'cocosCardId', 'cocosUnitId'];
       exactKeys(raw, allowed, `input.fixture.cards[${index}]`, 'INVALID_INPUT', true);
-      if ([raw.fixtureCardId, raw[PEER_CARD_ID_KEY], raw.cocosCardId].some((field) => typeof field !== 'string')) {
+      const referenceCardId = raw[PEER_CARD_ID_KEY];
+      if (typeof raw.fixtureCardId !== 'string' || typeof referenceCardId !== 'string' || typeof raw.cocosCardId !== 'string') {
         throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}] IDs must be strings`);
       }
       if (raw.cocosUnitId !== undefined && typeof raw.cocosUnitId !== 'string') throw new RunnerInputError('INVALID_INPUT', `input.fixture.cards[${index}].cocosUnitId must be a string`);
@@ -358,7 +359,7 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
       }
       return {
         fixtureCardId: raw.fixtureCardId,
-        referenceCardId: raw[PEER_CARD_ID_KEY] as string,
+        referenceCardId,
         cocosCardId: raw.cocosCardId,
         ...(raw.cocosUnitId === undefined ? {} : { cocosUnitId: raw.cocosUnitId }),
       };
@@ -377,8 +378,9 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
     const events: ParityEventMapping[] = value.events.map((raw, index) => {
       if (!isRecord(raw)) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events[${index}] must be an object`);
       exactKeys(raw, ['fixtureType', PEER_EVENT_TYPE_KEY, 'cocosType', 'fields'], `input.fixture.events[${index}]`, 'INVALID_INPUT', true);
-      if ([raw.fixtureType, raw[PEER_EVENT_TYPE_KEY], raw.cocosType].some((field) => typeof field !== 'string') || !isUnknownArray(raw.fields) || !raw.fields.every((field) => typeof field === 'string')) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events[${index}] is invalid`);
-      return { fixtureType: raw.fixtureType, referenceType: raw[PEER_EVENT_TYPE_KEY] as string, cocosType: raw.cocosType, fields: raw.fields as string[] };
+      const referenceType = raw[PEER_EVENT_TYPE_KEY];
+      if (typeof raw.fixtureType !== 'string' || typeof referenceType !== 'string' || typeof raw.cocosType !== 'string' || !isUnknownArray(raw.fields) || !raw.fields.every((field) => typeof field === 'string')) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events[${index}] is invalid`);
+      return { fixtureType: raw.fixtureType, referenceType, cocosType: raw.cocosType, fields: raw.fields as string[] };
     });
     for (const field of ['fixtureType', 'referenceType', 'cocosType'] as const) {
       if (new Set(events.map((eventMapping) => eventMapping[field])).size !== events.length) throw new RunnerInputError('INVALID_INPUT', `input.fixture.events ${field} values must be unique`);
@@ -409,8 +411,11 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
         const allowed = raw.type === 'MOVE_UNIT' && raw.steps !== undefined ? ['type', 'unitRef', 'steps'] : ['type', 'unitRef'];
         exactKeys(raw, allowed, `input.fixture.actions[${index}]`, 'INVALID_INPUT', true);
         if (typeof raw.unitRef !== 'string' || !unitFixtureRefs.has(raw.unitRef)) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] unitRef is invalid`);
-        if (raw.type === 'MOVE_UNIT' && raw.steps !== undefined && (!isSafeInteger(raw.steps) || raw.steps < 0)) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] steps is invalid`);
-        return raw.type === 'MOVE_UNIT' && raw.steps !== undefined ? { type: raw.type, unitRef: raw.unitRef, steps: raw.steps } : { type: raw.type, unitRef: raw.unitRef };
+        if (raw.type === 'MOVE_UNIT' && raw.steps !== undefined) {
+          if (!isSafeInteger(raw.steps) || raw.steps < 0) throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] steps is invalid`);
+          return { type: raw.type, unitRef: raw.unitRef, steps: raw.steps };
+        }
+        return { type: raw.type, unitRef: raw.unitRef };
       }
       throw new RunnerInputError('INVALID_COMMAND', `input.fixture.actions[${index}] type is unsupported`);
     });
