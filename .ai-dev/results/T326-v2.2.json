@@ -1,0 +1,27 @@
+{
+  "task_id": "T326",
+  "phase": "v2.2-M8-12-STABILITY",
+  "status": "passed",
+  "head_sha": "1dfefcdf75a973839f1bc563d87346bd9f71d16f",
+  "merge_sha": "1dfefcdf75a973839f1bc563d87346bd9f71d16f",
+  "implementation": {
+    "files": [
+      "cocos-client/tools/release/stability/verify-stability.mjs",
+      "documentation/release/stability/T326-stability-rehearsal.md"
+    ],
+    "summary": "发布前稳定性演练读取真实配置、章节与 A0 契约，运行长稳样本、回滚与异常恢复，并覆盖缺失/非法/越界失败样本。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/release/stability/verify-stability.mjs",
+    "independent_review": "pass",
+    "metrics": {
+      "ticks": 1800,
+      "battles": 60,
+      "rollback_checks": 7,
+      "checkpoints": 2,
+      "recovered_exceptions": 2,
+      "negative_cases": 32
+    }
+  },
+  "residual_risk": "T326 不替代真实 GPU 性能测试；该门禁由 T203/T327 等任务负责。"
+}

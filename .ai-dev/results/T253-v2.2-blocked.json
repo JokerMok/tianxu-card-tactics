@@ -1,0 +1,44 @@
+{
+  "task_id": "T253",
+  "phase": "v2.2-card-art-preflight",
+  "executor": "coordinator",
+  "implementer_id": "coordinator-blocker-audit",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "review_status": "blocked",
+  "dependencies": [],
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "T253 的任务定义明确要求负责人先确认美术风格锁定；当前任务仍为 blocked，未发现该前置确认。"
+    },
+    {
+      "severity": "P1",
+      "finding": "cocos-client/assets/resources/art/cards/ 目录及商业卡面母版专项验收脚本均不存在，不能把现有 A0 卡牌缩略图或 UI 图片冒充商业卡面母版。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "test -d cocos-client/assets/resources/art/cards",
+      "exit_code": 1
+    },
+    {
+      "command": "test -f cocos-client/tools/test-commercial-card-templates.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "note": "需先锁定美术风格并提供商业卡面母版输入后再拆分/重启 T253，不伪造卡面资源。",
+  "independent_audit": {
+    "agent_id": "01a02ad1-7ddf-7be0-b4f5-32d372b4d010",
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-blockers-20260823",
+    "status": "confirmed",
+    "changed_files": [],
+    "scope": "read-only blocker inventory"
+  }
+}
+

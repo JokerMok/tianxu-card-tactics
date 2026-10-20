@@ -92,18 +92,28 @@ export function createDefaultState(): GameState {
 }
 
 export function loadGame(): GameState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return createDefaultState();
-    const saved = JSON.parse(raw) as GameState;
-    if (saved.version !== 1 || !saved.player || !saved.resources || !Array.isArray(saved.cards)) return createDefaultState();
-    return saved;
-  } catch {
-    return createDefaultState();
+  const current=localStorage.getItem('tianxu.pve.save.v2');
+  if(current!==null){
+    const envelope=JSON.parse(current);
+    if(envelope.version!==2||envelope.game?.version!==1)throw new Error('存档版本不兼容，原记录已保留');
+    return envelope.game;
   }
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(raw===null)return createDefaultState();
+  const saved=JSON.parse(raw) as GameState;
+  if(saved.version!==1||!saved.player||!saved.resources||!Array.isArray(saved.cards))throw new Error('存档损坏，原记录已保留');
+  return saved;
 }
 
 export function saveGame(state: GameState): void {
+  const raw=localStorage.getItem('tianxu.pve.save.v2');
+  if(raw!==null){
+    const envelope=JSON.parse(raw);
+    if(envelope.version!==2)throw new Error('存档版本不兼容');
+    if(envelope.campaign?.phase==='active')throw new Error('战斗进行中，请先完成或退出');
+    localStorage.setItem('tianxu.pve.save.v2',JSON.stringify({...envelope,game:state}));
+    return;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 

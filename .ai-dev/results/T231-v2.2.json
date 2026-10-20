@@ -1,0 +1,11 @@
+{
+  "task_id": "T231",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "f392d3e",
+  "merge_sha": "343f13b1ceca81d8378aa4a9ba617bee4ccd32b9",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":12},
+  "verification": ["test-equipment-inventory.mjs: PASS","T226/T227/T228/Hero/Battle: PASS","git diff --check: PASS"],
+  "scope": "pass: equipment directory and test only",
+  "residual_risk": "Restore checks structural but not full processed-request semantic fingerprint consistency; equipment instance IDs are globally unique."
+}

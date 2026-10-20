@@ -1,0 +1,40 @@
+{
+  "task_id": "T223",
+  "title": "M5-08 多格特殊实体",
+  "status": "passed",
+  "head_sha": "eacbe54",
+  "merge_commit": "7bf853a5d6e73b242d96a7af9e2dfcc75eb73198",
+  "modified_files": [
+    "cocos-client/assets/scripts/core/board/special-entities/index.ts",
+    "cocos-client/tools/test-special-entities.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-special-entities.mjs",
+        "exit_code": 0,
+        "output": "T223 special entities PASS"
+      },
+      {
+        "command": "cd cocos-client && npm run test:battle-runner",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "eacbe54",
+    "scope_check": "passed",
+    "additional_probe": "sparse footprint rejection and deep runtime mutation resistance passed"
+  },
+  "repair_attempts": 1,
+  "residual_risk": "The special-entity module is not yet wired into the existing battle runner call chain; board-level shared references remain outside this task's scope.",
+  "rollback": "Revert merge commit 7bf853a5d6e73b242d96a7af9e2dfcc75eb73198 to remove T223 from the coordinator branch."
+}

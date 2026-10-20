@@ -1,0 +1,33 @@
+{
+  "task_id": "T048",
+  "executor": "cloud",
+  "implementer_id": "01a01126-da76-71d1-84a3-d1e34132c3f4",
+  "reviewer_id": "01a0113c-7f75-7c00-ab09-c69471dac126",
+  "reviewer_ids": [
+    "01a0112e-9b47-7252-a0d2-2fbc29b39ffc",
+    "01a01133-3a9d-7430-8f75-791f27465faa",
+    "01a0113c-7f75-7c00-ab09-c69471dac126"
+  ],
+  "base_sha": "bceb6b7cfa459bb1b69cfe8f300476a5ce6a2472",
+  "head_sha": "4e1ef9aa67e9d32eacd6a3a8eccb50199220ad9d",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && npm run test:battle-harness-v2", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T048 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "path": "cocos-client/assets/scripts/battle/testsupport/battle-harness-v2.ts:80", "summary": "首次审查发现变值 type getter 被 parseCommand 重复读取后可伪装为 END_TURN 并推进状态；修复提交 4e1ef9a 已覆盖该反例。"},
+    {"severity": "P1", "path": "cocos-client/assets/scripts/battle/testsupport/battle-harness-v2.ts:87", "summary": "最终审查发现可变 getOwnPropertyDescriptor 的 Proxy 仍可使快照阶段与执行阶段观察到不同 type，非法命令可执行 END_TURN 并改变会话、状态哈希与生命周期。"}
+  ],
+  "repair_attempted": true,
+  "repair_commit": "4e1ef9aa67e9d32eacd6a3a8eccb50199220ad9d",
+  "scope_note": "完整差异只位于批准的 cocos-client/；Web 依赖与构建产物仅用于隔离回归，构建产物已清除。T048 不得合入协调主线，保留 attempt1 worktree 与审查证据。",
+  "outcome": "blocked_after_one_cloud_repair"
+}

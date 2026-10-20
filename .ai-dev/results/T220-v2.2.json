@@ -1,0 +1,41 @@
+{
+  "task_id": "T220",
+  "title": "M5-05 塔门票、续战和重置",
+  "status": "passed",
+  "head_sha": "e255aa4",
+  "merge_commit": "ff50fc363d266e22fe5c3e4a23c82c20ac288c6c",
+  "modified_files": [
+    "cocos-client/assets/scripts/pve/tower/lifecycle/TowerLifecycle.ts",
+    "cocos-client/assets/scripts/pve/tower/lifecycle/index.ts",
+    "cocos-client/tools/test-tower-lifecycle.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-tower-lifecycle.mjs",
+        "exit_code": 0,
+        "output": "T220 tower lifecycle PASS: floors=50, daily-free=2, paid-retry=1, weekly-reset=2, invalid-cases=10, saves=8"
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-tower-config.mjs",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "e255aa4",
+    "scope_check": "passed",
+    "additional_probe": "time rollback, cross-cycle persistence, real date, compensation idempotence and serialized restore passed"
+  },
+  "repair_attempts": 1,
+  "residual_risk": "The service guarantees one-snapshot persistence, but a real storage adapter still needs transaction/version or CAS semantics for multi-instance concurrent writes.",
+  "rollback": "Revert merge commit ff50fc363d266e22fe5c3e4a23c82c20ac288c6c to remove T220 from the coordinator branch."
+}

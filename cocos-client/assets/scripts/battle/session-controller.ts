@@ -1,4 +1,4 @@
-import type { BattleEvent, BattleState } from '../../core/types/index.ts';
+import type { BattleEvent, BattleState } from '../core/types/index.ts';
 import type { BattlePlayCardAction } from './action-contract.ts';
 
 export type { BattlePlayCardAction, BattleTarget } from './action-contract.ts';

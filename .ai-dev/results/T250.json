@@ -1,0 +1,18 @@
+{
+  "task_id": "T250",
+  "executor": "cloud",
+  "implementer_id": "01a024e4-80b2-7e91-8221-043f81473494",
+  "reviewer_id": "01a02508-15b3-7333-b53a-fe18343b35bf",
+  "base_sha": "0b600a6",
+  "head_sha": "bfe57d8f1f7d75e69d92de716f8e4d2b49c6b8c6",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-scene-e104.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查发现 manifest referenceAsset.path 未绑定；补充路径漂移反例并修复。实现提交：1bbc8a2、5c5f3af；协调主线集成：d6d36e3、c9ff549。",
+  "scope_note": "仅修改 T250 允许的 E104 验证器路径，未改写 PNG 场景资产。"
+}

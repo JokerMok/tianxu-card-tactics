@@ -1,3 +1,5 @@
+import { applyCampaignSkill, expireCampaignBuffs, type CampaignSkillEffect } from './campaign-effects.ts';
+import type { CampaignLevel } from './campaign-config.ts';
 import type { AuthorityConfig, CardConfig, SkillConfig, UnitConfig, ProfessionConfig } from './battle-config.ts';
 import { createBoardState, deployUnit, getLegalDeploymentCells, isSummonCell } from '../../core/board/index.ts';
 import { actionOrder, createAttackAction, type AttackTarget } from '../../core/combat/index.ts';
@@ -286,6 +288,7 @@ export const DEFAULT_BATTLE_BINDINGS = Object.freeze({
 });
 
 export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAULT_BATTLE_BINDINGS) {
+  const campaignStates = new WeakSet<object>();
   const { createBoardState, moveUnit, createAttackAction, enqueue, resolveOutcome, chooseSeeded,
     isSafeInteger, isUnknownArray, parseActions, heroMaxHp: HERO_MAX_HP } = bindings;
   const NEUTRAL_RUNTIME_STATES = new WeakSet<object>();
@@ -600,9 +603,12 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
       const next = { ...state, ...patch, revision: state.revision + 1 };
       freezeNeutralValue(next);
       NEUTRAL_RUNTIME_STATES.add(next);
+      if(campaignStates.has(state))campaignStates.add(next);
       return next;
     }
-    return updateBattleState(state, patch as Partial<BattleState>) as RunnerBattleState;
+    const next = updateBattleState(state, patch as Partial<BattleState>) as RunnerBattleState;
+    if(campaignStates.has(state))campaignStates.add(next);
+    return next;
   }
 
   function emit(state: RunnerBattleState, type: string, side: Side, payload: Readonly<Record<string, unknown>> = {}): RunnerBattleState {
@@ -965,7 +971,10 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
     if (!actionResult) throw new RunnerInputError('INVALID_COMMAND', `attackerId has no legal target: ${action.attackerId}`);
     if (parity && actionResult.target.kind === 'unit') {
       const target = actionResult.target;
-      const damaged = damageUnit(createBoardState(state.units), target.unit.id, actionResult.damage, true);
+      const barrier = campaignStates.has(state) ? target.unit.statuses.find(s=>s.kind==='BARRIER') : undefined;
+      const rawDamage = Math.max(1,actionResult.damage-target.unit.armor);
+      const dealt = Math.max(0,rawDamage-(barrier?.value??0));
+      const damaged = barrier ? {state:createBoardState(state.units.map(u=>u.id===target.unit.id?{...u,hp:Math.max(0,u.hp-dealt),statuses:u.statuses.filter(s=>s.kind!=='BARRIER')}:u)),damage:Math.min(target.unit.hp,dealt),killed:target.unit.hp<=dealt} : damageUnit(createBoardState(state.units), target.unit.id, actionResult.damage, true);
       const units = damaged.state.units.map((unit) => unit.id === attacker.id ? { ...unit, actionsTaken: unit.actionsTaken + 1 } : unit);
       let next = update(state, { units });
       next = emit(next, 'DAMAGE', target.unit.side, { side: target.unit.side, targetKind: 'unit', targetId: target.unit.id, value: damaged.damage, sourceId: attacker.id });
@@ -1318,7 +1327,59 @@ export function createBattleRuntime(AUTHORITY: AuthorityConfig, bindings = DEFAU
     };
   }
 
-  return Object.freeze({ runBattleRunner, runBattleRunnerV2, runNeutralBattle });
+  function runCampaign(seed: number, actions: readonly HighLevelAction[], level: CampaignLevel, enemyDeck: readonly string[], effects: readonly CampaignSkillEffect[], professionId: string, enemyOpeningPriority: readonly string[] = []): BattleRunnerOutput {
+    const parsed = parseInput({ protocol: BATTLE_RUNNER_PROTOCOL, seed, actions });
+    let state = initialState(seed, { player: AUTHORITY.deck, enemy: enemyDeck });
+    campaignStates.add(state);
+    NEUTRAL_RUNTIME_STATES.add(state);
+    // Keep shuffled order and every card; move disallowed opening cards behind the opening draw.
+    const hands = { ...state.hands };
+    const decks = { ...state.decks };
+    let nextId = 1;
+    for (const side of SIDES) {
+      const sequence = [...hands[side].map(card => card.cardId), ...decks[side]];
+      // L01 strategy cards enter the opening hand before cards this opponent cannot play.
+      // Stable partition changes opening order only; every configured card is retained.
+      if(side==='enemy' && enemyOpeningPriority.length)sequence.sort((a,b)=>Number(enemyOpeningPriority.includes(b))-Number(enemyOpeningPriority.includes(a)));
+      const unitsOnly = side === 'enemy' || !level.scenarioRules.openingSkillCardsAllowed;
+      const opening: string[] = [];
+      const remaining: string[] = [];
+      for (const id of sequence) {
+        if (opening.length < 5 && (!unitsOnly || AUTHORITY.cards.find(card => card.id === id)?.cardType === 'UNIT')) opening.push(id);
+        else remaining.push(id);
+      }
+      hands[side] = opening.map(cardId => ({ instanceId: `card-${nextId++}`, cardId, remainingPreparation: AUTHORITY.prepareByCardId[cardId] }));
+      decks[side] = remaining;
+    }
+    state = update(state, { hands, decks, nextId, professionState:createRuntimeProfessionState(professionId), laneCount:level.scenarioRules.activeLaneCount,
+      heroHp:{...state.heroHp,player:level.scenarioRules.playerHeroHp},heroMaxHp:{...state.heroMaxHp,player:level.scenarioRules.playerHeroHp} });
+    for (const [index, action] of parsed.actions.entries()) {
+      if (state.status !== 'playing') throw new RunnerInputError('INVALID_COMMAND','battle already ended');
+      if (action.type === 'BATTLE_START') state = startBattle(state);
+      else if (action.type === 'DEPLOY_UNIT') {
+        if (action.lane < 0 || action.lane >= state.laneCount) throw new RunnerInputError('INVALID_COMMAND','lane is locked');
+        if (action.side === 'player' && action.cell >= level.scenarioRules.playerSummonSlots) throw new RunnerInputError('INVALID_COMMAND','summon cell is locked');
+        if (!state.hands[action.side]?.some(card => card.cardId===action.cardId && card.remainingPreparation===0)) throw new RunnerInputError('INVALID_COMMAND','card is not ready');
+        state = deploy(state,action,undefined,true,index+1);
+        if (level.scenarioRules.unlockSecondLaneOnFirstDeployment && state.laneCount<2) state=update(state,{laneCount:2});
+      } else if (action.type === 'END_TURN') {
+        const side=state.activeSide;
+        state=endTurnParity(state);
+        state=update(state,{units:expireCampaignBuffs(state.units,side)});
+      } else if (action.type === 'PLAY_CARD') {
+        state=submitCardTarget(state,action,index+1);
+        state=update(state,applyCampaignSkill(state,action,effects));
+        state=emit(state,'CARD_PLAYED',action.side,{cardId:action.cardId,target:action.target});
+      }
+      else throw new RunnerInputError('INVALID_COMMAND','campaign units act automatically at end turn');
+      if (state.status === 'playing' && (state.heroHp.player<=0 || state.heroHp.enemy<=0)) state=settle(state).state;
+    }
+    const outcome:OutcomeResult=state.status==='playing'?{status:'playing',reason:'ONGOING',round:state.round,rng:{rngState:state.rngState,rngCursor:state.rngCursor},objectiveIds:[],settled:false}:neutralOutcome(state);
+    return {protocol:BATTLE_RUNNER_PROTOCOL,status:'ok',runner:BATTLE_RUNNER,seed,actionCount:actions.length,
+      finalState:state,events:state.events,rngCursor:state.rngCursor,outcome,finalHash:hash(stable({seed,actions,finalState:state}))};
+  }
+
+  return Object.freeze({ runBattleRunner, runBattleRunnerV2, runNeutralBattle, runCampaign });
 }
 
 export function errorOutput(error: unknown, protocol: typeof BATTLE_RUNNER_PROTOCOL | typeof BATTLE_RUNNER_V2_PROTOCOL = BATTLE_RUNNER_PROTOCOL): BattleRunnerError {

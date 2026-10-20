@@ -1,0 +1,66 @@
+{
+  "bird": {
+    "triangles": 2832,
+    "drawGroups": 13
+  },
+  "rider": {
+    "triangles": 9288,
+    "drawGroups": 31
+  },
+  "guard": {
+    "triangles": 8564,
+    "drawGroups": 19
+  },
+  "soldier": {
+    "triangles": 8484,
+    "drawGroups": 20
+  },
+  "archer": {
+    "triangles": 6456,
+    "drawGroups": 23
+  },
+  "healer": {
+    "triangles": 5028,
+    "drawGroups": 19
+  },
+  "banner": {
+    "triangles": 8108,
+    "drawGroups": 21
+  },
+  "tide": {
+    "triangles": 5188,
+    "drawGroups": 20
+  },
+  "spirit": {
+    "triangles": 5164,
+    "drawGroups": 18
+  },
+  "engineer": {
+    "triangles": 4936,
+    "drawGroups": 18
+  },
+  "construct": {
+    "triangles": 4134,
+    "drawGroups": 19
+  },
+  "siege": {
+    "triangles": 4382,
+    "drawGroups": 9
+  },
+  "hound": {
+    "triangles": 2160,
+    "drawGroups": 10
+  },
+  "behemoth": {
+    "triangles": 2448,
+    "drawGroups": 12
+  },
+  "rhino": {
+    "triangles": 2484,
+    "drawGroups": 12
+  },
+  "stone": {
+    "triangles": 9140,
+    "drawGroups": 24
+  }
+}

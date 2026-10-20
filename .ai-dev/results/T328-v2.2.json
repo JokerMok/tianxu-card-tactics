@@ -1,0 +1,38 @@
+{
+  "task_id": "T328",
+  "phase": "v2.2-M8-12-SECURITY",
+  "status": "passed",
+  "head_sha": "9495f5aee71be5ccd18cc15db7dfa9bcc15c4e61",
+  "merge_sha": "9495f5aee71be5ccd18cc15db7dfa9bcc15c4e61",
+  "implementation": {
+    "files": [
+      "cocos-client/tools/release/security/verify-security.mjs",
+      "cocos-client/tools/release/security/samples/pass-release-security.json",
+      "cocos-client/tools/release/security/samples/fail-tampered-save.json",
+      "cocos-client/tools/release/security/samples/invalid-json.txt",
+      "documentation/release/security/T328-security-rehearsal.md"
+    ],
+    "summary": "完成真实配置/源码安全契约、合法与篡改存档、缺失/非法/越界/路径穿越反例，并将回退流程改为动态发现 T328 安全路径提交后逆序回退。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/release/security/verify-security.mjs",
+    "independent_review": "pass",
+    "dynamic_rollback": {
+      "related_commits": 5,
+      "revert_steps": 5,
+      "all_exit_codes": 0,
+      "conflicts": 0,
+      "final_worktree_clean": true,
+      "saved_copy_verifier_exit_code": 0
+    },
+    "negative_cases": [
+      "tampered save",
+      "missing sample",
+      "invalid JSON",
+      "out-of-range save integer",
+      "config path traversal",
+      "resource path traversal"
+    ]
+  },
+  "residual_risk": "SHA-256 基线与 verifier 同属仓库，不能替代独立信任根；结构合法但内容被篡改、账号/支付/服务端鉴权和发行平台安全不在本任务范围内。"
+}

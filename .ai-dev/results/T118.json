@@ -1,0 +1,24 @@
+{
+  "task_id": "T118",
+  "executor": "cloud",
+  "implementer_id": "01a01019-8ba4-7a61-87c2-6a616f323463",
+  "reviewer_id": "01a0105c-d2e7-76e2-91ef-1f007e771493",
+  "base_sha": "396554e8f4237f57a0faadc141ea433feea7930c",
+  "head_sha": "32e35fe26f4c623f42fc2b94490a627755e51f26",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/effects/battle-feedback-projector.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T118 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "协调器在四轮独立审查后修复未知单位 HP、失败事件状态泄漏、跨类型身份冲突、UNIT_DIED 回退身份校验、护盾阵营冲突和平局 winner 兼容问题；最终独立审查无 P0/P1/P2。",
+  "scope_note": "范围基线、最终范围检查和结果闸门均在 T118 独立 worktree 执行；临时 Web 依赖链接已移除。"
+}

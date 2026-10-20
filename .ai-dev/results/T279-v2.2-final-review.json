@@ -1,0 +1,24 @@
+{
+  "task_id": "T279",
+  "phase": "v2.2-unit-production-final-review",
+  "executor": "agent",
+  "implementer_id": "01a025d7-8919-7270-8f41-7c40e846bfb0",
+  "reviewer_id": "01a02621-04d4-7a53-a65d-84c2d0d85bc2",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "881f00b4097454faff8c952c46ef0e7f2570e2c9",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "finding": "skeleton.json 被修改但缺少对应 skeleton.json.meta。"},
+    {"severity": "P1", "finding": "两个正式 PNG 解码为 RGBA，但对应 .meta 的 hasAlpha 均为 false，元数据与真实资源不一致。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u002.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check 4dfd61c..881f00b", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "正式运行时路径与 RGBA 资源已修复，但 Cocos 元数据一致性仍阻断放行。"
+}

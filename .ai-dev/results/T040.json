@@ -1,0 +1,27 @@
+{
+  "task_id": "T040",
+  "executor": "cloud",
+  "implementer_id": "019ff695-ad25-71d1-b753-2d1066d86190",
+  "reviewer_id": "019ff6a2-fee5-75c3-8985-68e8927607ef",
+  "base_sha": "267f8c8",
+  "head_sha": "f32c196cc04752768d39c6916200d0fa35968b60",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "for f in cocos-client/assets/scripts/battle/**/*.test.mjs; do node --experimental-strip-types \"$f\"; done", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node tools/test-battle-runner.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node tools/test-parity-contract.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node tools/test-golden-runner.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-neutral-balance.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check ed34d81..HEAD", "exit_code": 0},
+    {"command": "python3 /Users/jokermok/.codex/skills/orchestrate-hybrid-development/scripts/scope_guard.py check --project-root /private/tmp/tianxu-t040-worktree --task-id T040 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查先发现 PLAY_CARD 未接入 session/runner，修复为共享动作契约并加入真实 controller→runner 集成；第二轮审查又发现 ENEMY_LANE/ALLY_LANE 被折叠且空车道可提交，修复为按阵营筛选并由 runner 校验存活目标。另补齐真实 controller dispatch 的 this 绑定与准备值生命周期回归。最终独立审查对 f32c196 PASS。",
+  "scope_note": "scope_guard 首次发现 React build 生成的 dist 文件，已移出任务 worktree；最终 scope_guard PASS。"
+}

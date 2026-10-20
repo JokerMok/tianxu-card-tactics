@@ -1,0 +1,26 @@
+{
+  "task_id": "T241",
+  "executor": "agent",
+  "implementer_id": "01a0278c-8920-79d2-848a-56ee8029f888",
+  "reviewer_id": "01a02882-5f8f-74f0-a87e-b6fa04e4f93a",
+  "base_sha": "01d223b1e9321abe5afa30b2b65a2ee6ca654795",
+  "head_sha": "ba81daa0e501075f096998acf71da08780824c94",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "T241_DIFF_COMMIT=ba81daa T241_DIFF_PARENT=679f0fe T241_WORKING_DIFF_BASE=HEAD node --experimental-strip-types cocos-client/tools/test-economy-30d.mjs", "exit_code": 0},
+    {"command": "T233_BASE_COMMIT=b630af9 T233_TARGET_COMMIT=678f7e0 node --experimental-strip-types cocos-client/tools/test-equipment-crafting.mjs", "exit_code": 0},
+    {"command": "T235_BASE_COMMIT=3350b3d T235_TARGET_COMMIT=f64f9bb node --experimental-strip-types cocos-client/tools/test-tax-research.mjs", "exit_code": 0},
+    {"command": "T236_DIFF_COMMIT=9b5ab23 T236_WORKING_DIFF_BASE=HEAD node --experimental-strip-types cocos-client/tools/test-expedition.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/tools/test-card-shop.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/tools/test-r2-stability.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T241 --attempt 5 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": ["1f0ca0b", "4e76726", "2b5cb5b", "1fd26bf"],
+  "merge_commits": ["679f0fe", "2ec0e90", "20fb4c4", "47025cd", "13c4219", "8184a86", "ba81daa"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T241-final-XRYpCb", "scope_guard_attempt": 6, "scope_check": "pass", "result_guard": "pass"},
+  "notes": "最终独立审查通过；30 天确定性仿真、资源守恒、save/restore、rollback、幂等、跨表配置、exact-key、derived seed、远征 history、ledger initial、bankrupt 当前边界与同步伪造双向拒绝，以及跨任务回归均通过。"
+}

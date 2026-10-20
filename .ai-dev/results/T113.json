@@ -1,0 +1,20 @@
+{
+  "task_id": "T113",
+  "executor": "cloud",
+  "implementer_id": "019fb0e3-f2a9-7430-8c9d-a2785cca640d",
+  "reviewer_id": "019fb0f1-423e-7cf2-87d8-9b1879074136",
+  "base_sha": "7a99c6f5eafdf2d30335c2a388280d455b4a397f",
+  "head_sha": "da2abf5a7ab69d36a6c0edad79f404a309436c27",
+  "scope_check": "pass",
+  "verification_commands": [
+    { "command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0 },
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run validate:a0", "exit_code": 0 },
+    { "command": "cd web-prototype && npm test", "exit_code": 0 },
+    { "command": "git diff --check 7a99c6f5eafdf2d30335c2a388280d455b4a397f..da2abf5a7ab69d36a6c0edad79f404a309436c27", "exit_code": 0 }
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

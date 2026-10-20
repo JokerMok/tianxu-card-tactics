@@ -1,0 +1,32 @@
+{
+  "task_id": "T115",
+  "executor": "cloud",
+  "implementer_id": "019fb821-0b2d-76a1-9d32-7f51f0039a93",
+  "reviewer_id": "019fb848-1078-7bb3-9b8c-ec449ac75c2b",
+  "base_sha": "ed00e72",
+  "head_sha": "0ae6853",
+  "scope_check": "pass",
+  "verification_commands": [
+    { "command": "cd cocos-client && npm run test:parity-contract", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0 },
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run validate:a0", "exit_code": 0 },
+    { "command": "cd web-prototype && npm test -- --run tests/parity", "exit_code": 0, "note": "使用临时主工作区 node_modules symlink，随后删除" },
+    { "command": "cd web-prototype && npm test", "exit_code": 0, "note": "使用临时主工作区 node_modules symlink，随后删除" },
+    { "command": "cd web-prototype && npm run build", "exit_code": 0, "note": "使用临时主工作区 node_modules symlink，随后删除 build 产物" },
+    { "command": "git diff --check ed00e72..0ae6853", "exit_code": 0 },
+    { "command": "python3 /Users/jokermok/.codex/skills/orchestrate-hybrid-development/scripts/scope_guard.py check --project-root /tmp/tianxu-t115-worktree --task-id T115 --attempt 1", "exit_code": 0 }
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    { "severity": "P1", "finding": "对拍测试只比较裁剪后的 finalState projection 与生命周期事件，projectParityEvents 未被调用，未直接比较协议事件语义；React BATTLE_END 由状态手工回填。" },
+    { "severity": "P1", "finding": "共同 fixture 只有 version/decks/actions，没有两端实际消费的显式 card/unit mapping。" },
+    { "severity": "P1", "finding": "100 seeds 只覆盖部署与移动，未覆盖阻挡、索敌/攻击和回合推进；英雄死亡仅单独覆盖一个 seed。" },
+    { "severity": "P1", "finding": "Cocos parity END_TURN 只处理准备值、抽牌和回合切换，没有执行与 React 正式 endTurn 对应的自动移动/攻击/胜负流程。" }
+  ],
+  "repair_attempted": true,
+  "repair_commit": "0ae6853",
+  "scope_note": "scope_guard pass; failed T115 worktree retained at /tmp/tianxu-t115-worktree"
+}

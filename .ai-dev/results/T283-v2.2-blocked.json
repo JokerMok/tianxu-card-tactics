@@ -1,0 +1,55 @@
+{
+  "task_id": "T283",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "coordinator",
+  "implementer_id": "coordinator-blocker-audit",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "review_status": "blocked",
+  "review_findings": [
+    {
+      "severity": "P0",
+      "finding": "T283 第一次独立审查否决：U006 使用卡面/场景裁切与整图绑定，动作复用且无真实图集帧，不能作为正式战场兵种资源。"
+    },
+    {
+      "severity": "P0",
+      "finding": "T283 第二次独立审查再次否决：资源为透明几何占位图，缺 named SpriteFrame，运行时未消费 U006 正式资源。"
+    },
+    {
+      "severity": "P1",
+      "finding": "当前基线 U006 正式资源目录与专项验收入口均不存在；不能在缺正式美术源时继续修补。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "test -d cocos-client/assets/resources/art/battle/units/U006",
+      "exit_code": 1
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u006.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/verify-production-performance.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "note": "T283 保留两次失败审查记录；需补充 U006 独立正式战场美术源、动作切片、atlas、骨骼/挂点、Cocos 元数据、运行时绑定与专项验收入口后重新安排，禁止使用占位资源。",
+  "independent_audit": {
+    "agent_id": "01a02ad1-7ddf-7be0-b4f5-32d372b4d010",
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-blockers-20260823",
+    "status": "confirmed",
+    "changed_files": [],
+    "scope": "read-only blocker inventory"
+  },
+  "prior_reviews": [
+    ".ai-dev/results/T283-v2.2-review.json",
+    ".ai-dev/results/T283-v2.2-second-review.json"
+  ]
+}
+

@@ -1,0 +1,39 @@
+{
+  "task_id": "T207",
+  "plan_version": "v2.2",
+  "executor": "cloud",
+  "implementer_id": "01a01d6d-435f-7dc2-8028-7a786b87b3bc",
+  "reviewer_id": "01a01da5-056d-7493-a48e-214461e85c53",
+  "base_sha": "c890e24",
+  "head_sha": "aecf3f6",
+  "merge_commit": "d0f6725e18dfbddc4f7bc5230f66d0adf3e68640",
+  "scope_check": "pass",
+  "verification_commands": [
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/test-enemy-strategy-config.mjs",
+      "exit_code": 0,
+      "summary": "L01-L12 configuration contract; 50 negative cases rejected"
+    },
+    {
+      "command": "cd cocos-client && npm run validate:config-cross-table",
+      "exit_code": 0,
+      "summary": "cross-table config contract passed"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempts": 2,
+  "repair_notes": "第一次审查修复 R1 maxCardsPerAction 与关卡边界；第二次审查补齐 L01 开局、嵌套字段闭集与 L11 特殊规则负例。运行时消费未纳入 T207，保留给 T204 章节运行时接入。",
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/enemy/",
+    "cocos-client/tools/test-enemy-strategy-config.mjs"
+  ],
+  "changed_paths": [
+    "cocos-client/assets/resources/config/enemy/strategies.json",
+    "cocos-client/tools/test-enemy-strategy-config.mjs"
+  ]
+}

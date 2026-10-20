@@ -1,0 +1,40 @@
+{
+  "task_id": "T327",
+  "phase": "v2.2-M8-12-PERF",
+  "status": "passed",
+  "head_sha": "9f099586dc4a537c0b9372121d462e0e8e4f61f0",
+  "merge_sha": "9f099586dc4a537c0b9372121d462e0e8e4f61f0",
+  "implementation": {
+    "files": [
+      "cocos-client/tools/release/perf/verify-perf.mjs",
+      "cocos-client/tools/release/perf/samples/pass-raw-frame-times.json",
+      "documentation/release/perf/T327-performance-rehearsal.md"
+    ],
+    "repair_commit": "9f099586dc4a537c0b9372121d462e0e8e4f61f0",
+    "summary": "建立可复验性能演练，保留真实失败样本与发布 BLOCKED 结论；补齐实际修改文件清单和具体回退 SHA。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs",
+    "independent_review": "pass",
+    "pass_sample": {
+      "frames": 120,
+      "fps": 61.35,
+      "p95_ms": 16.3
+    },
+    "failure_sample": {
+      "fps": 26.278,
+      "p95_ms": 50,
+      "reasons": ["headless", "preview-pose", "absolutePerformancePass=false"]
+    },
+    "negative_cases": [
+      "missing file",
+      "missing field",
+      "illegal renderer",
+      "FPS below threshold",
+      "P95 above threshold",
+      "short raw sample"
+    ]
+  },
+  "release_gate": "BLOCKED：真实性能证据仍为 headless/preview 失败产物，不能作为设备放行证据；这正是本演练的保守结论。",
+  "residual_risk": "需补齐正式设备/真实运行时性能产物后才能解除发布性能阻塞。"
+}

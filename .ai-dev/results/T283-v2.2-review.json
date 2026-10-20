@@ -1,0 +1,26 @@
+{
+  "task_id": "T283",
+  "phase": "v2.2-unit-production-review",
+  "executor": "agent",
+  "implementer_id": "01a02607-eeda-7ed3-aaf2-e380e9634151",
+  "reviewer_id": "01a02615-67e4-7c90-8c3a-6eb1042071e4",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "a7d136bf847adc4a3843271e1358947aa30ae262",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P0", "finding": "U006 运行时 pose/cutout 图包含完整城市场景和重复卡面构图，属于卡面裁切/重组，不是透明战斗单位资源。"},
+    {"severity": "P0", "finding": "skeleton attachments 均绑定整块 cutoutSheet，blade/wing 骨骼没有对应真实贴图部件，无法驱动真实单位像素。"},
+    {"severity": "P0", "finding": "五态动作列主要是同姿态复用与整体变换，不能证明生产级动作资源。"},
+    {"severity": "P1", "finding": "POSE-ATLAS/CUTOUT-ATLAS 没有真实帧边界，atlasUuid 为空且运行时仍引用整图。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u006.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check a7d136b", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "独立审查阻断；未合入主线。专项测试通过不足以覆盖资源真实性与真实部件绑定。"
+}

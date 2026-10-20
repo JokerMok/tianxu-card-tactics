@@ -1,0 +1,38 @@
+{
+  "task_id": "T222",
+  "title": "M5-07 多阶段 Boss 框架",
+  "status": "passed",
+  "head_sha": "2fcf3fb",
+  "merge_commit": "8734049",
+  "modified_files": [
+    "cocos-client/assets/scripts/core/boss/index.ts",
+    "cocos-client/tools/test-boss-phases.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-boss-phases.mjs",
+        "exit_code": 0
+      },
+      {
+        "command": "cd cocos-client && npm run test:battle-runner",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "2fcf3fb",
+    "scope_check": "passed"
+  },
+  "repair_attempts": 1,
+  "residual_risk": "Phase transitions are deterministic and configuration-driven; no visual Cocos scene wiring was added by this task.",
+  "rollback": "Revert merge commit 8734049 to remove T222 runtime and test changes without changing other Wave 8 tasks."
+}

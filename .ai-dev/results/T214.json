@@ -1,0 +1,19 @@
+{
+  "task_id": "T214",
+  "executor": "cloud",
+  "implementer_id": "01a01907-ddc3-73e2-be4b-f3733c10e639",
+  "reviewer_id": "01a0190a-bd84-7e41-a998-5de4a5a63ce7",
+  "base_sha": "0b8fd4f777e5436fb88ff64bc0a041c4a5ed4782",
+  "head_sha": "20a51104e78d057884dfb8a8ef42edae32e113f2",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter01-story.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T214 --attempt 2", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查发现入口导出不存在的 Chapter01StoryPersistence；已修正为真实 StoryPersistence 并增加入口加载/导出契约回归，20 个反例保留。",
+  "scope_note": "仅修改 T214 allowed_paths；UI 调用方接线留给后续任务。"
+}

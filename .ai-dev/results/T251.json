@@ -1,0 +1,18 @@
+{
+  "task_id": "T251",
+  "executor": "cloud",
+  "implementer_id": "01a02508-5fcf-75a2-9288-6a7ab2b8b7f3",
+  "reviewer_id": "01a02553-2920-7ec2-b8a4-9db4e2f9668e",
+  "base_sha": "0b600a6",
+  "head_sha": "bfe57d8f1f7d75e69d92de716f8e4d2b49c6b8c6",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-battle-effects-audio.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": false,
+  "repair_notes": "新增七类 executable sample 唯一类别校验；正式 14 个资源、7 个 PNG/WAV sample 通过。",
+  "scope_note": "仅修改 T251 允许的特效音频验证器；运行时播放接入不在本任务范围。"
+}

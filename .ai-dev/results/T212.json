@@ -1,0 +1,19 @@
+{
+  "task_id": "T212",
+  "executor": "cloud",
+  "implementer_id": "01a024d2-cc57-7183-adba-eb07b680f379",
+  "reviewer_id": "01a024e9-9d34-7a10-8e19-3a685cdac84b",
+  "base_sha": "0b600a6",
+  "head_sha": "bfe57d8f1f7d75e69d92de716f8e4d2b49c6b8c6",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-hero-profession.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查发现缺失 skillId 会回退到 card.id；修复为显式 skillId 严格匹配并补充反例。实现提交：62abf3b、76a0ebb；协调主线集成：c8402de、bf5689c。",
+  "scope_note": "两次实现提交仅修改 T212 允许路径；T330 战斗状态职业特性仍由后续任务负责。"
+}

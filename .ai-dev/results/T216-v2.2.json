@@ -1,0 +1,34 @@
+{
+  "task_id": "T216",
+  "title": "M5-01 三段式副本会话",
+  "status": "passed",
+  "head_sha": "3e3f080",
+  "merge_commit": "af19ef6",
+  "modified_files": [
+    "cocos-client/assets/scripts/pve/dungeon/DungeonSession.ts",
+    "cocos-client/tools/test-dungeon-session.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-dungeon-session.mjs",
+        "exit_code": 0,
+        "output": "T216 dungeon session PASS: real-battles=7, stages=3, retries=2, saves=4, negative-cases=11"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "3e3f080",
+    "scope_check": "passed"
+  },
+  "residual_risk": "First-stage failure checkpoint behavior is covered by the generated save records; no separate wall-clock persistence soak was added.",
+  "rollback": "Revert merge commit af19ef6 to remove T216 runtime and test changes without changing other Wave 8 tasks."
+}

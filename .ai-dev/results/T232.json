@@ -1,0 +1,25 @@
+{
+  "task_id": "T232",
+  "executor": "agent",
+  "implementer_id": "01a0269b-4601-7180-90a8-d7599f5fafa1",
+  "reviewer_id": "01a026ef-5445-7f82-aad3-a9c869493392",
+  "base_sha": "a93b610a6b821fc5f056fac3137327b84b61c7bc",
+  "head_sha": "01d223b1e9321abe5afa30b2b65a2ee6ca654795",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-equipment-enhancement.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-equipment-inventory.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-meta-page-inventory.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T232 --attempt 1 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": ["155a263", "afd2542", "0bc871d"],
+  "merge_commits": ["45761cc", "2d9db28", "714695f"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T232-final-20260822", "scope_guard_attempt": 1, "scope_check": "pass", "result_guard": "pass"},
+  "notes": "最终独立审查通过；恢复会校验请求、指纹、等级、属性、结果语义与资源快照，拒绝伪造重放。"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "T330",
+  "executor": "cloud",
+  "implementer_id": "01a0189a-e5c5-7312-b5cc-f788252e2ed0",
+  "reviewer_id": "01a018aa-1e27-71b3-94fd-609d9506a1c1",
+  "base_sha": "092aaf3aec894e3ecec9a3dc622ecc94b3a7cdb3",
+  "head_sha": "dceb3baf18ca46f0c35b5d6df0066d3b49179163",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-hero-profession-runtime.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T330 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": false,
+  "repair_notes": "独立审查确认四职业引用 T212 真实技能池，护盾、术法抗性、持续伤害减免、准备值减免写入可序列化状态；错误触发、重复触发、无效输入及确定性回归均通过。",
+  "scope_note": "仅修改 T330 allowed_paths；完整技能效果结算仍按任务边界留给后续任务。"
+}

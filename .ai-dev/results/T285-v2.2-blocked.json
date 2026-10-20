@@ -1,0 +1,23 @@
+{
+  "task_id": "T285",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "agent",
+  "implementer_id": "01a02661-03cd-7b22-a46b-bdec2bb2cdf1",
+  "base_sha": "db9586b",
+  "status": "blocked",
+  "review_status": "blocked",
+  "review_findings": [
+    {"severity": "P1", "finding": "U008 skeleton 仍为 A0-reference/reference-pose-skeleton，正式资源目录缺少透明 PNG、atlas、完整 .meta 与运行时引用。"},
+    {"severity": "P1", "finding": "现有 A0 姿势板和切片为 RGB 无 Alpha，不能转作正式战斗单位资源；T285 专项测试入口不存在。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u008.mjs", "exit_code": 1},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "repair_requested": false,
+  "note": "需要 U008 独立正式透明战场源、atlas、Cocos meta 与运行时引用后重启 T285。"
+}

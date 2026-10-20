@@ -1,0 +1,35 @@
+{
+  "task_id": "T265",
+  "phase": "v2.2-M8-12-FINAL",
+  "status": "passed",
+  "head_sha": "000e36b82f7a89ecb2c55013ed4ac233aba23839",
+  "merge_sha": "000e36b82f7a89ecb2c55013ed4ac233aba23839",
+  "implementation": {
+    "files": [
+      "cocos-client/tools/release/final/verify-release-final.mjs",
+      "documentation/release/final/T265-release-final.md"
+    ],
+    "summary": "建立发布总门，真实调用稳定性、性能、安全与恢复四类子门；保守识别 T327 正式性能证据阻塞，不伪造整体放行。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/release/final/verify-release-final.mjs",
+    "independent_review": "pass",
+    "exit_code": 1,
+    "gate_output": "T265 final release gate: BLOCKED",
+    "subgates": {
+      "T326": "pass",
+      "T327": "verifier pass; formal performance blocked",
+      "T328": "pass",
+      "T329": "pass"
+    },
+    "performance_blocker": {
+      "headless": true,
+      "art_mode": "preview-pose",
+      "fps": 26.278,
+      "p95_ms": 50,
+      "absolute_performance_pass": false,
+      "thresholds": "FPS >= 55 and P95 <= 22ms"
+    }
+  },
+  "residual_risk": "需补齐正式 headful/production runtime 性能 artifact 后才能解除发布阻塞；服务端鉴权、发行平台安全、存储介质和同步链路不在 T265 范围内。"
+}

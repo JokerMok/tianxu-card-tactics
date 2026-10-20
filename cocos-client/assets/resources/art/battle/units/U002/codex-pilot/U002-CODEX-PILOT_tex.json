@@ -1,0 +1,99 @@
+{
+  "name": "U002-CODEX-PILOT",
+  "imagePath": "U002-CODEX-PILOT_tex.png",
+  "width": 1536,
+  "height": 1024,
+  "SubTexture": [
+    {
+      "name": "rearSkirt",
+      "x": 329,
+      "y": 812,
+      "width": 145,
+      "height": 169
+    },
+    {
+      "name": "leftLeg",
+      "x": 267,
+      "y": 811,
+      "width": 30,
+      "height": 158
+    },
+    {
+      "name": "rightLeg",
+      "x": 303,
+      "y": 811,
+      "width": 28,
+      "height": 158
+    },
+    {
+      "name": "leftFoot",
+      "x": 108,
+      "y": 967,
+      "width": 45,
+      "height": 32
+    },
+    {
+      "name": "rightFoot",
+      "x": 210,
+      "y": 967,
+      "width": 39,
+      "height": 32
+    },
+    {
+      "name": "torso",
+      "x": 112,
+      "y": 650,
+      "width": 143,
+      "height": 279
+    },
+    {
+      "name": "leftArm",
+      "x": 40,
+      "y": 673,
+      "width": 41,
+      "height": 135
+    },
+    {
+      "name": "rightArm",
+      "x": 251,
+      "y": 702,
+      "width": 30,
+      "height": 91
+    },
+    {
+      "name": "leftShoulder",
+      "x": 266,
+      "y": 642,
+      "width": 54,
+      "height": 48
+    },
+    {
+      "name": "rightShoulder",
+      "x": 408,
+      "y": 642,
+      "width": 53,
+      "height": 47
+    },
+    {
+      "name": "head",
+      "x": 61,
+      "y": 579,
+      "width": 48,
+      "height": 73
+    },
+    {
+      "name": "spear",
+      "x": 472,
+      "y": 571,
+      "width": 29,
+      "height": 423
+    },
+    {
+      "name": "shield",
+      "x": 502,
+      "y": 779,
+      "width": 64,
+      "height": 204
+    }
+  ]
+}

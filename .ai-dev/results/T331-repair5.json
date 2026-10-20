@@ -1,0 +1,32 @@
+{
+  "task_id": "T331",
+  "executor": "cloud",
+  "implementer_id": "01a01cea-8ad3-77a0-9fd1-dcb805824c83",
+  "reviewer_id": "01a01cf2-facc-7a01-b9c0-5498c2d1b91a",
+  "base_sha": "94cf1d7092257519d943635f18ed185cdf936585",
+  "head_sha": "5efb8d7b71f380a7688f21c88b8a0a9207f01203",
+  "scope_check": "pass",
+  "verification_commands": [
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/test-chapter-level-contract.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && npm run validate:config-cross-table",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "scope_guard check --task-id T331 --attempt 5",
+      "exit_code": 0
+    }
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "真实 Cocos Web Desktop/Apple Metal 运行发现 Set/Iterator 展开被错误转译为 concat(Set)，造成章节 target registry 嵌套 Set；本次在既有 T331 允许路径内递归规范化 registry，并改用显式 registry 合并，新增嵌套 Set 与非法奖励回归用例。独立 reviewer 无 P0/P1/P2。",
+  "scope_note": "仅修改 T331 允许的章节契约模块与既有测试路径；未修改计划、审批记录或其他产品文件。"
+}

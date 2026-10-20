@@ -1,0 +1,25 @@
+{
+  "task_id": "T265",
+  "executor": "cloud",
+  "implementer_id": "01a02a91-fe27-7ba3-af22-7e9a6a037fb6",
+  "reviewer_id": "01a02ab8-b330-7eb0-bcb9-5576a2299c89",
+  "base_sha": "8161b9489798b342a4c4e920fb6b763a74b4a110",
+  "head_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "set +e; output=$(cd cocos-client && node --experimental-strip-types tools/release/final/verify-release-final.mjs 2>&1); code=$?; test \"$code\" -eq 1; printf '%s\\n' \"$output\" | grep -Fq 'T265 final release gate: BLOCKED'; printf '%s\\n' \"$output\" | grep -Fq 'T327 rehearsal: PASS'; printf '%s\\n' \"$output\" | grep -Fq 'T327 formal performance gate: BLOCKED'", "exit_code": 0},
+    {"command": "node --check cocos-client/tools/release/final/verify-release-final.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T265 --attempt 4 (independent guard worktree)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": ["16c2dea", "c747cc6"],
+  "review_history": {"first_review": {"reviewer_id": "01a02aa8-0ce3-7302-961f-5edb3fa2e2d4", "status": "fail", "p1": 2, "p2": 1}, "final_review": {"reviewer_id": "01a02ab8-b330-7eb0-bcb9-5576a2299c89", "status": "pass", "p0": 0, "p1": 0, "p2": 0}},
+  "observed_raw_command": {"command": "cd cocos-client && node --experimental-strip-types tools/release/final/verify-release-final.mjs", "exit_code": 1, "evidence": "T326/T328/T329 PASS; T327 rehearsal PASS; T327 formal performance gate: BLOCKED; T265 final release gate: BLOCKED; historical artifact was not consulted"},
+  "release_gate": "BLOCKED",
+  "blocker": "T327 当前正式 GPU/WebGL2 formal-runtime 证据缺失，T203 因 preview-pose 资产 fail-closed；T265 不使用历史 artifact 或 pass fixture 放行。",
+  "independent_guard": {"worktree": "/private/tmp/codex-v22-worktrees/guard-T265-final-20260823", "scope_guard_attempt": 4, "result_guard": "pass"},
+  "scope_note": "仅修改 T265 final verifier 与报告；当前 BLOCKED 是正式性能证据阻断，不是总门解析器实现失败。"
+}

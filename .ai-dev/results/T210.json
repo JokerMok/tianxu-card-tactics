@@ -1,0 +1,19 @@
+{
+  "task_id": "T210",
+  "executor": "agent",
+  "implementer_id": "01a01d26-c98e-7cb0-a7d4-f5c86e5a2058",
+  "reviewer_id": "01a01d2e-2b23-7c93-9d4e-996e17d7259e",
+  "base_sha": "bb9b109e64f91838b3be05c33482138750ae7388",
+  "head_sha": "81e796e2ad6b368e97c834ceec31fe41d03fcae8",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node cocos-client/tools/test-card-inventory.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T210 --attempt 4", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "补齐恢复视图、记录字段及 20 个负例覆盖；独立复核建议已关闭，新增断言确认 restore 后 sort/filter 完整恢复。",
+  "scope_note": "仅修改 T210 allowed_paths 内的 card inventory 测试。"
+}

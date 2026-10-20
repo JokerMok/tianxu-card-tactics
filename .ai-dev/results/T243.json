@@ -1,0 +1,19 @@
+{
+  "task_id": "T243",
+  "executor": "agent",
+  "implementer_id": "01a01d2e-653a-73e2-a5b6-5ff9c8793134",
+  "reviewer_id": "01a01d37-8f80-7ba1-b467-88b91b0f24a8",
+  "base_sha": "bb9b109e64f91838b3be05c33482138750ae7388",
+  "head_sha": "b429b856311b1d132ceab99fb937d446c3057e84",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node cocos-client/tools/test-ui-components.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T243 --attempt 3", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "修复 Modal 已打开时仍校验非法 payload 的边界，并强化 7 类组件逐项导出断言；独立复核未发现回归风险。",
+  "scope_note": "仅修改 T243 allowed_paths 内的 UI contract 与测试。"
+}

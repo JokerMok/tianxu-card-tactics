@@ -1,0 +1,18 @@
+{
+  "task_id": "T022",
+  "executor": "cloud",
+  "implementer_id": "coordinator-t022-repair",
+  "reviewer_id": "019fae06-1f6a-7d93-ab58-e375a1a8a8d1",
+  "base_sha": "b3d5f09001df4a88be6c4d41ba029af84e6ce1d6",
+  "head_sha": "16573f0f2f5b2ab03c717c05245c66fe33628b75",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/movement/validate-movement.ts", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

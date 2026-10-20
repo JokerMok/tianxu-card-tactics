@@ -1,0 +1,28 @@
+{
+  "task_id": "T323",
+  "phase": "v2.2-M8-02-R05",
+  "status": "passed",
+  "head_sha": "b12579d860aabb3fcd286b7034437132cc30ba9b",
+  "merge_sha": "b12579d860aabb3fcd286b7034437132cc30ba9b",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/R05.json",
+      "cocos-client/tools/test-build-r05.mjs"
+    ],
+    "summary": "R05 提供两套有效构筑（27U/3S、26U/4S），真实读取配置并覆盖缺失/非法职业、种族/卡牌、职业技能限制、复制上限、重复槽位、缺失字段、非法数量、越界槽位和总数错误等 11 个反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-r05.mjs",
+    "independent_review": "pass",
+    "negative_cases": 11,
+    "regression": [
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "R05 尚未纳入 ConfigLoader/运行时构筑消费链，UI 与战斗运行时留给后续 T255 集成。"
+}

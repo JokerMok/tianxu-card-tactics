@@ -1,0 +1,11 @@
+{
+  "task_id": "T310",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "53c718b",
+  "merge_sha": "ae046e911503c5dde326bf6a4fc58a43936545d8",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":10},
+  "verification": ["test-meta-page-hero.mjs: PASS","T205/T226/Meta Shell/T215/Hero: PASS","git diff --check: PASS"],
+  "scope": "pass: hero page directory and test only",
+  "residual_risk": "decks.json currently has D001; other profession decks are generated from base units/skills pending any future dedicated deck data."
+}

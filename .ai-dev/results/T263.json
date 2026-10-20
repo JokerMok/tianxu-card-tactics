@@ -1,0 +1,30 @@
+{
+  "task_id": "T263",
+  "phase": "v2.2-commerce-payment",
+  "executor": "cloud",
+  "implementer_id": "01a029b4-ab97-7711-b74e-ffa74431fdde",
+  "reviewer_id": "01a029e0-3fe0-74b3-adb4-cb9cc142f423",
+  "base_sha": "d74e408200e5f32d1a5d268e1925deea97e3faf6",
+  "head_sha": "c36551c35769d4e035a64a88fc25b284618b3954",
+  "status": "passed",
+  "scope_check": "pass",
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": [
+    "43c8c2a",
+    "c442aa8",
+    "84082e5"
+  ],
+  "merge_commits": ["72f5866", "703f168", "c36551c"],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-commerce-payment.mjs", "exit_code": 0, "output": "T263 commerce/payment PASS"},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-account-cloud-save.mjs", "exit_code": 0, "output": "T259 account/cloud save PASS"},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-analytics-events.mjs", "exit_code": 0, "output": "T261 analytics events PASS"},
+    {"command": "git diff --check", "exit_code": 0, "output": ""}
+  ],
+  "repair_notes": "补齐补单批次原子回滚、provider+transactionId 去重及 APPLIED/FAILED ledger 隔离；最终独立复审无 P0/P1/P2。",
+  "scope_note": "仅修改 cocos-client/assets/scripts/services/commerce/、backend/commerce/、cocos-client/tools/test-commerce-payment.mjs。",
+  "risks": ["当前为内存原型；真实支付渠道验签、持久化账本、跨进程事务与生产退款闭环仍需后续接入。"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-worktrees/guard-T263-final-20260822c", "scope_guard_attempt": 2, "scope_check": "pass", "result_guard": "pass"}
+}

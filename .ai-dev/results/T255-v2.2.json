@@ -1,0 +1,46 @@
+{
+  "task_id": "T255",
+  "phase": "v2.2-M8-02",
+  "status": "passed",
+  "head_sha": "bae906f86a7fc1aa3d3448edf235dc45a459fb0b",
+  "merge_sha": "bae906f86a7fc1aa3d3448edf235dc45a459fb0b",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/scripts/simulation/builds/build-simulation.ts",
+      "cocos-client/assets/scripts/simulation/builds/index.ts",
+      "cocos-client/tools/test-build-archetypes.mjs"
+    ],
+    "summary": "统一读取 P01-P04/R01-R07 的真实构筑配置，完成构筑归一化、职业/种族覆盖统计和多种子确定性模拟。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-archetypes.mjs",
+    "independent_review": "pass",
+    "coverage": {
+      "targets": 11,
+      "builds": 22,
+      "professions": {
+        "P001": 5,
+        "P002": 6,
+        "P003": 6,
+        "P004": 5
+      },
+      "races": {
+        "人族": 20,
+        "冥裔": 5,
+        "山灵": 6,
+        "巧民": 6,
+        "异兽": 11,
+        "羽民": 17,
+        "鳞民": 9
+      },
+      "deterministic_runs": 66,
+      "negative_cases": 13
+    },
+    "regression": [
+      "T315-T325",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "未验证 Cocos 渲染、运行时资源接入及战斗平衡；留给后续集成与平衡任务。"
+}

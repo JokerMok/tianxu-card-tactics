@@ -1,0 +1,55 @@
+{
+  "task_id": "T203",
+  "phase": "v2.2-current-gpu-runner-audit",
+  "executor": "cloud",
+  "implementer_id": "coordinator-current-state-audit",
+  "reviewer_id": "01a02ae1-e388-7d32-aa30-c5f184ee4023",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "head_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "scope_check": "pass",
+  "review_status": "blocked",
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "当前真实 Cocos native runner 退出码为 1；正式 runtime 不是 GREEN，检测到 artMode=preview-pose、previewPoseAssets=2、artIntegrationComplete=false，另有 GPU process 异常退出。"
+    },
+    {
+      "severity": "P1",
+      "finding": "FPS 61.35、P95 18.9ms 仅来自确定性契约模型，不能替代正式 GPU/WebGL2 runtime 证据。"
+    },
+    {
+      "severity": "P1",
+      "finding": "当前缺少可被 T203 接受的正式 A0 运行时资产与 live GPU/WebGL2 证据；旧 T203 PASS 记录对应历史 head，不代表当前基线。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/verify-production-performance.mjs",
+      "exit_code": 1,
+      "evidence": "contract/model PASS; formal runtime FAIL; preview-pose; previewPoseAssets=2; artIntegrationComplete=false"
+    },
+    {
+      "command": "cd cocos-client && npm run validate:a0",
+      "exit_code": 0,
+      "evidence": "A0 manifest and scene contract: PASS"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "scope_guard check --task-id T203 --attempt 6 (independent audit worktree)",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "independent_guard": {
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-T203-current-20260823",
+    "scope_guard_attempt": 6,
+    "result_guard": "not_applicable_blocked_audit"
+  },
+  "historical_record": ".ai-dev/results/T203.json",
+  "note": "当前记录仅表达 c747cc64 基线的正式性能状态；需补齐正式 battle assets、formal-runtime Cocos runner 与 live GPU/WebGL2 evidence 后重新验收。"
+}
+

@@ -1,0 +1,29 @@
+{
+  "task_id": "T114",
+  "executor": "cloud",
+  "implementer_id": "019fb18e-80d1-7ef0-94bd-7da7b64f6d6f",
+  "reviewer_id": "019fb1a5-0367-7c71-b7cf-38b7ecf3f7ac",
+  "base_sha": "61d99c2",
+  "head_sha": "5a57061",
+  "scope_check": "pass",
+  "verification_commands": [
+    { "command": "cd cocos-client && npm run test:parity-contract", "exit_code": 1, "note": "4/7 passed; 100 seeds, round80, determinism failed" },
+    { "command": "cd cocos-client && npm run test:battle-runner", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "cd cocos-client && npm run test:golden-runner", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/core/replay/validate-replay.ts", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "cd cocos-client && npm run validate:a0", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "cd web-prototype && npm test", "exit_code": null, "note": "修复轮中止，未执行" },
+    { "command": "cd web-prototype && npm run build", "exit_code": null, "note": "修复轮中止，未执行" }
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    { "severity": "P1", "finding": "100 seeds、seed1 与 seed42 determinism 失败：React/Cocos 单位 ID 生成策略不一致，导致高层 action 引用非法单位。" },
+    { "severity": "P1", "finding": "round80 对拍中 React adapter 未捕获 BATTLE_END；正式 engine 事件截断导致生命周期映射不完整。" },
+    { "severity": "P1", "finding": "v2 非法动作异常输出 protocol 可能回退为 v1，违反版本化错误契约。" },
+    { "severity": "P2", "finding": "自定义 deck 入口跳过正式 deck 校验；对拍测试仍未完全比较原始 finalState。" }
+  ],
+  "repair_attempted": true,
+  "repair_commit": "5a57061",
+  "scope_note": "scope_guard pass; failed task worktree retained at /tmp/tianxu-t114-worktree"
+}

@@ -1,0 +1,22 @@
+{
+  "task_id": "T287",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "agent",
+  "implementer_id": "01a02670-92d2-73d0-97c2-a7f32de06b7b",
+  "base_sha": "a3cdeb3",
+  "status": "blocked",
+  "review_status": "blocked",
+  "review_findings": [
+    {"severity": "P1", "finding": "U010 资源目录与专项测试不存在，仅有 RGB 卡面；正式透明战场源、动作切片、atlas、骨骼、挂点、.meta 与运行时引用全部缺失。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u010.mjs", "exit_code": 1},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "repair_requested": false,
+  "note": "配置存在且政治阵营为归墟会，但缺正式战场美术与生产链路，未伪造提交。"
+}

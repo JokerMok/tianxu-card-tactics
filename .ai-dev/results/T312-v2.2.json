@@ -1,0 +1,11 @@
+{
+  "task_id": "T312",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "2edbd0de4b6b5d9dd57c64a35ec80915d9c3e462",
+  "merge_sha": "87e824fa892988e2bcda362de5d917f483b52539",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":35},
+  "verification": ["test-meta-page-city.mjs: PASS","T313/Meta/Battle regressions: PASS","git diff --check: PASS"],
+  "scope": "pass: city page directory and test only; T247 group integration remains separate",
+  "residual_risk": "TypeScript compiler and T247 GameShell integration remain separate gates; local verify:meta was unavailable because 127.0.0.1:4180 was not running."
+}

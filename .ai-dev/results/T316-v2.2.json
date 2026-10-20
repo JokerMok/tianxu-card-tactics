@@ -1,0 +1,30 @@
+{
+  "task_id": "T316",
+  "phase": "v2.2-M8-02-P02",
+  "status": "passed",
+  "head_sha": "3112f881eb47653d56572444c53d0d6708435a66",
+  "merge_sha": "8a0ddb97f76c0ba4779d881f495f01fe5c5590c0",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/P02.json",
+      "cocos-client/tools/test-build-p02.mjs"
+    ],
+    "summary": "P02 提供两套有效构筑，覆盖真实卡牌、职业、种族、技能与牌组限制，并拒绝非法职业/种族、跨职业技能、超限复制、重复槽位和缺失字段。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-p02.mjs",
+    "independent_review": "pass",
+    "regression": [
+      "ConfigLoader",
+      "config cross-table validation",
+      "deck contract",
+      "card quality",
+      "deck management",
+      "profession runtime",
+      "enemy strategy",
+      "deck page"
+    ],
+    "review_findings": "无 P0/P1；审查记录的 P2 为测试脚本可进一步硬化项，不阻断本任务验收。"
+  },
+  "residual_risk": "P02 尚未接入 ConfigLoader/manifest 运行时消费，按任务边界留给后续 T255 集成。"
+}

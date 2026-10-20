@@ -1,0 +1,18 @@
+{
+  "task_id": "T024",
+  "executor": "cloud",
+  "implementer_id": "coordinator-t024-repair",
+  "reviewer_id": "019fae1b-391a-73e2-9f37-4dda908e5694",
+  "base_sha": "a216bdfd6a52e112fa7735427ebee69c3a91c818",
+  "head_sha": "32be092c8f19e656aec0bc898abd340415334b4b",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/core/combat/validate-damage.ts", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

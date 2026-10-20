@@ -1,0 +1,25 @@
+{
+  "task_id": "T282",
+  "phase": "v2.2-unit-production-second-review",
+  "executor": "agent",
+  "implementer_id": "01a0260d-e4b0-77b0-ad57-0c5a5fc22bd1",
+  "reviewer_id": "01a02622-5796-7892-ae4c-0048e2e581fa",
+  "base_sha": "f5092dea5a33ec7f10b0e438db043b5664c0c219",
+  "head_sha": "dd697b52a488543e3e14b37001013ea8298b98e0",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "finding": "U005 pose/cutout 仍是带城市、地面和反射场景的伪透明卡面裁切。"},
+    {"severity": "P1", "finding": "真实战斗切片要求仍未满足；专项测试漏检人物轮廓内部的场景背景。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u005.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check 4dfd61c..dd697b5", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "朝向已修复，但真实战斗资源与验收器防伪透明能力仍阻断放行。"
+}

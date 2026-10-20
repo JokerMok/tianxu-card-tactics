@@ -1,0 +1,16 @@
+{
+  "task_id": "T228",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "7c6fa39",
+  "merge_sha": "43cbca9a359f9b7fb7de837ff7619e14a8cdab01",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":15},
+  "verification": [
+    "test-card-dismantle.mjs: PASS",
+    "T226/Hero/Hero runtime/Battle Runner: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: dismantle service directory and test only",
+  "repair_attempts": 2,
+  "residual_risk": "Default material yield remains configurable by quality 1-6; UI/GameState integration is a later task."
+}

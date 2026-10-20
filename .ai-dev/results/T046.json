@@ -1,0 +1,26 @@
+{
+  "task_id": "T046",
+  "executor": "cloud",
+  "implementer_id": "01a010dc-e2ea-74c1-8135-5e3aec630ac8",
+  "reviewer_id": "01a010ee-b13f-7d32-a345-4fbe8dd7d80d",
+  "base_sha": "2754d7d08364586a0ef502ede079ae986f38aa4e",
+  "head_sha": "7b32f19a271c94fc993d0ea26155db83b6788b80",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-result-transaction.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-exit-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/services/validate-reward-service.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test && npm run build", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T046 --attempt 2", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "path": "cocos-client/assets/scripts/battle/battle-result-transaction.ts:44", "summary": "退出事务端口多次读取 progress.nodeId；变值 getter 可使校验节点与持久化节点不一致并仍扣除成本。"}
+  ],
+  "repair_attempted": true,
+  "outcome": "blocked_after_one_cloud_repair",
+  "scope_note": "未合入协调主线；T046 attempt2 worktree 与审查证据保留。"
+}

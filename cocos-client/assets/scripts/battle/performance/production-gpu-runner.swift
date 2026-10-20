@@ -66,13 +66,14 @@ func jsonObject(_ value: Any?, _ label: String) throws -> Any {
     return value
 }
 
-func runProcess(_ executable: String, _ arguments: [String], currentDirectory: String? = nil, label: String) throws -> Process {
+func runProcess(_ executable: String, _ arguments: [String], currentDirectory: String? = nil, label: String, environment: [String: String]? = nil) throws -> Process {
     let process = Process()
     process.executableURL = URL(fileURLWithPath: executable)
     process.arguments = arguments
     if let currentDirectory {
         process.currentDirectoryURL = URL(fileURLWithPath: currentDirectory, isDirectory: true)
     }
+    if let environment { process.environment = environment }
     process.standardOutput = FileHandle.standardError
     process.standardError = FileHandle.standardError
     do {
@@ -518,16 +519,22 @@ func run() throws -> [String: Any] {
     let scenarioData = FileHandle.standardInput.readDataToEndOfFile()
     let scenario = try readJSON(scenarioData, "production scenario")
     let clientRoot = FileManager.default.currentDirectoryPath
-    let stageRoot = try stageProject(clientRoot)
+    let stageRoot = URL(fileURLWithPath: "/private/tmp/t203-cocos-stage-\(UUID().uuidString)", isDirectory: true)
+    try FileManager.default.createDirectory(at: stageRoot, withIntermediateDirectories: false)
     defer { try? FileManager.default.removeItem(at: stageRoot) }
-    let buildRoot = stageRoot.appendingPathComponent("build/web-desktop", isDirectory: true).path
-    let creator = "/Users/jokermok/Applications/CocosCreator-3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator"
+    let buildRoot = stageRoot.appendingPathComponent("project/build/web-desktop", isDirectory: true).path
+    let creator = ProcessInfo.processInfo.environment["COCOS_CREATOR_BIN"] ?? "/Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator"
     let chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     guard FileManager.default.isExecutableFile(atPath: creator) else { throw RunnerError(description: "Cocos Creator executable is unavailable: \(creator)") }
     guard FileManager.default.isExecutableFile(atPath: chrome) else { throw RunnerError(description: "Google Chrome executable is unavailable: \(chrome)") }
 
     diagnostic("building Cocos Creator Web Desktop")
-    let build = try runProcess(creator, ["--project", stageRoot.path, "--build", "platform=web-desktop;debug=false"], currentDirectory: stageRoot.path, label: "Cocos Creator build")
+    var buildEnvironment = ProcessInfo.processInfo.environment
+    buildEnvironment["P0_BUILD_ROOT"] = stageRoot.path
+    buildEnvironment["P0_RECORD_BUILD_LOCATION"] = "0"
+    buildEnvironment["COCOS_CREATOR_BIN"] = creator
+    let buildScript = URL(fileURLWithPath: clientRoot, isDirectory: true).appendingPathComponent("tools/build-p0.sh").path
+    let build = try runProcess("/bin/bash", [buildScript], currentDirectory: clientRoot, label: "Cocos Creator build", environment: buildEnvironment)
     try waitFor(build, label: "Cocos Creator build")
     guard FileManager.default.fileExists(atPath: buildRoot), FileManager.default.fileExists(atPath: URL(fileURLWithPath: buildRoot).appendingPathComponent("index.html").path) else {
         throw RunnerError(description: "Cocos Creator build did not produce a complete build/web-desktop")

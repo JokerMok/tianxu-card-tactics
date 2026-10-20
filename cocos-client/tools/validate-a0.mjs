@@ -47,6 +47,9 @@ assert(source.includes('STRESS_UNIT_COUNT = 24'));
 assert(source.includes("C009-BATTLE-SIDESLOT/spriteFrame"));
 assert(source.includes("C001-BATTLE-SIDESLOT/spriteFrame"));
 assert(source.includes('displayWidth = displayHeight * source.texture.width / source.texture.height'));
-assert(source.includes('new GameShell(this.node, this.root)'));
+assert(source.includes('new GameShell(this.node, this.root,this.campaignView)'));
+assert(source.includes('await this.campaignView.load()'));
+assert(!source.includes('this.enemyHp - 300'));
+assert(!source.includes('__META_BATTLE_COMPLETE__?.(true)'));
 
-console.log('A0 manifest and scene contract: PASS');
+console.log('Legacy A0 assets retained; scene uses campaign entry: PASS');

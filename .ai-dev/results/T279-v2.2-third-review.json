@@ -1,0 +1,24 @@
+{
+  "task_id": "T279",
+  "phase": "v2.2-unit-production-third-review",
+  "executor": "agent",
+  "implementer_id": "01a0262e-894f-70a2-a9e6-3d87b077c307",
+  "reviewer_id": "01a02634-348b-7522-a30c-e627c73d1ca3",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "a03a5d9c5165de5d0892eab58da295651c2b59d5",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "finding": "候选链本身的 U002 formal runtime 已通过专项，但共享 skeleton 校验器仍要求 U002 为 A0-reference；T248 共享测试修复尚未随候选链纳入审查工作树，导致既有校验失败。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u002.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 1},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check 4dfd61c..a03a5d9", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "需要按依赖顺序把 T248 共享校验修复纳入 T279 最终复核；不修改 T279 资源合同。"
+}

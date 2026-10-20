@@ -1,4 +1,5 @@
-export type BattleSafeValue = null | boolean | number | string | readonly BattleSafeValue[] | Readonly<Record<string, BattleSafeValue>>;
+export interface BattleSafeRecord { readonly [key: string]: BattleSafeValue; }
+export type BattleSafeValue = null | boolean | number | string | readonly BattleSafeValue[] | BattleSafeRecord;
 
 export interface BattleProgress {
   readonly clearedNodes: readonly string[];
@@ -123,7 +124,7 @@ function resourceMap(value: BattleSafeValue | undefined): Readonly<Record<string
   const candidate = record(value);
   if (candidate === null) return null;
   for (const [key, amount] of Object.entries(candidate)) {
-    if (key.trim().length === 0 || key !== key.trim() || !Number.isSafeInteger(amount) || amount < 0) return null;
+    if (key.trim().length === 0 || key !== key.trim() || typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount < 0) return null;
   }
   return candidate as Readonly<Record<string, number>>;
 }
@@ -152,7 +153,9 @@ function canonical(value: BattleSafeValue): string {
   if (typeof value === 'boolean') return value ? 'b:1' : 'b:0';
   if (typeof value === 'number') return `n:${String(value)}`;
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
-  return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
+  const object = record(value);
+  if (!object) throw new Error('invalid canonical record');
+  return `{${Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${canonical(object[key])}`).join(',')}}`;
 }
 
 function freezeState(value: BattleResultState): BattleResultState {

@@ -1,0 +1,19 @@
+{
+  "task_id": "T209",
+  "executor": "agent",
+  "implementer_id": "01a01d26-c949-72f2-ae5f-87151b1806a6",
+  "reviewer_id": "01a01d2e-2b23-7c93-9d4e-996e17d7259e",
+  "base_sha": "bb9b109e64f91838b3be05c33482138750ae7388",
+  "head_sha": "cee25418328494734acae5104c758cdecdc30842",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node cocos-client/tools/test-profile-stamina.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T209 --attempt 2", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "补齐缩放阈值、经验余数、体力恢复余数及 23 个负例；独立复核建议已关闭，新增断言确认经验变更立即持久化。",
+  "scope_note": "仅修改 T209 allowed_paths 内的 profile/stamina 测试。"
+}

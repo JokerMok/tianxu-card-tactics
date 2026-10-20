@@ -1,0 +1,32 @@
+{
+  "task_id": "T123",
+  "executor": "cloud",
+  "implementer_id": "01a01248-8a21-7a71-9247-96f19fd11c32",
+  "reviewer_id": "01a01257-bcf6-78f3-a157-cbb4c181b814",
+  "reviewer_ids": [
+    "01a01250-90de-76b1-bc0a-49746ea0a51b",
+    "01a01257-bcf6-78f3-a157-cbb4c181b814"
+  ],
+  "base_sha": "50efc686b76c5783702247ef0e1b17f5b30a8187",
+  "head_sha": "30fe8078852c299704c67684010517964933ee55",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && npm run test:battle-harness-v2", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:golden-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner:types", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T123 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "path": "cocos-client/assets/scripts/battle/testsupport/battle-harness-v2.ts:75", "summary": "首次审查发现克隆规范化只读/不可配置数据描述符，而实现仅比较值与 enumerable，描述符不一致命令仍可执行；修复提交 30fe807 已覆盖该反例。"},
+    {"severity": "P1", "path": "cocos-client/assets/scripts/battle/testsupport/battle-harness-v2.ts:169", "summary": "最终审查发现可配置 accessor 可在 structuredClone 期间自改为普通数据属性，clone 后才读取源描述符会丢失访问器证据并执行 START。"}
+  ],
+  "repair_attempted": true,
+  "repair_commit": "30fe8078852c299704c67684010517964933ee55",
+  "scope_note": "完整差异仅在批准的 Harness source/test 与 package.json；Web 依赖和构建产物仅用于隔离回归且已清理。T123 不得合入协调主线，保留 attempt1 worktree 和审查证据。",
+  "outcome": "blocked_after_one_cloud_repair"
+}

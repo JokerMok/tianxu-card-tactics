@@ -1,0 +1,28 @@
+{
+  "task_id": "T117",
+  "executor": "cloud",
+  "implementer_id": "019ff8e6-065d-7283-b9cd-34610988b038",
+  "reviewer_id": "019ff902-21eb-7a50-bc52-2f79c09ef122",
+  "base_sha": "602a3263906fb1fb16ea333f2aa4977d3aaedb57",
+  "head_sha": "9a7da056a8dd534669eca4b6e233d89e62650c73",
+  "scope_check": "pass",
+  "verification_commands": [
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/battle/effects/battle-feedback-projector.test.mjs", "exit_code": 0 },
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.test.mjs", "exit_code": 0 },
+    { "command": "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.target-identity.test.mjs", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0 },
+    { "command": "cd cocos-client && npm run validate:a0", "exit_code": 0 },
+    { "command": "cd web-prototype && npm test", "exit_code": 0, "note": "使用临时协调工作区 node_modules 软链接，验证后已移出任务工作树" },
+    { "command": "cd web-prototype && npm run build", "exit_code": 0, "note": "使用临时协调工作区 node_modules 软链接，验证后已移出任务工作树" },
+    { "command": "git diff --check 602a3263906fb1fb16ea333f2aa4977d3aaedb57..9a7da056a8dd534669eca4b6e233d89e62650c73", "exit_code": 0 },
+    { "command": "scope_guard check --project-root /private/tmp/tianxu-t117-worktree --task-id T117 --attempt 1", "exit_code": 0 }
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    { "severity": "P1", "finding": "BATTLE_END 未强制非平局状态与胜者一致：status=won/winner=enemy 被错误接纳并终结反馈快照，和主将表现机契约不一致。" },
+    { "severity": "P2", "finding": "投影器回归测试未覆盖 won/enemy 与 lost/player 的拒绝及快照引用不变，因此未能阻止该 P1 回归。" }
+  ],
+  "repair_attempted": true,
+  "repair_commit": "9a7da056a8dd534669eca4b6e233d89e62650c73",
+  "scope_note": "任务工作树仅有六个批准路径的 Git 变更；临时 Web 依赖软链接已在最终范围检查前移出。"
+}

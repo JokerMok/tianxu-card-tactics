@@ -1,0 +1,19 @@
+{
+  "task_id": "T211",
+  "executor": "cloud",
+  "implementer_id": "01a018d5-237d-7cc0-88b4-c354c32d0ad9",
+  "reviewer_id": "01a018de-490c-76a0-937a-d920c90d64aa",
+  "base_sha": "08183d235fbb2d2474eadc9f52c8913c01aa5f5f",
+  "head_sha": "6dc944bc11843b90d03040585ac5493c97cde3d2",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-deck-management.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T211 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": false,
+  "repair_notes": "独立审查确认真实 cards.json 44 张卡、30 张上限、牌组生命周期、持久化/回滚及 25 个真实反例均通过。",
+  "scope_note": "仅修改 T211 allowed_paths；UI/GameState 接线留给后续任务。"
+}

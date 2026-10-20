@@ -1,0 +1,34 @@
+{
+  "task_id": "T120",
+  "executor": "cloud",
+  "implementer_id": "01a0109e-4b6a-71f2-825f-03b2101241d9",
+  "reviewer_id": "01a010ae-a70b-77a3-9ea7-02f7c831048b",
+  "reviewer_ids": [
+    "01a010a6-3bf0-7982-b8c7-0a88abcc681c",
+    "01a010ae-a70b-77a3-9ea7-02f7c831048b"
+  ],
+  "base_sha": "aee06f9490a17bb8543710dee137a416bf091c92",
+  "head_sha": "c0d2059f1ccc04a6032a346da28b4072c5b964dd",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "finding": "首轮审查发现策略在运行期间推进真实会话后，控制器未重新同步修订，单次 tick 会再次派发旧动作。修复提交 c0d2059 已覆盖该反例。"},
+    {"severity": "P2", "finding": "首轮审查发现 Proxy ownKeys 对抗测试未触发 trap。修复提交 c0d2059 已改为带 type 的 Proxy 并断言调用。"},
+    {"severity": "P1", "finding": "二次审查发现策略重入调用 controller.hide 后，plan 仍可写入候选动作，tick 未复检 canRun 或 invalidationPending 即派发。"},
+    {"severity": "P2", "finding": "二次审查发现缺少实际触发 Proxy get trap 的反例测试。"}
+  ],
+  "repair_attempted": true,
+  "repair_commit": "c0d2059f1ccc04a6032a346da28b4072c5b964dd",
+  "scope_note": "T120 attempt 1 仅变更四个批准的 battle 路径；context_pack 缓存、临时 Web node_modules 链接和 dist 构建产物均已移除。",
+  "outcome": "blocked_after_one_cloud_repair"
+}

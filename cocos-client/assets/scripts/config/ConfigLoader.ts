@@ -1131,6 +1131,7 @@ export async function loadChapter01Runtime(
   const decks = tables.get('decks');
   if (!decks) throw new ConfigLoadError('config/decks', '牌组资源未加载');
   const chapterContract = await import('./levels/ChapterLevelContract');
+  const typedChapterContract: typeof import('./levels/ChapterLevelContract') = chapterContract;
   const levels = await Promise.all(index.levels.map(async (entry) => {
     const value = await loadJsonAsset(entry.resource);
     if (!isRecord(value)) {
@@ -1191,7 +1192,7 @@ export async function loadChapter01Runtime(
         `必须与章节索引一致: ${entry.prerequisiteLevelId ?? 'null'}`,
       );
     }
-    chapterContract.assertChapterLevelContract(value, manifest, decks, references, entry.resource);
+    typedChapterContract.assertChapterLevelContract(value, manifest, decks, references, entry.resource);
     return value.chapterLevels[0] as ChapterLevelConfig;
   }));
   const levelsById = new Map(levels.map((level) => [level.id, level as unknown as Record<string, unknown>]));

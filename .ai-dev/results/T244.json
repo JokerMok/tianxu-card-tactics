@@ -1,0 +1,19 @@
+{
+  "task_id": "T244",
+  "executor": "cloud",
+  "implementer_id": "01a018f0-a5ad-7e13-b55b-f4a18019e9dc",
+  "reviewer_id": "01a018f2-fd0d-7382-a6da-21806c924ad3",
+  "base_sha": "08183d235fbb2d2474eadc9f52c8913c01aa5f5f",
+  "head_sha": "0aeb25d4c50791bedf3464ac80c9bf5d77e7f82e",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-meta-shell.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T244 --attempt 3", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查发现持久化同步重入会丢失 pendingState，先后补充 mutation 排队与 save/restore 最新状态语义；最终精确回归通过，35 个反例保留。",
+  "scope_note": "仅修改 T244 allowed_paths；GameShell 视觉节点接线留给后续适配任务。"
+}

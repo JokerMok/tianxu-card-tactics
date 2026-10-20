@@ -1,0 +1,25 @@
+{
+  "task_id": "T327",
+  "executor": "cloud",
+  "implementer_id": "01a02a81-c71e-7c71-9c26-0bc14daa0a78",
+  "reviewer_id": "01a02a89-8014-7b83-99b0-35d75175e7ff",
+  "base_sha": "f00cb1d7195dba1dc0ab7f4644fbba97f75e8d00",
+  "head_sha": "8161b9489798b342a4c4e920fb6b763a74b4a110",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "set +e; output=$(cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs 2>&1); code=$?; test \"$code\" -eq 1; printf '%s\\n' \"$output\" | grep -Fq 'T327 formal performance gate: BLOCKED'", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T327 --attempt 5 (independent guard worktree)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": ["dc2758b", "791d87c", "b25d5ff", "8161b94"],
+  "independent_reviewers": ["01a02a69-5a40-77c1-ab82-0502539280ee", "01a02a89-8014-7b83-99b0-35d75175e7ff"],
+  "observed_raw_command": {"command": "cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs", "exit_code": 1, "evidence": "T327 formal performance gate: BLOCKED; artMode=preview-pose; previewPoseAssets=2; artIntegrationComplete=false; historical artifact was not consulted"},
+  "verification_summary": "契约、通过夹具与反例断言完成；正式 T203 live formal-runtime GPU 证据缺失时 fail-closed 阻断发布。",
+  "release_gate": "BLOCKED",
+  "blocker": "当前正式运行时仍为 preview-pose，未提供 formal-runtime GPU/WebGL2 证据；不得用历史 headless/preview artifact 或 contract-rehearsal-fixture 放行。",
+  "independent_guard": {"worktree": "/private/tmp/codex-v22-worktrees/guard-T327-final-20260823", "scope_guard_attempt": 5, "result_guard": "pass"},
+  "scope_note": "仅修改 T327 允许的性能验证器与报告路径；当前发布阻断是预期的正式资产门禁结果，不是验证器契约实现失败。"
+}

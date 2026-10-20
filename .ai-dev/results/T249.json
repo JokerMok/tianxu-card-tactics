@@ -1,0 +1,19 @@
+{
+  "task_id": "T249",
+  "executor": "cloud",
+  "implementer_id": "01a024e1-1dac-76f2-8797-31dc1c9878b6",
+  "reviewer_id": "01a02551-68c0-7ea1-bf77-dde809267aa8",
+  "base_sha": "0b600a6",
+  "head_sha": "bfe57d8f1f7d75e69d92de716f8e4d2b49c6b8c6",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-hero-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T249 --attempt 2", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查先发现空提交、缺少错误比例/SHA 反例及计数错误；重建干净分支后保留单个实际提交 1a09821，20 个反例通过。协调主线集成：9c8b5f4。",
+  "scope_note": "仅修改 T249 允许的骨骼验证器；正式 C001/C009 资源未被改写。"
+}

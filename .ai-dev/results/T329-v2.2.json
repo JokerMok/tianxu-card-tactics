@@ -1,0 +1,34 @@
+{
+  "task_id": "T329",
+  "phase": "v2.2-M8-12-RECOVERY",
+  "status": "passed",
+  "head_sha": "950bfc3b6e5cf3cbe2c8efbc58c6e6eff5b46a28",
+  "merge_sha": "950bfc3b6e5cf3cbe2c8efbc58c6e6eff5b46a28",
+  "implementation": {
+    "files": [
+      "cocos-client/tools/release/recovery/verify-recovery.mjs",
+      "cocos-client/tools/release/recovery/samples/fail-unrecoverable-save.json",
+      "cocos-client/tools/release/recovery/samples/invalid-json.txt",
+      "cocos-client/tools/release/recovery/samples/pass-release-recovery.json",
+      "documentation/release/recovery/T329-recovery-rehearsal.md"
+    ],
+    "summary": "完成客户端存档 primary/backup/default、旧版迁移与恢复失败演练，验证真实源码、样本和缺失/非法/越界反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/release/recovery/verify-recovery.mjs",
+    "independent_review": "pass",
+    "coverage": [
+      "primary",
+      "backup",
+      "default",
+      "legacy migration",
+      "missing file",
+      "invalid JSON",
+      "unknown field",
+      "invalid version",
+      "timestamp out of range",
+      "negative resource"
+    ]
+  },
+  "residual_risk": "不覆盖浏览器存储介质、平台同步、账号服务端及完整发布流程，报告已明确限定范围。"
+}

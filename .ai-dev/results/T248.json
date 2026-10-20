@@ -1,0 +1,24 @@
+{
+  "task_id": "T248",
+  "executor": "agent",
+  "implementer_id": "01a0260e-205e-7f20-a3bd-992b064169e6",
+  "reviewer_id": "01a02644-df6c-79b0-8fb2-0e69aff2ce6d",
+  "base_sha": "48438cb",
+  "head_sha": "a3cdeb33dc55ed125d5baa9405ba3004f5e9915f",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T248 --attempt 1 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "共享样例从 U002 A0 硬编码改为 U002 formal runtime/U008 A0 双合同分流，19 个反例全部拒绝；实现提交：7d1444d；主线集成：37bb283。",
+  "scope_note": "仅修改 T248 允许的验证器；U002/U008 资源由 T279 任务负责，未由 T248 改写。",
+  "implementation_commits": ["7d1444dba8069c1680739da9071e0e6838845b54"],
+  "merge_commits": ["37bb283"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T248-final-20260822", "scope_guard_attempt": 1, "scope_check": "pass", "result_guard": "pass"}
+}

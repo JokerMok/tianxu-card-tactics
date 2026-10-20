@@ -1,0 +1,30 @@
+{
+  "task_id": "T321",
+  "phase": "v2.2-M8-02-R03",
+  "status": "passed",
+  "head_sha": "00036444effa7b99252171c4b584a4203393808c",
+  "merge_sha": "00036444effa7b99252171c4b584a4203393808c",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/R03.json",
+      "cocos-client/tools/test-build-r03.mjs"
+    ],
+    "summary": "R03 提供两套 26U/4S 有效构筑，真实读取配置并覆盖非法职业/种族/卡牌、技能职业限制、复制上限、重复槽位、缺失字段、非法数量和越界槽位等 11 个反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-r03.mjs",
+    "independent_review": "pass",
+    "negative_cases": 11,
+    "regression": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "R01",
+      "R02",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "R03 尚未接入 Cocos 完整运行时消费链路，留给后续 T255 集成；当前未发现范围内 P0/P1/P2。"
+}

@@ -1,0 +1,26 @@
+{
+  "task_id": "T318",
+  "phase": "v2.2-M8-02-P04",
+  "status": "passed",
+  "head_sha": "6705632ca9f012618048b2f652c91c4c8e335cae",
+  "merge_sha": "6705632ca9f012618048b2f652c91c4c8e335cae",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/P04.json",
+      "cocos-client/tools/test-build-p04.mjs"
+    ],
+    "summary": "P04 提供两套 26U/4S 有效构筑，真实读取并拒绝非法职业/种族、未知卡牌、职业技能限制、复制超限、重复槽位、缺失字段和越界槽位等 10 个反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-p04.mjs",
+    "independent_review": "pass",
+    "negative_cases": 10,
+    "regression": [
+      "P01",
+      "P02",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "P04 尚未进行 Cocos 编辑器/运行时烟测和 UI 集成验证，留给后续集成任务；当前未发现范围内 P0/P1/P2。"
+}

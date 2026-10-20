@@ -1,5 +1,7 @@
+import { CampaignBattleView } from '../battle/presentation/CampaignBattleView';
 import {
   _decorator,
+  profiler,
   Button,
   Color,
   Component,
@@ -129,18 +131,19 @@ export class BattleA0Bootstrap extends Component {
   private metrics!: A0Metrics;
   private gameShell!: GameShell;
   private configRuntime!: ConfigRuntime;
+  private campaignView?: CampaignBattleView;
   private startupBlocked = false;
   private startupToken = 0;
 
   onLoad(): void {
-    void this.start(++this.startupToken);
+    void this.initializeCampaign(++this.startupToken);
   }
 
   private isStartupActive(token: number): boolean {
     return token === this.startupToken && this.node.isValid;
   }
 
-  private async start(token: number): Promise<void> {
+  private async initializeCampaign(token: number): Promise<void> {
     let configRuntime: ConfigRuntime;
     try {
       configRuntime = await loadConfigRuntime();
@@ -154,15 +157,19 @@ export class BattleA0Bootstrap extends Component {
     view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
     this.node.getComponent(UITransform)!.setContentSize(DESIGN_WIDTH, DESIGN_HEIGHT);
     this.node.setPosition(DESIGN_WIDTH / 2, DESIGN_HEIGHT / 2);
+    profiler.hideStats();
     this.root = new Node('BattleA0Root');
     this.root.layer = Layers.Enum.UI_2D;
     this.root.setParent(this.node);
     this.addTransform(this.root, DESIGN_WIDTH, DESIGN_HEIGHT);
-    this.buildScene();
-    this.publishHarness();
-    void this.loadRuntimeArt(token);
-    this.gameShell = new GameShell(this.node, this.root);
-    this.gameShell.mount();
+    try {
+      this.campaignView=new CampaignBattleView(this.root);
+      await this.campaignView.load();
+      if(!this.isStartupActive(token)){this.campaignView.destroy();return;}
+      this.gameShell = new GameShell(this.node, this.root,this.campaignView);
+      this.gameShell.mount();
+    }catch(error){this.blockStartup(error);}
+
   }
 
   private blockStartup(error: unknown): void {
@@ -184,6 +191,7 @@ export class BattleA0Bootstrap extends Component {
   }
 
   onDestroy(): void {
+    this.campaignView?.destroy();
     this.startupToken += 1;
     const runtime = globalThis as Record<string, unknown>;
     delete runtime.__A0_METRICS__;
@@ -205,6 +213,7 @@ export class BattleA0Bootstrap extends Component {
 
   update(deltaTime: number): void {
     if (this.startupBlocked) return;
+    this.campaignView?.update(deltaTime);
     for (const [art, idle] of this.unitPreviewEntries) {
       idle.phase += deltaTime * idle.speed;
       const breath = (Math.sin(idle.phase) + 1) * 0.5;
@@ -577,25 +586,8 @@ export class BattleA0Bootstrap extends Component {
   }
 
   private triggerEnemyHit(): void {
-    if (this.enemyHp <= 0) return;
-    this.enemyHp = Math.max(0, this.enemyHp - 300);
-    this.hitCount += 1;
-    this.enemyHpLabel.string = `${this.enemyHp} / 3600`;
-    const ratio = this.enemyHp / 3600;
-    this.enemyHpBar.getComponent(UITransform)!.setContentSize(482 * ratio, 5);
-    this.enemyHpBar.setPosition(-241 * (1 - ratio), -19);
-
-    const opacity = this.enemyFlash.getComponent(UIOpacity)!;
-    opacity.opacity = 230;
-    tween(opacity).to(0.09, { opacity: 0 }).start();
-    tween(this.enemyCommander)
-      .by(0.08, { position: new Vec3(10, 0, 0) })
-      .by(0.14, { position: new Vec3(-10, 0, 0) })
-      .start();
-    this.updateMetrics();
-    if (this.enemyHp === 0) {
-      window.setTimeout(() => (globalThis as Record<string, any>).__META_BATTLE_COMPLETE__?.(true), 650);
-    }
+    // Retained legacy preview callback has no combat authority.
+    return;
   }
 
   private publishHarness(): void {
@@ -796,7 +788,7 @@ export class BattleA0Bootstrap extends Component {
   }
 
   private createKeyedPoseSheet(source: SpriteFrame): SpriteFrame {
-    const image = source.texture.image?.data;
+    const image = source.texture instanceof Texture2D ? source.texture.image?.data : undefined;
     if (!image || ArrayBuffer.isView(image)) return source;
 
     const canvas = document.createElement('canvas');

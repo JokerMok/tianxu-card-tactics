@@ -1,5 +1,6 @@
 {
-  "name": "tianxu-development",
+  "name": "tianxu-card-tactics",
+  "description": "天墟：万象战阵，东方幻想双战线战术卡牌游戏",
   "private": true,
   "scripts": {
     "verify": "node scripts/verify-all.mjs"

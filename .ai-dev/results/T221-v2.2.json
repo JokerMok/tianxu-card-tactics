@@ -1,0 +1,46 @@
+{
+  "task_id": "T221",
+  "title": "M5-06 塔币与塔商店",
+  "status": "passed",
+  "head_sha": "cba5140",
+  "merge_commit": "9161e37",
+  "modified_files": [
+    "cocos-client/assets/scripts/pve/tower/shop/TowerShop.ts",
+    "cocos-client/assets/scripts/pve/tower/shop/TowerShopConfig.ts",
+    "cocos-client/assets/scripts/pve/tower/shop/index.ts",
+    "cocos-client/tools/test-tower-shop.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-tower-shop.mjs",
+        "exit_code": 0,
+        "output": "T221 tower shop verified: 21 persisted commits, 10 guaranteed floors"
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-tower-config.mjs",
+        "exit_code": 0
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-tower-lifecycle.mjs",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "cba5140",
+    "scope_check": "passed",
+    "additional_probe": "refresh ledger, numeric refresh IDs in reverse order, purchase ledger, +7-day cycle, unordered floor claims and persistence rollback passed"
+  },
+  "repair_attempts": 5,
+  "residual_risk": "Schema v3 rejects older v1/v2 saves; a migration or controlled save reset is required before production rollout. Real cross-process storage concurrency remains outside this service task.",
+  "rollback": "Revert the coordinator merge commit containing cba5140 (currently 9161e37) to remove T221 from the coordinator branch."
+}

@@ -1,0 +1,26 @@
+{
+  "task_id": "T041",
+  "executor": "cloud",
+  "implementer_id": "019ff6c3-118b-7be0-95a9-d3a6564bf67d",
+  "reviewer_id": "019ff6ca-6a79-7e30-bbb2-a2aea9fe93ec",
+  "base_sha": "324daab957a978f61954b4cc2e75f9e3d7ea37e9",
+  "head_sha": "6bf0456e69d2c7b51b29d1dfb936f7ba9f8434df",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/unit-action-state-machine.test.mjs", "exit_code": 0},
+    {"command": "for f in cocos-client/assets/scripts/battle/**/*.test.mjs; do node --experimental-strip-types \"$f\"; done", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-battle-runner.mjs", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-parity-contract.mjs", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-golden-runner.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check 324daab..HEAD", "exit_code": 0},
+    {"command": "python3 /Users/jokermok/.codex/skills/orchestrate-hybrid-development/scripts/scope_guard.py check --project-root /private/tmp/tianxu-t041-worktree --task-id T041 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "首轮独立审查发现核心 ATTACK 事件标准 payload.sourceId 未被解析，导致有效事件被拒绝；修复提交 6bf0456 增加 payload.sourceId 回退并补充契约测试。复审验证 payload.attackerId、event.sourceId、payload.sourceId 三种来源均通过，未发现回归。",
+  "scope_note": "上下文包与 React 构建产物均为协调器临时文件，已移出任务 worktree；最终 scope_guard PASS。"
+}

@@ -1,0 +1,11 @@
+{
+  "task_id": "T230",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "455d60d4d6eea15adf97d3ad44a0de1c21468bc2",
+  "merge_sha": "0c8956965cba0ba817daa4f29cca309d9bb9f5af",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":"collection integrity, prototype pollution, idempotency, restore, rollback, deep-freeze"},
+  "verification": ["test-card-collection.mjs: PASS","T226/T227/T228/Hero/Battle: PASS","git diff --check: PASS"],
+  "scope": "pass: card collection directory and test only",
+  "residual_risk": "Current restore contract is fail-closed for cooperative quantity/result/fingerprint and authority pollution tampering; future save-version migration must preserve the same semantic binding."
+}

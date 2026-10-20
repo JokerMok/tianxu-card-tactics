@@ -1,0 +1,44 @@
+{
+  "task_id": "T203",
+  "phase": "v2.2-runtime-rerun-after-T229-fix",
+  "status": "passed",
+  "head_sha": "baf66b73897780ab9e42b0751d368ab1a4a229dc",
+  "merge_sha": "baf66b73897780ab9e42b0751d368ab1a4a229dc",
+  "implementation": {
+    "fix_commit": "baf66b73897780ab9e42b0751d368ab1a4a229dc",
+    "files": [
+      "cocos-client/assets/scripts/meta/alchemy/refining/CardRefining.ts"
+    ],
+    "summary": "将 Cocos 3.8.8 会错误转译的 Set 展开改为 Array.from(new Set(...))，保持顺序、去重和后续配方归一化语义不变。"
+  },
+  "independent_review": {
+    "status": "pass",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_commit": "baf66b73897780ab9e42b0751d368ab1a4a229dc"
+  },
+  "verification": {
+    "node": [
+      "test-card-refining: PASS, 44 production recipes",
+      "test-card-quality: PASS, 44 cards, 264 definitions, 26 negative cases",
+      "validate:config-loader: PASS",
+      "validate:config-cross-table: PASS",
+      "validate:a0: PASS"
+    ],
+    "cocos": {
+      "creator": "3.8.8",
+      "production_build": "PASS",
+      "a0_ready": "PASS",
+      "assets_ready": "PASS",
+      "gpu": "Google Inc. (Apple) / ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)",
+      "webgl": "WebGL/WebGL2 enabled; live WebGL2 context",
+      "scenario": "1920x1080, 24 units, 6 layers, 7 effects and 7 audio",
+      "fps": 119.928,
+      "p95_ms": 9.3,
+      "thresholds": "FPS >= 55 and P95 <= 22ms"
+    },
+    "counterexample": "父提交在同一 Cocos runner 上构建成功但 A0 启动失败，真实错误为 CardRefiningError: recipes[0].id is invalid；修复版消除该错误。"
+  },
+  "residual_risk": "本轮未将临时 runner 诊断改动纳入提交；运行时消费与更高层业务集成按后续任务处理。"
+}

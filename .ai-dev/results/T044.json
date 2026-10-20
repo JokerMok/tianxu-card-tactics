@@ -1,0 +1,28 @@
+{
+  "task_id": "T044",
+  "executor": "cloud",
+  "implementer_id": "01a01066-5512-7620-82de-0ac7e658715f",
+  "reviewer_id": "01a01073-a47c-7bf3-b067-901ae7b4ec84",
+  "base_sha": "32e35fe26f4c623f42fc2b94490a627755e51f26",
+  "head_sha": "c7c805162e5de242e6f5e27ec7be289b88d4bcfd",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "git diff --check 32e35fe..HEAD", "exit_code": 0},
+    {"command": "scope_guard.py check --task-id T044 --attempt 3", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P1", "finding": "暂停或恢复不会使已排队托管动作失效；恢复后 tick 仍可派发基于暂停前快照生成的旧动作。"},
+    {"severity": "P2", "finding": "控制器测试把暂停、恢复后继续执行旧队列作为预期，缺少暂停或恢复后清队且不派发的反例。"}
+  ],
+  "repair_attempted": true,
+  "repair_commit": "c7c805162e5de242e6f5e27ec7be289b88d4bcfd",
+  "scope_note": "T044 attempt 3 的代码变更均在批准范围内；临时上下文缓存、Web 依赖链接与构建产物已移除。"
+}

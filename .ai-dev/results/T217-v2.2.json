@@ -1,0 +1,42 @@
+{
+  "task_id": "T217",
+  "title": "M5-02 副本双难度",
+  "status": "passed",
+  "head_sha": "e2be6fd",
+  "merge_commit": "5949d75eb8c6b7a024f74acf80b514322e914316",
+  "modified_files": [
+    "cocos-client/assets/scripts/pve/dungeon/difficulty/DungeonDifficulty.ts",
+    "cocos-client/assets/scripts/pve/dungeon/difficulty/index.ts",
+    "cocos-client/tools/test-dungeon-difficulty.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-dungeon-difficulty.mjs",
+        "exit_code": 0,
+        "output": "T217 dungeon difficulty PASS: difficulties=2, stages=3, rewards=4, negative-cases=36, saves=10"
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-dungeon-session.mjs",
+        "exit_code": 0,
+        "output": "T216 dungeon session PASS: real-battles=7, stages=3, retries=2, saves=4, negative-cases=11"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "e2be6fd",
+    "scope_check": "passed",
+    "additional_probe": "v1 rejection, no-evidence clear rejection, Hard enemy isolation and failed-run isolation passed"
+  },
+  "repair_attempts": 2,
+  "residual_risk": "Schema v1 saves are rejected rather than auto-migrated because the old format lacks settled outcome evidence; client-side JSON is not a cryptographic anti-cheat boundary.",
+  "rollback": "Revert merge commit 5949d75eb8c6b7a024f74acf80b514322e914316 to remove T217 from the coordinator branch."
+}

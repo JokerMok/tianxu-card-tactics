@@ -1,0 +1,27 @@
+{
+  "task_id": "T315",
+  "phase": "v2.2-M8-02-P01",
+  "status": "passed",
+  "head_sha": "8a0ddb97f76c0ba4779d881f495f01fe5c5590c0",
+  "merge_sha": "8a0ddb97f76c0ba4779d881f495f01fe5c5590c0",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/P01.json",
+      "cocos-client/tools/test-build-p01.mjs"
+    ],
+    "summary": "P01 提供两套有效构筑，验证真实卡牌、职业、种族、技能与牌组限制，并拒绝非法职业/种族、超限复制、跨职业技能、重复槽位、缺失字段和契约不一致。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-p01.mjs",
+    "independent_review": "pass",
+    "negative_cases": 7,
+    "regression": [
+      "P02",
+      "config cross-table validation",
+      "ConfigLoader",
+      "profession runtime",
+      "deck runtime"
+    ]
+  },
+  "residual_risk": "P01 尚未接入运行时消费链路，留给后续 T255 集成；当前未发现范围内 P0/P1/P2。"
+}

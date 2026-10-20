@@ -1,0 +1,50 @@
+{
+  "task_id": "T297",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "coordinator",
+  "implementer_id": "coordinator-blocker-audit",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "review_status": "blocked",
+  "dependencies": [
+    "T203"
+  ],
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "U020 正式资源目录不存在，缺少透明战场源、动作切片/atlas、骨骼、挂点与 Cocos .meta，不能进入正式生产。"
+    },
+    {
+      "severity": "P1",
+      "finding": "U020 专项生产验收脚本不存在，无法执行该兵种的正式资源清单验收。"
+    },
+    {
+      "severity": "P1",
+      "finding": "直接前置 T203 当前仍因正式 GPU/WebGL2 runtime/正式资产缺失而 fail-closed，不能用 preview-pose 或历史 artifact 代替。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "test -d cocos-client/assets/resources/art/battle/units/U020",
+      "exit_code": 1
+    },
+    {
+      "command": "test -f cocos-client/tools/test-unit-production-u020.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "note": "需补充 U020 独立正式战场美术源、Cocos 导入元数据、运行时绑定与专项验收入口后重启 T297。",
+  "independent_audit": {
+    "agent_id": "01a02ad1-7ddf-7be0-b4f5-32d372b4d010",
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-blockers-20260823",
+    "status": "confirmed",
+    "changed_files": [],
+    "scope": "read-only blocker inventory"
+  }
+}
+

@@ -1,0 +1,51 @@
+{
+  "task_id": "T257",
+  "phase": "v2.2-web-packaging-preflight",
+  "executor": "coordinator",
+  "implementer_id": "coordinator-blocker-audit",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "review_status": "blocked",
+  "dependencies": [
+    "T241",
+    "T252"
+  ],
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "T257 依赖 T252，而 T252 当前被正式兵种资源和父级验收门阻塞。"
+    },
+    {
+      "severity": "P1",
+      "finding": "任务允许的精确目录 cocos-client/build-templates/web/、tools/resource-packaging/ 与专项测试入口均不存在；现有 web-desktop 目录不等同于该任务要求的 web 目录。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "test -d cocos-client/build-templates/web",
+      "exit_code": 1
+    },
+    {
+      "command": "test -d cocos-client/tools/resource-packaging",
+      "exit_code": 1
+    },
+    {
+      "command": "test -f cocos-client/tools/test-web-resource-packaging.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "note": "需待 T252 完成并补齐 Web 分包契约、实现目录与测试入口后重启 T257，不扩大允许路径。",
+  "independent_audit": {
+    "agent_id": "01a02ad1-7ddf-7be0-b4f5-32d372b4d010",
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-blockers-20260823",
+    "status": "confirmed",
+    "changed_files": [],
+    "scope": "read-only blocker inventory"
+  }
+}
+

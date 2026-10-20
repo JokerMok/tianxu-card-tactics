@@ -1,0 +1,18 @@
+{
+  "task_id": "T017",
+  "executor": "cloud",
+  "implementer_id": "019fadcb-fcad-7f62-a587-9f0c01e4826b",
+  "reviewer_id": "019fadd6-7628-73b3-9258-cc5e67cc1bd4",
+  "base_sha": "dc4cf713f4a6d9d1ab8f72364cb9f54bf1f93c7e",
+  "head_sha": "f98eb74a6d162815a2313007a7ad4f2753e3a87a",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/services/validate-reward-service.mjs", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

@@ -1,0 +1,25 @@
+{
+  "id": "T401",
+  "dependencies": [],
+  "depends_on": [],
+  "wave": 1,
+  "executor": "cloud",
+  "risk": "high",
+  "verification_commands": [
+    "cd cocos-client && node --experimental-strip-types tools/test-browser-battle-core.mjs",
+    "cd cocos-client && npm run test:battle-runner && npm run test:battle-runner:types && npm run test:golden-runner && npm run test:parity-contract"
+  ],
+  "allowed_paths": [
+    "cocos-client/assets/scripts/battle/runner/",
+    "cocos-client/assets/scripts/battle/runtime/",
+    "cocos-client/tools/test-browser-battle-core.mjs"
+  ],
+  "excluded_snapshot_paths": [
+    "web-prototype/node_modules/",
+    "web-prototype/dist/",
+    "cocos-client/library/",
+    "cocos-client/temp/",
+    "cocos-client/build/"
+  ]
+}
+

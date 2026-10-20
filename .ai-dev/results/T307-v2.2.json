@@ -1,0 +1,23 @@
+{
+  "task_id": "T307",
+  "phase": "v2.2-final-repair",
+  "head_sha": "6c7256aba388f7fcb38a3fddac4c6df8f4ae32b8",
+  "merge_sha": "002d0ad1acb510d4c57abfabf94a370a11f68285",
+  "status": "passed",
+  "independent_review": {
+    "status": "pass",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "probes": ["L02-only no state", "L02-only initialState", "L02-only data+levels", "injected old L01 state", "hidden-active rejection", "nested mutation/freeze"]
+  },
+  "verification": [
+    "test-meta-page-campaign.mjs: PASS",
+    "T205/T306/T213/Meta Shell/T215: PASS",
+    "npm run validate:a0: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: campaign page component directory and its test only",
+  "repair_attempts": 4,
+  "residual_risk": "Actual Cocos scene visual wiring remains outside T307 scope."
+}

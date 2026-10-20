@@ -1,0 +1,33 @@
+{
+  "task_id": "T324",
+  "phase": "v2.2-M8-02-R06",
+  "status": "passed",
+  "head_sha": "db194a9efc17fd2e60ac9cc2f7d5963051bf2180",
+  "merge_sha": "db194a9efc17fd2e60ac9cc2f7d5963051bf2180",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/R06.json",
+      "cocos-client/tools/test-build-r06.mjs"
+    ],
+    "summary": "R06 提供两套真实可读取构筑（27U/3S、26U/4S），覆盖非法职业/种族/卡牌限制、重复槽位、缺失字段和越界槽位等 11 个反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-r06.mjs",
+    "independent_review": "pass",
+    "negative_cases": 11,
+    "regression": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "R01",
+      "R02",
+      "R03",
+      "R04",
+      "R05",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "未验证 Cocos 编辑器导入、资源打包及运行时消费，留给后续 T255 集成。"
+}

@@ -1,0 +1,63 @@
+{
+  "task_id": "T215",
+  "title": "M4-12 R2 三十分钟稳定性",
+  "status": "passed",
+  "head_sha": "389fcda",
+  "merge_commit": "389fcda",
+  "modified_files": [
+    "cocos-client/tools/test-r2-stability.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-r2-stability.mjs",
+        "exit_code": 0,
+        "output": "T215 R2 stability PASS: ticks=1800, battles=60, objectiveBattles=60, battleEvents=23895, objectiveEvents=141, checkpoints=2, restoredServices=16, saves=18, rollbackChecks=7, recoveredExceptions=2, duplicateRewards=12, negativeCases=32"
+      },
+      {
+        "command": "cd cocos-client && npm run validate:a0",
+        "exit_code": 0,
+        "output": "A0 manifest and scene contract: PASS"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "389fcda",
+    "scope_check": "passed"
+  },
+  "coverage": {
+    "ticks": 1800,
+    "battles": 60,
+    "objective_battles": 60,
+    "checkpoints": 2,
+    "restored_services": 16,
+    "rollback_checks": 7,
+    "recovered_exceptions": 2,
+    "duplicate_rewards": 12,
+    "negative_cases": 32,
+    "objective_event_sources": [
+      "UNIT_DIED",
+      "BATTLE_START",
+      "ROUND_START",
+      "DAMAGE",
+      "BATTLE_END"
+    ],
+    "objective_types": [
+      "KILL",
+      "TIMED",
+      "DEFEND",
+      "SURVIVE"
+    ]
+  },
+  "repair_attempts": 4,
+  "residual_risk": "The thirty-minute duration is simulated by 1800 deterministic one-second ticks; no real-time wall-clock soak was introduced.",
+  "rollback": "Revert merge commit 389fcda to remove T215 test coverage without changing product runtime code."
+}

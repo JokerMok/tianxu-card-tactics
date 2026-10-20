@@ -1,0 +1,63 @@
+{
+  "task_id": "T204",
+  "plan_version": "v2.2",
+  "executor": "cloud",
+  "implementer_id": "01a01dac-a902-7ec2-ae94-a9e3d847e33d",
+  "repair_implementer_id": "01a01dc5-73cf-7e72-a60e-f9c67fe3e1eb",
+  "reviewer_id": "01a01de5-31c2-7a90-9feb-ee2157065885",
+  "base_sha": "d0f6725e18dfbddc4f7bc5230f66d0adf3e68640",
+  "head_sha": "db9586b",
+  "merge_commit": "c07b12f",
+  "scope_check": "pass",
+  "verification_commands": [
+    {
+      "command": "cd cocos-client && node tools/test-chapter01-levels.mjs",
+      "exit_code": 0,
+      "summary": "strategy-driven A0 input/display, readonly indexes, L01-L12 runtime registry, 30/30 unknown-field probes rejected"
+    },
+    {
+      "command": "cd cocos-client && npm run validate:config-loader",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && npm run validate:config-cross-table",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && npm run validate:a0",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/test-enemy-strategy-config.mjs",
+      "exit_code": 0,
+      "summary": "T207 static contract; 50 negative cases rejected"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempts": 2,
+  "repair_notes": "修复 A0 Harness-only 伪接线、策略牌组与关卡牌组不一致、运行时可变策略索引及关卡规则子树未知字段；完整 Cocos 场景未启动，保留场景挂载与资源加载风险。",
+  "allowed_paths": [
+    "cocos-client/assets/resources/config/levels/chapter01/index.json",
+    "cocos-client/assets/resources/config/manifest.json",
+    "cocos-client/assets/scripts/config/ConfigLoader.ts",
+    "cocos-client/assets/scripts/config/ConfigValidator.ts",
+    "cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts",
+    "cocos-client/tools/validate-config-loader.mjs",
+    "cocos-client/tools/validate-config-cross-table.mjs",
+    "cocos-client/tools/test-chapter01-levels.mjs"
+  ],
+  "changed_paths": [
+    "cocos-client/assets/resources/config/levels/chapter01/index.json",
+    "cocos-client/assets/resources/config/manifest.json",
+    "cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts",
+    "cocos-client/assets/scripts/config/ConfigLoader.ts",
+    "cocos-client/tools/test-chapter01-levels.mjs",
+    "cocos-client/tools/validate-config-cross-table.mjs",
+    "cocos-client/tools/validate-config-loader.mjs"
+  ]
+}

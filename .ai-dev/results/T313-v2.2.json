@@ -1,0 +1,11 @@
+{
+  "task_id": "T313",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "b7eac552e9a3b584013104376b05dea09b169f7b",
+  "merge_sha": "87e824fa892988e2bcda362de5d917f483b52539",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":"duplicate events, invalid inputs, dangerous IDs, 12 levels/12 tasks"},
+  "verification": ["test-meta-page-tasks.mjs: PASS","63 test-*.mjs regression: PASS","git diff --check: PASS"],
+  "scope": "pass: tasks page directory and test only",
+  "residual_risk": "verify:meta was not judged because the local 127.0.0.1:4180 service was not running; Cocos runtime UI wiring remains in the later group integration gate."
+}

@@ -1,0 +1,24 @@
+{
+  "task_id": "T331",
+  "phase": "v2.2-second-repair",
+  "head_sha": "05c648f79375fe464c417b60b22cf7ec16fb1fac",
+  "merge_sha": "fc1682349a9979ad40a59a3cd10e1d488e59cbe4",
+  "status": "passed",
+  "independent_review": {
+    "status": "pass",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "probes": ["missing real L01 field", "invalid prerequisite/id", "nested Set/Array/Iterator", "cyclic/empty registry", "invalid reward"]
+  },
+  "verification": [
+    "test-chapter-level-contract.mjs: PASS",
+    "npm run validate:config-cross-table: PASS",
+    "npm run validate:config-loader: PASS",
+    "chapter runtime/story/campaign regressions: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: ChapterLevelContract.ts and test-chapter-level-contract.mjs only",
+  "repair_attempts": 1,
+  "residual_risk": "Custom unbounded iterators could run indefinitely; production uses finite registries."
+}

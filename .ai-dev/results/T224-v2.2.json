@@ -1,0 +1,44 @@
+{
+  "task_id": "T224",
+  "title": "M5-09 三名系统援军",
+  "status": "passed",
+  "head_sha": "8d730fb",
+  "merge_commit": "9161e37",
+  "modified_files": [
+    "cocos-client/assets/scripts/core/ai/reinforcements/index.ts",
+    "cocos-client/tools/test-boss-reinforcements.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-boss-reinforcements.mjs",
+        "exit_code": 0,
+        "output": "T224 M5-09 Boss reinforcements: configurable professions, target priorities, downed/recovery rules, idempotent actions and save restore PASS"
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-boss-phases.mjs",
+        "exit_code": 0
+      },
+      {
+        "command": "cd cocos-client && npm run test:battle-runner",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "8d730fb",
+    "scope_check": "passed",
+    "additional_probe": "state counter causality, recovery formula, non-JSON payload rejection, sparse arrays and deep copy/freeze passed"
+  },
+  "repair_attempts": 3,
+  "residual_risk": "This task covers core rules and script-level contracts; Cocos UI/E2E wiring and production save migration remain separate integration work.",
+  "rollback": "Revert merge commit 9161e37 to remove T224 from the coordinator branch."
+}

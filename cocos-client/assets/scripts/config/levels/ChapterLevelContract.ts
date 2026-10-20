@@ -147,7 +147,7 @@ function assertObjectives(
     if (type === 'SURVIVE_ROUNDS') {
       positiveInteger(levelRequired(objective, 'rounds', itemPath), `${itemPath}.rounds`);
     }
-    return objective as ChapterLevelObjective;
+    return { ...objective, type: type as LevelObjectiveType };
   });
 }
 
@@ -200,7 +200,7 @@ function assertRewards(
         }
       }
     }
-    return reward as ChapterLevelReward;
+    return { ...reward, type: type as LevelRewardType, id, quantity };
   });
 }
 
@@ -228,7 +228,7 @@ function assertFailureConditions(
         assertTargetId(levelRequired(condition, 'targetId', itemPath), targetPath, pattern);
       }
     }
-    return condition as ChapterLevelFailureCondition;
+    return { ...condition, type: type as LevelFailureType };
   });
 }
 
@@ -236,7 +236,10 @@ function deckIds(value: unknown): Set<string> {
   if (!isLevelRecord(value) || !Array.isArray(value.decks) || value.decks.some((deck) => !isLevelRecord(deck) || typeof deck.id !== 'string')) {
     throw new ConfigLoadError('config/decks.decks', '必须是包含 ID 的 array');
   }
-  return new Set((value as DeckTable).decks.map((deck) => deck.id));
+  return new Set(value.decks.map((deck: unknown) => {
+    if (!isLevelRecord(deck) || typeof deck.id !== 'string') throw new ConfigLoadError('config/decks.decks', '卡组 ID 无效');
+    return deck.id;
+  }));
 }
 
 function isIterator(value: unknown): value is Iterator<unknown> {

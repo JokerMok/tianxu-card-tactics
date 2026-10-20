@@ -1,0 +1,26 @@
+{
+  "task_id": "T042",
+  "executor": "cloud",
+  "implementer_id": "019ff6d5-7f73-7031-95eb-b0458fcbc898",
+  "reviewer_id": "019ff6de-a143-7713-8061-a1b9fcdc09ea",
+  "base_sha": "dad0604c9db9e0d5d636b287e26b17331c754c3b",
+  "head_sha": "f7f72cb912735719eebeee530d7840c7179393e6",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/presentation/hero-action-state-machine.test.mjs", "exit_code": 0},
+    {"command": "for f in cocos-client/assets/scripts/battle/**/*.test.mjs; do node --experimental-strip-types \"$f\"; done", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-battle-runner.mjs", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-parity-contract.mjs", "exit_code": 0},
+    {"command": "node cocos-client/tools/test-golden-runner.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check dad0604c9db9e0d5d636b287e26b17331c754c3b..HEAD", "exit_code": 0},
+    {"command": "python3 /Users/jokermok/.codex/skills/orchestrate-hybrid-development/scripts/scope_guard.py check --project-root /private/tmp/tianxu-t042-worktree --task-id T042 --attempt 1", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "首轮独立审查发现四项问题：事件字段不严格、BATTLE_END 默认推断、缺少 ORDER、阈值无批准依据。修复提交 f7f72cb 收紧字段/冲突/结算校验，支持 ORDER，并将 heavyDamageThreshold 与 criticalHpRatio 改为调用方显式策略；复审确认真实 DAMAGE/HERO_DAMAGED/BATTLE_END、draw、冲突、六状态、主将隔离和回归均通过。",
+  "scope_note": "React 构建产物和上下文包均已移出任务 worktree；最终 scope_guard PASS。"
+}

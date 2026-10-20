@@ -1,0 +1,20 @@
+{
+  "task_id": "T206",
+  "executor": "cloud",
+  "implementer_id": "01a01933-09b7-7d83-9091-1b3aa187ed4a",
+  "reviewer_id": "01a0193b-4691-7d63-b6a7-58369df43ca2",
+  "base_sha": "0b8fd4f777e5436fb88ff64bc0a041c4a5ed4782",
+  "head_sha": "4a1633f3e7571946349c1f52e8593ecfe74044a4",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter-objectives.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T206 --attempt 3", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查要求补齐 BATTLE_STARTED、胜负结算原因、完整事件序列及回放校验；最终保留 KILL/DEFEND/TIMED/SURVIVE、UI snapshot 与 23 个精确负例。",
+  "scope_note": "仅修改 T206 allowed_paths；计划、任务状态与其他结果未改。"
+}

@@ -1,0 +1,42 @@
+{
+  "task_id": "T218",
+  "title": "M5-03 翻牌奖励",
+  "status": "passed",
+  "head_sha": "8b1e8fb",
+  "merge_commit": "52ea7a0",
+  "modified_files": [
+    "cocos-client/assets/scripts/pve/reveal/RevealReward.ts",
+    "cocos-client/assets/scripts/pve/reveal/index.ts",
+    "cocos-client/tools/test-reveal-reward.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-reveal-reward.mjs",
+        "exit_code": 0,
+        "output": "T218 reveal reward PASS: pools=2, cards=5, free-claims=2, additional-claims=3, invalid-cases=14, saves=6"
+      },
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-reward-service.mjs",
+        "exit_code": 0,
+        "output": "T208 reward service PASS: idempotency, single-persist atomicity and rollback"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "8b1e8fb",
+    "scope_check": "passed",
+    "additional_probe": "future date, state/session day consistency, zero grant, card duplicate and pool exhaustion passed"
+  },
+  "repair_attempts": 2,
+  "residual_risk": "Persistence is synchronous and single-instance; production multi-instance storage still needs transaction or CAS semantics. The default business day uses local runtime date and must use the product timezone in production deployment.",
+  "rollback": "Revert merge commit 52ea7a0 to remove T218 from the coordinator branch."
+}

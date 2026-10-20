@@ -1,0 +1,300 @@
+{
+  "schema_version": 1,
+  "task_id": "T251",
+  "budget_tokens": 8000,
+  "estimated_tokens": 1178,
+  "repo_revision": "000e36b82f7a89ecb2c55013ed4ac233aba23839",
+  "task_file": ".ai-dev/tasks/T251.json",
+  "task_markdown": ".ai-dev/tasks/T251.md",
+  "required_files": [
+    "cocos-client/assets/resources/art/battle/audio/sfx_attack_impact_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_attack_impact_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_button_activate_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_button_activate_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_death_release_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_death_release_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_heal_pulse_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_heal_pulse_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_hit_impact_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_hit_impact_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_settlement_reveal_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_settlement_reveal_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/audio/sfx_spell_resolve_v001.wav",
+    "cocos-client/assets/resources/art/battle/audio/sfx_spell_resolve_v001.wav.meta",
+    "cocos-client/assets/resources/art/battle/effects/battle-effects-audio-contract.json",
+    "cocos-client/assets/resources/art/battle/effects/battle-effects-audio-contract.json.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_attack_slash_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_attack_slash_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_button_press_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_button_press_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_death_release_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_death_release_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_heal_pulse_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_heal_pulse_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_hit_crack_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_hit_crack_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_settlement_ring_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_settlement_ring_v001.png.meta",
+    "cocos-client/assets/resources/art/battle/effects/vfx_spell_burst_v001.png",
+    "cocos-client/assets/resources/art/battle/effects/vfx_spell_burst_v001.png.meta",
+    "cocos-client/tools/test-battle-effects-audio.mjs"
+  ],
+  "evidence": [
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/battle-effects-audio-contract.json",
+      "lines": "1-32",
+      "reason": "任务允许路径",
+      "sha256": "8752aff9b15de82e54fe9716693a8ad8e738c543f05c437e81453efe24464176",
+      "symbols": [],
+      "content": "// lines 1-32\n{\n  \"schemaVersion\": 1,\n  \"contractId\": \"T251-BATTLE-FEEDBACK\",\n  \"contractVersion\": \"1.0.0\",\n  \"engine\": \"Cocos Creator 3.8.8\",\n  \"resourceRoot\": \"assets/resources\",\n  \"productionTask\": \"T251\",\n  \"validation\": {\n    \"requiredCategories\": [\n      \"attack\",\n      \"spell\",\n      \"heal\",\n      \"hit\",\n      \"death\",\n      \"button\",\n      \"settlement\"\n    ],\n    \"effect\": {\n      \"format\": \"png\",\n      \"minBytes\": 1024,\n      \"width\": 256,\n      \"height\": 256,\n      \"durationMs\": {\n        \"min\": 80,\n        \"max\": 1200\n      }\n    },\n    \"audio\": {\n      \"format\": \"wav\",\n      \"minBytes\": 1000,\n      \"sampleRate\": 48000,\n      \"channels\": 1,",
+      "estimated_tokens": 165,
+      "cache_hit": false
+    },
+    {
+      "path": "cocos-client/tools/test-battle-effects-audio.mjs",
+      "lines": "1-86,88-110,129-139",
+      "reason": "任务允许路径",
+      "sha256": "bc30f51ed4441fcfbd93b13d31025b7213bed7d166428a6d80a2bb2da9b059f5",
+      "symbols": [
+        "toolsDir",
+        "projectRoot",
+        "resourceRoot",
+        "effectsRoot",
+        "audioRoot",
+        "contractPath",
+        "REQUIRED_CATEGORIES",
+        "EVENT_BY_CATEGORY",
+        "EFFECT_MIN_BYTES",
+        "EFFECT_DIMENSION",
+        "EFFECT_DURATION_MIN_MS",
+        "EFFECT_DURATION_MAX_MS",
+        "AUDIO_MIN_BYTES",
+        "AUDIO_SAMPLE_RATE",
+        "AUDIO_CHANNELS",
+        "AUDIO_BIT_DEPTH",
+        "AUDIO_DURATION_MIN_MS",
+        "AUDIO_DURATION_MAX_MS",
+        "fail",
+        "isRecord",
+        "requireRecord",
+        "requireString",
+        "requireInteger",
+        "requireNumber",
+        "requireOneOf",
+        "sha256",
+        "crc32",
+        "crc",
+        "parsePng",
+        "signature",
+        "offset",
+        "header",
+        "idat",
+        "sawEnd",
+        "length",
+        "type",
+        "dataStart",
+        "dataEnd",
+        "crcOffset",
+        "data",
+        "expectedCrc",
+        "actualCrc",
+        "rowLength",
+        "raw",
+        "rgba",
+        "sourceOffset",
+        "previous",
+        "filter",
+        "current",
+        "rawValue",
+        "left",
+        "above",
+        "upperLeft",
+        "p",
+        "pa",
+        "pb",
+        "pc",
+        "predictor",
+        "alphaPixels",
+        "coloredPixels",
+        "parseWav",
+        "offset",
+        "format",
+        "data",
+        "type",
+        "length",
+        "start",
+        "end",
+        "peak",
+        "validatePath",
+        "resourcePath",
+        "expectedPrefix",
+        "root",
+        "resolvedRoot",
+        "resolvedPath",
+        "stat",
+        "validateAsset",
+        "label",
+        "id",
+        "category",
+        "kind",
+        "expectedFormat",
+        "fileName",
+        "filePath",
+        "stat",
+        "minimumBytes",
+        "durationMs",
+        "durationLimits",
+        "eventAtMs",
+        "maxAlpha",
+        "png",
+        "priority",
+        "wav",
+        "validateThresholds",
+        "validateContract",
+        "ids",
+        "byCategory",
+        "asset",
+        "assets",
+        "sampleIds",
+        "sample",
+        "sampleId",
+        "category",
+        "categoryAssets",
+        "effect",
+        "audio",
+        "clone",
+        "expectFailure",
+        "candidate",
+        "contract",
+        "summary",
+        "asset",
+        "asset"
+      ],
+      "content": "// lines 1-86\nimport assert from 'node:assert/strict';\nimport crypto from 'node:crypto';\nimport fs from 'node:fs';\nimport path from 'node:path';\nimport zlib from 'node:zlib';\nimport { fileURLToPath } from 'node:url';\n\nconst toolsDir = path.dirname(fileURLToPath(import.meta.url));\nconst projectRoot = path.resolve(toolsDir, '..');\nconst resourceRoot = path.join(projectRoot, 'assets', 'resources');\nconst effectsRoot = path.join(resourceRoot, 'art', 'battle', 'effects');\nconst audioRoot = path.join(resourceRoot, 'art', 'battle', 'audio');\nconst contractPath = path.join(effectsRoot, 'battle-effects-audio-contract.json');\n\nconst REQUIRED_CATEGORIES = Object.freeze([\n  'attack',\n  'spell',\n  'heal',\n  'hit',\n  'death',\n  'button',\n  'settlement',\n]);\nconst EVENT_BY_CATEGORY = Object.freeze({\n  attack: 'attack.impact',\n  spell: 'spell.resolve',\n  heal: 'heal.pulse',\n  hit: 'hit.impact',\n  death: 'death.release',\n  button: 'ui.button.activate',\n  settlement: 'battle.settlement.reveal',\n});\nconst EFFECT_MIN_BYTES = 1024;\nconst EFFECT_DIMENSION = 256;\nconst EFFECT_DURATION_MIN_MS = 80;\nconst EFFECT_DURATION_MAX_MS = 1200;\nconst AUDIO_MIN_BYTES = 1000;\nconst AUDIO_SAMPLE_RATE = 48000;\nconst AUDIO_CHANNELS = 1;\nconst AUDIO_BIT_DEPTH = 16;\nconst AUDIO_DURATION_MIN_MS = 80;\nconst AUDIO_DURATION_MAX_MS = 1000;\n\nfunction fail(message) {\n  throw new Error(message);\n}\n\nfunction isRecord(value) {\n  return value !== null && typeof value === 'object' && !Array.isArray(value);\n}\n\nfunction requireRecord(value, label) {\n  if (!isRecord(value)) fail(`${label} must be an object`);\n  return value;\n}\n\nfunction requireString(value, label) {\n  if (typeof value !== 'string' || value.length === 0) fail(`${label} must be a non-empty string`);\n  return value;\n}\n\nfunction requireInteger(value, label) {\n  if (!Number.isInteger(value)) fail(`${label} must be an integer`);\n  return value;\n}\n\nfunction requireNumber(value, label) {\n  if (typeof value !== 'number' || !Number.isFinite(value)) fail(`${label} must be a finite number`);\n  return value;\n}\n\nfunction requireOneOf(value, allowed, label) {\n  if (!allowed.includes(value)) fail(`${label} must be one of ${allowed.join(', ')}`);\n  return value;\n}\n\nfunction sha256(filePath) {\n  return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');\n}\n\nfunction crc32(buffer) {\n  let crc = 0xffffffff;\n  for (const byte of buffer) {\n    crc ^= byte;\n    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));\n  }\n// lines 88-110\n}\n\nfunction parsePng(buffer, label) {\n  const signature = Buffer.from('\\x89PNG\\r\\n\\x1a\\n', 'binary');\n  if (!buffer.subarray(0, signature.length).equals(signature)) fail(`${label} is not a PNG`);\n  let offset = signature.length;\n  let header = null;\n  const idat = [];\n  let sawEnd = false;\n  while (offset + 12 <= buffer.length) {\n    const length = buffer.readUInt32BE(offset);\n    const type = buffer.toString('ascii', offset + 4, offset + 8);\n    const dataStart = offset + 8;\n    const dataEnd = dataStart + length;\n    const crcOffset = dataEnd;\n    if (crcOffset + 4 > buffer.length) fail(`${label} has a truncated ${type} chunk`);\n    const data = buffer.subarray(dataStart, dataEnd);\n    const expectedCrc = buffer.readUInt32BE(crcOffset);\n    const actualCrc = crc32(Buffer.concat([Buffer.from(type, 'ascii'), data]));\n    if (expectedCrc !== actualCrc) fail(`${label} has an invalid ${type} CRC`);\n    if (type === 'IHDR') {\n      if (length !== 13) fail(`${label} has an invalid IHDR length`);\n      header = {\n// lines 129-139\n    fail(`${label} must be a non-interlaced 8-bit RGBA PNG`);\n  }\n  const rowLength = header.width * 4;\n  const raw = zlib.inflateSync(Buffer.concat(idat));\n  if (raw.length !== (rowLength + 1) * header.height) fail(`${label} has invalid RGBA scanline length`);\n  const rgba = Buffer.alloc(rowLength * header.height);\n  let sourceOffset = 0;\n  let previous = Buffer.alloc(rowLength);\n  for (let y = 0; y < header.height; y += 1) {\n    const filter = raw[sourceOffset];\n    sourceOffset += 1;",
+      "estimated_tokens": 1013,
+      "cache_hit": false
+    }
+  ],
+  "task_references": [],
+  "excluded_candidates": [
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_attack_impact_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_attack_impact_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_button_activate_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_button_activate_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_death_release_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_death_release_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_heal_pulse_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_heal_pulse_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_hit_impact_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_hit_impact_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_settlement_reveal_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_settlement_reveal_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_spell_resolve_v001.wav",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/audio/sfx_spell_resolve_v001.wav.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/battle-effects-audio-contract.json.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_attack_slash_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_attack_slash_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_button_press_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_button_press_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_death_release_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_death_release_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_heal_pulse_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_heal_pulse_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_hit_crack_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_hit_crack_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_settlement_ring_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_settlement_ring_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_spell_burst_v001.png",
+      "reason": "二进制或非文本文件"
+    },
+    {
+      "path": "cocos-client/assets/resources/art/battle/effects/vfx_spell_burst_v001.png.meta",
+      "reason": "二进制或非文本文件"
+    }
+  ],
+  "expansion_policy": "先请求指定文件或符号，再扩大到完整文件；不得自行扫描全仓库",
+  "estimation": "约每 4 个字符 1 token，仅用于预算控制",
+  "confidence": "medium"
+}

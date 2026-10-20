@@ -1,0 +1,3 @@
+{
+  "task_id":"T330","executor":"agent","implementer_id":"01a01d4d-ae12-7a42-bd08-ba5bf89bf7b7","reviewer_id":"01a01d50-5355-76d1-a7ef-6e46f8c1c7fc","base_sha":"cec4226cb32559cf54b29bc5ff9b30e4269cdfde","head_sha":"cec4226cb32559cf54b29bc5ff9b30e4269cdfde","scope_check":"pass","verification_commands":[{"command":"node cocos-client/tools/test-hero-profession-runtime.mjs","exit_code":0},{"command":"cd cocos-client && npm run validate:a0","exit_code":0},{"command":"git diff --check","exit_code":0},{"command":"scope_guard check --task-id T330 --attempt 2","exit_code":0}],"review_status":"pass","review_findings":[],"repair_attempted":false,"repair_notes":"四职业运行时、序列化状态、100 seeds 确定性及 A0 复核均通过；独立 reviewer 无 P0/P1/P2。","scope_note":"零产品改动承接；实现已存在于批准 v2.2 基线。"
+}

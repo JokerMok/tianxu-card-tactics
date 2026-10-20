@@ -1,0 +1,31 @@
+{
+  "task_id": "T279",
+  "phase": "v2.2-unit-production-review",
+  "executor": "agent",
+  "implementer_id": "01a025d7-8919-7270-8f41-7c40e846bfb0",
+  "reviewer_id": "01a025f5-222f-7480-93c4-a1d910f6d27b",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "8eececec4d630f7780c06a1653e33ef6e75b1ae5",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "U002 production-contract 标记正式资源，但 skeleton 仍为 A0-reference/reference-pose-skeleton，源图路径继续指向 a0/美术素材/A0，运行时未真实切换到正式目录。"
+    },
+    {
+      "severity": "P1",
+      "finding": "新增 U002 正式 PNG 无透明通道，且与 A0 参考图逐字节相同；测试未断言正式路径、assetStage/runtimeMode 与 alpha。"
+    }
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u002.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-hero-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "git diff --check 4dfd61cbceddc8e9bbc10c63e63b14ab2995613e 8eececec4d630f7780c06a1653e33ef6e75b1ae5", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "失败证据保留；未合入主线。"
+}

@@ -244,7 +244,8 @@ assert.match(bootstrap, /startupToken/);
 assert.match(bootstrap, /node\.isValid/);
 assert.match(bootstrap, /this\.startupToken \+= 1/);
 assert.match(bootstrap, /if \(!this\.isStartupActive\(token\)\) return/);
-assert.match(bootstrap, /void this\.loadRuntimeArt\(token\)/);
+assert.match(bootstrap, /await this\.campaignView\.load\(\)/);
+assert.match(bootstrap, /if\(!this\.isStartupActive\(token\)\)\{this\.campaignView\.destroy\(\);return;\}/);
 assert.match(bootstrap, /private async loadRuntimeArt\(token: number\)/);
 
 console.log('Config loader contract and error paths: PASS');

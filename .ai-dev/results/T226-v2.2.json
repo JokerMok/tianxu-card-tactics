@@ -1,0 +1,24 @@
+{
+  "task_id": "T226",
+  "phase": "v2.2-final-repair",
+  "head_sha": "24bea20",
+  "merge_sha": "0e0624385503077f087c25289b188c9f1feb96b3",
+  "status": "passed",
+  "independent_review": {
+    "status": "pass",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "probes": ["forged.name", "registry copyLimit", "U002:1 attack=4", "deleted quality record", "negative ability", "copy limit over card", "unknown entry field"]
+  },
+  "verification": [
+    "test-card-quality.mjs: 44 cards, 264 definitions, 26 negative cases, PASS",
+    "T210/T211: PASS",
+    "Hero profession/runtime: PASS",
+    "Battle Runner: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: quality catalog directory and test-card-quality.mjs only",
+  "repair_attempts": 4,
+  "residual_risk": "Future cards.json changes must update the fixed registry and quality catalog digest; digest is non-cryptographic and not runtime scene wiring."
+}

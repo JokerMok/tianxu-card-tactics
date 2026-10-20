@@ -1,0 +1,29 @@
+{
+  "task_id": "T317",
+  "phase": "v2.2-M8-02-P03",
+  "status": "passed",
+  "head_sha": "5550a6217128030397c43bbf0dd4df524c5e2e51",
+  "merge_sha": "5550a6217128030397c43bbf0dd4df524c5e2e51",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/P03.json",
+      "cocos-client/tools/test-build-p03.mjs"
+    ],
+    "summary": "P03 提供两套 P003 有效构筑，均为 26U/4S/30 张，并覆盖真实配置引用及非法职业/种族、未知卡牌、跨职业技能、复制上限、重复槽位、缺失字段、越界槽位和契约不一致反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-p03.mjs",
+    "independent_review": "pass",
+    "negative_cases": 10,
+    "regression": [
+      "P01",
+      "P02",
+      "ConfigLoader",
+      "config cross-table validation",
+      "T010",
+      "T012",
+      "T013"
+    ]
+  },
+  "residual_risk": "P03 尚未接入运行时消费链路、manifest 注册和像素审计，留给后续集成任务；当前未发现范围内 P0/P1/P2。"
+}

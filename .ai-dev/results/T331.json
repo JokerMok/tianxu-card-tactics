@@ -1,0 +1,30 @@
+{
+  "task_id": "T331",
+  "executor": "cloud",
+  "implementer_id": "01a025a8-ceb1-7cd2-bc6e-22daf0a9c11a",
+  "reviewer_id": "01a02a74-1be1-70b3-8787-66122e7e400c",
+  "base_sha": "bfe57d8f1f7d75e69d92de716f8e4d2b49c6b8c6",
+  "head_sha": "f00cb1d7195dba1dc0ab7f4644fbba97f75e8d00",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter-level-contract.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-cross-table", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-loader", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter01-levels.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter01-story.mjs", "exit_code": 0},
+    {"command": "scope_guard check --task-id T331 --attempt 6 (independent review worktree)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "acceptance_review": {"reviewer_id": "01a02a74-1be1-70b3-8787-66122e7e400c", "reviewed_head": "f00cb1d7195dba1dc0ab7f4644fbba97f75e8d00", "p0": 0, "p1": 0, "p2": 0},
+  "independent_guard": {"worktree": "/private/tmp/codex-v22-worktrees/review-T331-approval-20260823", "scope_guard_attempt": 6, "result_guard": "pass"},
+  "repair_attempted": true,
+  "implementation_commits": [
+    "fe931600dfd4962b4641196fb388ead53c0c2476",
+    "00f40bbb685e8e2d558e44b32ccb00e63464eab1"
+  ],
+  "merge_commits": ["b91c6dc", "54e3e80"],
+  "repair_notes": "第二次修复最终组合版本保留 Iterator WeakMap 缓存、空/循环/无限迭代保护，并将 Iterator.next() 异常归一化为 ConfigLoadError；新增真实 A→B→A 循环回归用例。独立 reviewer 在干净副本完成章节契约、配置、故事回归及针对性探针，未发现 P0/P1/P2。",
+  "scope_note": "仅修改 T331 允许的章节契约模块与 test-chapter-level-contract.mjs；既有失败证据保留于 .ai-dev/results/T331-v2.2-second-repair-r2.json。本次由独立审查者在当前 HEAD 重新验证，结果 guard 在独立 worktree 通过。"
+}

@@ -1,0 +1,43 @@
+{
+  "task_id": "T203",
+  "phase": "v2.2-current-gpu-runner-repair",
+  "executor": "cloud",
+  "implementer_id": "01a029f2-350d-7871-b696-7eac3a95f892",
+  "reviewer_id": "01a029fd-a5d4-7413-a4a0-2f24ec9f35fd",
+  "base_sha": "c36551c35769d4e035a64a88fc25b284618b3954",
+  "head_sha": "21fa49074f31d8baf9099f0b2ff4680171709b67",
+  "status": "passed",
+  "scope_check": "pass",
+  "verification_commands": [
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/verify-production-performance.mjs",
+      "exit_code": 0,
+      "evidence": "真实 Apple Metal/WebGL2；FPS 119.97600479904021；P95 9.5ms"
+    },
+    {
+      "command": "cd cocos-client && npm run validate:a0",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "仅 staging A0 实际导入脚本闭包，隔离无关 crafting 模块的 Cocos 3.8.8 转译错误；不降低真实性或性能阈值。",
+  "implementation_commit": "5b60eef",
+  "merge_commit": "21fa490",
+  "scope_note": "仅修改 cocos-client/assets/scripts/battle/performance/production-gpu-runner.swift。",
+  "independent_guard": {"clone": "/private/tmp/codex-v22-worktrees/guard-T203-current-gpu-20260822a", "scope_guard_attempt": 2, "scope_check": "pass", "result_guard": "pass"},
+  "risks": ["canvas 容差与完整资源 staging 为父提交既有边界，未由本修复引入。"]
+}

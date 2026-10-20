@@ -1,0 +1,11 @@
+{
+  "task_id": "T229",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "87e824fa892988e2bcda362de5d917f483b52539",
+  "merge_sha": "87e824fa892988e2bcda362de5d917f483b52539",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":"restore chain, inventory anchors, auto-refresh identity, DST, recipes, deep-freeze"},
+  "verification": ["test-card-refining.mjs: PASS","T226/T227/T228/Hero/Battle/config: PASS","git diff --check: PASS"],
+  "scope": "pass: refining directory and test only",
+  "residual_risk": "Event-chain digest is client-side and protects ordinary save tampering, not a hostile player who can modify client code; test-neutral-balance timed out and was recorded as unjudged."
+}

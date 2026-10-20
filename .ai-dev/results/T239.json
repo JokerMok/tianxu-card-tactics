@@ -1,0 +1,26 @@
+{
+  "task_id": "T239",
+  "executor": "agent",
+  "implementer_id": "01a02723-722c-7f73-b82a-8a43ce52b2df",
+  "reviewer_id": "01a0272e-b473-7a71-a81f-de50bd99dd85",
+  "base_sha": "3350b3da433d6bda89e0914841c06f47a2e66ef6",
+  "head_sha": "01d223b1e9321abe5afa30b2b65a2ee6ca654795",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-daily-rewards.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-mainline-tasks.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-reward-service.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-profile-stamina.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T239 --attempt 1 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": ["51b6983", "44a553c"],
+  "merge_commits": ["b8c65c6", "6ab0c16"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T239-final-20260822", "scope_guard_attempt": 1, "scope_check": "pass", "result_guard": "pass"},
+  "notes": "最终独立审查通过；重复事件、周任务领取、跨日事务、重入、存档完整性、exact-key 与 canonical digest 均已固化。"
+}

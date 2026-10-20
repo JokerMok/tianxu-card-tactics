@@ -1,0 +1,950 @@
+{
+  "name": "U002-CODEX-PILOT",
+  "version": "5.5",
+  "compatibleVersion": "5.5",
+  "frameRate": 30,
+  "armature": [
+    {
+      "name": "U002",
+      "type": "Armature",
+      "frameRate": 30,
+      "aabb": {
+        "x": -170,
+        "y": -430,
+        "width": 360,
+        "height": 430
+      },
+      "bone": [
+        {
+          "name": "root",
+          "transform": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "name": "pelvis",
+          "parent": "root",
+          "transform": {
+            "x": 0,
+            "y": -158
+          }
+        },
+        {
+          "name": "leftLeg",
+          "parent": "pelvis",
+          "transform": {
+            "x": -27,
+            "y": 0
+          }
+        },
+        {
+          "name": "rightLeg",
+          "parent": "pelvis",
+          "transform": {
+            "x": 29,
+            "y": 0
+          }
+        },
+        {
+          "name": "leftFoot",
+          "parent": "leftLeg",
+          "transform": {
+            "x": -2,
+            "y": 127
+          }
+        },
+        {
+          "name": "rightFoot",
+          "parent": "rightLeg",
+          "transform": {
+            "x": 6,
+            "y": 127
+          }
+        },
+        {
+          "name": "torso",
+          "parent": "pelvis",
+          "transform": {
+            "x": 0,
+            "y": -89
+          }
+        },
+        {
+          "name": "head",
+          "parent": "torso",
+          "transform": {
+            "x": 0,
+            "y": -119
+          }
+        },
+        {
+          "name": "leftArm",
+          "parent": "torso",
+          "transform": {
+            "x": -65,
+            "y": -95
+          }
+        },
+        {
+          "name": "rightArm",
+          "parent": "torso",
+          "transform": {
+            "x": 65,
+            "y": -95
+          }
+        },
+        {
+          "name": "spear",
+          "parent": "leftArm",
+          "transform": {
+            "x": -39,
+            "y": 71
+          }
+        },
+        {
+          "name": "shield",
+          "parent": "rightArm",
+          "transform": {
+            "x": 29,
+            "y": 119
+          }
+        }
+      ],
+      "slot": [
+        {
+          "name": "rearSkirt",
+          "parent": "pelvis",
+          "displayIndex": 0
+        },
+        {
+          "name": "leftLeg",
+          "parent": "leftLeg",
+          "displayIndex": 0
+        },
+        {
+          "name": "rightLeg",
+          "parent": "rightLeg",
+          "displayIndex": 0
+        },
+        {
+          "name": "leftFoot",
+          "parent": "leftFoot",
+          "displayIndex": 0
+        },
+        {
+          "name": "rightFoot",
+          "parent": "rightFoot",
+          "displayIndex": 0
+        },
+        {
+          "name": "torso",
+          "parent": "torso",
+          "displayIndex": 0
+        },
+        {
+          "name": "leftArm",
+          "parent": "leftArm",
+          "displayIndex": 0
+        },
+        {
+          "name": "rightArm",
+          "parent": "rightArm",
+          "displayIndex": 0
+        },
+        {
+          "name": "leftShoulder",
+          "parent": "torso",
+          "displayIndex": 0
+        },
+        {
+          "name": "rightShoulder",
+          "parent": "torso",
+          "displayIndex": 0
+        },
+        {
+          "name": "head",
+          "parent": "head",
+          "displayIndex": 0
+        },
+        {
+          "name": "spear",
+          "parent": "spear",
+          "displayIndex": 0
+        },
+        {
+          "name": "shield",
+          "parent": "shield",
+          "displayIndex": 0
+        }
+      ],
+      "skin": [
+        {
+          "name": "default",
+          "slot": [
+            {
+              "name": "rearSkirt",
+              "display": [
+                {
+                  "name": "rearSkirt",
+                  "type": "image",
+                  "path": "rearSkirt",
+                  "transform": {
+                    "x": 0,
+                    "y": 58
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "leftLeg",
+              "display": [
+                {
+                  "name": "leftLeg",
+                  "type": "image",
+                  "path": "leftLeg",
+                  "transform": {
+                    "x": 2,
+                    "y": 48
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "rightLeg",
+              "display": [
+                {
+                  "name": "rightLeg",
+                  "type": "image",
+                  "path": "rightLeg",
+                  "transform": {
+                    "x": 1,
+                    "y": 48
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "leftFoot",
+              "display": [
+                {
+                  "name": "leftFoot",
+                  "type": "image",
+                  "path": "leftFoot",
+                  "transform": {
+                    "x": 1,
+                    "y": 15
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "rightFoot",
+              "display": [
+                {
+                  "name": "rightFoot",
+                  "type": "image",
+                  "path": "rightFoot",
+                  "transform": {
+                    "x": 4,
+                    "y": 15
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "torso",
+              "display": [
+                {
+                  "name": "torso",
+                  "type": "image",
+                  "path": "torso",
+                  "transform": {
+                    "x": 3,
+                    "y": 38
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "leftArm",
+              "display": [
+                {
+                  "name": "leftArm",
+                  "type": "image",
+                  "path": "leftArm",
+                  "transform": {
+                    "x": 0,
+                    "y": 83
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "rightArm",
+              "display": [
+                {
+                  "name": "rightArm",
+                  "type": "image",
+                  "path": "rightArm",
+                  "transform": {
+                    "x": -3,
+                    "y": 90
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "leftShoulder",
+              "display": [
+                {
+                  "name": "leftShoulder",
+                  "type": "image",
+                  "path": "leftShoulder",
+                  "transform": {
+                    "x": -51,
+                    "y": -65
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "rightShoulder",
+              "display": [
+                {
+                  "name": "rightShoulder",
+                  "type": "image",
+                  "path": "rightShoulder",
+                  "transform": {
+                    "x": 68,
+                    "y": -65
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "head",
+              "display": [
+                {
+                  "name": "head",
+                  "type": "image",
+                  "path": "head",
+                  "transform": {
+                    "x": 5,
+                    "y": 0
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "spear",
+              "display": [
+                {
+                  "name": "spear",
+                  "type": "image",
+                  "path": "spear",
+                  "transform": {
+                    "x": 29,
+                    "y": 55
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            },
+            {
+              "name": "shield",
+              "display": [
+                {
+                  "name": "shield",
+                  "type": "image",
+                  "path": "shield",
+                  "transform": {
+                    "x": -2,
+                    "y": 105
+                  },
+                  "pivot": {
+                    "x": 0.5,
+                    "y": 0.5
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "animation": [
+        {
+          "name": "Idle",
+          "duration": 36,
+          "playTimes": 0,
+          "bone": [
+            {
+              "name": "torso",
+              "translateFrame": [
+                {
+                  "duration": 18,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 18,
+                  "x": 0,
+                  "y": -3,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "head",
+              "rotateFrame": [
+                {
+                  "duration": 18,
+                  "rotate": -1,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 18,
+                  "rotate": 1,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "spear",
+              "rotateFrame": [
+                {
+                  "duration": 18,
+                  "rotate": -2,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 18,
+                  "rotate": 2,
+                  "tweenEasing": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Move",
+          "duration": 24,
+          "playTimes": 0,
+          "bone": [
+            {
+              "name": "pelvis",
+              "translateFrame": [
+                {
+                  "duration": 6,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "x": 0,
+                  "y": -5,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "x": 0,
+                  "y": -5,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "leftLeg",
+              "rotateFrame": [
+                {
+                  "duration": 6,
+                  "rotate": -8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": 8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "rightLeg",
+              "rotateFrame": [
+                {
+                  "duration": 6,
+                  "rotate": 8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": -8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 6,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "spear",
+              "rotateFrame": [
+                {
+                  "duration": 12,
+                  "rotate": -2,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 12,
+                  "rotate": 2,
+                  "tweenEasing": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Attack",
+          "duration": 24,
+          "playTimes": 1,
+          "frame": [
+            {
+              "duration": 5
+            },
+            {
+              "duration": 8,
+              "actions": [
+                {
+                  "type": 10,
+                  "name": "windup"
+                }
+              ]
+            },
+            {
+              "duration": 11,
+              "actions": [
+                {
+                  "type": 10,
+                  "name": "impact"
+                }
+              ]
+            }
+          ],
+          "bone": [
+            {
+              "name": "pelvis",
+              "translateFrame": [
+                {
+                  "duration": 5,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "x": -12,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "x": -26,
+                  "y": -2,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "torso",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": -7,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": 8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "leftArm",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": -24,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": 42,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "spear",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": -23,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": 22,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "rightArm",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": -8,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": 13,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Hit",
+          "duration": 12,
+          "playTimes": 1,
+          "frame": [
+            {
+              "duration": 2
+            },
+            {
+              "duration": 10,
+              "actions": [
+                {
+                  "type": 10,
+                  "name": "hit"
+                }
+              ]
+            }
+          ],
+          "bone": [
+            {
+              "name": "pelvis",
+              "translateFrame": [
+                {
+                  "duration": 2,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "x": 12,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 7,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "torso",
+              "rotateFrame": [
+                {
+                  "duration": 2,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": 9,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 7,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "head",
+              "rotateFrame": [
+                {
+                  "duration": 2,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": -7,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 7,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "shield",
+              "rotateFrame": [
+                {
+                  "duration": 2,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 3,
+                  "rotate": -12,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 7,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Death",
+          "duration": 24,
+          "playTimes": 1,
+          "frame": [
+            {
+              "duration": 22
+            },
+            {
+              "duration": 2,
+              "actions": [
+                {
+                  "type": 10,
+                  "name": "despawn"
+                }
+              ]
+            }
+          ],
+          "bone": [
+            {
+              "name": "pelvis",
+              "translateFrame": [
+                {
+                  "duration": 5,
+                  "x": 0,
+                  "y": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "x": 9,
+                  "y": 25,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 11,
+                  "x": 20,
+                  "y": 48,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "torso",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": 15,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 11,
+                  "rotate": 62,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "head",
+              "rotateFrame": [
+                {
+                  "duration": 5,
+                  "rotate": 0,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 8,
+                  "rotate": -9,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 11,
+                  "rotate": 16,
+                  "tweenEasing": 0
+                }
+              ]
+            },
+            {
+              "name": "root",
+              "scaleFrame": [
+                {
+                  "duration": 14,
+                  "x": 1,
+                  "y": 1,
+                  "tweenEasing": 0
+                },
+                {
+                  "duration": 10,
+                  "x": 0.92,
+                  "y": 0.82,
+                  "tweenEasing": 0
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "defaultActions": [
+        {
+          "gotoAndPlay": "Idle"
+        }
+      ]
+    }
+  ]
+}

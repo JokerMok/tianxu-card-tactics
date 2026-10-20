@@ -1,0 +1,23 @@
+{
+  "task_id": "T284",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "agent",
+  "implementer_id": "01a02649-ef22-79a1-93c2-bd5a4ad7c305",
+  "base_sha": "db9586b",
+  "status": "blocked",
+  "review_status": "blocked",
+  "review_findings": [
+    {"severity": "P1", "finding": "U007 缺少独立正式战场美术源、动作切片、atlas、骨骼、挂点与 .meta；现有 U007-CARD.png 为 RGB 无 Alpha 卡面，禁止转作战斗单位。"},
+    {"severity": "P1", "finding": "T284 专项测试入口不存在，无法执行生产资源验收。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u007.mjs", "exit_code": 1},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "repair_requested": false,
+  "note": "没有伪造提交；需补充 U007 独立正式战场美术源和生产验收入口后重启 T284。"
+}

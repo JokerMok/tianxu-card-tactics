@@ -1,0 +1,16 @@
+{
+  "task_id": "T309",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "ed10691",
+  "merge_sha": "edfdc4cea7c117ea7396215a8346b8ab5f5ab687",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":8},
+  "verification": [
+    "test-meta-page-deck.mjs: 44 cards, 34 components, 11 negative cases, PASS",
+    "T205/T210/T211/T226/Meta Shell/T215: PASS",
+    "npm run validate:a0: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: deck page directory and test only",
+  "residual_risk": "Scene visual wiring remains outside T309; TypeScript compiler was unavailable, strip-types/source probes passed."
+}

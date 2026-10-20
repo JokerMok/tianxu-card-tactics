@@ -51,3 +51,12 @@ cocos-client/native/engine/android/**/assets/
 **/test-artifacts/**/*.jpg
 **/test-artifacts/**/*.jpeg
 **/test-artifacts/**/*.webp
+
+# Local delivery builds and generated art drafts; runtime assets live in cocos-client/assets
+/交付/
+/美术素材/生成/
+/.ai-dev/results/p0-build-location.txt
+/.ai-dev/results/**/*.png
+*.blend1
+/.codex/PROJECT_STATE.lock/
+/.codex/PROJECT_STATE.md.tmp-*

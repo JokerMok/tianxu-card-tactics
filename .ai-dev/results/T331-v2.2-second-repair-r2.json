@@ -1,0 +1,33 @@
+{
+  "task_id": "T331",
+  "phase": "v2.2-second-repair-review-r2",
+  "executor": "cloud",
+  "implementer_id": "01a0258a-4a1a-7322-8090-f945b2c2d52d",
+  "reviewer_id": "01a02592-4806-7ef1-b969-c806fdaa134d",
+  "base_sha": "05c648f79375fe464c417b60b22cf7ec16fb1fac",
+  "head_sha": "a9493e2a4c6e6d258447e4954c0bb31e6bad19ba",
+  "status": "failed",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter-level-contract.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-cross-table", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-loader", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter01-levels.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-chapter01-story.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T331 --attempt 2 (clean review clone)", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {
+      "severity": "P2",
+      "finding": "normalizeStringRegistry 直接调用 Iterator.next()；next() 抛异常时泄漏原始 Error，未统一为 ConfigLoadError，且缺少对应反例测试。"
+    }
+  ],
+  "repair_attempted": true,
+  "repair_notes": "首次复审发现 Iterator 不可重复消费后已完成一次修正；二次独立复审确认重复消费、空/循环/无限 Iterator 已覆盖并通过，但仍发现 throwing Iterator 的错误归一化缺口。按流水线规则停止，不合入主线。",
+  "implementation_commit": "cb5f65f",
+  "review_commit": "a9493e2",
+  "merge_sha": null,
+  "scope_note": "修正仅在 T331 allowed_paths 内；当前协调主线仍停留在 05c648f 对应实现，a9493e2 未合入。"
+}

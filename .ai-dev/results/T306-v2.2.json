@@ -1,0 +1,37 @@
+{
+  "task_id": "T306",
+  "title": "M7-04-HOME 主城页面组件化",
+  "status": "passed",
+  "head_sha": "729288a",
+  "merge_commit": "a5fbeff",
+  "modified_files": [
+    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/HomeContracts.ts",
+    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/HomeComponents.ts",
+    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/HomePageService.ts",
+    "cocos-client/assets/scripts/meta/ui/pages/home-campaign-cards/home/index.ts",
+    "cocos-client/tools/test-meta-page-home.mjs"
+  ],
+  "verification": {
+    "commands": [
+      {
+        "command": "cd cocos-client && node --experimental-strip-types tools/test-meta-page-home.mjs",
+        "exit_code": 0,
+        "output": "T306 meta home PASS: components=7, empty-components=4, negative-cases=9, real-source-files=4"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "independent_review": {
+    "status": "passed",
+    "p0": 0,
+    "p1": 0,
+    "p2": 0,
+    "review_head": "729288a",
+    "scope_check": "passed"
+  },
+  "residual_risk": "The home page component/service contracts are isolated data-driven modules; GameShell integration is owned by subsequent meta-page convergence tasks.",
+  "rollback": "Revert merge commit a5fbeff to remove T306 changes; retain the earlier Wave 8 merges by replaying only the T306 parent if a selective rollback is required."
+}

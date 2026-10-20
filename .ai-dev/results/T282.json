@@ -1,0 +1,30 @@
+{
+  "task_id": "T282",
+  "executor": "agent",
+  "implementer_id": "01a0262e-8992-7c82-8331-ff2c9b2b5e10",
+  "reviewer_id": "01a02667-bba8-79d3-8166-a2a3e4c0611d",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "a93b610a6b821fc5f056fac3137327b84b61c7bc",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u005.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T282 --attempt 1 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": [
+    "f5092dea5a33ec7f10b0e438db043b5664c0c219",
+    "dd697b52a488543e3e14b37001013ea8298b98e0",
+    "522b715",
+    "8efa2bd",
+    "41a5712"
+  ],
+  "merge_commits": ["ad86023", "ae4030e", "8106026", "7a836c6", "a93b610"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T282-final-20260822", "scope_guard_attempt": 1, "scope_check": "pass", "result_guard": "pass"},
+  "repair_notes": "第三次修复去除 U005 pose/cutout 内部场景残留；后续补强加入多尺度、颜色变换和非 4 像素对齐的场景纹理签名检测。最终独立审查确认真实资源无误杀、64 个非对齐残留位置均拒绝。外部 verify-meta 因缺少 playwright 未执行，但 PNG meta 已由专项直接读取。"
+}

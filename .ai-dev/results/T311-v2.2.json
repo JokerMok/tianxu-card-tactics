@@ -1,0 +1,11 @@
+{
+  "task_id": "T311",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "7e2b4853c6b4b2e41eb9ae699d38a5e6aa7f37c3",
+  "merge_sha": "3b7b53f605de3495c278a3a506e29372b4797322",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":1,"probes":16},
+  "verification": ["test-meta-page-adventure.mjs: PASS","T309/T310/T226/T215/Meta Shell: PASS","git diff --check: PASS"],
+  "scope": "pass: adventure page directory and test only",
+  "residual_risk": "Reviewer noted a conditional risk: restore may accept an older progress snapshot; this is retained as a compatibility choice pending a future save-version migration contract."
+}

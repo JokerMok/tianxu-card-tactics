@@ -1,0 +1,20 @@
+{
+  "task_id": "T213",
+  "executor": "cloud",
+  "implementer_id": "01a01ca3-8c1d-7743-a089-afedb7fb981c",
+  "reviewer_id": "01a01ca8-d0c1-7691-8db0-a02fa4908265",
+  "base_sha": "1aa5371fe484327cc645389dc452535e77cad7bd",
+  "head_sha": "3848b2bb9e4ea36bc5327a5a1fc75af4112bbe14",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-mainline-tasks.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T213 --attempt 4", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "最终独立审查确认真实 Chapter01Story 快照使用下一个待演出节点语义；严格协议仅对存在 STORY_NODE_READ 且节点属于 CHAPTER01 的配置启用；reward outbox 保持版本化、可恢复、可重试和 ack 幂等。外部奖励 sink 明确为 at-least-once，必须以稳定 businessKey 去重并在持久成功后 ack。",
+  "scope_note": "仅修改 T213 allowed_paths；未修改计划、任务状态、approval 或其他产品路径。"
+}

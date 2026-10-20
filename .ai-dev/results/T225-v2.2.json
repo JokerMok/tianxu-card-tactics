@@ -1,0 +1,11 @@
+{
+  "task_id": "T225",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "808c19a",
+  "merge_sha": "170d153",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0},
+  "verification": ["test-pve-reward-isolation.mjs: PASS","T208/T331/T205: PASS","git diff --check: PASS"],
+  "scope": "pass: production reward isolation service, save schema, level/drop resources and regression test only",
+  "residual_risk": "Reward-isolation coverage validates the current PvE boundary and rollback contract; future reward sources must continue using the same production service boundary."
+}

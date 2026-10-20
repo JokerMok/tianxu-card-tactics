@@ -1,0 +1,29 @@
+{
+  "task_id": "T320",
+  "phase": "v2.2-M8-02-R02",
+  "status": "passed",
+  "head_sha": "dcf4356c8a9981269b66806a2d545c1ebab0f045",
+  "merge_sha": "dcf4356c8a9981269b66806a2d545c1ebab0f045",
+  "implementation": {
+    "files": [
+      "cocos-client/assets/resources/config/builds/R02.json",
+      "cocos-client/tools/test-build-r02.mjs"
+    ],
+    "summary": "R02 提供两套有效构筑（27U/3S、26U/4S），真实读取配置并覆盖非法职业/种族/卡牌、复制上限、重复槽位、字段缺失、槽位越界和总数错误等 10 个反例。"
+  },
+  "verification": {
+    "command": "cd cocos-client && node --experimental-strip-types tools/test-build-r02.mjs",
+    "independent_review": "pass",
+    "negative_cases": 10,
+    "regression": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "R01",
+      "ConfigLoader",
+      "config cross-table validation"
+    ]
+  },
+  "residual_risk": "未覆盖实际战斗平衡与强度评估，符合 T320 任务边界；运行时消费留给后续 T255 集成。"
+}

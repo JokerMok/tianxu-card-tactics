@@ -1,0 +1,31 @@
+{
+  "task_id": "T281",
+  "phase": "v2.2-unit-production-review",
+  "executor": "agent",
+  "implementer_id": "01a025d7-90a1-7821-a380-f7afc7f3d3dc",
+  "reviewer_id": "01a025f5-449d-7c81-9c36-8b962830456f",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "f47bce506bbcda6f4f13a01e09df7f637dcdb38b",
+  "status": "failed",
+  "scope_check": "pass",
+  "review_status": "fail",
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "U004 skeleton 的 player/enemy scaleX 映射与项目正式规范相反；当前视觉为朝右弓手，导致玩家朝左、敌方朝右。"
+    },
+    {
+      "severity": "P2",
+      "finding": "验收器只把镜像 scaleX 当双向朝向通过条件，未覆盖左右向资源/预览证据，也未验证不可安全镜像的持械手与翼根结构。"
+    }
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u004.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-loader", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-cross-table", "exit_code": 0},
+    {"command": "git diff --check 4dfd61cbceddc8e9bbc10c63e63b14ab2995613e f47bce506bbcda6f4f13a01e09df7f637dcdb38b", "exit_code": 0}
+  ],
+  "repair_requested": true,
+  "note": "失败证据保留；未合入主线。"
+}

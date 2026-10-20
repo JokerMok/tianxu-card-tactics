@@ -1,0 +1,86 @@
+{
+  "task_id": "T252",
+  "phase": "v2.2-unit-production-rollup",
+  "executor": "coordinator",
+  "implementer_id": "coordinator-blocker-audit",
+  "base_sha": "c747cc64f4f887ca23e33faf00e9bd4fc2260783",
+  "status": "blocked",
+  "review_status": "blocked",
+  "dependencies": [
+    "T203",
+    "T278",
+    "T279",
+    "T280",
+    "T281",
+    "T282",
+    "T283",
+    "T284",
+    "T285",
+    "T286",
+    "T287",
+    "T288",
+    "T289",
+    "T290",
+    "T291",
+    "T292",
+    "T293",
+    "T294",
+    "T295",
+    "T296",
+    "T297",
+    "T298",
+    "T299",
+    "T300",
+    "T301",
+    "T302",
+    "T303",
+    "T304",
+    "T305"
+  ],
+  "review_findings": [
+    {
+      "severity": "P1",
+      "finding": "T252 要求 U001–U028 子任务全部通过后才能汇总；U006/U007/U009/U010 与 U011–U028 尚未具备正式资源及专项验收，U008 仍为 A0/reference 资源。"
+    },
+    {
+      "severity": "P1",
+      "finding": "全量生产验收脚本与性能验收脚本当前不存在，无法执行父任务的只读汇总门。"
+    },
+    {
+      "severity": "P1",
+      "finding": "T203 正式 GPU/WebGL2 性能证据仍缺失，不能以历史 headless/preview artifact 放行。"
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "test -f cocos-client/tools/test-unit-production-assets.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "test -f cocos-client/tools/verify-production-performance.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "test -d cocos-client/assets/resources/art/battle/units/U006 && test -d cocos-client/assets/resources/art/battle/units/U028",
+      "exit_code": 1
+    },
+    {
+      "command": "cd cocos-client && node --experimental-strip-types tools/release/perf/verify-perf.mjs",
+      "exit_code": 1
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "repair_requested": false,
+  "note": "需先完成 T203、T283–T305 的正式输入并新增父任务验收入口；当前不提交代码。",
+  "independent_audit": {
+    "agent_id": "01a02ad1-7ddf-7be0-b4f5-32d372b4d010",
+    "worktree": "/private/tmp/codex-v22-worktrees/audit-blockers-20260823",
+    "status": "confirmed",
+    "changed_files": [],
+    "scope": "read-only blocker inventory"
+  }
+}
+

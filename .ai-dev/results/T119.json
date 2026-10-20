@@ -1,0 +1,33 @@
+{
+  "task_id": "T119",
+  "executor": "cloud",
+  "implementer_id": "01a01080-e6db-7081-9773-bad68fde1f0c",
+  "reviewer_id": "01a01096-18df-7a82-871d-a887c685b356",
+  "reviewer_ids": [
+    "01a0108c-9e70-7673-9fcf-5a7cf3dc6dea",
+    "01a01096-18df-7a82-871d-a887c685b356"
+  ],
+  "base_sha": "0f544157349012eb56d015a225d4e46dfe1959d",
+  "head_sha": "1fbdd10730f304a627be1eb427d64b31c1e9b781",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "fail",
+  "review_findings": [
+    {"severity": "P2", "finding": "首轮审查发现入队动作未防御性复制，且策略产物规范化和合法性查询异常可穿透。修复提交 1fbdd10 已覆盖这两项反例。"},
+    {"severity": "P2", "finding": "二次审查发现 BattleControlController.tick 未捕获 session.dispatch 异常，合法性查询成功但派发异常时会穿透宿主。"},
+    {"severity": "P2", "finding": "二次审查发现 BattleSessionController.isActionLegal 在 try 外读取 action.type；异常 getter 或 Proxy 会抛出。"}
+  ],
+  "repair_attempted": true,
+  "repair_commit": "1fbdd10730f304a627be1eb427d64b31c1e9b781",
+  "scope_note": "T119 attempt 2 仅变更四个批准的 battle 路径；context_pack 缓存、临时 Web node_modules 链接和 dist 构建产物均已移除。",
+  "outcome": "blocked_after_one_cloud_repair"
+}

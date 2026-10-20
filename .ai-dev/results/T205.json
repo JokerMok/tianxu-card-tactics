@@ -1,0 +1,19 @@
+{
+  "task_id": "T205",
+  "executor": "cloud",
+  "implementer_id": "01a01938-d365-7dd0-ada7-da105ee076af",
+  "reviewer_id": "01a0193f-d1a2-7393-9344-eb1dcaee8a3b",
+  "base_sha": "0b8fd4f777e5436fb88ff64bc0a041c4a5ed4782",
+  "head_sha": "46c3c1c9d21091ed11ec87d774bca32d97caa2ac",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-campaign-state.mjs", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T205 --attempt 4", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "repair_notes": "独立审查要求显式覆盖 24 组恢复可达性（合法 15、非法 9）；最终保留原 34+3 负例及状态机、保存恢复、回滚和重入回归。",
+  "scope_note": "仅修改 T205 allowed_paths；计划、任务状态与其他结果未改。"
+}

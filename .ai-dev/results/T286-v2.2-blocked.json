@@ -1,0 +1,23 @@
+{
+  "task_id": "T286",
+  "phase": "v2.2-unit-production-preflight",
+  "executor": "agent",
+  "implementer_id": "01a0266a-9c9b-7930-8efb-ac9c08263909",
+  "base_sha": "a3cdeb3",
+  "status": "blocked",
+  "review_status": "blocked",
+  "review_findings": [
+    {"severity": "P1", "finding": "U009 资源目录、专项测试、透明战场源、动作切片、atlas、骨骼、挂点、预览与 .meta 全部缺失；仅有 RGB 卡面，无法进入正式生产。"},
+    {"severity": "P1", "finding": "U009 配置绑定存在，但 GameState.ts 另有‘山海药师/山海遗族’旧文本，与 units/cards 正式配置冲突；不在 T286 允许范围内。"}
+  ],
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u009.mjs", "exit_code": 1},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "repair_requested": false,
+  "note": "需要 U009 正式透明战场源及独立资源链路；GameState.ts 冲突需另行安排允许范围内的配置/政治身份修复。"
+}

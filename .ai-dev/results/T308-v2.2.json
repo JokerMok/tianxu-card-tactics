@@ -1,0 +1,16 @@
+{
+  "task_id": "T308",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "7b9a1b9",
+  "merge_sha": "42235416c9726490579aae0c2a25cf198a116421",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":7},
+  "verification": [
+    "test-meta-page-cards.mjs: 44 cards, 264 quality definitions, 14 negative cases, PASS",
+    "T226/T205/Meta Shell/T215: PASS",
+    "npm run validate:a0: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: cards page directory and test only",
+  "residual_risk": "Scene-node visual wiring remains outside T308 scope."
+}

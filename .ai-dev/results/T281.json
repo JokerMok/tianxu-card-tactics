@@ -1,0 +1,30 @@
+{
+  "task_id": "T281",
+  "executor": "agent",
+  "implementer_id": "01a025d7-90a1-7821-a380-f7afc7f3d3dc",
+  "reviewer_id": "01a0262d-cc7d-7b83-9b8c-2ef907520fe7",
+  "base_sha": "4dfd61cbceddc8e9bbc10c63e63b14ab2995613e",
+  "head_sha": "a3cdeb33dc55ed125d5baa9405ba3004f5e9915f",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-production-u004.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/test-unit-skeleton-samples.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-loader.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && node --experimental-strip-types tools/validate-config-cross-table.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0},
+    {"command": "scope_guard check --task-id T281 --attempt 5 (clean guard clone)", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": true,
+  "implementation_commits": [
+    "f47bce506bbcda6f4f13a01e09df7f637dcdb38b",
+    "a32437a2ef967f199b89a911f477e57aa20921dd",
+    "4ef6adffe483ad30f9483f1f865be798d6520db1",
+    "a3b56c885de7020108e168fa1369f08ba1951c3d"
+  ],
+  "merge_commits": ["236ac20", "1bf1e91", "635d795", "a3cdeb3"],
+  "independent_guard": {"clone": "/private/tmp/codex-v22-clones/guard-T281-final-v6-20260822", "scope_guard_attempt": 6, "scope_check": "pass", "result_guard": "pass"},
+  "repair_notes": "第三次修复补齐 U004 敌方独立非镜像差异、四份 PNG Cocos .meta；第四次补强固化 spellResist/cards.unitId 绑定与解码像素非透明差异证据，独立审查 P0/P1/P2 清零。"
+}

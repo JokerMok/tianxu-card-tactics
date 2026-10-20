@@ -21,10 +21,10 @@
             "_value": true
           },
           "skeletal-animation": {
-            "_value": false
+            "_value": true
           },
           "3d": {
-            "_value": false
+            "_value": true
           },
           "meshopt": {
             "_value": false
@@ -101,7 +101,7 @@
             "_value": true
           },
           "primitive": {
-            "_value": false
+            "_value": true
           },
           "profiler": {
             "_value": true
@@ -178,13 +178,13 @@
           },
           "render-pipeline": {
             "_value": true,
-            "_option": "custom-pipeline"
+            "_option": "legacy-pipeline"
           },
           "custom-pipeline": {
-            "_value": true
+            "_value": false
           },
           "legacy-pipeline": {
-            "_value": false
+            "_value": true
           },
           "xr": {
             "_value": false
@@ -196,7 +196,6 @@
           "animation",
           "audio",
           "base",
-          "custom-pipeline",
           "dragon-bones",
           "gfx-webgl",
           "gfx-webgl2",
@@ -212,7 +211,11 @@
           "tween",
           "ui",
           "video",
-          "webview"
+          "webview",
+          "3d",
+          "primitive",
+          "skeletal-animation",
+          "legacy-pipeline"
         ],
         "noDeprecatedFeatures": {
           "value": false,

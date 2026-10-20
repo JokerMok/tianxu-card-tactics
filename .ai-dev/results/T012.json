@@ -1,0 +1,21 @@
+{
+  "task_id": "T012",
+  "executor": "local",
+  "implementer_id": "coordinator-t012-repair",
+  "reviewer_id": "019fad36-88cf-7f53-8d43-070d7eef733c",
+  "base_sha": "06dd33c",
+  "head_sha": "f712a35ddf00604b7961edf1f4f5e78703661d52",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node cocos-client/assets/resources/config/validate-t012.mjs", "exit_code": 0},
+    {"command": "node cocos-client/assets/resources/config/validate-t010.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-cross-table -- assets/resources/config/manifest.json", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:config-cross-table", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

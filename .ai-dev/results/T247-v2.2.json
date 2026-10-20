@@ -1,0 +1,11 @@
+{
+  "task_id": "T247",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "71058bdf0f7b0c63435c9e50e26fc1fb13dd0b21",
+  "merge_sha": "71058bdf0f7b0c63435c9e50e26fc1fb13dd0b21",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"asserts":502,"negative_cases":24},
+  "verification": ["test-meta-pages-city-tasks-inventory.mjs: PASS","T229/T230/T231/T312/T313/T314/Meta/Battle: PASS","git diff --check: PASS"],
+  "scope": "pass: group integration test only; no cross-page event bus or GameShell changes introduced",
+  "residual_risk": "verify:meta was unavailable because 127.0.0.1:4180 was not running; browser-level host wiring remains a separate environment gate."
+}

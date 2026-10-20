@@ -1,0 +1,27 @@
+{
+  "task_id": "T122",
+  "executor": "cloud",
+  "implementer_id": "01a010f5-40f1-7d40-9fe4-367264d6290f",
+  "reviewer_id": "01a01105-e715-7d23-8a22-7393f7dcba0c",
+  "base_sha": "4be84e1a73ee4452d090bdc9c88ab48626985c7b",
+  "head_sha": "1fc187896ac31c0532d35a7c88f5c03056436a7a",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-result-transaction.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-exit-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/battle-control-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/session-controller.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/battle/action-integration.test.mjs", "exit_code": 0},
+    {"command": "node --experimental-strip-types cocos-client/assets/scripts/services/validate-reward-service.mjs", "exit_code": 0},
+    {"command": "cd cocos-client && npm run test:battle-runner", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "cd web-prototype && npm test", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0, "note": "隔离 worktree 临时链接协调工作区 node_modules，验证后已移除"},
+    {"command": "scope_guard.py check --task-id T122 --attempt 2", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": [],
+  "repair_attempted": false,
+  "repair_notes": "T122 attempt1 的透明 Proxy 审查意见暴露不可实现的验收表述，已在重新审批的 attempt2 中改为可观测敌意行为拒绝与单次安全快照；attempt2 独立审查通过。",
+  "scope_note": "范围快照、最终范围检查和结果守卫均在 T122 attempt2 独立 worktree 执行；未复用 T046 失败代码。"
+}

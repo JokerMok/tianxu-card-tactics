@@ -1,0 +1,17 @@
+{
+  "task_id": "T227",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "997ef47",
+  "merge_sha": "6a39804b8a3e51181f5582a6a408bfdafdfb286d",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":22},
+  "verification": [
+    "test-card-synthesis.mjs: 44 cards, 220 production recipes, PASS",
+    "T226/T210/T211/Hero/Battle: PASS",
+    "full wave regression including T225/T208/T228/T308/T309/T215: PASS",
+    "git diff --check: PASS"
+  ],
+  "scope": "pass: synthesis service directory and test only",
+  "repair_attempts": 4,
+  "residual_risk": "Save state does not store an initial inventory baseline, so external injected surplus satisfying replay invariants cannot be distinguished."
+}

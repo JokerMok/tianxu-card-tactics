@@ -1,0 +1,19 @@
+{
+  "task_id": "T401",
+  "date": "2026-09-09",
+  "head_sha": "b521a6b16d21d18c42fafb183bca7b360d3d11e6",
+  "status": "passed-and-integrated",
+  "scope": "Three type-narrowing repairs; unchanged runtime semantics",
+  "verification": {
+    "actual_typescript_compile": 0,
+    "browser_battle_core": 0,
+    "battle_runner": 0,
+    "battle_runner_types_static": 0,
+    "golden_runner": 0,
+    "parity_contract": 0,
+    "git_diff_check": 0
+  },
+  "review": "Current repair diff reviewed by primary agent; no new independent agent review claimed",
+  "integration": "Fast-forward coordination/p0-session-20260906 to this commit; original dispatch-plan modification retained",
+  "limitations": "T402/T403 not implemented; current runtime has campaign contract gaps documented separately"
+}

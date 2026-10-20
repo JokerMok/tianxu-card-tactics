@@ -1,0 +1,18 @@
+{
+  "task_id": "T001",
+  "executor": "cloud",
+  "implementer_id": "coordinator-bootstrap",
+  "reviewer_id": "019fa818-3476-7022-941e-6724d89290cf",
+  "base_sha": "38426d7500a8e5b355a2b3c79396dcbffa7cf781",
+  "head_sha": "f749faa7dfb9d5e089ad01c9a87db91a1fdb5d5f",
+  "scope_check": "pass",
+  "verification_commands": [
+    {"command": "cd web-prototype && npm test", "exit_code": 0},
+    {"command": "cd web-prototype && npm run build", "exit_code": 0},
+    {"command": "cd cocos-client && npm run validate:a0", "exit_code": 0},
+    {"command": "git diff --cached --name-only forbidden-path scan", "exit_code": 0},
+    {"command": "git ls-files web-prototype/artifacts", "exit_code": 0}
+  ],
+  "review_status": "pass",
+  "review_findings": []
+}

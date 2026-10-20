@@ -1,0 +1,11 @@
+{
+  "task_id": "T314",
+  "phase": "v2.2-m6-m7-wave",
+  "head_sha": "ecb01b36f26981ac39999a15ee923702cb059806",
+  "merge_sha": "ecb01b36f26981ac39999a15ee923702cb059806",
+  "status": "passed",
+  "independent_review": {"status":"pass","p0":0,"p1":0,"p2":0,"probes":"single-transaction, external T231 sync, façade reentry, Reflect.ownKeys, real data"},
+  "verification": ["test-meta-page-inventory.mjs: PASS","T231/T230/T312/T313/Meta/Battle: PASS","git diff --check: PASS"],
+  "scope": "pass: inventory page directory and test only",
+  "residual_risk": "GameShell/T247 group integration remains a separate gate; the adapter currently relies on T231 runtime internals rather than ECMAScript private fields."
+}
