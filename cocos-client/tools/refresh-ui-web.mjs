@@ -5,7 +5,7 @@ import path from 'node:path';
 const require = createRequire(import.meta.url);
 const ts = require('/Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/Resources/resources/3d/engine/node_modules/typescript/lib/typescript.js');
 const client = path.resolve(import.meta.dirname, '..');
-const web = path.resolve(process.argv[2] ?? path.join(client, '..', '交付/系统界面设计对照版-20260927/web'));
+const web = path.resolve(process.argv[2] ?? path.join(client, '..', '交付/双行同色大石板与角色比例校正版-20260930/web'));
 const bundlePath = path.join(web, 'assets/main/index.js');
 let bundle = await readFile(bundlePath, 'utf8');
 function replaceModule(name, compiled) {
