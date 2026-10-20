@@ -60,3 +60,13 @@ cocos-client/native/engine/android/**/assets/
 *.blend1
 /.codex/PROJECT_STATE.lock/
 /.codex/PROJECT_STATE.md.tmp-*
+
+# Local imported copyrighted game data and assets; rebuild with scripts/import-kings-call.py
+/cocos-client/assets/resources/recovered/
+/cocos-client/assets/resources/recovered.meta
+/backend/data/
+/.local/
+
+# Python tool bytecode
+__pycache__/
+*.pyc

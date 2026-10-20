@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-10-20T11:14:13.025Z",
+  "status": "passed",
+  "scope": "integrated-game",
+  "steps": [
+    {
+      "command": "node scripts/verify-recovered-content.mjs",
+      "exitCode": 0,
+      "durationMs": 589
+    },
+    {
+      "command": "node --test --test-concurrency=1 backend/game/campaign-rewards.test.mjs backend/game/competition-systems.test.mjs backend/game/content.test.mjs backend/game/growth-systems.test.mjs backend/game/integration.test.mjs backend/game/league-systems.test.mjs backend/game/multiplayer-variants.test.mjs backend/game/presentation.test.mjs backend/game/pve-systems.test.mjs backend/game/scene-compatibility.test.mjs backend/game/social.test.mjs cocos-client/assets/scripts/game/BattleKernel.test.mjs",
+      "exitCode": 0,
+      "durationMs": 104135
+    },
+    {
+      "command": "node web-prototype/node_modules/typescript/bin/tsc --noEmit --strict --target es2022 --module esnext --moduleResolution bundler --allowImportingTsExtensions --experimentalDecorators --skipLibCheck .local/creator-build/project/temp/declarations/cc.d.ts cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts",
+      "exitCode": 0,
+      "durationMs": 156
+    },
+    {
+      "command": "node scripts/verify-recovered-visuals.mjs",
+      "exitCode": 0,
+      "durationMs": 459
+    }
+  ],
+  "boundaries": [
+    "Browser interaction evidence is recorded separately in ui-check.md.",
+    "Configuration counts do not prove every possible deck or matchup has been played."
+  ],
+  "sourceHashes": {
+    "backend/game/campaign-rewards.mjs": "e146aa89f9fb32dc904b5a507f5c4315b9c4f028a3765177232da594a3316c1a",
+    "backend/game/campaign-rewards.test.mjs": "ab520a0eb8d7ce988b9956d6f3d5a702cfac3798c4855f23ce06bd6f9b1e72e4",
+    "backend/game/compatibility.mjs": "0c8b5d162ce0628d3a76c485e24070e04e20619ca8c749a0929c41fae3956223",
+    "backend/game/competition-systems.mjs": "434dce03f901b586b9fe5ee6684dc4429d0d3649949de9dea265bef5fef2a1ab",
+    "backend/game/competition-systems.test.mjs": "8659f696b9d7213cc9204f0b815c4dc0056c2236f19e58fb3456a700e497fe64",
+    "backend/game/content.mjs": "52fb7eb625874596e2dd60caa9b9d2dfdb13ccc3a0c3f069ec9b1ad472131cd8",
+    "backend/game/content.test.mjs": "d9baea78642d745698a15c585cfd0656acc88db2b81e4f7e330d550a0966623f",
+    "backend/game/growth-systems.mjs": "d51d43484e4589045c2bd3b86518180739e6655d48e150f7703a9d3a6b00af17",
+    "backend/game/growth-systems.test.mjs": "32a12b713826196701e2223f538e6e3f5368bc6769efe8240ebc99688d3ea140",
+    "backend/game/integration.test.mjs": "d258bb73f3e38b3ee3ab4328de3c0f02ca3254d45953ce6f1bf2d387cd9f3170",
+    "backend/game/league-systems.mjs": "8d6fce47898f0dd3455214e72114d21efc60f5b1f37ad8fd2f00a1e6a47e2f75",
+    "backend/game/league-systems.test.mjs": "7f6a27eaadbd863a55e514f89c138ef4f147caff8d98ada541f382fb520b7604",
+    "backend/game/multiplayer-variants.test.mjs": "b4b0755d1f26e18495fb0da7aec7734eb3c8b2a9eb676bce0dc443b3186b88cb",
+    "backend/game/presentation.mjs": "f1ebdad5d21da288703558924436361ec0b2864f7d0a406ef5d01759f3e7f033",
+    "backend/game/presentation.test.mjs": "3b9f3c6d3328f3f8b8845930a3a819a6e43030b41c4e76c99373030de6ac5d23",
+    "backend/game/pve-systems.mjs": "dd90daac3f5960e390e1637af5dfd6c2a7a08361014be7b1e8313e24d416180d",
+    "backend/game/pve-systems.test.mjs": "8fde090a8d5606ac08e344febe8e59e291df278b3dae588d0d04da55ae0b4de9",
+    "backend/game/scene-compatibility.mjs": "e75b90164f446511e52880759674d28d7815fb7222562061792ece05b76fd88b",
+    "backend/game/scene-compatibility.test.mjs": "d7d9bd3aa70dca7447f2a4596ec6e3060145ba7ad239c416f9b602ec5d7afb8d",
+    "backend/game/server.mjs": "38a332bb4579ba80195c5039cc95ba257a031f5ffc92b45b057447003c450600",
+    "backend/game/service.mjs": "ae6f656bbe70b200cddacb94a486b807eb7fe140704fd574ae2d04f4f23d882f",
+    "backend/game/social.mjs": "8a96443210144d40f3645e51c31e373802dba42f70f5eba34e2a17e35d59fd27",
+    "backend/game/social.test.mjs": "91ea073d4bad282e10a7cd5e29216a5a58aa5eda0b093a1b6b652ace1c54ad10",
+    "backend/game/store.mjs": "39ca8c94c684f5f5b03118be6c4b8e2161ddaf326075a2066cda80c611f21063",
+    "cocos-client/assets/scripts/game/BattleKernel.test.mjs": "dc9f784aa1e29a2c6292c3a316a94ca7ab424b0197da9c77aa4ff1052fa32d15",
+    "cocos-client/assets/scripts/game/BattleKernel.ts": "7cf2658b48b29f314478114d2150c01459a1341110f21a1bf53e922d2782cb22",
+    "cocos-client/assets/scripts/game/CocosUi.ts": "09e36fe545e1b234648d7c523f86ac7703205b7025834b17132e72eab6e36912",
+    "cocos-client/assets/scripts/game/GameAudio.ts": "fbdc36bd584318ea2301715ff4a80ea7c6df386f45a6dccdf93cb0b8770d4eb2",
+    "cocos-client/assets/scripts/game/GameContracts.ts": "acbd2127af58d1ae5bfa2b36d3038550c384b37a0720e1cd7439829a6b2d3355",
+    "cocos-client/assets/scripts/game/RecoveredAnimation.ts": "7058fbbab19f2de68a9cdce6adf8e489fa245ea7e11e316c7c82e671ff1693ca",
+    "cocos-client/assets/scripts/game/RecoveredContent.ts": "f5bf74c91f88d62c84a33b1833c235e25c3415f36a15270fc418414f0b13d208",
+    "cocos-client/assets/scripts/game/RecoveredEffects.ts": "c50fd49eb9d7e354fd32c536fcc93a51221f315ffb2903487e07f3f6aafb5860",
+    "cocos-client/assets/scripts/game/TianxuGame.ts": "c5554623df72c80fdc3072ac9059b37734daebd72d23ccfbe85eee91d50abe1e"
+  },
+  "buildPresent": true,
+  "formattingOnlyAfterChecks": {
+    "note": "Removed one extra EOF newline in the two listed source files; exact trimmed source is unchanged. Passed behavioral checks were reused. Documentation trailing whitespace was also removed.",
+    "files": [
+      {
+        "path": "backend/game/scene-compatibility.mjs",
+        "verifiedSha256": "e75b90164f446511e52880759674d28d7815fb7222562061792ece05b76fd88b",
+        "finalSha256": "1f1b035101c79a12a6b3622233d90d81f5838e83ba662c6cc49542347798e30a",
+        "change": "removed one extra EOF newline"
+      },
+      {
+        "path": "backend/game/scene-compatibility.test.mjs",
+        "verifiedSha256": "d7d9bd3aa70dca7447f2a4596ec6e3060145ba7ad239c416f9b602ec5d7afb8d",
+        "finalSha256": "94e411ec1d87c6e888faf8ab07cbbab156245d4c82e943fbdd9e02a128d8f2e6",
+        "change": "removed one extra EOF newline"
+      }
+    ]
+  }
+}

@@ -5,13 +5,17 @@ BUILD_ROOT="${P0_BUILD_ROOT:-$(mktemp -d /private/tmp/tianxu-p0-build-XXXXXX)}"
 CREATOR_BIN="${COCOS_CREATOR_BIN:-/Applications/Cocos/Creator/3.8.8/CocosCreator.app/Contents/MacOS/CocosCreator}"
 stage_project() {
 mkdir -p "$BUILD_ROOT/project"
-rsync -a --exclude 'assets/scripts/' --exclude library --exclude temp --exclude build --exclude node_modules --exclude '*.mjs' --exclude '*.mjs.meta' --exclude 'validate-*.ts' --exclude 'validate-*.ts.meta' --exclude 'assets/scripts/battle/runner/' --exclude 'assets/scripts/battle/testsupport/' --exclude 'assets/scripts/battle/performance/' --exclude '*.test.ts' --exclude '*.test.ts.meta' "$SOURCE_PROJECT/" "$BUILD_ROOT/project/"
+rsync -a --exclude 'assets/' --exclude 'assets/resources/recovered/' --exclude 'assets/resources/recovered.meta' --exclude 'assets/scripts/' --exclude library --exclude temp --exclude build --exclude node_modules --exclude '*.mjs' --exclude '*.mjs.meta' --exclude 'validate-*.ts' --exclude 'validate-*.ts.meta' --exclude 'assets/scripts/battle/runner/' --exclude 'assets/scripts/battle/testsupport/' --exclude 'assets/scripts/battle/performance/' --exclude '*.test.ts' --exclude '*.test.ts.meta' "$SOURCE_PROJECT/" "$BUILD_ROOT/project/"
 python3 - "$SOURCE_PROJECT" "$BUILD_ROOT" <<'PYGRAPH'
 from pathlib import Path
 import re,sys,shutil,json,time
 source,root=map(Path,sys.argv[1:]);target=root/'project'
-old=target/'assets/scripts'
-if old.exists(): shutil.move(str(old),str(root/('previous-scripts-'+str(time.time_ns()))))
+old=target/'assets'
+if old.exists(): shutil.move(str(old),str(root/('previous-assets-'+str(time.time_ns()))))
+for relative in ['assets/scenes.meta', 'assets/scripts.meta', 'assets/scenes/BattleA0.scene', 'assets/scenes/BattleA0.scene.meta']:
+ file=source/relative
+ if file.is_file():
+  dest=target/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(file,dest)
 queue=[source/'assets/scripts/a0/BattleA0Bootstrap.ts'];seen=set()
 while queue:
  file=queue.pop().resolve()
@@ -59,7 +63,7 @@ settings=json.loads((web/'src/settings.json').read_text())
 scripts=settings.get('scripting',{}).get('scriptPackages',[])
 scene=settings.get('launch',{}).get('launchScene')
 bundle=web/'assets/main/index.js'
-if not scripts or not scene or not bundle.is_file() or 'GameShell.ts' not in bundle.read_text():
+if not scripts or not scene or not bundle.is_file() or 'TianxuGame.ts' not in bundle.read_text():
     raise SystemExit(1)
 PYCHECK
 }
@@ -70,6 +74,16 @@ for attempt in 1 2 3 4; do
     fi
     printf 'Build ready: %s\n' "$BUILD_ROOT/project/build/web-desktop"
     exit 0
+  fi
+  if python3 - "$BUILD_ROOT/creator.log" <<'PYSYNTAX'
+from pathlib import Path
+import sys
+s=Path(sys.argv[1]).read_text(errors='replace')
+raise SystemExit(0 if '[buildScriptCommand]SyntaxError:' in s else 1)
+PYSYNTAX
+  then
+    tail -35 "$BUILD_ROOT/creator.log"
+    exit 1
   fi
   if [[ $attempt != 4 ]]; then
     if [[ $attempt == 2 ]]; then

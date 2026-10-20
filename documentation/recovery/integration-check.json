@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-20T10:02:35Z",
+  "status": "passed",
+  "command": "node --test backend/game/integration.test.mjs",
+  "exitCode": 0,
+  "runtime": {
+    "node": "v25.9.0",
+    "host": "127.0.0.1",
+    "port": "operating-system-assigned",
+    "database": "temporary-sqlite-path",
+    "scheduler": false
+  },
+  "testFile": {
+    "path": "backend/game/integration.test.mjs",
+    "sha256": "dc86bb7511dcfae92ec34ad71558f5871140715ad30c7c06dd016201a244d34c"
+  },
+  "result": {
+    "repetitions": 3,
+    "testsPerRepetition": 1,
+    "passedRepetitions": 3,
+    "failed": 0,
+    "durationMs": [2009.263375, 1953.961375, 1979.869417]
+  },
+  "verified": [
+    "Registration and login use real HTTP requests with Bearer tokens.",
+    "Two accounts see only their own characters and cannot read the other account's character state.",
+    "A normal initial character wins and clears the first two campaign nodes using legal battle.command requests.",
+    "An identical request id replays its stored result, while reuse with a different payload is rejected.",
+    "Invalid actions and an insufficient-silver purchase leave revision, state, and balances unchanged.",
+    "Friend request and acceptance, private chat, mail attachment claim, direct trade, and auction buy work through real HTTP requests.",
+    "Mail, trade, and auction card quantities are conserved; successful trade and auction preserve combined player silver apart from the explicit mail postage checked before those exchanges.",
+    "Both player accounts issue real HTTP actions in a cooperative battle and receive winning settlement.",
+    "Both player accounts issue real HTTP actions in a ranked PVP battle; wins, losses, ratings, and ranking order settle consistently.",
+    "After closing and recreating the server on the same SQLite path, fresh logins recover progression, balances, friendship, completed trade, completed auction, and ranked ratings."
+  ],
+  "boundaries": [
+    "The regression starts the imported createGameServer on a random loopback port.",
+    "All gameplay changes pass through public HTTP endpoints; the test does not edit the game database directly.",
+    "The temporary SQLite directory is deleted during test teardown.",
+    "No Cocos build or external deployment is part of this check."
+  ]
+}

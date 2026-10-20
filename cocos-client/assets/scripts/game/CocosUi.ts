@@ -1,0 +1,69 @@
+import { Node, UITransform, Layers, Graphics, Color, Label, Button, EditBox,
+  HorizontalTextAlignment, VerticalTextAlignment, Sprite, SpriteFrame, assetManager, ImageAsset, Texture2D } from 'cc';
+
+export const Theme = { ink: new Color(18, 27, 28), panel: new Color(26, 41, 43, 244),
+  raised: new Color(38, 59, 59, 245), gold: new Color(220, 193, 132), text: new Color(239, 231, 207),
+  dim: new Color(158, 176, 171), green: new Color(92, 200, 146), red: new Color(218, 103, 89) };
+export interface ClickTarget { name: string; x: number; y: number; width: number; height: number; disabled: boolean }
+export class CocosUi {
+  targets: ClickTarget[] = [];
+  readonly frames = new Map<string, SpriteFrame>();
+  node(parent: Node, name: string, width: number, height: number, x = 0, y = 0): Node {
+    const node = new Node(name); node.layer = Layers.Enum.UI_2D; parent.addChild(node);
+    node.addComponent(UITransform).setContentSize(width, height); node.setPosition(x, y); return node;
+  }
+  panel(parent: Node, name: string, width: number, height: number, x = 0, y = 0, fill = Theme.panel, border?: Color): Node {
+    const node = this.node(parent, name, width, height, x, y); const g = node.addComponent(Graphics);
+    g.fillColor = fill; g.roundRect(-width / 2, -height / 2, width, height, 5); g.fill();
+    if (border) { g.strokeColor = border; g.lineWidth = 1; g.stroke(); } return node;
+  }
+  label(parent: Node, name: string, text: string, x: number, y: number, width = 300, height = 30, size = 16, color = Theme.text, left = false): Label {
+    const node = this.node(parent, name, width, height, x, y); const label = node.addComponent(Label);
+    label.string = text; label.fontSize = size; label.lineHeight = size + 4; label.color = color;
+    label.horizontalAlign = left ? HorizontalTextAlignment.LEFT : HorizontalTextAlignment.CENTER;
+    label.verticalAlign = VerticalTextAlignment.CENTER; label.overflow = Label.Overflow.SHRINK;
+    label.enableWrapText = true; label.fontFamily = 'Arial'; return label;
+  }
+  button(parent: Node, name: string, text: string, x: number, y: number, width: number, height: number,
+      callback: () => void, disabled = false, transparent = false): Node {
+    const node = this.panel(parent, name, width, height, x, y,
+      transparent ? new Color(220, 193, 132, 35) : disabled ? new Color(34, 42, 43) : Theme.raised,
+      disabled ? Theme.dim : Theme.gold);
+    this.label(node, name + ':text', text, 0, 0, width - 10, height - 4, 15, disabled ? Theme.dim : Theme.text);
+    const button = node.addComponent(Button); button.interactable = !disabled;
+    node.on(Button.EventType.CLICK, callback);
+    // A read-only design-coordinate map supports actual pointer tests of the canvas UI.
+    let px = x; let py = y; let ancestor = parent;
+    while (ancestor.parent && ancestor.name !== 'TianxuRoot') { px += ancestor.position.x; py += ancestor.position.y; ancestor = ancestor.parent; }
+    this.targets.push({ name, x: px + 600, y: 300 - py, width, height, disabled });
+    return node;
+  }
+  input(parent: Node, name: string, placeholder: string, x: number, y: number, width = 280, value = '', password = false): EditBox {
+    const node = this.panel(parent, name, width, 38, x, y, new Color(12, 23, 24), Theme.dim);
+    node.active = false;
+    const box = node.addComponent(EditBox);
+    box.textLabel = this.label(node, name + ':value', '', 0, 0, width - 18, 32, 17, Theme.text, true);
+    box.placeholderLabel = this.label(node, name + ':placeholder', placeholder, 0, 0, width - 18, 32, 16, Theme.dim, true);
+    box.textLabel.node.getComponent(UITransform)!.setAnchorPoint(0, 1);
+    box.placeholderLabel.node.getComponent(UITransform)!.setAnchorPoint(0, 1);
+    box.placeholder = placeholder;
+    box.inputMode = EditBox.InputMode.SINGLE_LINE;
+    box.inputFlag = password ? EditBox.InputFlag.PASSWORD : EditBox.InputFlag.DEFAULT;
+    box.maxLength = 128; box.string = value; node.active = true; return box;
+  }
+  async image(parent: Node, name: string, url: string, width: number, height: number, x = 0, y = 0) {
+    const node = this.node(parent, name, width, height, x, y);
+    const sprite = node.addComponent(Sprite); sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+    try {
+      let frame = this.frames.get(url);
+      if (!frame) {
+        const image = await new Promise<ImageAsset>((resolve, reject) => assetManager.loadRemote<ImageAsset>(url,
+          { ext: url.endsWith('.jpg') || url.endsWith('.jpeg') ? '.jpg' : '.png' }, (error, asset) => error ? reject(error) : resolve(asset)));
+        const texture = new Texture2D(); texture.image = image; frame = new SpriteFrame(); frame.texture = texture;
+        this.frames.set(url, frame);
+      }
+      if (node.isValid) sprite.spriteFrame = frame;
+    } catch { if (node.isValid) this.label(node, 'MissingImage', '图像缺失', 0, 0, width, height, 11, Theme.dim); }
+    return node;
+  }
+}

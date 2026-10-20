@@ -1,8 +1,19 @@
 {
   "name": "tianxu-card-tactics",
-  "description": "天墟：万象战阵，东方幻想双战线战术卡牌游戏",
+  "description": "天墟：万象战阵 · Cocos 战术卡牌与本机权威服务",
   "private": true,
   "scripts": {
-    "verify": "node scripts/verify-all.mjs"
+    "verify": "node scripts/verify-game.mjs",
+    "import:original": "python3 scripts/import-kings-call.py",
+    "verify:content": "node scripts/verify-recovered-content.mjs",
+    "verify:campaign": "node scripts/verify-campaign.mjs",
+    "start": "node scripts/start-game.mjs",
+    "build": "node scripts/build-game.mjs",
+    "test:game": "node --test --test-concurrency=1 backend/game/*.test.mjs cocos-client/assets/scripts/game/BattleKernel.test.mjs",
+    "verify:visuals": "node scripts/verify-recovered-visuals.mjs",
+    "verify:legacy": "node scripts/verify-all.mjs"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

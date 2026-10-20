@@ -1,0 +1,193 @@
+{
+  "sourceManifest": "5254333315581813739",
+  "scopes": {
+    "main": {
+      "cards": 9320,
+      "monsters": 8265,
+      "skills": 728,
+      "maps": 68,
+      "scenes": 95,
+      "nodes": 423,
+      "triggers": 1129,
+      "unreachableNodes": [
+        "main:scene:3103:node:310301",
+        "main:scene:603:node:60301",
+        "main:scene:703:node:70301",
+        "main:scene:1903:node:190301",
+        "main:scene:303:node:30301",
+        "main:scene:302:node:30201",
+        "main:scene:101:node:10101",
+        "main:scene:103:node:10301",
+        "main:scene:102:node:10201",
+        "main:scene:203:node:20301",
+        "main:scene:202:node:20201",
+        "main:scene:403:node:40301",
+        "main:scene:503:node:50301",
+        "main:scene:402:node:40201",
+        "main:scene:2903:node:290301",
+        "main:scene:2803:node:280301",
+        "main:scene:3003:node:300301",
+        "main:scene:3603:node:360301"
+      ],
+      "danglingEdges": [
+        {
+          "scene": "main:scene:19",
+          "row": "config_row:ac084b562b35180558a9",
+          "from": "1912",
+          "to": "1913"
+        },
+        {
+          "scene": "main:scene:19",
+          "row": "config_row:d0797375f1f8801e40c0",
+          "from": "1913",
+          "to": "1914"
+        },
+        {
+          "scene": "main:scene:3903",
+          "row": "config_row:98955427a15b2b6fcd12",
+          "from": "390301",
+          "to": "390302"
+        },
+        {
+          "scene": "main:scene:3902",
+          "row": "config_row:ad3a47c9b898ed53ac01",
+          "from": "390201",
+          "to": "390202"
+        },
+        {
+          "scene": "main:scene:4003",
+          "row": "config_row:cf2edb621d7cdf32a0a4",
+          "from": "400301",
+          "to": "400302"
+        },
+        {
+          "scene": "main:scene:4002",
+          "row": "config_row:f8e9ee8416b43eb0a916",
+          "from": "400201",
+          "to": "400202"
+        },
+        {
+          "scene": "main:scene:5103",
+          "row": "config_row:9c5bd854c0246fbd1e95",
+          "from": "510301",
+          "to": "510302"
+        },
+        {
+          "scene": "main:scene:5102",
+          "row": "config_row:24852703fa051589818b",
+          "from": "510201",
+          "to": "510202"
+        },
+        {
+          "scene": "main:scene:5125",
+          "row": "config_row:80e1881231a595155dca",
+          "from": "512501",
+          "to": "512502"
+        },
+        {
+          "scene": "main:scene:5124",
+          "row": "config_row:b3059241e5761ed40a77",
+          "from": "512401",
+          "to": "512402"
+        },
+        {
+          "scene": "main:scene:4203",
+          "row": "config_row:a4bb4ae18c637a7cbd65",
+          "from": "420301",
+          "to": "420302"
+        },
+        {
+          "scene": "main:scene:4303",
+          "row": "config_row:97a7bd78710819fe2df4",
+          "from": "430301",
+          "to": "430302"
+        },
+        {
+          "scene": "main:scene:4403",
+          "row": "config_row:8dc9a467879248a6b531",
+          "from": "440301",
+          "to": "440302"
+        },
+        {
+          "scene": "main:scene:4503",
+          "row": "config_row:50fb36249cb80a330380",
+          "from": "450301",
+          "to": "450302"
+        },
+        {
+          "scene": "main:scene:3702",
+          "row": "config_row:2e2961601ee479a0113d",
+          "from": "370201",
+          "to": "370202"
+        },
+        {
+          "scene": "main:scene:3703",
+          "row": "config_row:74f52c0537ab3fd5796b",
+          "from": "370301",
+          "to": "370302"
+        },
+        {
+          "scene": "main:scene:3802",
+          "row": "config_row:b213fa3473612f581537",
+          "from": "380201",
+          "to": "380202"
+        },
+        {
+          "scene": "main:scene:3803",
+          "row": "config_row:3376aabdd1031db6b359",
+          "from": "380301",
+          "to": "380302"
+        }
+      ],
+      "missingCardMonsterRows": [],
+      "missingCardSkillRows": [],
+      "unmatchedCardArt": 123,
+      "unmatchedCardModels": 0,
+      "cardsWithoutModelReference": 1332,
+      "sourceUnmatchedCardModels": 50,
+      "sourceCardsWithoutModelReference": 1332,
+      "missingMapLayouts": [
+        "map:c4de62cc32c68267a4b9",
+        "map:54234030a0124b6c8788"
+      ]
+    },
+    "media": {
+      "cards": 6820,
+      "monsters": 5707,
+      "skills": 462,
+      "maps": 26,
+      "scenes": 42,
+      "nodes": 245,
+      "triggers": 704,
+      "unreachableNodes": [
+        "media:scene:603:node:60301",
+        "media:scene:102:node:10201",
+        "media:scene:101:node:10101",
+        "media:scene:503:node:50301",
+        "media:scene:703:node:70301",
+        "media:scene:302:node:30201",
+        "media:scene:403:node:40301",
+        "media:scene:103:node:10301",
+        "media:scene:203:node:20301",
+        "media:scene:402:node:40201",
+        "media:scene:202:node:20201",
+        "media:scene:303:node:30301"
+      ],
+      "danglingEdges": [],
+      "missingCardMonsterRows": [],
+      "missingCardSkillRows": [],
+      "unmatchedCardArt": 104,
+      "unmatchedCardModels": 5647,
+      "cardsWithoutModelReference": 1173,
+      "sourceUnmatchedCardModels": 5647,
+      "sourceCardsWithoutModelReference": 1173,
+      "missingMapLayouts": [
+        "map:4a1a396ebe563b2f0d18"
+      ]
+    }
+  },
+  "tableFilesVerified": 435,
+  "metadataChecksPassed": true,
+  "assetsRuntimeValidated": false,
+  "gameplayValidated": false
+}
