@@ -1,6 +1,6 @@
 # 本轮定向验证与差异（2026-10-21）
 
-当前分支 `codex/restore-original-ui-presentation`，基线 `5572feafbe0d7dd7c0708a8f9ffd64fd9c91f15c`。此前整款完成结论已撤回。本轮本地待体验，未经用户游玩确认不推送。
+当前分支 `codex/restore-original-ui-presentation`，基线 `5572feafbe0d7dd7c0708a8f9ffd64fd9c91f15c`。此前整款完成结论已撤回。用户最新授权先推送修正分支；本轮仍待用户实际游玩确认，不因推送变更质量结论。
 
 | 维度 | 本轮证据 | 不能据此得出的结论 |
 | --- | --- | --- |

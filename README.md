@@ -4,7 +4,7 @@ Cocos Creator 3.8.8 横屏战术卡牌游戏。沿用现有工程、场景身份
 
 ## 本轮修正状态（2026-10-21）
 
-用户已否定 5572fea 的复原效果，上一轮“整款完成”口径撤回。当前在 `codex/restore-original-ui-presentation` 修正原版主城、地图、卡组、成长窗口及战斗事件表现，保留既有服务与存档。原版来源、运行验证和剩余差异见 [修正映射](documentation/corrections/ui-source-map.md)；功能、流程、界面交互、战斗表现分开判定。此轮仅本地待体验，用户确认后再推送。
+用户已否定 5572fea 的复原效果，上一轮“整款完成”口径撤回。当前在 `codex/restore-original-ui-presentation` 修正原版主城、地图、卡组、成长窗口及战斗事件表现，保留既有服务与存档。原版来源、运行验证和剩余差异见 [修正映射](documentation/corrections/ui-source-map.md)；功能、流程、界面交互、战斗表现分开判定。按用户最新要求先推送修正分支；当前仍待用户实际体验确认。
 
 当前本机对照与战斗录像入口：**http://127.0.0.1:7402/compare.html**（本地证据目录，需运行其 HTTP 服务）。具体实测范围及剩余差异见 [本轮验证](documentation/corrections/runtime-check.md)。
 
