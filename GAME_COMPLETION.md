@@ -1,16 +1,18 @@
 # 整款游戏实施台账
 
-目标：沿用当前天墟 Cocos 3.8.8 工程和本机权威服务，完成可持续运行的 PVE、成长、社交、合作、PVP、竞技赛、周天梯与公会城战。最终全量回归通过后才可提交并推送。
+目标：沿用当前 Cocos 3.8.8 工程和本机权威服务，恢复原版界面、交互与战斗表现，保留现有 PVE、成长、社交、合作、PVP、竞技赛、周天梯和公会城战。2026-10-21 本轮仅保留本地修正提交，用户实际体验确认后才可推送。
 
-核对日期：2026-10-20。当前结论是“本地正式游戏入口的功能、内容、存档与多人闭环已完成，最终整合回归通过”。本表不以配置数量、资源导入、代码存在或单项测试代替整款验收。
+核对日期：2026-10-21。用户已经体验并否定 5572fea 的复原效果，撤回此前“整款完成、最终整合回归通过”的质量结论。下面 40 模块表保留为历史功能清单及各自验证记录，不能据此推导当前视觉、动画或整款复原已通过。
+
+本轮按四个维度单独验收：功能可调用、流程可玩、原版界面与交互恢复、战斗表现正确。前三者中的任何一项不能替代其他项；规则测试、资源存在性和模拟 Cocos 检查均不作为视觉验收。修正映射见 documentation/corrections/；本机实际构建与连续帧证据另行记录。
 
 ## 证据口径
 
 - **原版恢复**：有本机只读逆向项目、配置或反编译客户端入口支持；不代表原服算法已恢复。
 - **自主补建**：原服务端缺失，使用可审查的本地权威规则；规则位置和替代边界必须明确。
 - **已定向验证**：已有对应测试或机器可读报告；只证明列出的范围。
-- **最终回归通过**：正式入口构建、106项规则/HTTP/多人/事务检查、严格类型、内容和视觉批量检查通过；真实客户端关键流程记录在 ui-check.md。
-- 当前主要证据：`documentation/recovery/content-check.json`、`campaign-check.json`、`integration-check.json`，各模块 `*.test.mjs`，以及恢复说明文档。最终报告 [final-regression.json](documentation/recovery/final-regression.json) 状态为 passed；[campaign-check.json](documentation/recovery/campaign-check.json) 为 passed-with-source-gaps。旧 integration-check.json 是其记录源码哈希下的历史结果，当前结果以最终报告为准。
+- **历史回归记录**：旧版的 106 项规则/HTTP/多人/事务检查、类型与内容检查只证明其当时记录的范围。旧 ui-check.md 不能证明本轮原版视觉和动画验收。
+- 当前主要证据：`documentation/recovery/content-check.json`、`campaign-check.json`、`integration-check.json`，各模块 `*.test.mjs`，以及恢复说明文档。最终报告 [final-regression.json](documentation/recovery/final-regression.json) 状态为 passed；[campaign-check.json](documentation/recovery/campaign-check.json) 为 passed-with-source-gaps。旧 integration-check.json 是其记录源码哈希下的历史结果，该报告仅为旧提交的历史结果，不是本轮验收结论。
 
 ## 40 模块覆盖
 

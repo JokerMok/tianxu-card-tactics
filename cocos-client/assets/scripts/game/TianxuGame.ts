@@ -1,10 +1,14 @@
-import { Component, Node, Label, EditBox, Color, UITransform, view, ResolutionPolicy, tween, Vec3, Graphics, profiler } from 'cc';
+import { Component, Node, Label, EditBox, Color, UITransform, view, ResolutionPolicy, profiler, Button, BlockInputEvents } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
-import { RecoveredAnimation } from './RecoveredAnimation.ts';
-import { RecoveredEffects } from './RecoveredEffects.ts';
 import { GameAudio } from './GameAudio.ts';
 import type { RecoveredCatalog, RecoveredCard } from './RecoveredContent.ts';
-import type { BattleState, LegalPlay, BattleAction, BattleEvent } from './GameContracts.ts';
+import type { BattleState, LegalPlay, BattleAction } from './GameContracts.ts';
+import { OriginalUi, type OriginalUiCatalog, type OriginalUiMount } from './OriginalUi.ts';
+import { BattleSceneView } from './BattleSceneView.ts';
+import { CardDeckWindow } from './CardDeckWindow.ts';
+import { GrowthWindows } from './GrowthWindows.ts';
+import { WorldMapWindow } from './WorldMapWindow.ts';
+import { SecondaryWindows } from './SecondaryWindows.ts';
 
 interface FormField { key: string; label: string; type?: string; value?: unknown; min?: number; max?: number; options?: {label: string; value: string}[] }
 interface ActionItem { label: string; detail?: string; action: string; payload?: Record<string, unknown>; disabled?: boolean; fields?: FormField[] }
@@ -18,11 +22,10 @@ interface ActorView { id: string; name: string; profession: number; level: numbe
 type Row = Record<string, unknown>;
 interface Snapshot { assetNames: Record<string, string>; story: string; revision: number; now: number; actor: ActorView; scenes: SceneView[];
   tasks: { id: string; name: string; detail: string; ready: boolean; claimed: boolean; reward: number }[];
-  growth: { profile: { avatarAssetId: string | null }; sections: Section[] }; social: { people: Row[]; friends: Row[]; friendRequests: Row[]; chat: Row[]; mail: Row[]; guilds: Row[]; trades: Row[]; auctions: Row[] };
+  growth: { profile: { avatarAssetId: string | null }; summary: {energy: number}; sections: Section[] }; social: { people: Row[]; friends: Row[]; friendRequests: Row[]; chat: Row[]; mail: Row[]; guilds: Row[]; trades: Row[]; auctions: Row[] };
   rooms: Row[]; roomInvites: Row[]; rankings: Row[]; dungeons: Row[];
-  battle: { id: string; mode: string; state: BattleState; settled: boolean; rewards?: { won: boolean; silver: number; xp: number; cards: {id: string; count: number}[] }; legalPlays: LegalPlay[] } | null }
+  battle: { id: string; mode: string; state: BattleState; entryState?: BattleState; settled: boolean; rewards?: { won: boolean; silver: number; xp: number; cards: {id: string; count: number}[] }; legalPlays: LegalPlay[] } | null }
 interface Character { id: string; name: string; level: number; profession: number }
-interface UnitDisplay { node: Node; animation: RecoveredAnimation; hp: Label; name: Label; monsterId: number; team: number }
 const PROFESSIONS = ['', '战士', '游侠', '法师', '牧师'];
 const NAV = [['home','主城'],['world','世界地图'],['cards','卡牌与编队'],['growth','成长与背包'],['tasks','任务与引导'],
   ['social','好友与聊天'],['mail','邮件'],['guild','公会与城战'],['trade','交易与拍卖'],['rooms','合作与竞技'],['rankings','天梯排行'],['settings','系统设置']];
@@ -36,18 +39,18 @@ export class TianxuGame extends Component {
   private cardsAll = false; private draftDeck?: string[]; private busy = false; private polling = false;
   private notice = ''; private noticeUntil = 0; private noticeLabel?: Label;
   private pollTimer?: ReturnType<typeof setInterval>; private autoTimer = 0; private autoplay = false; private battleHidden = false;
-  private selectedHand = ''; private battleId = ''; private battleLayer?: Node; private battleHud?: Node;
-  private lastUnitCells = new Map<string, { row: number; col: number; team: number }>();
-  private unitDisplays = new Map<string, UnitDisplay>(); private eventSeq = 0; private speed = 1;
-  private animationQueue: BattleEvent[] = []; private nextEventAt = 0;
-  private apiBase = '';
-  private recoveredEffects?: RecoveredEffects;
+  private battleId = ''; private entryReplayBattleId = ''; private apiBase = '';
   private authKey = AUTH_KEY; private backdrop = ''; private audio?: GameAudio;
+  private original?: OriginalUi; private home?: OriginalUiMount; private renderGeneration = 0;
+  private battleView?: BattleSceneView; private deckWindow?: CardDeckWindow; private growthWindows?: GrowthWindows;
+  private worldWindow?: WorldMapWindow; private debugUi = false;
+  private secondaryWindows?: SecondaryWindows;
 
   onLoad() {
     view.setDesignResolutionSize(1200, 600, ResolutionPolicy.SHOW_ALL);
     profiler.hideStats();
     const params = new URLSearchParams(globalThis.location?.search ?? '');
+    this.debugUi = params.get('debug') === '1';
     const origin = params.get('api') ?? globalThis.location?.origin ?? 'http://127.0.0.1:7400';
     const destination = new URL(origin);
     this.apiBase = ['localhost','127.0.0.1','[::1]'].includes(destination.hostname) ? destination.origin : globalThis.location.origin;
@@ -63,17 +66,13 @@ export class TianxuGame extends Component {
   }
   onDestroy() {
     if (this.pollTimer) clearInterval(this.pollTimer);
-    this.audio?.destroy(); this.recoveredEffects?.destroy();
-    for (const display of this.unitDisplays.values()) display.animation.destroy();
+    this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
   }
   update(dt: number) {
-    this.recoveredEffects?.update(dt * this.speed);
-    for (const display of this.unitDisplays.values()) display.animation.update(dt * this.speed);
+    this.battleView?.update(dt);
+    this.growthWindows?.update(dt); this.secondaryWindows?.update(dt);
     if (this.noticeLabel?.isValid) this.noticeLabel.string = Date.now() < this.noticeUntil ? this.notice : '';
-    if (this.animationQueue.length && Date.now() >= this.nextEventAt) {
-      const event = this.animationQueue.shift()!; this.playEvent(event); this.nextEventAt = Date.now() + 150 / this.speed;
-    }
-    if (this.autoplay && this.state?.battle && !this.state.battle.settled && !this.busy && Date.now() > this.autoTimer) {
+    if ((this.battleView?.autoplay ?? this.autoplay) && !this.battleView?.locked && this.state?.battle && !this.state.battle.settled && !this.busy && Date.now() > this.autoTimer) {
       const battle = this.state.battle; const player = battle.state.players[battle.state.activePlayer];
       if (player?.id === this.characterId) {
         this.autoTimer = Date.now() + 350;
@@ -89,7 +88,14 @@ export class TianxuGame extends Component {
   }
   private saveAuth() { localStorage.setItem(this.authKey, JSON.stringify({ token: this.token, characterId: this.characterId })); }
   private async boot() {
+    this.entryReplayBattleId = '';
     if (!this.backdrop) { try { this.backdrop = (await this.api<{backdrop?: string}>('/api/bootstrap')).backdrop ?? ''; } catch { /* Login still provides the server error on submission. */ } }
+    if (!this.original) {
+      const response = await fetch(this.apiBase + '/recovered/original-ui.json', { cache: 'no-store' });
+      if (!response.ok) { this.renderLogin(); this.toast('原版界面资源未导入，请导入界面资源后重启'); return; }
+      this.original = new OriginalUi(await response.json() as OriginalUiCatalog, this.apiBase + '/recovered/');
+      this.ui.configureOriginal(this.original, this.apiBase + '/recovered/');
+    }
     if (!this.token) { this.renderLogin(); return; }
     try {
       this.characters = (await this.api<{ characters: Character[] }>('/api/characters')).characters;
@@ -105,19 +111,35 @@ export class TianxuGame extends Component {
     this.polling = true;
     try {
       const next = await this.api<Snapshot>('/api/state');
-      if (next.revision !== this.state.revision) { this.state = next; this.render(); }
+      if (next.revision !== this.state.revision) {
+        if (next.battle && next.battle.id !== this.state.battle?.id) {
+          this.battleHidden = false;
+          this.entryReplayBattleId = next.battle.id;
+        }
+        this.state = next;
+        if (this.original && !this.debugUi && this.page === 'rooms' && this.body?.isValid
+            && (!next.battle || this.battleHidden)) this.renderModuleWindow();
+        else this.render();
+      }
     } catch (error) { this.toast(String(error)); }
     finally { this.polling = false; }
   }
   private async run(action: string, payload: Record<string, unknown> = {}) {
     if (this.busy) return; this.busy = true;
+    const previousBattleId = this.state?.battle?.id;
     try {
       const response = await this.api<{ result: { message?: string; characterId?: string; roomId?: string; battleId?: string }; replayed: boolean }>('/api/act', {
         requestId: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`, action, payload });
       if (response.result.characterId) { this.characterId = response.result.characterId; this.saveAuth(); await this.boot(); }
       else { this.state = await this.api<Snapshot>('/api/state');
         if (['pve.dungeon', 'pve.enterScene', 'pve.transition'].includes(action)) this.selectedScene = Number(this.state.actor.progress.sceneId);
-        if (response.result.roomId) this.page = 'rooms'; if (response.result.battleId) this.battleHidden = false; this.render(); }
+        if (response.result.roomId) this.page = 'rooms';
+        if (response.result.battleId) {
+          this.battleHidden = false;
+          if (response.result.battleId !== previousBattleId && this.state.battle?.id === response.result.battleId)
+            this.entryReplayBattleId = response.result.battleId;
+        }
+        this.render(); }
       this.toast(response.result.message ?? '操作完成');
     } catch (error) { this.toast(String(error)); }
     finally { this.busy = false; }
@@ -125,10 +147,12 @@ export class TianxuGame extends Component {
   private toast(message: string) { this.notice = message.replace(/^Error: /, ''); this.noticeUntil = Date.now() + 5500;
     if (this.noticeLabel?.isValid) { this.noticeLabel.string = this.notice; this.noticeLabel.node.setSiblingIndex(this.root.children.length - 1); } }
   private clear() {
-    this.recoveredEffects?.destroy(); this.recoveredEffects = undefined;
-    for (const display of this.unitDisplays.values()) display.animation.destroy(); this.unitDisplays.clear();
+    this.renderGeneration++; this.home = undefined;
+    this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
+    this.battleView?.destroy(); this.battleView = undefined;
+
     for (const child of Array.from(this.root.children)) child.destroy();
-    this.root.removeAllChildren(); this.ui.targets = []; this.battleLayer = undefined; this.battleHud = undefined; this.battleId = ''; this.modal = undefined;
+    this.root.removeAllChildren(); this.ui.targets = []; this.battleId = ''; this.modal = undefined;
     this.ui.panel(this.root, 'Base', 1200, 600, 0, 0, Theme.ink);
     if (this.backdrop) {
       void this.ui.image(this.root, 'OriginalBackdrop', this.apiBase + this.backdrop, 1200, 600);
@@ -137,6 +161,7 @@ export class TianxuGame extends Component {
     this.noticeLabel = this.ui.label(this.root, 'Notice', '', 0, -282, 1160, 28, 15, Theme.green);
   }
   private renderLogin() {
+    if (this.original?.catalog.fairygui.aliases['Login/LoginWnd'] && !this.debugUi) { this.renderOriginalLogin(); return; }
     this.clear(); this.ui.label(this.root, 'Title', '天墟：万象战阵', 0, 175, 700, 55, 36, Theme.gold);
     this.ui.label(this.root, 'Subtitle', '战术卡牌 · 结伴征战', 0, 124, 600, 28, 18, Theme.dim);
     const username = this.ui.input(this.root, 'Username', '账号', 0, 52);
@@ -151,7 +176,34 @@ export class TianxuGame extends Component {
     this.ui.button(this.root, 'Register', '注册账号', 76, -65, 130, 40, () => { void auth(true); });
     this.ui.label(this.root, 'LocalIdentity', '创建角色，整备卡组，从世界地图出发。', 0, -130, 720, 45, 16, Theme.dim);
   }
+  private sourceInput(mount: OriginalUiMount, name: string, placeholder: string, password = false): EditBox {
+    const parent = mount.requireChild(name); const size = parent.getComponent(UITransform)!.contentSize;
+    const title = parent.getChildByName('title'); if (title) title.active = false;
+    return this.ui.input(parent, 'LiveInput:' + name, placeholder, size.width / 2, -size.height / 2, size.width, '', password, size.height, true);
+  }
+  private renderOriginalLogin() {
+    this.clear(); const generation = this.renderGeneration;
+    void this.original!.mount('Login/LoginWnd', this.root).then(async login => {
+      if (generation !== this.renderGeneration) return; login.node.setPosition(-600, 300);
+      await login.setController('debug', '0'); await login.setController('loginState', '0');
+      if (generation !== this.renderGeneration) return;
+      login.setVisible('txt_clearSite', false);
+      const username = this.sourceInput(login, 'textUserName', '本机账号');
+      const password = this.sourceInput(login, 'textPassword', '密码（至少6位）', true);
+      const auth = async (register: boolean) => {
+        if (this.busy) return; this.busy = true;
+        try { const result = await this.api<{token: string}>(register ? '/api/register' : '/api/login', { username: username.string, password: password.string });
+          this.token = result.token; this.characterId = ''; this.saveAuth(); await this.boot(); }
+        catch (error) { this.toast(String(error)); } finally { this.busy = false; }
+      };
+      login.on('logindebugBtn', Button.EventType.CLICK, () => { void auth(false); });
+      this.ui.button(this.root, 'RegisterLocal', '注册本机账号', 0, -260, 150, 27, () => { void auth(true); });
+      this.ui.label(this.root, 'LocalServer', '本机服务器 · 账号与角色保存在此电脑', 0, -294, 600, 20, 12, Theme.dim);
+      this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
+    }).catch(error => this.toast(String(error)));
+  }
   private renderCharacters() {
+    if (this.original?.catalog.fairygui.aliases['Login/ServerListWnd'] && !this.debugUi) { this.renderOriginalCharacters(); return; }
     this.clear(); this.ui.label(this.root, 'Title', '选择角色', 0, 240, 600, 50, 30, Theme.gold);
     this.characters.forEach((char, index) => this.ui.button(this.root, `Character:${char.id}`,
       `${char.name} · ${PROFESSIONS[char.profession]} Lv.${char.level}`, 0, 170 - index * 50, 420, 40,
@@ -162,11 +214,46 @@ export class TianxuGame extends Component {
           payload => { void this.run('character.create', { ...payload, profession: item.payload?.profession }); })));
     this.ui.button(this.root, 'ReturnLogin', '返回登录', 0, -140, 160, 36, () => { this.token = ''; this.characterId = ''; this.saveAuth(); this.renderLogin(); });
   }
+  private renderOriginalCharacters() {
+    this.clear(); const generation = this.renderGeneration;
+    void this.original!.mount('Login/ServerListWnd', this.root).then(mount => {
+      if (generation !== this.renderGeneration) return; mount.node.setPosition(-600, 300);
+      const list = mount.requireChild('list'); list.active = false;
+      ['nGroup0', 'nGroup1', 'nGroup2'].forEach(name => mount.setVisible(name, false));
+      this.ui.label(this.root, 'Character:LocalTitle', '本机角色', 0, 165, 600, 36, 24, Theme.gold);
+      this.characters.forEach((char, index) => this.ui.button(this.root, `Character:${char.id}`, `${char.name} · ${PROFESSIONS[char.profession]} Lv.${char.level}`,
+        0, 105 - index * 64, 350, 44, () => { this.characterId = char.id; void this.boot(); }));
+      this.ui.button(this.root, 'CreateCharacter', '创建新角色', -140, -188, 210, 34, () => this.renderCreateCharacter(), this.characters.length >= 4);
+      this.ui.button(this.root, 'ReturnLogin', '返回登录', 140, -188, 210, 34, () => { this.token = ''; this.characterId = ''; this.saveAuth(); this.renderLogin(); });
+      this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
+    }).catch(error => this.toast(String(error)));
+  }
+  private renderCreateCharacter() {
+    this.clear(); const generation = this.renderGeneration;
+    void this.original!.mount('Login/CreateActorWnd', this.root).then(mount => {
+      if (generation !== this.renderGeneration) return; mount.node.setPosition(-600, 300);
+      const name = this.sourceInput(mount, 'actorname', '角色名称'); name.maxLength = 14;
+      let gender = 2, profession = 1;
+      mount.on('roleListItem0', Button.EventType.CLICK, () => { gender = 1; mount.setText('msg', '已选择男性角色'); });
+      mount.on('roleListItem1', Button.EventType.CLICK, () => { gender = 2; mount.setText('msg', '已选择女性角色'); });
+      mount.on('btnRandom', Button.EventType.CLICK, () => { name.string = '旅人' + Math.floor(Math.random() * 100000); });
+      const choices = this.ui.node(this.root, 'LocalProfession:server-adapter', 360, 70, 313, -103);
+      this.ui.label(choices, 'Hint', '选择初始职业', 0, 15, 340, 20, 12, Theme.gold);
+      const labels: Label[] = [];
+      [1, 2, 3, 4].forEach((value, index) => { const button = this.ui.button(choices, 'Profession:' + value, '', -135 + index * 90, -15, 82, 30, () => {
+        profession = value; labels.forEach((label, i) => { label.color = i === index ? Theme.gold : Theme.text; });
+      }, false, true); labels.push(this.ui.label(button, 'Name', PROFESSIONS[value], 0, 0, 80, 24, 14, value === 1 ? Theme.gold : Theme.text)); });
+      mount.on('btnStart', Button.EventType.CLICK, () => { void this.run('character.create', { name: name.string, profession, gender }); });
+      this.ui.button(this.root, 'BackCharacters', '返回角色', -500, -264, 120, 27, () => this.renderCharacters());
+      this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
+    }).catch(error => this.toast(String(error)));
+  }
   private navigate(page: string) { this.page = page; this.listPage = 0; this.section = ''; this.battleHidden = page !== 'battle'; this.render(); }
   private render() {
     if (!this.state) return;
     this.audio?.sync(this.state.battle?.state.mapId ?? 1, this.state.actor.settings);
     if (this.state.battle && !this.battleHidden) { this.renderBattle(); return; }
+    if (this.original && !this.debugUi) { this.renderPlayer(); return; }
     this.clear(); const actor = this.state.actor;
     this.ui.label(this.root, 'Brand', '天墟 · 万象战阵', -390, 275, 400, 35, 24, Theme.gold, true);
     const avatar = this.catalog!.assets[this.state.growth.profile.avatarAssetId ?? ''];
@@ -192,6 +279,85 @@ export class TianxuGame extends Component {
     else if (this.page === 'rooms') this.renderRooms();
     else if (this.page === 'rankings') this.renderRankings();
     else if (this.page === 'settings') this.renderSettings();
+  }
+  private renderPlayer() {
+    this.clear(); const generation = this.renderGeneration;
+    const homeLayer = this.ui.node(this.root, 'HomeWnd:original', 1200, 600);
+    void this.original!.mount('Home/HomeWnd', homeLayer).then(home => {
+      if (generation !== this.renderGeneration || !homeLayer.isValid) { if (home.node.isValid) home.node.destroy(); return; }
+      home.node.setPosition(-600, 300); this.home = home;
+      const actor = this.state!.actor;
+      home.setText('_nameLabel', actor.name); home.setText('_level', `Lv.${actor.level}`);
+      home.setText('_gold', actor.currencies.gold); home.setText('_silver', actor.currencies.silver); home.setText('_shuijin', actor.currencies.crystal);
+      home.setProgress('_jlTiao', this.state!.growth.summary.energy, 40);
+      home.setVisible('vipGrouy', false);
+      const portrait = home.child('actorPane/head/pic'); const avatar = this.catalog!.assets[this.state!.growth.profile.avatarAssetId ?? ''];
+      if (portrait && avatar?.path) { portrait.active = false; const holder = home.requireChild('actorPane/head');
+        void this.ui.image(holder, 'SavedAvatar', this.apiBase + '/recovered/' + avatar.path, 60, 60, 30, -30); }
+      const bind = (name: string, fn: () => void) => { const node = home.child(name); if (node) {
+        if (!node.getComponent(Button)) node.addComponent(Button); node.on(Button.EventType.CLICK, fn);
+      } };
+      const growth = (section: string) => { this.section = section; this.page = 'growth'; this.listPage = 0; this.render(); };
+      bind('roleBtn', () => growth('inventory')); bind('tjBtn', () => { this.cardsAll = true; this.navigate('cards'); });
+      bind('rwBtn', () => this.navigate('tasks')); bind('kpBtn', () => { this.cardsAll = false; this.navigate('cards'); });
+      bind('dtBtn', () => this.navigate('world')); bind('swBtn', () => growth('progression')); bind('jjBtn', () => this.navigate('rooms'));
+      bind('sjBtn', () => this.navigate('social')); bind('petBtn', () => growth('pets')); bind('scBtn', () => growth('shop'));
+      bind('czgk', () => growth('dock')); bind('hh', () => this.navigate('guild')); bind('jjc', () => this.navigate('rooms'));
+      bind('ljf', () => growth('cards')); bind('phb', () => this.navigate('rankings')); bind('tjp', () => growth('equipment'));
+      bind('mxdt', () => this.navigate('world')); bind('ttt', () => growth('tower')); bind('zc', () => growth('city'));
+      bind('pmh', () => this.navigate('trade')); bind('hcys', () => growth('city'));
+      bind('head', () => growth('inventory')); bind('systemSetBtn', () => this.navigate('settings')); bind('mailBtn', () => this.navigate('mail'));
+      bind('liBtn', () => growth('activities')); bind('chargeBtn', () => growth('shop')); bind('zhuanBtn', () => growth('profession-skill-shop'));
+      bind('_jiBtn', () => growth('activities'));
+      const chat = home.child('chat');
+      if (chat) {
+        const input = this.sourceInput(home, 'chat/input', '输入世界消息');
+        const transcript = this.state!.social.chat.filter(row => row.channel === 'world').slice(-5)
+          .map(row => `${this.characterName(row.from)}：${row.text}`).join('\n');
+        this.ui.label(chat, 'ChatTranscript', transcript, 185, -56, 355, 100, 12, Theme.text, true);
+        bind('enterBtn', () => { if (input.string.trim()) void this.run('chat.send', { channel: 'world', text: input.string }); });
+        bind('channelBtn', () => this.navigate('social')); bind('msgBtn', () => this.navigate('social'));
+      }
+      const activityRoutes = ['activities','world-boss','ranked-season','forbidden','activities',null,'activities',null,null,'activities','activities','activities','tournament','activities','forbidden','ranked-season','activities','activities','world-boss',null,'activities','activities','shop'];
+      activityRoutes.forEach((section, index) => bind(`listItem${index}`, () => section ? growth(section) : this.info('原版活动', '该入口的原客户端资源已取得，当前对应服务规则和专属窗口仍未恢复。')));
+      bind('expandBtn', () => { const list = home.child('list'); if (list) list.active = !list.active; });
+      // Window overlays stay above the asynchronously imported home display tree.
+      if (this.noticeLabel?.isValid) this.noticeLabel.node.setSiblingIndex(this.root.children.length - 1);
+    }).catch(error => { if (generation === this.renderGeneration) this.toast(String(error)); });
+    if (this.page === 'home') {
+      if (this.state!.battle) this.ui.button(this.root, 'Home:Resume', '继续战斗', 0, -195, 160, 32, () => { this.battleHidden = false; this.render(); });
+      return;
+    }
+    this.body = this.ui.node(this.root, 'PlayerWindow:' + this.page, 1200, 600);
+    if (this.page === 'cards') {
+      this.deckWindow ??= new CardDeckWindow(this.ui, this.original!, this.catalog!, this.apiBase, {
+        close: () => this.navigate('home'), save: cards => { void this.run('deck.save', { cards }); },
+        detail: card => this.cardDetail(card), growth: () => { this.page = 'growth'; this.section = 'cards'; this.render(); },
+      }); this.deckWindow.render(this.body, this.state!.actor, this.cardsAll); return;
+    }
+    if (this.page === 'growth') {
+      this.growthWindows ??= new GrowthWindows(this.ui, this.original!, this.catalog!, this.apiBase, {
+        close: () => this.navigate('home'), action: item => this.action(item), run: (action, payload) => { void this.run(action, payload); },
+        detail: (title, text, actions) => this.info(title, text, actions),
+      }); this.growthWindows.render(this.body, this.state!, this.section || 'inventory'); return;
+    }
+    if (this.page === 'world') {
+      this.worldWindow ??= new WorldMapWindow(this.ui, this.original!, this.catalog!, this.apiBase, {
+        close: () => this.navigate('home'), enter: sceneId => { this.selectedScene = sceneId; void this.run('pve.enterScene', { sceneId }); },
+        transition: nodeId => { void this.run('pve.transition', { nodeId }); }, challenge: node => this.openNode(node),
+        dungeon: sceneId => { void this.run('pve.dungeon', { sceneId }); },
+      }); this.worldWindow.render(this.body, this.state!, this.selectedScene); return;
+    }
+    // Source-specific remaining windows are dispatched below; debug navigation is never shown here.
+    this.renderModuleWindow();
+  }
+  private renderModuleWindow() {
+    this.secondaryWindows ??= new SecondaryWindows(this.ui, this.original!, this.catalog!, this.apiBase, {
+      close: () => this.navigate('home'), run: (action, payload) => { void this.run(action, payload); },
+      action: item => this.action(item), navigate: (page, section) => { this.page = page; this.section = section ?? ''; if (page === 'battle') this.battleHidden = false; this.render(); },
+      info: (title, text, actions) => this.info(title, text, actions),
+      choose: (title, items, callback) => this.choose(title, items, callback),
+    }); this.secondaryWindows.render(this.body, this.state!, this.page, this.characterId);
   }
   private title(text: string, subtitle = '') {
     this.ui.label(this.body, 'PageTitle', text, -250, 223, 480, 34, 25, Theme.gold, true);
@@ -239,12 +405,38 @@ export class TianxuGame extends Component {
     }
   }
   private openNode(node: SceneNodeView) {
+    if (this.original && !this.debugUi) { this.openOriginalNode(node); return; }
     const actions = [
       { label: '单人挑战', detail: '独自迎战当前敌军', action: 'pve.start', payload: { nodeId: node.id } },
       { label: '创建合作房间', detail: '队友加入并准备后开始', action: 'room.create', payload: { mode: 'coop', nodeId: node.id } },
     ];
     if (node.story) this.info(node.name, node.story, actions); else this.choose(node.name, actions);
     this.battleHidden = false;
+  }
+  private openOriginalNode(node: SceneNodeView, page = 0) {
+    this.closeModal();
+    this.modal = this.ui.panel(this.root, 'PathPoint:shade', 1200, 600, 0, 0, new Color(0, 0, 0, 128));
+    const panel = this.ui.skin(this.modal, 'PathPointPane', 'dtks_1', 0, 0, 472, 346);
+    this.ui.label(panel, 'Title', node.name, 0, 154, 380, 26, 18, Theme.gold);
+    this.ui.sourceButton(panel, 'PathPoint:Close', 'ajguanbixiao', '', '', 218, 155, 24, 24, () => this.closeModal());
+    const story = (node.story || node.name).replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&'); const chunks = story.match(/[\s\S]{1,300}/g) ?? [story];
+    this.ui.label(panel, 'Description', chunks[page] ?? '', -83, 37, 256, 200, 13, Theme.text, true);
+    this.ui.label(panel, 'DeckName', `当前卡组 ${this.state!.actor.deck.length} 张`, -63, -94, 210, 26, 14, Theme.gold);
+    this.ui.sourceButton(panel, 'PathPoint:Deck', 'ajtpgg_1', '', '', -39, -133, 114, 36, () => { this.closeModal(); this.navigate('cards'); });
+    const scene = this.catalog!.scopes.main.scenes.find(scene => scene.id === node.id.split(':node:')[0]);
+    const pathpoint = scene?.nodes.find(row => row._tag === 'pathpoint' && String(row.id) === node.originalId);
+    const card = this.catalog!.scopes.main.cards[String(pathpoint?.cardid ?? '')]; const art = this.catalog!.assets[card?.art[0]];
+    if (art?.path) void this.ui.image(panel, 'PathPoint:EnemyCard', this.apiBase + '/recovered/' + art.path, 121, 166, 139, 40);
+    this.ui.sourceButton(panel, 'PathPoint:Start', 'ajks_1', '', '', 139, -89, 114, 36, () => {
+      this.closeModal(); this.battleHidden = false; void this.run('pve.start', { nodeId: node.id });
+    }, !node.accessible, 'game/data/img/ui/ui_step1.swf#177');
+    this.ui.button(panel, 'PathPoint:Coop', '合作挑战', 139, -132, 114, 27, () => {
+      this.closeModal(); this.battleHidden = false; void this.run('room.create', { mode: 'coop', nodeId: node.id });
+    }, !node.accessible);
+    if (chunks.length > 1) {
+      this.ui.button(panel, 'PathPoint:Previous', '‹', -188, -76, 28, 22, () => this.openOriginalNode(node, page - 1), page === 0);
+      this.ui.button(panel, 'PathPoint:Next', '›', 16, -76, 28, 22, () => this.openOriginalNode(node, page + 1), page + 1 >= chunks.length);
+    }
   }
   private renderCards() {
     const state = this.state!; this.title('卡牌与编队', `当前卡组 ${state.actor.deck.length} 张；进入详情调整，保存后生效。`);
@@ -271,6 +463,7 @@ export class TianxuGame extends Component {
     ], () => { this.draftDeck ??= [...this.state!.actor.deck]; this.draftDeck.push(card.id); this.editDeck(); });
   }
   private editDeck() {
+    if (!this.debugUi) { this.closeModal(); this.navigate('cards'); return; }
     this.draftDeck ??= [...this.state!.actor.deck];
     this.choose(`待保存卡组 · ${this.draftDeck.length} 张`, this.draftDeck.map((id, index) => ({ label: `${String(this.catalog!.scopes.main.cards[id.split(':').at(-1)!]?.raw.Name ?? id)} · 移除`, action: '', payload: { index } })), item => {
       this.draftDeck!.splice(Number(item.payload?.index), 1); this.editDeck();
@@ -402,6 +595,7 @@ export class TianxuGame extends Component {
   }
   private action(item: ActionItem) {
     if (item.disabled) return;
+    if (item.action === 'local:battleHide') { this.closeModal(); this.battleHidden = true; this.page = 'home'; this.render(); return; }
     if (item.action === 'local:clanwar') { this.closeModal(); this.page = 'growth'; this.section = 'clan-war'; this.listPage = 0; this.render(); return; }
     if (item.action === 'local:characters') { this.characterId = ''; this.state = undefined; this.renderCharacters(); return; }
     if (item.action === 'local:logout') { void this.api('/api/logout', {}).finally(() => { this.token = ''; this.characterId = ''; this.state = undefined; this.saveAuth(); this.renderLogin(); }); return; }
@@ -418,6 +612,7 @@ export class TianxuGame extends Component {
     else { this.closeModal(); void this.run(item.action, item.payload); }
   }
   private selectDraft(item: ActionItem, field: FormField, selected: string[], offset = 0) {
+    if (this.original && !this.debugUi) { this.sourceDraft(item, field, selected, offset); return; }
     const panel = this.modalBase(`${item.label} · ${selected.length}/${field.max ?? 10}`);
     const options = field.options ?? [];
     options.slice(offset, offset + 6).forEach((option, index) => this.ui.button(panel, 'DraftCard:' + index, `${selected.includes(option.value) ? '✓ ' : ''}${option.label}`, 0, 160 - index * 54, 790, 43, () => {
@@ -436,6 +631,7 @@ export class TianxuGame extends Component {
     this.ui.button(panel, 'CloseModal', '关闭', 350, 225, 85, 29, () => this.closeModal()); return panel;
   }
   private form(title: string, fields: FormField[], callback: (payload: Record<string, unknown>) => void) {
+    if (this.original && !this.debugUi) { this.sourceFields(title, fields, callback); return; }
     const panel = this.modalBase(title); const boxes: { field: FormField; box: EditBox }[] = [];
     fields.forEach((field, index) => {
       this.ui.label(panel, 'FieldLabel:' + field.key, field.label, -235, 145 - index * 72, 320, 32, 16, Theme.dim, true);
@@ -447,6 +643,7 @@ export class TianxuGame extends Component {
     });
   }
   private choose(title: string, items: ActionItem[], callback?: (item: ActionItem) => void, extra: {label: string; callback: () => void}[] = [], offset = 0) {
+    if (this.original && !this.debugUi) { this.sourceChoices(title, items, callback, extra, offset); return; }
     const panel = this.modalBase(title); const page = items.slice(offset, offset + 6);
     if (!page.length) this.ui.label(panel, 'ModalEmpty', '当前没有可选记录', 0, 30, 700, 60, 19, Theme.dim);
     page.forEach((item, index) => this.ui.button(panel, 'Choice:' + index, item.detail ? `${item.label}  ·  ${item.detail}` : item.label,
@@ -458,145 +655,126 @@ export class TianxuGame extends Component {
     extra.forEach((button, index) => this.ui.button(panel, 'ChoiceExtra:' + index, button.label, -170 + index * 340, -225, 300, 32, button.callback));
   }
   private info(title: string, text: string, actions: ActionItem[] = [], callback?: () => void) {
+    if (this.original && !this.debugUi) { this.sourceInformation(title, text, actions, callback); return; }
     const panel = this.modalBase(title); this.ui.label(panel, 'Information', text.replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, ''), 0, 5, 770, 340, 19, Theme.text, true);
     actions.forEach((item, index) => this.ui.button(panel, 'InfoAction:' + index, item.label, (index - (actions.length - 1) / 2) * Math.min(340, 780 / actions.length), -210, Math.min(300, 750 / actions.length), 36, () => callback ? callback() : this.action(item), item.disabled));
   }
-  private async command(action: BattleAction) {
-    const battle = this.state?.battle; if (!battle || this.busy) return;
-    const hand = battle.state.players.find(player => player.id === this.characterId)?.hand ?? [];
-    const index = action.type === 'play' ? hand.findIndex(card => card.instanceId === action.instanceId) : -1;
-    const card = index >= 0 ? hand[index] : undefined; const previousSeq = battle.state.events.at(-1)?.seq ?? 0;
-    this.selectedHand = ''; await this.run('battle.command', { battleId: battle.id, revision: battle.state.revision, action });
-    if (action.type === 'play' && card && this.state?.battle?.id === battle.id && this.state.battle.state.events.some(event =>
-      event.seq > previousSeq && event.type === 'play' && event.actor === this.characterId && event.cardId === card.cardId)) {
-      void this.flyCard(card.cardId, index, action.row, action.col);
+  /** NMiniPopWnd supplies the original shared input/message shell. Content
+   * below adapts local service parameters; it does not replace module windows. */
+  private sourcePanel(title: string, wide = false) {
+    this.closeModal(); this.modal = this.ui.node(this.root, 'NMiniPopWnd:modal-host', 1200, 600);
+    this.modal.addComponent(BlockInputEvents);
+    this.ui.panel(this.modal, 'NMiniPopWnd:shade', 1200, 600, 0, 0, new Color(0, 0, 0, 128));
+    const width = wide ? 777 : 477, height = wide ? 513 : 346;
+    const panel = this.ui.skin(this.modal, 'NMiniPopWnd:source-frame', wide ? 'kphcbj_1_2' : 'kpglk_1', 0, 0, width, height);
+    this.ui.label(panel, 'NMiniPopWnd:title', title, 0, height / 2 - 17, width - 70, 27, 16, Theme.gold);
+    this.ui.sourceButton(panel, 'NMiniPopWnd:close', 'ajguanbixiao', '', '', width / 2 - 19,
+      height / 2 - 17, 24, 24, () => this.closeModal());
+    return panel;
+  }
+  private sourceFields(title: string, fields: FormField[], callback: (payload: Record<string, unknown>) => void,
+      offset = 0, values: Record<string, unknown> = {}) {
+    const panel = this.sourcePanel(title); const visible = fields.slice(offset, offset + 3);
+    const boxes = visible.map((field, index) => {
+      this.ui.label(panel, 'ParameterLabel:' + field.key, field.label, -135, 86 - index * 66, 145, 26, 13, Theme.gold);
+      const box = this.ui.input(panel, 'Parameter:' + field.key, '', 73, 86 - index * 66, 236,
+        String(values[field.key] ?? field.value ?? ''));
+      return { field, box };
+    });
+    this.ui.button(panel, 'NMiniPopWnd:confirm', offset + 3 < fields.length ? '下一步' : '确认', 0, -130, 120, 29, () => {
+      const result = { ...values };
+      for (const {field, box} of boxes) {
+        const value = field.type === 'number' ? Number(box.string) : box.string;
+        if (typeof value === 'number' && (!Number.isFinite(value) || field.min !== undefined && value < field.min || field.max !== undefined && value > field.max)) {
+          this.toast(`${field.label}超出允许范围`); return;
+        }
+        result[field.key] = value;
+      }
+      if (offset + 3 < fields.length) this.sourceFields(title, fields, callback, offset + 3, result);
+      else { this.closeModal(); callback(result); }
+    });
+  }
+  private sourceChoices(title: string, items: ActionItem[], callback?: (item: ActionItem) => void,
+      extra: {label: string; callback: () => void}[] = [], offset = 0) {
+    const panel = this.sourcePanel(title); const page = items.slice(offset, offset + 6);
+    page.forEach((item, index) => {
+      const x = index % 2 ? 111 : -111, y = 85 - Math.floor(index / 2) * 73;
+      this.ui.button(panel, 'SourceChoice:' + index, item.label, x, y, 205, 31,
+        () => { this.closeModal(); callback ? callback(item) : this.action(item); }, item.disabled);
+      if (item.detail) this.ui.label(panel, 'SourceChoiceDetail:' + index, item.detail, x, y - 25, 202, 27, 10, Theme.dim, true);
+    });
+    if (!page.length) this.ui.label(panel, 'Empty', '当前没有可选项目', 0, 0, 360, 50, 14, Theme.dim);
+    if (items.length > 6) {
+      this.ui.button(panel, 'SourceChoice:previous', '‹', -192, -106, 32, 25,
+        () => this.sourceChoices(title, items, callback, extra, Math.max(0, offset - 6)), offset === 0);
+      this.ui.button(panel, 'SourceChoice:next', '›', 192, -106, 32, 25,
+        () => this.sourceChoices(title, items, callback, extra, offset + 6), offset + 6 >= items.length);
+    }
+    extra.forEach((button, index) => this.ui.button(panel, 'SourceChoiceExtra:' + index, button.label,
+      (index - (extra.length - 1) / 2) * 180, -137, 170, 26, button.callback));
+  }
+  private sourceInformation(title: string, text: string, actions: ActionItem[], callback?: () => void, offset = 0) {
+    const plain = text.replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '');
+    const pages = plain.match(/[\s\S]{1,420}/g) ?? ['']; const panel = this.sourcePanel(title);
+    this.ui.label(panel, 'MessageText', pages[offset] ?? '', 0, 12, 422, 214, 13, Theme.text, true);
+    actions.forEach((item, index) => this.ui.button(panel, 'MessageAction:' + index, item.label,
+      (index - (actions.length - 1) / 2) * Math.min(210, 420 / actions.length), -132,
+      Math.min(200, 410 / actions.length), 29, () => callback ? callback() : this.action(item), item.disabled));
+    if (pages.length > 1) {
+      this.ui.button(panel, 'MessagePrevious', '‹', -197, -99, 26, 22,
+        () => this.sourceInformation(title, text, actions, callback, offset - 1), offset === 0);
+      this.ui.button(panel, 'MessageNext', '›', 197, -99, 26, 22,
+        () => this.sourceInformation(title, text, actions, callback, offset + 1), offset + 1 >= pages.length);
     }
   }
-  private async flyCard(cardId: string, index: number, row: number, col: number) {
-    const state = this.state?.battle?.state; if (!state || !this.root.isValid) return;
-    const card = this.catalog!.scopes.main.cards[cardId.split(':').at(-1)!]; const art = this.catalog!.assets[card?.art[0]];
-    if (!art?.path) return;
-    const layout = this.catalog!.scopes.main.maps[String(state.mapId)]?.layoutRows.find(value => value._tag === 'map');
-    const tw = Number(layout?.tilewidth ?? 90), th = Number(layout?.tileheight ?? 95);
-    const destination = new Vec3((1200 - state.columns * tw) / 2 + (col + .5) * tw - 600, 300 - (45 + (row + .5) * th), 0);
-    const flight = this.ui.panel(this.root, 'CardFlight', 85, 116, -350 + index * 89, -207, Theme.panel, Theme.gold);
-    await this.ui.image(flight, 'FlightPortrait', this.apiBase + '/recovered/' + art.path, 75, 100);
-    if (!flight.isValid) return;
-    const duration = .38 / this.speed; this.nextEventAt = Math.max(this.nextEventAt, Date.now() + duration * 1000);
-    tween(flight).to(duration, { position: destination, scale: new Vec3(.65, .65, 1) }, { easing: 'quadOut' })
-      .call(() => { if (flight.isValid) flight.destroy(); }).start();
+  private sourceDraft(item: ActionItem, field: FormField, selected: string[], offset: number) {
+    const panel = this.sourcePanel(`${item.label} · ${selected.length}/${field.max ?? 10}`, true);
+    const options = field.options ?? []; const visible = options.slice(offset, offset + 9);
+    visible.forEach((option, index) => {
+      const x = -281 + index % 3 * 110, y = 125 - Math.floor(index / 3) * 133;
+      const card = this.catalog!.scopes.main.cards[option.value.split(':').at(-1)!];
+      const slot = this.ui.button(panel, 'DraftCard:' + index, '', x, y, 91, 120, () => {
+        const next = selected.includes(option.value) ? selected.filter(id => id !== option.value)
+          : selected.length < (field.max ?? 10) ? [...selected, option.value] : selected;
+        this.sourceDraft(item, field, next, offset);
+      }, false, true);
+      const art = this.catalog!.assets[card?.art[0]];
+      if (art?.path) void this.ui.image(slot, 'OriginalCard', this.apiBase + '/recovered/' + art.path, 85, 116);
+      if (selected.includes(option.value)) this.ui.label(slot, 'Selected', '✓', 24, 37, 32, 35, 27, Theme.green);
+      this.ui.label(slot, 'CardName', String(card?.raw.Name ?? option.label), 0, -50, 83, 25, 10, Theme.text);
+    });
+    this.ui.label(panel, 'DraftInstructions', `已选择 ${selected.length} 张\n\n${selected.map(id => this.assetName(id)).join('\n')}`,
+      192, 30, 290, 330, 13, Theme.text, true);
+    this.ui.button(panel, 'DraftPrevious', '‹', -305, -211, 50, 28,
+      () => this.sourceDraft(item, field, selected, Math.max(0, offset - 9)), offset === 0);
+    this.ui.button(panel, 'DraftNext', '›', -84, -211, 50, 28,
+      () => this.sourceDraft(item, field, selected, offset + 9), offset + 9 >= options.length);
+    this.ui.button(panel, 'DraftSave', '保存卡组', 192, -211, 150, 30,
+      () => { this.closeModal(); void this.run(item.action, { ...item.payload, [field.key]: selected }); }, selected.length !== (field.min ?? 10));
+  }
+
+  private async command(action: BattleAction) {
+    const battle = this.state?.battle;
+    if (!battle || this.busy || this.battleView?.locked) return;
+    await this.run('battle.command', { battleId: battle.id, revision: battle.state.revision, action });
   }
   private renderBattle() {
-    const battle = this.state!.battle!; const state = battle.state;
-    if (!this.battleLayer?.isValid || this.battleId !== battle.id) {
-      this.recoveredEffects?.destroy(); this.recoveredEffects = undefined;
-      this.clear(); this.lastUnitCells.clear(); this.battleId = battle.id; this.eventSeq = 0; this.animationQueue = [];
-      this.battleLayer = this.ui.node(this.root, 'BattleScene', 1200, 600);
-      const map = this.catalog!.scopes.main.maps[String(state.mapId)]; const art = this.catalog!.assets[map?.background_asset_ids[0]];
-      if (art?.path) void this.ui.image(this.battleLayer, 'MapBackground', this.apiBase + '/recovered/' + art.path, 1200, 600);
-      this.recoveredEffects = new RecoveredEffects(this.battleLayer, this.catalog!, this.apiBase + '/recovered/');
-    }
-    const map = this.catalog!.scopes.main.maps[String(state.mapId)]; const raw = map?.layoutRows.find(row => row._tag === 'map');
-    const tw = Number(raw?.tilewidth ?? 90); const th = Number(raw?.tileheight ?? 95);
-    const xy = (row: number, col: number) => ({ x: (1200 - state.columns * tw) / 2 + (col + .5) * tw - 600, y: 300 - (45 + (row + .5) * th) });
-    for (const unit of state.units) {
-      this.lastUnitCells.set(unit.id, { row: unit.row, col: unit.col, team: unit.team });
-      if (unit.hp <= 0) continue; let display = this.unitDisplays.get(unit.id);
-      const position = xy(unit.row, unit.col);
-      if (!display) {
-        const node = this.ui.node(this.battleLayer!, 'Unit:' + unit.id, 100, 120, position.x, position.y - 28);
-        const visual = this.ui.node(node, 'Visual', 170, 170, 0, 0);
-        const animation = new RecoveredAnimation(visual, this.catalog!, this.apiBase + '/recovered/');
-        const owner = state.players.find(player => player.id === unit.playerId)!;
-        const loaded = unit.flags.hero === 1 && !unit.monsterId ? animation.setActor(owner.profession ?? 1, owner.sex ?? 1) : animation.setMonster(unit.monsterId);
-        void loaded.then(() => {
-          if (node.isValid && this.unitDisplays.get(unit.id)?.node === node) animation.play('stand', unit.team === 0 ? 'east' : 'west');
-        }).catch(error => this.toast(String(error)));
-        display = { node, animation, monsterId: unit.monsterId, team: unit.team,
-          name: this.ui.label(node, 'UnitName', unit.flags.hero ? owner.name : String(this.catalog!.scopes.main.monsters[String(unit.monsterId)]?.Name ?? ''), 0, 57, 130, 22, 12, unit.team === 0 ? Theme.green : Theme.red),
-          hp: this.ui.label(node, 'Health', `${unit.hp}/${unit.maxHp}`, 0, 38, 100, 20, 13, Theme.text) };
-        this.unitDisplays.set(unit.id, display);
-      } else {
-        if (Math.abs(display.node.position.x - position.x) > 1 || Math.abs(display.node.position.y - (position.y - 28)) > 1) {
-          display.animation.play('walk', unit.team === 0 ? 'east' : 'west');
-          tween(display.node).to(.25 / this.speed, { position: new Vec3(position.x, position.y - 28, 0) }).call(() => display?.animation.play('stand', unit.team === 0 ? 'east' : 'west')).start();
-        }
-        display.hp.string = `${unit.hp}/${unit.maxHp}`;
+    if (this.original) {
+      const battle = this.state!.battle!;
+      if (!this.battleView || this.battleId !== battle.id) {
+        this.clear(); this.battleId = battle.id;
+        this.battleView = new BattleSceneView(this.root, this.ui, this.original, this.catalog!, this.apiBase, {
+          command: action => { void this.command(action); }, hide: () => this.info('战斗设置', '当前战斗会持续保存。', [
+            { label: '返回主城，稍后继续', action: 'local:battleHide' },
+            { label: '认输', action: 'battle.command', payload: { battleId: battle.id, revision: this.state!.battle!.state.revision, action: { type: 'surrender' } } },
+          ]), dismiss: () => { this.battleHidden = true; this.page = 'world'; void this.run('battle.dismiss', { battleId: battle.id }); },
+          sound: skill => this.audio?.shot(skill), log: text => this.info('战报', text), notice: text => this.toast(text),
+        });
       }
-    }
-    for (const [id, display] of this.unitDisplays) if (!state.units.some(unit => unit.id === id && unit.hp > 0)) {
-      display.hp.string = display.hp.string.replace(/^\d+\//, '0/');
-      this.unitDisplays.delete(id);
-      display.animation.play('die', display.team === 0 ? 'east' : 'west');
-      setTimeout(() => { if (display.node.isValid) { display.animation.destroy(); display.node.destroy(); } }, 400 / this.speed);
-    }
-    const events = state.events.filter(event => event.seq > this.eventSeq);
-    for (const event of events) if (event.type === 'death' && event.actor && event.row !== undefined && event.col !== undefined) {
-      this.lastUnitCells.set(event.actor, { row: event.row, col: event.col, team: this.lastUnitCells.get(event.actor)?.team ?? 0 });
-    }
-    if (this.eventSeq > 0) this.animationQueue.push(...events.filter(event => ['play','attack','damage','death','status','skill','effect'].includes(event.type)));
-    this.eventSeq = state.events.at(-1)?.seq ?? 0;
-    if (this.battleHud?.isValid) this.battleHud.destroy(); this.ui.targets = [];
-    this.battleHud = this.ui.node(this.root, 'BattleHud', 1200, 600);
-    this.ui.panel(this.battleHud, 'Header', 1200, 40, 0, 280, new Color(12, 25, 27, 235));
-    const active = state.players[state.activePlayer];
-    this.ui.label(this.battleHud, 'Turn', `回合 ${state.turn} · ${battle.settled ? '已结束' : active?.name + '行动'}`, -210, 281, 700, 30, 18, Theme.gold);
-    this.ui.button(this.battleHud, 'Battle:Log', '战报', 380, 280, 80, 28, () => this.info('战报', state.events.slice(-35).map(event => `${event.seq} ${event.type} ${event.amount ?? ''}`).join('\n')));
-    this.ui.button(this.battleHud, 'Battle:Menu', '菜单', 520, 280, 95, 28, () => this.choose('战斗菜单', [
-      { label: '稍后继续', action: 'local:battleHide' }, { label: '认输退出', action: 'battle.command', payload: { battleId: battle.id, revision: state.revision, action: { type: 'surrender' } } },
-    ], item => { if (item.action === 'local:battleHide') { this.battleHidden = true; this.page = 'home'; this.render(); } else this.action(item); }));
-    this.ui.panel(this.battleHud, 'HandBase', 1200, 151, 0, -224, new Color(12, 25, 27, 240));
-    const me = state.players.find(player => player.id === this.characterId)!;
-    me.hand.forEach((hand, index) => {
-      const card = this.catalog!.scopes.main.cards[hand.cardId.split(':').at(-1)!]; if (!card) return;
-      const x = -350 + index * 89; const selected = this.selectedHand === hand.instanceId;
-      const box = this.ui.button(this.battleHud!, 'Hand:' + index, '', x, -222 + (selected ? 15 : 0), 85, 116, () => { this.selectedHand = selected ? '' : hand.instanceId; this.renderBattle(); }, hand.wait > 0 || active?.id !== me.id);
-      const art = this.catalog!.assets[card.art[0]];
-      if (art?.path) void this.ui.image(box, 'HandPortrait', this.apiBase + '/recovered/' + art.path, 75, 88, 0, 6);
-      this.ui.label(box, 'Countdown', hand.wait > 0 ? `准备 ${hand.wait}` : '可出牌', 0, 45, 80, 22, 13, hand.wait > 0 ? Theme.gold : Theme.green);
-      this.ui.label(box, 'HandName', String(card.raw.Name), 0, -42, 80, 30, 13, Theme.text);
-    });
-    this.ui.label(this.battleHud, 'DeckCount', `牌库 ${me.drawPile.length}\n墓地 ${me.graveyard.length}`, -510, -224, 145, 70, 18, Theme.dim);
-    this.ui.button(this.battleHud, 'Battle:End', '结束回合', 440, -210, 220, 44, () => { void this.command({ type: 'end' }); }, battle.settled || active?.id !== this.characterId);
-    this.ui.button(this.battleHud, 'Battle:Auto', this.autoplay ? '托管：开' : '托管：关', 395, -265, 125, 32, () => { this.autoplay = !this.autoplay; this.renderBattle(); }, battle.settled);
-    this.ui.button(this.battleHud, 'Battle:Speed', `${this.speed}倍速`, 520, -265, 100, 32, () => { this.speed = this.speed === 1 ? 2 : 1; this.renderBattle(); });
-    for (const [index, play] of battle.legalPlays.filter(play => play.instanceId === this.selectedHand).entries()) {
-      const position = xy(play.row, play.col);
-      this.ui.button(this.battleHud, 'Legal:' + index, play.targetId ? '目标' : '部署', position.x, position.y, tw - 8, th - 8,
-        () => { void this.command({ type: 'play', ...play }); }, false, true);
-    }
-    if (battle.settled) {
-      const outcome = battle.rewards; const panel = this.ui.panel(this.battleHud, 'Result', 620, 225, 0, 10, Theme.panel, Theme.gold);
-      this.ui.label(panel, 'Outcome', state.winner === null ? '平局' : outcome?.won ? '胜利' : '战败', 0, 65, 500, 45, 34, outcome?.won ? Theme.gold : Theme.red);
-      this.ui.label(panel, 'Rewards', `银币 +${outcome?.silver ?? 0}  ·  经验 +${outcome?.xp ?? 0}\n${outcome?.cards?.map(card => `${this.catalog!.scopes.main.cards[card.id.split(':').at(-1)!]?.raw.Name} ×${card.count}`).join('  ') ?? ''}`, 0, 2, 560, 65, 20);
-      this.ui.button(panel, 'Battle:Dismiss', '保存结算并返回', 0, -68, 280, 40, () => { this.battleHidden = true; this.page = 'world'; void this.run('battle.dismiss', { battleId: battle.id }); });
-    }
-  }
-  private playEvent(event: BattleEvent) {
-    if ((event.type === 'play' && event.skillId !== undefined) || event.type === 'attack') {
-      const state = this.state?.battle?.state;
-      const target = event.row !== undefined && event.col !== undefined ? { row: event.row, col: event.col } : this.lastUnitCells.get(event.target ?? event.actor ?? '');
-      const caster = this.lastUnitCells.get(event.actor ?? '') ?? this.lastUnitCells.get('hero:' + event.actor);
-      if (target && state) {
-        const layout = this.catalog!.scopes.main.maps[String(state.mapId)]?.layoutRows.find(row => row._tag === 'map');
-        const tw = Number(layout?.tilewidth ?? 90), th = Number(layout?.tileheight ?? 95);
-        this.recoveredEffects?.play(event.skillId ?? 0, (1200 - state.columns * tw) / 2 + (target.col + .5) * tw - 600,
-          300 - (45 + (target.row + .5) * th), caster?.team === 1 ? 'west' : 'east');
-      }
-      if (event.type !== 'attack') this.audio?.shot(event.skillId ?? 0);
-    }
-    if (event.type === 'attack') {
-      this.audio?.shot(event.skillId ?? 0);
-      const actor = event.actor ? this.unitDisplays.get(event.actor) : undefined;
-      const unit = this.state?.battle?.state.units.find(unit => unit.id === event.actor);
-      actor?.animation.play('atk', unit?.team === 1 ? 'west' : 'east', () => {
-        const target = event.target ? this.unitDisplays.get(event.target) : undefined;
-        if (target) { target.hp.color = Theme.red; setTimeout(() => { if (target.hp.isValid) target.hp.color = Theme.text; }, 180); }
-      });
-    }
-    if (event.type === 'damage' || event.type === 'status') {
-      const display = event.target ? this.unitDisplays.get(event.target) : undefined;
-      display?.animation.play('hit', display.team === 0 ? 'east' : 'west');
+      const replayEntry = this.entryReplayBattleId === battle.id;
+      this.battleView.sync(battle, this.characterId, replayEntry);
+      if (replayEntry) this.entryReplayBattleId = '';
+      return;
     }
   }
 }

@@ -8,6 +8,7 @@ import { competitionActions, operateCompetition, competitionView, tournamentDeck
 import { leagueActions, operateLeague, leagueView, tickLeague, validateLeagueRoom, onLeagueSettled } from './league-systems.mjs';
 import { grantCampaignExtras } from './campaign-rewards.mjs';
 import { presentationNames, presentSections } from './presentation.mjs';
+import { playerUi } from './player-ui.mjs';
 import { requireText, requireCount } from './store.mjs';
 
 const nowDay = now => new Date(now + 8 * 3600000).toISOString().slice(0, 10);
@@ -158,11 +159,13 @@ export class GameService {
   }
   createCharacter(world, accountId, payload, now) {
     const name = requireText(payload.name, '角色名称', 14); const profession = Number(payload.profession);
+    const gender = payload.gender === undefined ? 1 : Number(payload.gender);
+    if (![1, 2].includes(gender)) throw new Error('性别无效');
     if (![1, 2, 3, 4].includes(profession)) throw new Error('职业无效');
     if (Object.values(world.characters).some(char => char.name === name)) throw new Error('角色名称已存在');
     if (Object.values(world.characters).filter(char => char.accountId === accountId).length >= 4) throw new Error('每个账号最多4个角色');
     const id = randomUUID(); const deck = [1, 19, 43, 61].map(key => this.content.card(key).id);
-    const actor = { id, accountId, name, profession, level: 1, xp: 0,
+    const actor = { id, accountId, name, profession, gender, level: 1, xp: 0,
       currencies: { silver: 300, gold: 20, crystal: 0 }, cards: Object.fromEntries(deck.map(id => [id, 1])),
       deck, inventory: {}, equipment: {}, enhancements: {}, warehouse: {},
       progress: { sceneId: 1, clearedNodes: [], clearedTriggers: [], unlockedScenes: [1], positionByScene: {} },
@@ -224,9 +227,10 @@ export class GameService {
         initialUnits.push({ playerId: defenderId, monsterId: level.board.monsterId + index % 3, ...cell });
       }
     }
-    const state = advanceAI(this.content, createBattle(this.content, { id, seed, mapId: level.mapId, players, firstPlayer: numeric(level.trigger.raw, 'firstteam') === 1 ? 0 : undefined, rows: Math.max(level.rows ?? 4, ...[0, 1].map(team => players.filter(player => player.team === team).length)),
-      ...(level.board ? { boardClearTeam: 1, turnLimit: 48, initialUnits } : {}) }));
-    const record = { id, state, mode, roomId, participants: actors.map(actor => actor.id),
+    const entryState = createBattle(this.content, { id, seed, mapId: level.mapId, players, firstPlayer: numeric(level.trigger.raw, 'firstteam') === 1 ? 0 : undefined, rows: Math.max(level.rows ?? 4, ...[0, 1].map(team => players.filter(player => player.team === team).length)),
+      ...(level.board ? { boardClearTeam: 1, turnLimit: 48, initialUnits } : {}) });
+    const state = advanceAI(this.content, entryState);
+    const record = { id, entryState, state, mode, roomId, participants: actors.map(actor => actor.id),
       level: { sceneId: level.sceneId, nodeId: level.node.id, triggerId: level.trigger.id, elite },
       createdAt: now, settled: false, rewards: {}, dismissed: [] };
     world.battles[id] = record;
@@ -252,8 +256,9 @@ export class GameService {
         attack: numeric(raw, 'Attack'), monsterId: numeric(card.raw, 'MonsterID'), ai: true, deck: [card.id, card.id] });
     }
     let mapId = Number(setup.mapId); if (!this.content.data.maps[String(mapId)]?.layoutRows.length) mapId = 1;
-    const state = advanceAI(this.content, createBattle(this.content, { id, seed, mapId, players }));
-    const record = { id, state, mode: setup.mode, pve: setup.pve, participants: [actor.id], createdAt: now,
+    const entryState = createBattle(this.content, { id, seed, mapId, players });
+    const state = advanceAI(this.content, entryState);
+    const record = { id, entryState, state, mode: setup.mode, pve: setup.pve, participants: [actor.id], createdAt: now,
       settled: false, rewards: {}, dismissed: [] };
     world.battles[id] = record; this.settle(world, record, now); return record;
   }
@@ -421,10 +426,15 @@ export class GameService {
     let battle = null;
     if (record) {
       const state = publicBattle(record.state, actor.id);
-      battle = { id: record.id, mode: record.mode, state, settled: record.settled, rewards: record.rewards[actor.id],
+      const entryState = record.entryState ? publicBattle(record.entryState, actor.id) : undefined;
+      battle = { id: record.id, mode: record.mode, state, ...(entryState ? { entryState } : {}), settled: record.settled, rewards: record.rewards[actor.id],
         legalPlays: record.settled ? [] : legalPlays(this.content, record.state, actor.id) };
     }
     const growth = growthView(ctx); const pve = pveView(ctx); const competition = competitionView(ctx); const league = leagueView(ctx);
+    const actorLevel = this.content.actorStats(actor), shownBonus = combatBonuses(ctx);
+    growth.characterStats = { level: actor.level, xp: actor.xp, nextLevelXp: Number(actorLevel.NextLevlExp),
+      hp: Number(actorLevel.HP) + Number(world.guilds[actor.guildId]?.skills?.vitality ?? 0) + shownBonus.hp,
+      attack: 1 + shownBonus.attack, critical: null, soldierBlock: null, soldierAttack: null };
     growth.sections.push(...pve.sections, ...competition.sections, ...league.sections);
     for (const territory of league.clanWar.territories) if (actor.guildId && territory.registeredGuildIds.includes(actor.guildId)) {
       growth.sections.find(section => section.id === 'clan-war').items.push({ label: `出征：${territory.name}`,
@@ -433,10 +443,10 @@ export class GameService {
     growth.sections.find(section => section.id === 'tournament')?.items.push({ label: '创建竞技赛房间', action: 'room.create', payload: { mode: 'tournament' }, disabled: competition.tournament?.status !== 'active' });
     growth.sections = presentSections(this.content, growth.sections);
     const social = socialView(world, actor); const names = presentationNames(this.content);
-    const assets = new Set([...Object.keys(actor.inventory), ...Object.keys(actor.cards),
+    const assets = new Set([...Object.keys(actor.inventory), ...Object.keys(actor.cards), ...Object.keys(actor.warehouse ?? {}), ...Object.values(actor.equipment ?? {}),
       ...social.trades.map(row => row.goods?.id), ...social.auctions.map(row => row.goods?.id), ...social.mail.map(row => row.attachment?.id)].filter(Boolean));
     const assetNames = Object.fromEntries(Array.from(assets, id => [id, names[id] ?? (id.includes(':item:') ? `物品 #${id.split(':').at(-1)}` : `卡牌 #${id.split(':').at(-1)}`)]));
-    return { revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor, battle, league, assetNames,
+    return { revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor, battle, league, assetNames, ...playerUi(this.content, assets),
       story: String(this.content.table('stringres').find(row => row.ID === 10100)?.des ?? ''),
       scenes: this.content.sceneSummary(actor), tasks: this.tasks(actor), growth, pve, social,
       roomInvites: Object.values(world.roomInvites ?? {}).filter(invite => invite.to === actor.id && invite.expires > this.clock() && world.rooms[invite.roomId]?.status === 'waiting'),

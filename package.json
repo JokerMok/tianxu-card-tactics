@@ -9,7 +9,8 @@
     "verify:campaign": "node scripts/verify-campaign.mjs",
     "start": "node scripts/start-game.mjs",
     "build": "node scripts/build-game.mjs",
-    "test:game": "node --test --test-concurrency=1 backend/game/*.test.mjs cocos-client/assets/scripts/game/BattleKernel.test.mjs",
+    "test:game": "node --test --test-concurrency=1 backend/game/*.test.mjs cocos-client/assets/scripts/game/BattleKernel.test.mjs cocos-client/assets/scripts/game/BattlePresentation.test.mjs",
+    "test:presentation": "node --test cocos-client/assets/scripts/game/BattlePresentation.test.mjs && node cocos-client/tools/test-recovered-animation-timeline.mjs",
     "verify:visuals": "node scripts/verify-recovered-visuals.mjs",
     "verify:legacy": "node scripts/verify-all.mjs"
   },

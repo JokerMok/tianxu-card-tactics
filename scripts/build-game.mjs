@@ -1,8 +1,22 @@
+import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { mkdir, cp, rename, stat, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// Rebuild the source UI mapping with the code so newly used windows cannot
+// silently keep an older ignored catalog. Existing assets remain untouched.
+const originalSource = process.env.KINGS_CALL_SOURCE ?? path.resolve(root, '../KingsCall-原版客户端逆向研究');
+if (existsSync(path.join(originalSource, 'client-handoff/data/screens.json')) &&
+    existsSync(path.join(root, 'cocos-client/assets/resources/recovered/catalog.json'))) {
+  for (const script of ['scripts/import-original-ui.py', 'scripts/import-item-ui.py']) {
+    const result = await new Promise(resolve => {
+      const child = spawn('python3', [script], { cwd: root, env: { ...process.env, KINGS_CALL_SOURCE: originalSource }, stdio: 'inherit' });
+      child.once('exit', resolve); child.once('error', () => resolve(1));
+    });
+    if (result !== 0) process.exit(Number(result ?? 1));
+  }
+}
 const buildRoot = path.join(root, '.local/creator-build');
 await mkdir(buildRoot, { recursive: true });
 const code = await new Promise(resolve => {

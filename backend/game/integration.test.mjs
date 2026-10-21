@@ -76,7 +76,7 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
     return expectOk('/api/state', { token: player.token, characterId: player.characterId });
   }
 
-  async function register(username, name, profession) {
+  async function register(username, name, profession, gender) {
     const session = await expectOk('/api/register', {
       method: 'POST', json: { username, password: 'correct-horse' },
     });
@@ -85,7 +85,7 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
       json: {
         requestId: `create-${username}`,
         action: 'character.create',
-        payload: { name, profession },
+        payload: { name, profession, ...(gender === undefined ? {} : { gender }) },
       },
     });
     return { username, token: session.token, accountId: session.accountId, characterId: created.result.characterId };
@@ -119,6 +119,19 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
     const node = scene.nodes.find(candidate => candidate.originalId === String(originalNodeId));
     assert.equal(node.accessible, true);
     const started = await act(player, 'pve.start', { nodeId: node.id });
+    const entered = await state(player);
+    assert.equal(entered.battle.id, started.result.battleId);
+    assert.equal(entered.battle.entryState.id, started.result.battleId);
+    assert.equal(entered.battle.entryState.revision, 0);
+    const stored = app.store.read().battles[started.result.battleId];
+    assert.ok(stored.entryState, 'PVE record preserves the createBattle entry snapshot');
+    const storedEnemy = stored.entryState.players.find(candidate => candidate.team === 1);
+    const projectedEnemy = entered.battle.entryState.players.find(candidate => candidate.team === 1);
+    assert.ok(storedEnemy.deck.length > 0);
+    assert.deepEqual(projectedEnemy.deck, []);
+    assert.deepEqual(projectedEnemy.hand, []);
+    assert.equal(projectedEnemy.deckCount, storedEnemy.deck.length);
+    assert.equal(projectedEnemy.handCount, storedEnemy.hand.length);
     const finished = await finishBattle(new Map([[player.characterId, player]]), started.result.battleId, [player]);
     assert.equal(finished.state.battle.state.winner, 0);
     assert.equal(finished.state.battle.rewards.won, true);
@@ -131,7 +144,15 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
   assert.equal(health.ready, true);
 
   const alpha = await register('integration_alpha', 'AlphaTester', 1);
-  const beta = await register('integration_beta', 'BetaTester', 2);
+  const beta = await register('integration_beta', 'BetaTester', 2, 2);
+  assert.equal((await state(alpha)).actor.gender, 1);
+  assert.equal((await state(beta)).actor.gender, 2);
+  const alphaPresentation = await state(alpha);
+  assert.equal(alphaPresentation.growth.characterStats.level, alphaPresentation.actor.level);
+  assert.ok(alphaPresentation.growth.characterStats.hp > 0);
+  assert.equal(alphaPresentation.social.people.find(person => person.id === beta.characterId).profession, 2);
+  assert.equal(alphaPresentation.social.people.find(person => person.id === beta.characterId).gender, 2);
+  await failedAct(alpha, 'character.create', { name: 'InvalidGender', profession: 1, gender: 3 });
   assert.notEqual(alpha.accountId, beta.accountId);
   assert.notEqual(alpha.characterId, beta.characterId);
 
@@ -268,6 +289,12 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
   assert.deepEqual([alphaState.actor.wins + betaState.actor.wins, alphaState.actor.losses + betaState.actor.losses], [1, 1]);
   assert.deepEqual(alphaState.rankings.map(entry => entry.rating), [1016, 984]);
 
+  const towerStarted = await act(alpha, 'tower.challenge', { mode: 'normal' });
+  alphaState = await state(alpha);
+  assert.equal(alphaState.battle.id, towerStarted.result.battleId);
+  assert.equal(alphaState.battle.entryState.id, towerStarted.result.battleId);
+  assert.equal(alphaState.battle.entryState.revision, 0, 'special PVE also exposes its projected entry baseline');
+
   const persisted = {
     alphaRating: alphaState.actor.rating,
     betaRating: betaState.actor.rating,
@@ -289,6 +316,8 @@ test('real HTTP integration covers isolated accounts, progression, economy, mult
   beta.token = betaLogin.token;
   alphaState = await state(alpha);
   betaState = await state(beta);
+  assert.equal(alphaState.actor.gender, 1);
+  assert.equal(betaState.actor.gender, 2);
   assert.equal(alphaState.actor.rating, persisted.alphaRating);
   assert.equal(betaState.actor.rating, persisted.betaRating);
   assert.equal(alphaState.actor.currencies.silver, persisted.alphaSilver);

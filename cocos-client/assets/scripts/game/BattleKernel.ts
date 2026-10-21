@@ -1,5 +1,5 @@
 import type {
-  BattleAction, BattleEvent, BattlePlayer, BattleSpec, BattleState, BattleUnit,
+  BattleAction, BattleEvent, BattleEventUnitView, BattlePlayer, BattleSpec, BattleState, BattleUnit,
   HandCard, LegalPlay, Team, UnitStatus,
 } from './GameContracts.ts';
 import { numeric, type RawRow, type RecoveredSkill, RecoveredContent } from './RecoveredContent.ts';
@@ -168,8 +168,25 @@ function shuffle(state: MutableState, values: string[]): void {
   }
 }
 
+function eventUnitView(unit: BattleUnit | undefined): BattleEventUnitView | undefined {
+  if (!unit) return undefined;
+  return {
+    ...unit,
+    statuses: unit.statuses.map(status => ({ ...status })),
+    effects: [...unit.effects],
+    flags: { ...unit.flags },
+  };
+}
+
 function emit(state: MutableState, event: Omit<BattleEvent, 'seq'>): void {
-  state.events.push({ seq: state.events.length ? state.events[state.events.length - 1]!.seq + 1 : 1, ...event });
+  const actorView = event.actorView ?? eventUnitView(event.actor ? state.units.find(unit => unit.id === event.actor) : undefined);
+  const targetView = event.targetView ?? eventUnitView(event.target ? state.units.find(unit => unit.id === event.target) : undefined);
+  state.events.push({
+    seq: state.events.length ? state.events[state.events.length - 1]!.seq + 1 : 1,
+    ...event,
+    ...(actorView ? { actorView } : {}),
+    ...(targetView ? { targetView } : {}),
+  });
 }
 
 function player(state: BattleState, id: string): BattlePlayer {
@@ -664,9 +681,10 @@ function heal(state: MutableState, source: BattleUnit | undefined, target: Battl
   if (amount <= 0 || target.hp <= 0 || target.flags.noHeal === 1 || (target.flags.statusNoHeal ?? 0) > 0) return 0;
   const restored = Math.min(amount, target.maxHp - target.hp);
   if (restored <= 0) return 0;
+  const hpBefore = target.hp;
   target.hp += restored;
   syncHero(state, target);
-  emit(state, { type: 'heal', actor: source?.id, target: target.id, amount: restored, skillId });
+  emit(state, { type: 'heal', actor: source?.id, target: target.id, amount: restored, skillId, hpBefore, hpAfter: target.hp });
   if (source && source.hp > 0) {
     if ((source.flags.healHpGrowth ?? 0) > 0) growHp(source, source.flags.healHpGrowth!);
     if ((source.flags.healAttackGrowth ?? 0) > 0) source.attack += source.flags.healAttackGrowth!;
@@ -1102,20 +1120,22 @@ function damage(
     if (source.hp <= 0 || (target.flags.firstStrike === 1 && counter > 0)) return 0;
   }
   if (source && message === undefined && target.flags.burrow === 1) {
+    const moveFrom = { row: target.row, col: target.col };
     const col = source.col + (source.team === 0 ? -1 : 1);
     if (col > 0 && col < state.columns - 1 && !occupied(state, source.row, col, target.id)) {
       target.row = source.row; target.col = col;
-      emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, message: 'burrow' });
+      emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, moveFrom, moveTo: { row: target.row, col: target.col }, message: 'burrow' });
       if (distance(source, target) > effectiveRange(content, source)) return 0;
     }
   }
   if (source && message === undefined && target.flags.withdraw === 1) {
+    const moveFrom = { row: target.row, col: target.col };
     for (let step = 0; step < target.movement; step += 1) {
       const col = target.col + (target.col >= source.col ? 1 : -1);
       if (col <= 0 || col >= state.columns - 1 || occupied(state, target.row, col, target.id)) break;
       target.col = col;
     }
-    emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, message: 'withdraw' });
+    emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, moveFrom, moveTo: { row: target.row, col: target.col }, message: 'withdraw' });
     if (distance(source, target) > effectiveRange(content, source)) return 0;
   }
   if ((target.flags.damageImmuneTurns ?? 0) > 0 || target.flags.invincible === 1 || hasEffectType(content, target, 111)) return 0;
@@ -1129,8 +1149,9 @@ function damage(
     return 0;
   }
   if ((target.flags.magicDamageToHp === 1 || hasEffectType(content, target, 248)) && damageType >= 2) {
+    const hpBefore = target.hp;
     growHp(target, amount);
-    emit(state, { type: 'heal', actor: target.id, target: target.id, amount, message: 'magic-conversion' });
+    emit(state, { type: 'heal', actor: target.id, target: target.id, amount, hpBefore, hpAfter: target.hp, message: 'magic-conversion' });
     return 0;
   }
   if ((target.flags.ignoreRepeatedHits === 1 || hasEffectType(content, target, 235)) && source
@@ -1207,7 +1228,7 @@ function damage(
     emitEffect(state, target, rewind, 'turn-back-time', target, target.hp);
   }
   syncHero(state, target);
-  emit(state, { type: 'damage', actor: source?.id, target: target.id, amount: dealt, effectiveAmount, skillId, message });
+  emit(state, { type: 'damage', actor: source?.id, target: target.id, amount: dealt, effectiveAmount, hpBefore, hpAfter: target.hp, skillId, message });
   if (halfReflect && source && source.hp > 0 && message !== 'half-reflection') {
     const reflected = Math.max(1, Math.floor(amount * optionalNumber(halfReflect.raw, 'param2', 100) / 200));
     damage(content, state, target, source, reflected, true, 'half-reflection', skillId, damageType);
@@ -1238,6 +1259,7 @@ function damage(
     if (!suppressed && !reflectionDisabled && target.flags.reflectDamage === 1 && activeEffectRows(content, target, 47).length > 0
         && target.hp > 0 && message !== 'reflection') damage(content, state, target, source, dealt, true, 'reflection', skillId, damageType);
     if (!suppressed && target.flags.counterattack === 1 && target.hp > 0 && message !== 'counter' && distance(target, source) <= effectiveRange(content, target)) {
+      emit(state, { type: 'attack', actor: target.id, target: source.id, amount: target.attack, skillId: target.flags.normalSkillId || undefined, message: 'counter' });
       damage(content, state, target, source, target.attack, false, 'counter', target.flags.normalSkillId || undefined, target.flags.attackType ?? 0);
     }
     if ((target.flags.retaliateStatus ?? 0) > 0 && chance(state, target.flags.retaliateStatusChance ?? 100)) applyStatus(content, state, target, source, target.flags.retaliateStatus!);
@@ -2187,7 +2209,10 @@ function moveUnit(content: RecoveredContent, state: MutableState, unit: BattleUn
   [unit.row, unit.col] = [landedRow, landedCol];
   unit.flags.movedThisTurn = Math.abs(fromRow - unit.row) + Math.abs(fromCol - unit.col);
   if (unit.row !== fromRow || unit.col !== fromCol) {
-    emit(state, { type: 'move', actor: unit.id, row: unit.row, col: unit.col });
+    emit(state, {
+      type: 'move', actor: unit.id, row: unit.row, col: unit.col,
+      moveFrom: { row: fromRow, col: fromCol }, moveTo: { row: unit.row, col: unit.col },
+    });
     for (const effect of activeEffectRows(content, unit)) {
       if (effect.type === 230) {
         const statusId = optionalNumber(effect.raw, 'param1', 0);
@@ -2361,7 +2386,11 @@ function attack(content: RecoveredContent, state: MutableState, attacker: Battle
   }
   if (attacker.flags.hitAndRun === 1 && attacker.hp > 0) {
     const col = attacker.col + (attacker.team === 0 ? -1 : 1);
-    if (col > 0 && col < state.columns - 1 && !occupied(state, attacker.row, col, attacker.id)) { attacker.col = col; emit(state, { type: 'move', actor: attacker.id, row: attacker.row, col }); }
+    if (col > 0 && col < state.columns - 1 && !occupied(state, attacker.row, col, attacker.id)) {
+      const moveFrom = { row: attacker.row, col: attacker.col };
+      attacker.col = col;
+      emit(state, { type: 'move', actor: attacker.id, row: attacker.row, col, moveFrom, moveTo: { row: attacker.row, col } });
+    }
   }
   removeDead(content, state);
 }

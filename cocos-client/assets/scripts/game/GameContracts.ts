@@ -59,6 +59,13 @@ export interface BattleUnit {
   summonedTurn: number;
   flags: Record<string, number>;
 }
+/**
+ * Public combat data captured when an event is emitted. It deliberately contains
+ * no deck or hand data, so presentation events can be shared with every battle
+ * participant without exposing another player's private cards.
+ */
+export type BattleEventUnitView = BattleUnit;
+export interface BattleEventPoint { row: number; col: number }
 export interface BattleEvent {
   seq: number;
   type: string;
@@ -72,6 +79,12 @@ export interface BattleEvent {
   skillId?: number;
   effectId?: number;
   message?: string;
+  actorView?: BattleEventUnitView;
+  targetView?: BattleEventUnitView;
+  moveFrom?: BattleEventPoint;
+  moveTo?: BattleEventPoint;
+  hpBefore?: number;
+  hpAfter?: number;
 }
 export interface BattleState {
   version: 1;

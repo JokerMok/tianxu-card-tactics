@@ -70,7 +70,7 @@ export async function createGameServer(options = {}) {
       if (!filename.startsWith(path.resolve(base) + path.sep) || !existsSync(filename) || !statSync(filename).isFile()) return json(404, { error: '资源不存在' });
       const stat = statSync(filename);
       response.writeHead(200, { 'Content-Type': MIME[path.extname(filename).toLowerCase()] ?? 'application/octet-stream',
-        'Content-Length': stat.size, 'Cache-Control': isResource ? 'private, max-age=3600' : 'no-cache' });
+        'Content-Length': stat.size, 'Cache-Control': isResource && path.extname(filename) !== '.json' ? 'private, max-age=3600' : 'no-cache' });
       if (request.method === 'HEAD') return response.end();
       createReadStream(filename).pipe(response);
     } catch (error) {

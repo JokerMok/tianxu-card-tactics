@@ -208,7 +208,7 @@ export function tickSocial(world, now) {
   return changed;
 }
 export function socialView(world, actor) {
-  const people = Object.values(world.characters).map(char => ({ id: char.id, name: char.name, level: char.level,
+  const people = Object.values(world.characters).map(char => ({ id: char.id, name: char.name, level: char.level, profession: char.profession, gender: char.gender ?? 1,
     rating: char.rating, guildId: char.guildId ?? null, wins: char.wins, losses: char.losses }));
   const friends = people.filter(char => world.friendships.includes(pairKey(actor.id, char.id)));
   return { people, friends,

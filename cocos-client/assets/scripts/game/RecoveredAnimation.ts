@@ -9,8 +9,16 @@ import {
   SpriteFrame,
   Texture2D,
   UITransform,
+  Vec3,
 } from 'cc';
 import type { DataScope, RecoveredCatalog } from './RecoveredContent.ts';
+import {
+  evaluateRecoveredTimeline,
+  recoveredChildFrame,
+  type RecoveredDisplayState,
+  type RecoveredMatrix2D,
+  type RecoveredTimelineControl,
+} from './RecoveredTimeline.ts';
 
 export type RecoveredAnimationStatus = 'stand' | 'walk' | 'atk' | 'hit' | 'die';
 export type RecoveredAnimationDirection = 'east' | 'west';
@@ -22,20 +30,19 @@ export interface RecoveredOneShot {
   statusName: string;
 }
 
-interface Matrix2D {
-  a: number; b: number; c: number; d: number;
-  tx_px?: number; ty_px?: number;
+export interface RecoveredPlaybackHandle {
+  generation: number;
+  status: RecoveredAnimationStatus;
+  statusName: string | null;
+  durationSeconds: number;
+  cueSeconds: number | null;
+  hasNativeState: boolean;
+  completion: Promise<void>;
+  cancel(): void;
 }
-interface TimelineControl {
-  op: 'place' | 'remove';
-  depth: number;
-  frame: number;
-  move?: boolean;
-  inherit_missing_fields?: boolean;
-  character_id?: number;
-  asset_id?: string;
-  matrix?: Matrix2D;
-}
+
+type Matrix2D = RecoveredMatrix2D;
+type TimelineControl = RecoveredTimelineControl;
 interface Timeline {
   id: string;
   container_path: string;
@@ -77,13 +84,7 @@ interface RuntimeCatalog {
   models: Record<string, Model>;
   timelines: Record<string, Timeline>;
 }
-interface DisplayState {
-  characterId?: number;
-  assetId?: string;
-  matrix: Matrix2D;
-  placedFrame: number;
-}
-
+type DisplayState = RecoveredDisplayState;
 const IDENTITY: Matrix2D = { a: 1, b: 0, c: 0, d: 1, tx_px: 0, ty_px: 0 };
 const STATUS_ALIASES: Record<RecoveredAnimationStatus, string[]> = {
   stand: ['stand', 'std', 'idle'], walk: ['walk', 'move'], atk: ['atk', 'attack'],
@@ -124,7 +125,7 @@ export class RecoveredAnimation {
   private models: Model[] = [];
   private current: ModelStatus | null = null;
   private currentLayers: Array<{ model: Model; status: ModelStatus }> = [];
-  private elapsed = 0;
+  private currentDirection: RecoveredAnimationDirection = 'east';
   private frameAccumulator = 0;
   private absoluteFrame = 0;
   private frame = -1;
@@ -134,6 +135,8 @@ export class RecoveredAnimation {
   private attackCallback?: () => void;
   private completionFired = false;
   private completionCallback?: () => void;
+  private completionResolve?: () => void;
+  private playbackGeneration = 0;
   private generation = 0;
   private disposed = false;
 
@@ -161,18 +164,18 @@ export class RecoveredAnimation {
   }
 
   /** Load the source client's default body + weapon actor for a profession. */
-  async setActor(profession: number, sex: 0 | 1 = 0): Promise<void> {
+  async setActor(profession: number, sex: 0 | 1 = 0, previewOnly = false): Promise<void> {
     if (this.disposed) throw new Error('RecoveredAnimation has been destroyed');
     const link = this.catalog.scopes.main.actorModels?.[`${profession}:${sex}`];
     if (!link || link.resolution !== 'actor_xml_exact' || link.modelIds.length < 2) {
       throw new Error(`No complete recovered actor.xml model for profession ${profession}, sex ${sex}`);
     }
-    await this.setModels(link.modelIds);
+    await this.setModels(link.modelIds, previewOnly);
     this.play('stand', 'east');
   }
 
   /** Load exact recovered model layers without replacing them with fallback art. */
-  async setModels(modelIds: string[]): Promise<void> {
+  async setModels(modelIds: string[], standOnly = false): Promise<void> {
     if (this.disposed) throw new Error('RecoveredAnimation has been destroyed');
     if (modelIds.length === 0) throw new Error('Recovered model list is empty');
     const models = modelIds.map(id => {
@@ -183,31 +186,60 @@ export class RecoveredAnimation {
     this.models = models;
     this.model = models[0];
     this.applyModelOrigin(this.model);
-    await Promise.all(models.map(model => this.preloadModel(model)));
+    await Promise.all(models.map(model => this.preloadModel(model, standOnly)));
   }
 
   play(status: RecoveredAnimationStatus, direction: RecoveredAnimationDirection,
-       onAttack?: () => void): void {
-    if (!this.model || this.disposed) return;
-    this.currentLayers = this.models.map(model => ({ model, status: this.selectStatus(model, status, direction) }))
+       onAttack?: () => void, onComplete?: () => void): RecoveredPlaybackHandle {
+    const playbackGeneration = this.beginPlayback();
+    if (!this.model || this.disposed) return this.unavailablePlayback(status, playbackGeneration);
+    const selected = this.selectStatus(this.model, status, direction);
+    if (!selected) {
+      // Missing hit/death timelines are source gaps. In particular, do not
+      // present stand as a native death animation; a missing death hides the
+      // recovered display so the owner can apply its source-backed removal.
+      if (status === 'die') {
+        this.current = null;
+        this.currentLayers = [];
+        this.clearDisplay();
+      }
+      return this.unavailablePlayback(status, playbackGeneration);
+    }
+    const actualDirection = String(selected.raw.dir ?? 'east') as RecoveredAnimationDirection;
+    this.currentLayers = this.models.map(model => ({ model, status: this.selectStatus(model, status, actualDirection) }))
       .filter((layer): layer is { model: Model; status: ModelStatus } => Boolean(layer.status));
-    const selected = this.currentLayers[0]?.status;
-    this.current = selected ?? null;
-    this.elapsed = 0;
+    this.current = selected;
+    this.currentDirection = direction;
+    this.applyModelOrigin(this.model, direction);
     this.frameAccumulator = 0;
     this.absoluteFrame = 0;
     this.frame = -1;
     this.loop = String(selected?.raw.loop ?? '0') === '1';
-    const configuredCue = finite(String(selected?.raw.attack ?? '0').split(',')[0]);
-    this.attackFrame = status === 'atk' ? Math.max(0, (configuredCue || 3) - 1) : -1;
+    const timeline = selected.timeline_id ? this.catalog.timelines[selected.timeline_id] : undefined;
+    const fps = Math.max(1, finite(selected.particle_framerate,
+      finite(selected.raw.framerate, timeline?.fps || 24)));
+    const frames = Math.max(1, timeline?.show_frame_count || timeline?.declared_frames || 1);
+    const configuredCue = finite(String(selected.raw.attack ?? '0').split(',')[0]);
+    const cueFrame = status === 'atk' ? Math.max(1, configuredCue || 3) : 0;
+    this.attackFrame = cueFrame ? cueFrame - 1 : -1;
     this.attackFired = false;
     this.attackCallback = onAttack;
     this.completionFired = false;
-    this.completionCallback = undefined;
-    const actualDirection = String(selected?.raw.dir ?? 'east');
-    const mirror = actualDirection === direction ? 1 : -1;
-    this.node.setScale(mirror, 1, 1);
+    this.completionCallback = onComplete;
+    const completion = new Promise<void>(resolve => { this.completionResolve = resolve; });
+    this.node.setScale(1, 1, 1);
     this.renderCurrentFrame(true);
+    if (this.attackFrame === 0) this.fireAttack(playbackGeneration);
+    return {
+      generation: playbackGeneration,
+      status,
+      statusName: String(selected.raw.name ?? status),
+      durationSeconds: frames / fps,
+      cueSeconds: cueFrame ? (Math.min(frames, cueFrame) - 1) / fps : null,
+      hasNativeState: true,
+      completion,
+      cancel: () => this.cancelPlayback(playbackGeneration),
+    };
   }
 
   /**
@@ -217,16 +249,19 @@ export class RecoveredAnimation {
    */
   playOneShot(direction: RecoveredAnimationDirection, onComplete?: () => void): RecoveredOneShot | null {
     if (!this.model || this.disposed) return null;
+    this.beginPlayback();
     const chosen = this.selectOneShotStatus(this.model, direction);
     if (!chosen?.timeline_id) return null;
     const statusName = String(chosen.raw.name ?? '');
+    const actualDirection = String(chosen.raw.dir ?? 'east') as RecoveredAnimationDirection;
     this.currentLayers = this.models.map(model => {
-      const status = this.selectNamedStatus(model, statusName, direction)
-        ?? this.selectOneShotStatus(model, direction);
+      const status = this.selectNamedStatus(model, statusName, actualDirection)
+        ?? this.selectOneShotStatus(model, actualDirection);
       return status ? { model, status } : null;
     }).filter((layer): layer is { model: Model; status: ModelStatus } => Boolean(layer));
     this.current = chosen;
-    this.elapsed = 0;
+    this.currentDirection = direction;
+    this.applyModelOrigin(this.model, direction);
     this.frameAccumulator = 0;
     this.absoluteFrame = 0;
     this.frame = -1;
@@ -236,8 +271,7 @@ export class RecoveredAnimation {
     this.attackCallback = undefined;
     this.completionFired = false;
     this.completionCallback = onComplete;
-    const actualDirection = String(chosen.raw.dir ?? 'east');
-    this.node.setScale(actualDirection === direction ? 1 : -1, 1, 1);
+    this.node.setScale(1, 1, 1);
     this.renderCurrentFrame(true);
     const timeline = this.catalog.timelines[chosen.timeline_id];
     const fps = Math.max(1, finite(chosen.particle_framerate,
@@ -250,6 +284,7 @@ export class RecoveredAnimation {
 
   update(dt: number): void {
     if (!this.current?.timeline_id || this.disposed || dt <= 0) return;
+    const playbackGeneration = this.playbackGeneration;
     const timeline = this.catalog.timelines[this.current.timeline_id];
     if (!timeline) return;
     const fps = Math.max(1, finite(this.current.particle_framerate,
@@ -261,17 +296,27 @@ export class RecoveredAnimation {
     // The recovered client advances at most one frame per render update and
     // resets its clock; a long stall must not burst through several poses.
     this.frameAccumulator = 0;
-    this.elapsed += interval;
     this.absoluteFrame++;
     const nextFrame = this.loop ? this.absoluteFrame % count : Math.min(count - 1, this.absoluteFrame);
     if (this.attackFrame >= 0 && !this.attackFired && this.absoluteFrame >= this.attackFrame) {
-      this.attackFired = true;
-      this.attackCallback?.();
+      this.fireAttack(playbackGeneration);
+      if (playbackGeneration !== this.playbackGeneration) return;
     }
     if (nextFrame !== this.frame) this.renderCurrentFrame(false);
     if (!this.loop && this.absoluteFrame >= count && !this.completionFired) {
+      // CreatureAttackState calls the attack on exit when the configured cue
+      // was never reached (for example, a malformed cue beyond the clip).
+      if (this.attackFrame >= 0 && !this.attackFired) {
+        this.fireAttack(playbackGeneration);
+        if (playbackGeneration !== this.playbackGeneration) return;
+      }
       this.completionFired = true;
-      this.completionCallback?.();
+      const callback = this.completionCallback;
+      const resolve = this.completionResolve;
+      this.completionCallback = undefined;
+      this.completionResolve = undefined;
+      callback?.();
+      resolve?.();
     }
   }
 
@@ -287,13 +332,64 @@ export class RecoveredAnimation {
     this.current = null;
     this.currentLayers = [];
     this.completionCallback = undefined;
+    this.completionResolve?.();
+    this.completionResolve = undefined;
   }
 
-  private applyModelOrigin(model: Model): void {
-    const scale = finite(model.raw.scale, 1) || 1;
-    const [anchorX, anchorY] = pair(model.raw.anchor);
+  /** AutoupdateAssertBackground sizes the actual displayed clip to its UI box.
+   * This is only for window previews; board entities retain source anchors. */
+  fitPreviewBox(width: number, height: number): boolean {
+    const parent = this.node.parent?.getComponent(UITransform);
+    if (!parent || this.disposed) return false;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const visit = (node: Node) => {
+      if (node.getComponent(Sprite)) {
+        const box = node.getComponent(UITransform)?.getBoundingBoxToWorld();
+        if (box) for (const [x, y] of [[box.xMin, box.yMin], [box.xMax, box.yMax]]) {
+          const point = parent.convertToNodeSpaceAR(new Vec3(x, y, 0));
+          minX = Math.min(minX, point.x); minY = Math.min(minY, point.y);
+          maxX = Math.max(maxX, point.x); maxY = Math.max(maxY, point.y);
+        }
+      }
+      for (const child of node.children) visit(child);
+    };
+    visit(this.node);
+    if (!Number.isFinite(minX) || maxX <= minX || maxY <= minY) return false;
+    const sx = width / (maxX - minX), sy = height / (maxY - minY);
+    this.node.setScale(this.node.scale.x * sx, this.node.scale.y * sy, 1);
+    this.node.setPosition(-(minX + maxX) / 2 * sx, -(minY + maxY) / 2 * sy);
+    return true;
+  }
+
+  /** Nominal source envelope, not measured opaque pixels or a foot marker. */
+  getSourceLayoutMetrics(direction: RecoveredAnimationDirection = this.currentDirection) {
+    if (!this.model) return undefined;
+    const raw = this.model.raw, scale = finite(raw.scale, 1) || 1;
+    const [anchorX, anchorY] = pair(raw.anchor);
+    return { nominalWidth: finite(raw.width) * scale, nominalHeight: finite(raw.height) * scale,
+      anchorX: direction === 'west' ? finite(raw.width) * scale - anchorX : anchorX, anchorY };
+  }
+
+  private applyModelOrigin(model: Model,
+                           direction: RecoveredAnimationDirection = 'east'): void {
     const [mountX, mountY] = pair(model.raw.mount);
-    this.mountNode.setPosition((mountX - anchorX) * scale, (anchorY - mountY) * scale);
+    // AnimateSceneObject.statusPoint is relative to the logical position, not
+    // the renderer's anchor-adjusted top-left position.
+    this.mountNode.setPosition(direction === 'west' ? -mountX : mountX, -mountY);
+  }
+
+  private applyRendererGeometry(host: Node, model: Model, status: ModelStatus,
+                                direction: RecoveredAnimationDirection): void {
+    const scale = finite(model.raw.scale, 1) || 1;
+    const width = finite(model.raw.width);
+    const [anchorX, anchorY] = pair(model.raw.anchor);
+    // AnimateSceneObject subtracts the raw anchor before DisplayObjectRenderer
+    // applies scale. West uses wanchor.x = width * scale - anchor.x.
+    const sourceAnchorX = direction === 'west' ? width * scale - anchorX : anchorX;
+    const actualDirection = String(status.raw.dir ?? 'east');
+    const mirrored = actualDirection !== direction;
+    host.setPosition(-sourceAnchorX + (mirrored ? width * scale : 0), anchorY);
+    host.setScale(mirrored ? -scale : scale, scale, 1);
   }
 
   private selectNamedStatus(model: Model, name: string,
@@ -323,16 +419,10 @@ export class RecoveredAnimation {
       aliases.includes(String(candidate.raw.name ?? '').toLowerCase()) && Boolean(candidate.timeline_id));
     return statuses.find(candidate => String(candidate.raw.dir ?? 'east') === direction)
       ?? statuses.find(candidate => String(candidate.raw.dir ?? 'east') === 'east')
-      ?? statuses[0]
-      ?? model.statuses.find(candidate =>
-        STATUS_ALIASES.stand.includes(String(candidate.raw.name ?? '').toLowerCase())
-        && String(candidate.raw.dir ?? 'east') === direction && Boolean(candidate.timeline_id))
-      ?? model.statuses.find(candidate =>
-        STATUS_ALIASES.stand.includes(String(candidate.raw.name ?? '').toLowerCase())
-        && Boolean(candidate.timeline_id));
+      ?? statuses[0];
   }
 
-  private async preloadModel(model: Model): Promise<void> {
+  private async preloadModel(model: Model, standOnly = false): Promise<void> {
     const bitmapIds = new Set<string>();
     const timelines = new Set<string>();
     const visit = (timelineId?: string): void => {
@@ -348,7 +438,7 @@ export class RecoveredAnimation {
         if (child) visit(child.id);
       }
     };
-    for (const status of model.statuses) visit(status.timeline_id);
+    for (const status of model.statuses) if (!standOnly || STATUS_ALIASES.stand.includes(String(status.raw.name ?? '').toLowerCase())) visit(status.timeline_id);
     await Promise.all(Array.from(bitmapIds).map(id => this.loadTexture(id).catch(() => undefined)));
   }
 
@@ -364,18 +454,25 @@ export class RecoveredAnimation {
     this.frame = nextFrame;
     const generation = ++this.generation;
     this.clearDisplay();
+    const rendererNode = new Node('RecoveredRenderer');
+    rendererNode.layer = Layers.Enum.UI_2D;
+    rendererNode.setParent(this.node);
+    this.applyRendererGeometry(rendererNode, this.model!, this.current!, this.currentDirection);
     for (const [index, layer] of this.currentLayers.entries()) {
       const layerTimeline = layer.status.timeline_id ? this.catalog.timelines[layer.status.timeline_id] : undefined;
       if (!layerTimeline) continue;
       const layerNode = new Node(`RecoveredLayer-${index}-${layer.model.name}`);
       layerNode.layer = Layers.Enum.UI_2D;
-      layerNode.setParent(this.node);
-      const scale = finite(layer.model.raw.scale, 1) || 1;
-      layerNode.setScale(scale, scale, 1);
-      const [anchorX, anchorY] = pair(layer.model.raw.anchor);
+      layerNode.setParent(rendererNode);
       const layerCount = Math.max(1, layerTimeline.show_frame_count || layerTimeline.declared_frames);
-      const layerFrame = this.loop ? this.absoluteFrame % layerCount : Math.min(layerCount - 1, this.absoluteFrame);
-      this.renderTimeline(layerTimeline, layerFrame + 1, layerNode, generation, new Set(), -anchorX, anchorY);
+      const currentTimeline = this.current?.timeline_id ? this.catalog.timelines[this.current.timeline_id] : undefined;
+      const currentFps = Math.max(1, finite(this.current?.particle_framerate,
+        finite(this.current?.raw.framerate, currentTimeline?.fps || 24)));
+      const layerFps = Math.max(1, finite(layer.status.particle_framerate,
+        finite(layer.status.raw.framerate, layerTimeline.fps || currentFps)));
+      const layerAbsoluteFrame = Math.floor(this.absoluteFrame / currentFps * layerFps + 1e-9);
+      const layerFrame = this.loop ? layerAbsoluteFrame % layerCount : Math.min(layerCount - 1, layerAbsoluteFrame);
+      this.renderTimeline(layerTimeline, layerFrame + 1, layerNode, generation, new Set());
     }
   }
 
@@ -385,26 +482,7 @@ export class RecoveredAnimation {
   }
 
   private evaluate(timeline: Timeline, frame: number): Map<number, DisplayState> {
-    const display = new Map<number, DisplayState>();
-    for (const control of timeline.controls) {
-      if (control.frame > frame) break;
-      if (control.op === 'remove') {
-        display.delete(control.depth);
-        continue;
-      }
-      const previous = display.get(control.depth);
-      const inherited = Boolean(control.move && control.inherit_missing_fields);
-      if (inherited && !previous && control.character_id === undefined && control.asset_id === undefined) {
-        continue;
-      }
-      display.set(control.depth, {
-        characterId: control.character_id ?? (inherited ? previous?.characterId : undefined),
-        assetId: control.asset_id ?? (inherited ? previous?.assetId : undefined),
-        matrix: control.matrix ?? (inherited ? previous?.matrix : undefined) ?? IDENTITY,
-        placedFrame: inherited && previous ? previous.placedFrame : control.frame,
-      });
-    }
-    return display;
+    return evaluateRecoveredTimeline(timeline.controls, frame);
   }
 
   private renderTimeline(timeline: Timeline, frame: number, parent: Node, generation: number,
@@ -416,8 +494,7 @@ export class RecoveredAnimation {
       const child = state.characterId === undefined ? undefined
         : this.timelineByCharacter.get(`${timeline.container_path}:${state.characterId}`);
       if (child) {
-        const count = Math.max(1, child.show_frame_count || child.declared_frames);
-        const childFrame = Math.floor(this.elapsed * Math.max(1, child.fps || timeline.fps || 24)) % count + 1;
+        const childFrame = recoveredChildFrame(frame, timeline.fps, state, child);
         this.renderTimeline(child, childFrame, transformed, generation, branch);
       } else if (state.assetId) {
         this.renderAsset(state.assetId, transformed, generation);
@@ -511,5 +588,38 @@ export class RecoveredAnimation {
     });
     this.textures.set(assetId, promise);
     return promise;
+  }
+
+  private beginPlayback(): number {
+    this.cancelPlayback(this.playbackGeneration);
+    this.playbackGeneration++;
+    this.attackCallback = undefined;
+    this.completionCallback = undefined;
+    this.attackFired = false;
+    this.completionFired = false;
+    return this.playbackGeneration;
+  }
+
+  private cancelPlayback(generation: number): void {
+    if (generation !== this.playbackGeneration || this.completionFired) return;
+    this.completionFired = true;
+    this.attackCallback = undefined;
+    this.completionCallback = undefined;
+    this.completionResolve?.();
+    this.completionResolve = undefined;
+  }
+
+  private unavailablePlayback(status: RecoveredAnimationStatus, generation: number): RecoveredPlaybackHandle {
+    this.completionFired = true;
+    return { generation, status, statusName: null, durationSeconds: 0, cueSeconds: null,
+      hasNativeState: false, completion: Promise.resolve(), cancel: () => undefined };
+  }
+
+  private fireAttack(generation: number): void {
+    if (generation !== this.playbackGeneration || this.attackFired) return;
+    this.attackFired = true;
+    const callback = this.attackCallback;
+    this.attackCallback = undefined;
+    callback?.();
   }
 }

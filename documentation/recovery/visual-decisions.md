@@ -10,9 +10,9 @@
 
 导入器不会重新提取已经成功转换的位图，也不会把所有 SWF 烘焙为逐帧大图。它保留 shape 的 bounds、bitmap fill matrix 和 bitmap 依赖；本次复用 26,804 个现成位图，保留 29,308 个 shape/sprite 描述符。56,128 个被引用资源均来自固定 source manifest `5254333315581813739`，导入报告为 0 个导入错误。
 
-玩家英雄走独立的原版 actor 链路。`ActorViewHelper.createDefaultAnimateObject` 证明 sex 0 为 female、1 为 male，职业 1—4 的默认 body id 分别为 100/200/300/400，weapon id 分别为 101/201/301/401。导入器再用 main actor.xml 把这些 component id 映射到 actorItems 模型，生成 `catalog.scopes.main.actorModels["profession:sex"]`。8 个职业/性别组合都得到精确的 body + weapon 双层模型。`setActor()` 同步播放两层各自的 stand/walk/atk timeline，并分别应用源 anchor 与 scale；没有把玩家英雄回退成通用怪物或卡面。
+玩家英雄走独立的原版 actor 链路。`ActorViewHelper.createDefaultAnimateObject` 证明 sex 0 为 female、1 为 male，职业 1—4 的默认 body id 分别为 100/200/300/400，weapon id 分别为 101/201/301/401。导入器再用 main actor.xml 把这些 component id 映射到 actorItems 模型，生成 `catalog.scopes.main.actorModels["profession:sex"]`。8 个职业/性别组合都得到精确的 body + weapon 双层模型。`setActor()` 同步播放两层各自的 stand/walk/atk timeline；与原版 `ActorAnimateSceneObject` 一致，两层作为同一 renderer 的子级，共用 body 模型的 anchor、scale 和方向镜像，而不是分别建立渲染原点。没有把玩家英雄回退成通用怪物或卡面。
 
-`RecoveredAnimation` 执行原时间线的 depth display list：支持 place/remove、Move 缺字段继承、子 timeline、父子矩阵组合、y 轴方向转换，以及用双旋转加缩放分解一般二维仿射矩阵。播放使用 status 的 `framerate` 和 `loop`，长帧停顿时每次 update 最多推进一帧。方向缺失时使用对向动画镜像。anchor 对齐到渲染原点，mount 暴露为 `mountNode`。`attack[0]` 作为攻击回调帧，0 按原逻辑回退第 3 帧。
+`RecoveredAnimation` 执行原时间线的 depth display list：支持 place/remove、Move 缺字段继承、子 timeline、父子矩阵组合、y 轴方向转换，以及用双旋转加缩放分解一般二维仿射矩阵。播放使用 status 的 `framerate` 和 `loop`，长帧停顿时每次 update 最多推进一帧。方向缺失时使用对向动画镜像。逻辑位置先减去未缩放的源 `anchor/wanchor`，renderer 随后应用模型 scale；镜像缺方向时追加原版 `width * scale` 横向偏移。`mountNode` 按逻辑位置的 `statusPoint` 暴露，不混入 anchor 或 scale。`attack[0]` 作为攻击回调帧，0 按原逻辑回退第 3 帧。
 
 技能特效的源链路不同于角色：`main Skill.xml` → effects 索引的 `visualModels` → `Resources_xml5.xml` 的 `magicitem/effect.animatename` → `Resources_xml13.xml` 的 emitter id → 精确 SWF 路径和导出 symbol → 已索引 timeline。导入器按数字 id、容器路径和 symbol 三项精确连接，不靠模型同名猜测，也不重新提取 SWF。粒子 emitter 的 `framerate` 覆盖 SWF 容器帧率；当前 730 个主库技能模型引用中，717 个已取得真实 timeline，覆盖 602 个技能。其余 13 个引用实际只涉及 `baofengxue_status`、`shihuashu_status` 两个没有 `animatename` 的状态模型，保持不可播放。
 

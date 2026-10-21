@@ -12,6 +12,8 @@ async function run(command, args) {
   if (code !== 0) process.exit(Number(code ?? 1));
 }
 if (!existsSync(path.join(root, 'cocos-client/assets/resources/recovered/catalog.json'))) await run('python3', ['scripts/import-kings-call.py']);
+if (!existsSync(path.join(root, 'cocos-client/assets/resources/recovered/original-ui.json'))) await run('python3', ['scripts/import-original-ui.py']);
+if (!existsSync(path.join(root, 'cocos-client/assets/resources/recovered/item-ui.json'))) await run('python3', ['scripts/import-item-ui.py']);
 if (!existsSync(path.join(root, '.local/web/index.html'))) await run(process.execPath, ['scripts/build-game.mjs']);
 const { createGameServer } = await import('../backend/game/server.mjs');
 const app = await createGameServer();

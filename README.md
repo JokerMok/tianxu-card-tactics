@@ -2,6 +2,12 @@
 
 Cocos Creator 3.8.8 横屏战术卡牌游戏。沿用现有工程、场景身份和仓库；本机 Node.js 权威服务负责账号、战斗、经济、社交与 SQLite 存档。客户端通过同一服务输入和显示，AI 与玩家使用同一个战斗核心。
 
+## 本轮修正状态（2026-10-21）
+
+用户已否定 5572fea 的复原效果，上一轮“整款完成”口径撤回。当前在 `codex/restore-original-ui-presentation` 修正原版主城、地图、卡组、成长窗口及战斗事件表现，保留既有服务与存档。原版来源、运行验证和剩余差异见 [修正映射](documentation/corrections/ui-source-map.md)；功能、流程、界面交互、战斗表现分开判定。此轮仅本地待体验，用户确认后再推送。
+
+当前本机对照与战斗录像入口：**http://127.0.0.1:7402/compare.html**（本地证据目录，需运行其 HTTP 服务）。具体实测范围及剩余差异见 [本轮验证](documentation/corrections/runtime-check.md)。
+
 ## 本机启动
 
 环境：Node.js **22.18 或更新**（当前实测 25.9.0）、Python 3、Cocos Creator **3.8.8**。构建脚本在 macOS 使用已安装的 Creator；其他安装位置可设置 `COCOS_CREATOR_BIN`。
@@ -55,7 +61,7 @@ npm run verify:visuals
 npm run verify
 ```
 
-`verify` 使用本轮完整游戏验证入口；`verify:legacy` 保留旧原型的历史检查，不代表本轮验收。严格 Cocos 类型检查使用构建生成的引擎声明及 `web-prototype` 的 TypeScript 工具；首次需要先在该目录执行 `npm ci` 并完成一次构建。
+`verify` 是现有规则和资源验证入口，不承担本轮视觉复原验收；`verify:legacy` 保留旧原型的历史检查，不代表本轮验收。严格 Cocos 类型检查使用构建生成的引擎声明及 `web-prototype` 的 TypeScript 工具；首次需要先在该目录执行 `npm ci` 并完成一次构建。
 
 报告在 `documentation/recovery/`。HTTP 回归使用临时 SQLite、真实本机连接和独立账号；不修改个人数据库。正常新账号的第一章至第二章验证只使用公开操作、合法战斗和真实升级。时间规则由实际调度执行，定向测试可以传入受控时钟。
 
@@ -65,4 +71,4 @@ npm run verify
 
 不接官方账号、Steam、真实支付或外部交易。本地补给和战令测试解锁在界面明确标注，均有发放上限与持久化回执。源码存在的缺失敌人、孤立路线、空摆怪配置及源等级 95 与任务 100 的不一致通过显式兼容层处理，原始数据不变。源文件中无后续节点的悬空边不虚构成未取得的章节。
 
-最终推送须在功能台账、构建与整体回归满足后执行；实际状态以 `.codex/PROJECT_STATE.md` 和最终回归报告为准。
+本轮不自动推送。完成定向验证后，须由用户实际游玩确认；旧最终回归报告只保留为历史证据，当前状态以 `.codex/PROJECT_STATE.md` 和本轮修正记录为准。

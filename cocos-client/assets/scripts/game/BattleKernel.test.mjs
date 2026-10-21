@@ -56,6 +56,9 @@ test('play/end uses one reducer for human and AI and never mutates input', () =>
   assert.deepEqual(initial, before);
   assert.equal(deployed.revision, 1);
   assert.ok(deployed.events.some(event => event.type === 'summon'));
+  const summonEvent = deployed.events.find(event => event.type === 'summon');
+  assert.equal(summonEvent.targetView?.id, summonEvent.target, 'summon exposes its initial public unit state');
+  assert.equal(summonEvent.targetView?.hp, summonEvent.targetView?.maxHp);
   assert.equal(deployed.players[0].graveyard.length, 0, 'a living creature card remains on the battlefield');
 
   const ended = applyBattleAction(content, deployed, 'p0', { type: 'end' });
@@ -102,6 +105,13 @@ test('actual recovered armor, movement, regeneration and direct-damage families 
   assert.ok(state.events.some(event => event.type === 'attack'));
   assert.ok(state.events.some(event => event.type === 'damage'));
   assert.ok(state.events.some(event => event.type === 'move'));
+  const attackEvent = state.events.find(event => event.type === 'attack');
+  assert.equal(attackEvent.actorView?.id, attackEvent.actor);
+  assert.equal(attackEvent.targetView?.id, attackEvent.target);
+  const damageEvent = state.events.find(event => event.type === 'damage' && event.amount > 0);
+  assert.equal(damageEvent.hpBefore - damageEvent.hpAfter, damageEvent.effectiveAmount);
+  const moveEvent = state.events.find(event => event.type === 'move');
+  assert.ok(moveEvent.moveFrom && moveEvent.moveTo);
 });
 
 test('a recovered damaging skill causes death and moves the spell to graveyard', () => {
@@ -116,6 +126,8 @@ test('a recovered damaging skill causes death and moves the spell to graveyard',
   assert.ok(play);
   state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
   assert.ok(state.events.some(event => event.type === 'death'));
+  const deathEvent = state.events.find(event => event.type === 'death');
+  assert.equal(deathEvent.actorView?.id, deathEvent.actor, 'death retains a public unit snapshot after authoritative removal');
   const overkill = state.events.find(event => event.type === 'damage' && event.target === play.targetId);
   assert.ok(overkill.amount > overkill.effectiveAmount);
   assert.equal(overkill.effectiveAmount, 3);

@@ -11,7 +11,8 @@ await mkdir(path.dirname(out), { recursive: true });
 const tests = (await readdir(path.join(root, 'backend/game'))).filter(file => file.endsWith('.test.mjs')).map(file => 'backend/game/' + file);
 const steps = [
   [process.execPath, ['scripts/verify-recovered-content.mjs']],
-  [process.execPath, ['--test', '--test-concurrency=1', ...tests, 'cocos-client/assets/scripts/game/BattleKernel.test.mjs']],
+  [process.execPath, ['--test', '--test-concurrency=1', ...tests, 'cocos-client/assets/scripts/game/BattleKernel.test.mjs', 'cocos-client/assets/scripts/game/BattlePresentation.test.mjs']],
+  [process.execPath, ['cocos-client/tools/test-recovered-animation-timeline.mjs']],
   [process.execPath, ['web-prototype/node_modules/typescript/bin/tsc', '--noEmit', '--strict', '--target', 'es2022', '--module', 'esnext', '--moduleResolution', 'bundler', '--allowImportingTsExtensions', '--experimentalDecorators', '--skipLibCheck', '.local/creator-build/project/temp/declarations/cc.d.ts', 'cocos-client/assets/scripts/a0/BattleA0Bootstrap.ts']],
   [process.execPath, ['scripts/verify-recovered-visuals.mjs']],
 ];

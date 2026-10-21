@@ -1092,7 +1092,9 @@ export function growthView(ctx) {
     { id: 'reputation-shop', title: '声望商店', items: reputationShopItems },
     { id: 'profession-skill-shop', title: '职业技能商店', items: skillShopItems },
     { id: 'pets', title: '宠物与坐骑', items: petCatalog.map(r => {
-      const id = numericField(r, ['ID']); return uiItem(`领养 ${field(r, ['Name'], id)}`, `品质 ${numericField(r, ['Quality'], 0)}`, 'pet.adopt', { petId: id }, Boolean(g.pets[id]));
+      const id = numericField(r, ['ID']), quality = numericField(r, ['Quality'], 0), price = 300 + quality * 200;
+      return uiItem(`领养 ${field(r, ['Name'], id)}`, `品质 ${quality} · ${price} 银币 · 3级开放`, 'pet.adopt', { petId: id },
+        Boolean(g.pets[id]) || actor.level < 3 || actor.currencies.silver < price);
     }).concat(pets.flatMap(([id, pet]) => [
       uiItem(`喂养宠物 ${id}`, `等级 ${pet.level}，经验 ${pet.exp}`, 'pet.feed', { petId: Number(id), itemId: itemKey(1101), count: 1 }),
       uiItem(`升级宠物 ${id}`, '经验达到配置要求后升级', 'pet.upgrade', { petId: Number(id) })
