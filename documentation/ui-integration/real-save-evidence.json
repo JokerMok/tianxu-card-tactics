@@ -1,0 +1,208 @@
+{
+  "testDataOnly": true,
+  "records": [
+    {
+      "at": 1792637375418,
+      "requestId": "332b2bba-e878-445e-af7b-150e6d0a0c1b",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1"
+          ]
+        },
+        "revision": 11,
+        "replayed": false
+      },
+      "droppedAfterAck": false
+    },
+    {
+      "at": 1792637430808,
+      "requestId": "65a56b2e-3803-46c9-8682-d002e927eeea",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1",
+            "main:card:1"
+          ]
+        },
+        "revision": 13,
+        "replayed": false
+      },
+      "droppedAfterAck": true
+    },
+    {
+      "at": 1792637430811,
+      "requestId": "65a56b2e-3803-46c9-8682-d002e927eeea",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1",
+            "main:card:1"
+          ]
+        },
+        "revision": 13,
+        "replayed": true
+      },
+      "droppedAfterAck": false
+    },
+    {
+      "at": 1792637717560,
+      "requestId": "aaedcb24-0c33-4d7f-a18b-ba9540248b62",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1",
+        "main:card:9402"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1",
+            "main:card:1",
+            "main:card:9402"
+          ]
+        },
+        "revision": 19,
+        "replayed": false
+      },
+      "droppedAfterAck": false
+    },
+    {
+      "at": 1792637799575,
+      "requestId": "4a74436e-b82a-48eb-8357-05c91d5b6bc5",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1",
+            "main:card:1"
+          ]
+        },
+        "revision": 21,
+        "replayed": false
+      },
+      "droppedAfterAck": false
+    },
+    {
+      "at": 1792637800302,
+      "requestId": "f68826c9-a369-4ff6-812b-899f626bb125",
+      "cards": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1",
+        "main:card:9402"
+      ],
+      "httpStatus": 200,
+      "response": {
+        "result": {
+          "message": "卡组已保存",
+          "cards": [
+            "main:card:1",
+            "main:card:19",
+            "main:card:43",
+            "main:card:61",
+            "main:card:41001",
+            "main:card:1",
+            "main:card:1",
+            "main:card:9402"
+          ]
+        },
+        "revision": 22,
+        "replayed": false
+      },
+      "droppedAfterAck": false
+    }
+  ],
+  "restartReadback": {
+    "at": 1792637789618,
+    "deck": [
+      "main:card:1",
+      "main:card:19",
+      "main:card:43",
+      "main:card:61",
+      "main:card:41001",
+      "main:card:1",
+      "main:card:1",
+      "main:card:9402"
+    ],
+    "capacity": 30,
+    "revision": 20
+  }
+}

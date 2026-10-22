@@ -50,7 +50,7 @@ export function presentationNames(content) {
   for (const row of content.table('card') ?? []) {
     const id = positiveId(first(row, ['ID', '卡牌ID\n', '卡牌ID']));
     const name = sourceName(row, ['Name', '名字\n', '名字', '名称\n', '名称']);
-    if (id && name) names[`main:card:${id}`] = name;
+    if (id && name) names[`main:card:${id}`] = content.catalog?.localization?.cards?.[`main:card:${id}`]?.name ?? name;
   }
 
   const result = Object.freeze(names);
@@ -89,19 +89,24 @@ function replaceObjectId(label, asset, names, allowLeading = false) {
   return label.replace(contextual, (_, prefix) => `${prefix}${name}`);
 }
 
-function presentOption(option, names) {
+function localizeCardLiteral(text,asset,names,content){
+  if(typeof text!=='string'||asset?.kind!=='card')return text;
+  const original=content?.data?.cards?.[String(asset.id)]?.raw?.Name;
+  return typeof original==='string'&&original.length>0?text.split(original).join(displayName(names,'card',asset.id)):text;
+}
+function presentOption(option, names, content) {
   if (!option || typeof option !== 'object') return option;
   const asset = payloadAsset(option, 'itemId', 'item')
     || payloadAsset(option, 'cardId', 'card')
     || payloadAsset({ cardId: option.value }, 'cardId', 'card')
     || payloadAsset({ itemId: option.value }, 'itemId', 'item');
-  const label = replaceObjectId(presentText(option.label, names), asset, names, true);
+  const label = localizeCardLiteral(replaceObjectId(presentText(option.label, names), asset, names, true),asset,names,content);
   return label === option.label ? option : { ...option, label };
 }
 
-function presentField(field, names) {
+function presentField(field, names, content) {
   if (!field || typeof field !== 'object' || !Array.isArray(field.options)) return field;
-  const options = field.options.map(option => presentOption(option, names));
+  const options = field.options.map(option => presentOption(option, names, content));
   return options.every((option, index) => option === field.options[index]) ? field : { ...field, options };
 }
 
@@ -114,9 +119,9 @@ export function presentSections(content, sections) {
       const itemAsset = payloadAsset(item?.payload, 'itemId', 'item');
       const cardAsset = payloadAsset(item?.payload, 'cardId', 'card');
       let label = presentText(item?.label, names);
-      label = replaceObjectId(label, itemAsset || cardAsset, names);
-      const detail = presentText(item?.detail, names);
-      const fields = Array.isArray(item?.fields) ? item.fields.map(field => presentField(field, names)) : item?.fields;
+      label = localizeCardLiteral(replaceObjectId(label, itemAsset || cardAsset, names),cardAsset,names,content);
+      const detail = localizeCardLiteral(presentText(item?.detail, names),cardAsset,names,content);
+      const fields = Array.isArray(item?.fields) ? item.fields.map(field => presentField(field, names, content)) : item?.fields;
       return { ...item, label, detail, ...(fields === undefined ? {} : { fields }) };
     }) : section?.items,
   }));

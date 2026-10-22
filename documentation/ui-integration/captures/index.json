@@ -1,0 +1,442 @@
+[
+  {
+    "name": "draft-six",
+    "note": "从正式主城进入卡组，真实跨栏拖入，5→6未保存",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637367052
+  },
+  {
+    "name": "saving-with-later-edit",
+    "note": "真实请求提交6张，响应延迟期间继续编辑为7张",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637375783
+  },
+  {
+    "name": "ack-preserves-newer-draft",
+    "note": "6张提交已确认，后续第7张仍显示未保存，没有被响应覆盖",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637418624
+  },
+  {
+    "name": "long-detail-drag-eight",
+    "note": "正式卡库到底、固定中文长说明滚动、拖入灵耳，8张草稿并独立滚动左栏",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637717539
+  },
+  {
+    "name": "saved-reopened-eight",
+    "note": "服务器确认8张，关闭并从主城重新进入仍8张，选中与滚动位置保留",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637726006
+  },
+  {
+    "name": "unsaved-close-confirmation",
+    "note": "跨栏移除灵耳为7张草稿，关闭时提示保存后关闭/继续编辑/放弃",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637755040
+  },
+  {
+    "name": "network-failure-keeps-seven",
+    "note": "停止隔离服务后真实网络请求失败，7张草稿、滚动与固定详情保留；可重试上次保存",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637766813
+  },
+  {
+    "name": "network-retry-real-success",
+    "note": "重启同一测试服务后重试原请求，7张真实保存成功",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792637799914
+  },
+  {
+    "name": "refresh-restores-eight",
+    "note": "真实保存8张后刷新页面，由同一服务读取8张，不读取预览存储",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638032291
+  },
+  {
+    "name": "second-character-four",
+    "note": "切换角色乙：4/4卡组、逆序开局卡，不残留角色甲8张和长说明",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638083762
+  },
+  {
+    "name": "pve-saved-deck-start",
+    "note": "真实PVE开局，卡组8张参与，中文手牌与准备值",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638356036
+  },
+  {
+    "name": "pve-victory",
+    "note": "使用已保存8张卡组，真实PVE第4回合胜利与奖励",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638415937
+  },
+  {
+    "name": "pve-final-chinese-reward",
+    "note": "最新正式构建及统一中文映射：胜利奖励卡名与手牌均使用同一映射",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638711356
+  },
+  {
+    "name": "pve-reward-return",
+    "note": "领取并返回后实际地图画面，服务端battle=null，pveWins=1",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638937351
+  },
+  {
+    "name": "final-drag-and-cancel",
+    "note": "最终构建：合法跨栏8→9；窗口外释放取消；纵向手势只滚动，仍9张",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792638967777
+  },
+  {
+    "name": "atlas-long-scroll-1200",
+    "note": "正式图鉴筛选技能，滚动至底部，查看未持有卡：可以阅读，不能加入卡组。",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792639228964
+  },
+  {
+    "name": "atlas-unowned-rejected",
+    "note": "正式图鉴未持有卡跨栏拖放被拒绝，草稿仍8张。",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792639540268
+  },
+  {
+    "name": "formal-1440-long-detail",
+    "note": "1440×900；画布1440×900，1200×600设计内容等比1.2显示为1440×720，纵向偏移90；中文长名、多段说明独立滚动。",
+    "geometry": {
+      "backing": [
+        1440,
+        900
+      ],
+      "canvas": [
+        1440,
+        900
+      ],
+      "dpr": 1,
+      "viewport": [
+        1440,
+        900
+      ]
+    },
+    "at": 1792639694723
+  },
+  {
+    "name": "formal-1440-valid-drop",
+    "note": "1440×900 实际跨栏拖放，8→9 未保存；详情和左右滚动位置保留。",
+    "geometry": {
+      "backing": [
+        1440,
+        900
+      ],
+      "canvas": [
+        1440,
+        900
+      ],
+      "dpr": 1,
+      "viewport": [
+        1440,
+        900
+      ]
+    },
+    "at": 1792639705532
+  },
+  {
+    "name": "formal-final-1440",
+    "note": "最终构建动态调整窗口成功：Canvas与backing1440×900，内容1.2倍、偏移90；8张卡组、两栏偏移和固定长详情保持。",
+    "geometry": {
+      "backing": [
+        1440,
+        900
+      ],
+      "canvas": [
+        1440,
+        900
+      ],
+      "dpr": 1,
+      "viewport": [
+        1440,
+        900
+      ]
+    },
+    "at": 1792640758841
+  },
+  {
+    "name": "formal-final-1200",
+    "note": "最终构建动态返回1200×600，backing与CSS均1200×600，缩放1；8张卡组及固定详情保持。",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792640777693
+  },
+  {
+    "name": "formal-expanded-skill-chinese",
+    "note": "正式图鉴预览范围外技能：完整中文说明、未持有可查看，仍8张真实保存卡组。",
+    "geometry": {
+      "backing": [
+        1200,
+        600
+      ],
+      "canvas": [
+        1200,
+        600
+      ],
+      "dpr": 1,
+      "viewport": [
+        1200,
+        600
+      ]
+    },
+    "at": 1792640835243
+  }
+]

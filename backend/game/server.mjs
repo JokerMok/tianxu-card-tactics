@@ -64,8 +64,9 @@ export async function createGameServer(options = {}) {
       }
       if (request.method !== 'GET' && request.method !== 'HEAD') return json(405, { error: '不支持此请求' });
       const isResource = url.pathname.startsWith('/recovered/');
-      const base = isResource ? folder : web;
-      const relative = decodeURIComponent(isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
+      const isUi=url.pathname.startsWith('/ui-assets/');
+      const base = isUi ? path.join(folder,'../ui-revision-a') : isResource ? folder : web;
+      const relative = decodeURIComponent(isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
       const filename = path.resolve(base, relative);
       if (!filename.startsWith(path.resolve(base) + path.sep) || !existsSync(filename) || !statSync(filename).isFile()) return json(404, { error: '资源不存在' });
       const stat = statSync(filename);

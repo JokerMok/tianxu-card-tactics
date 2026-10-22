@@ -1,0 +1,29 @@
+{
+  "testOnly": true,
+  "health": {
+    "ready": true,
+    "game": "天墟：万象战阵",
+    "version": 1,
+    "sourceManifest": "5254333315581813739"
+  },
+  "deck": [
+    "main:card:1",
+    "main:card:19",
+    "main:card:43",
+    "main:card:61",
+    "main:card:41001",
+    "main:card:1",
+    "main:card:1",
+    "main:card:9402"
+  ],
+  "deckCapacity": 30,
+  "battle": null,
+  "stats": {
+    "battles": 1,
+    "pveWins": 1,
+    "coopWins": 0,
+    "pvpMatches": 0,
+    "deckEdits": 6
+  },
+  "revision": 78
+}

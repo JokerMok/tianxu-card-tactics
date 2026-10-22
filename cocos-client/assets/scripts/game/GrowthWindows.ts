@@ -1,3 +1,4 @@
+import { cardName } from './GameText.ts';
 import { BlockInputEvents, Color, Node } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import type { OriginalUi } from './OriginalUi.ts';
@@ -601,7 +602,7 @@ export class GrowthWindows {
   private assetName(id: unknown): string {
     const key = String(id ?? '');
     return this.state!.assetNames?.[key]
-      ?? String(this.catalog.scopes.main.cards[key.split(':').at(-1) ?? '']?.raw.Name ?? `物品 #${key.split(':').at(-1)}`);
+      ?? (key.includes(':card:')?cardName(this.catalog,key):`物品 #${key.split(':').at(-1)}`);
   }
 
   private shortName(id: string): string {

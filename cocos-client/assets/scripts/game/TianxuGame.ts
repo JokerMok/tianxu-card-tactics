@@ -1,10 +1,11 @@
-import { Component, Node, Label, EditBox, Color, UITransform, view, ResolutionPolicy, profiler, Button, BlockInputEvents } from 'cc';
+import { Component, Node, Label, EditBox, Color, UITransform, view, screen, Size, ResolutionPolicy, profiler, Button, BlockInputEvents } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import { GameAudio } from './GameAudio.ts';
 import type { RecoveredCatalog, RecoveredCard } from './RecoveredContent.ts';
 import type { BattleState, LegalPlay, BattleAction } from './GameContracts.ts';
 import { OriginalUi, type OriginalUiCatalog, type OriginalUiMount } from './OriginalUi.ts';
 import { BattleSceneView } from './BattleSceneView.ts';
+import { cardName, cardDisplay } from './GameText.ts';
 import { CardDeckWindow } from './CardDeckWindow.ts';
 import { GrowthWindows } from './GrowthWindows.ts';
 import { WorldMapWindow } from './WorldMapWindow.ts';
@@ -17,7 +18,7 @@ interface SceneNodeView { id: string; originalId: string; name: string; story?: 
   battle: boolean; transitions: number[]; triggers: { id: string; name: string; repeat: number }[] }
 interface SceneView { id: string; name: string; unlocked: boolean; minLevel: number; nodes: SceneNodeView[] }
 interface ActorView { id: string; name: string; profession: number; level: number; xp: number; tutorialStep: number;
-  currencies: { silver: number; gold: number; crystal: number }; cards: Record<string, number>; deck: string[];
+  currencies: { silver: number; gold: number; crystal: number }; cards: Record<string, number>; deck: string[]; deckCapacity: number;
   inventory: Record<string, number>; progress: { sceneId: number }; guildId?: string; settings: Record<string, boolean> }
 type Row = Record<string, unknown>;
 interface Snapshot { assetNames: Record<string, string>; story: string; revision: number; now: number; actor: ActorView; scenes: SceneView[];
@@ -46,8 +47,17 @@ export class TianxuGame extends Component {
   private worldWindow?: WorldMapWindow; private debugUi = false;
   private secondaryWindows?: SecondaryWindows;
 
+  private viewportObserver?: ResizeObserver; private viewportKey='';
+  private syncViewport=()=>{
+    if(typeof window==='undefined')return;const width=window.innerWidth,height=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,2),key=width+':'+height+':'+dpr;
+    if(width<=0||height<=0||key===this.viewportKey)return;this.viewportKey=key;screen.windowSize=new Size(width*dpr,height*dpr);
+  };
   onLoad() {
     view.setDesignResolutionSize(1200, 600, ResolutionPolicy.SHOW_ALL);
+    view.resizeWithBrowserSize(true);
+    // CSS-sized SubFrame containers do not change inline styles on resize; notify the public screen API explicitly.
+    if(typeof ResizeObserver!=='undefined'){this.viewportObserver=new ResizeObserver(this.syncViewport);this.viewportObserver.observe(document.documentElement);}
+    globalThis.addEventListener('resize',this.syncViewport);
     profiler.hideStats();
     const params = new URLSearchParams(globalThis.location?.search ?? '');
     this.debugUi = params.get('debug') === '1';
@@ -65,8 +75,9 @@ export class TianxuGame extends Component {
     this.pollTimer = setInterval(() => { void this.poll(); }, 1000);
   }
   onDestroy() {
+    this.viewportObserver?.disconnect();globalThis.removeEventListener('resize',this.syncViewport);
     if (this.pollTimer) clearInterval(this.pollTimer);
-    this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
+    this.deckWindow?.destroy(); this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
   }
   update(dt: number) {
     this.battleView?.update(dt);
@@ -80,11 +91,11 @@ export class TianxuGame extends Component {
       }
     }
   }
-  private async api<T>(route: string, payload?: unknown): Promise<T> {
+  private async api<T>(route: string, payload?: unknown, characterId = this.characterId): Promise<T> {
     const response = await fetch(this.apiBase + route, { method: payload === undefined ? 'GET' : 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}`, 'X-Character-Id': this.characterId },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}`, 'X-Character-Id': characterId },
       ...(payload === undefined ? {} : { body: JSON.stringify(payload) }) });
-    const value = await response.json(); if (!response.ok) throw new Error(value.error ?? `请求失败 ${response.status}`); return value as T;
+    const value = await response.json(); if (!response.ok) { const error = new Error(value.error ?? `请求失败 ${response.status}`) as Error & {definitive:boolean}; error.definitive=response.status>=400&&response.status<500; throw error; } return value as T;
   }
   private saveAuth() { localStorage.setItem(this.authKey, JSON.stringify({ token: this.token, characterId: this.characterId })); }
   private async boot() {
@@ -110,8 +121,9 @@ export class TianxuGame extends Component {
     if (!this.state || this.busy || this.polling || this.modal?.isValid) return;
     this.polling = true;
     try {
-      const next = await this.api<Snapshot>('/api/state');
-      if (next.revision !== this.state.revision) {
+      const actorId=this.characterId;const next = await this.api<Snapshot>('/api/state',undefined,actorId);
+      if(actorId!==this.characterId||!this.state)return;
+      if (next.revision > this.state.revision) {
         if (next.battle && next.battle.id !== this.state.battle?.id) {
           this.battleHidden = false;
           this.entryReplayBattleId = next.battle.id;
@@ -119,6 +131,7 @@ export class TianxuGame extends Component {
         this.state = next;
         if (this.original && !this.debugUi && this.page === 'rooms' && this.body?.isValid
             && (!next.battle || this.battleHidden)) this.renderModuleWindow();
+        else if(this.page==='cards'&&this.body?.isValid&&this.deckWindow&&(!next.battle||this.battleHidden))this.deckWindow.updateActor(next.actor);
         else this.render();
       }
     } catch (error) { this.toast(String(error)); }
@@ -144,10 +157,16 @@ export class TianxuGame extends Component {
     } catch (error) { this.toast(String(error)); }
     finally { this.busy = false; }
   }
-  private toast(message: string) { this.notice = message.replace(/^Error: /, ''); this.noticeUntil = Date.now() + 5500;
+  private async saveDeck(cards:string[],requestId:string,actorId:string):Promise<string[]> {
+    const response=await this.api<{result:{cards:string[]};revision:number;replayed:boolean}>('/api/act',{action:'deck.save',payload:{cards},requestId},actorId);
+    if(!Array.isArray(response.result.cards))throw new Error('保存响应缺少确认卡组，请重试确认');
+    if(this.state?.actor.id===actorId){this.state.actor.deck=[...response.result.cards];this.state.revision=Math.max(this.state.revision,response.revision);}
+    return response.result.cards;
+  }
+  private toast(message: string) { this.notice = /Failed to fetch|NetworkError|Load failed/i.test(message)?'网络连接中断，请稍后重试。':message.replace(/^Error: /, ''); this.noticeUntil = Date.now() + 5500;
     if (this.noticeLabel?.isValid) { this.noticeLabel.string = this.notice; this.noticeLabel.node.setSiblingIndex(this.root.children.length - 1); } }
   private clear() {
-    this.renderGeneration++; this.home = undefined;
+    this.renderGeneration++; this.home = undefined; this.deckWindow?.detach();
     this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
     this.battleView?.destroy(); this.battleView = undefined;
 
@@ -298,8 +317,8 @@ export class TianxuGame extends Component {
         if (!node.getComponent(Button)) node.addComponent(Button); node.on(Button.EventType.CLICK, fn);
       } };
       const growth = (section: string) => { this.section = section; this.page = 'growth'; this.listPage = 0; this.render(); };
-      bind('roleBtn', () => growth('inventory')); bind('tjBtn', () => { this.cardsAll = true; this.navigate('cards'); });
-      bind('rwBtn', () => this.navigate('tasks')); bind('kpBtn', () => { this.cardsAll = false; this.navigate('cards'); });
+      bind('roleBtn', () => growth('inventory')); bind('tjBtn', () => { this.cardsAll = true; this.deckWindow?.setLibraryMode(true); this.navigate('cards'); });
+      bind('rwBtn', () => this.navigate('tasks')); bind('kpBtn', () => { this.cardsAll = false; this.deckWindow?.setLibraryMode(false); this.navigate('cards'); });
       bind('dtBtn', () => this.navigate('world')); bind('swBtn', () => growth('progression')); bind('jjBtn', () => this.navigate('rooms'));
       bind('sjBtn', () => this.navigate('social')); bind('petBtn', () => growth('pets')); bind('scBtn', () => growth('shop'));
       bind('czgk', () => growth('dock')); bind('hh', () => this.navigate('guild')); bind('jjc', () => this.navigate('rooms'));
@@ -331,7 +350,7 @@ export class TianxuGame extends Component {
     this.body = this.ui.node(this.root, 'PlayerWindow:' + this.page, 1200, 600);
     if (this.page === 'cards') {
       this.deckWindow ??= new CardDeckWindow(this.ui, this.original!, this.catalog!, this.apiBase, {
-        close: () => this.navigate('home'), save: cards => { void this.run('deck.save', { cards }); },
+        close: () => this.navigate('home'), save: (cards, requestId, actorId) => this.saveDeck(cards, requestId, actorId),
         detail: card => this.cardDetail(card), growth: () => { this.page = 'growth'; this.section = 'cards'; this.render(); },
       }); this.deckWindow.render(this.body, this.state!.actor, this.cardsAll); return;
     }
@@ -450,26 +469,25 @@ export class TianxuGame extends Component {
       const panel = this.ui.button(this.body, 'Card:' + card.id, '', x, y, 230, 104, () => this.cardDetail(card));
       const art = this.catalog!.assets[card.art[0]];
       if (art?.path) void this.ui.image(panel, 'Portrait', this.apiBase + '/recovered/' + art.path, 57, 79, -76, 0);
-      this.ui.label(panel, 'CardName', `${String(card.raw.Name)}\n持有 ${state.actor.cards[card.id] ?? 0} · 准备 ${card.raw.InitReady}`, 35, 8, 145, 65, 15);
+      this.ui.label(panel, 'CardName', `${cardName(this.catalog!,card.id)}\n持有 ${state.actor.cards[card.id] ?? 0} · 准备 ${card.raw.InitReady}`, 35, 8, 145, 65, 15);
     });
     this.pager(cards.length, 12, () => this.render());
   }
   private cardDetail(card: RecoveredCard) {
-    const monster = this.catalog!.scopes.main.monsters[String(card.raw.MonsterID)];
-    const skill = this.catalog!.scopes.main.skills[String(card.raw.SkillID)];
-    const text = monster ? `生命 ${monster.HP} · 攻击 ${monster.Attack}\n` + [1,2,3,4,5].map(index => this.catalog!.scopes.main.effects[String(monster[`ability${index}`])]?.EffectDes ?? '').filter(Boolean).join('\n') : String(skill?.raw?.Des ?? card.raw.Des ?? '特殊英雄展示卡');
-    this.info(String(card.raw.Name), text, [
+    const display=cardDisplay(this.catalog!,card,this.apiBase);
+    const text=display.abilities.map(a=>a.name+'：'+a.text).join('\n');
+    this.info(cardName(this.catalog!,card.id), text, [
       { label: '加入待保存卡组', action: '', payload: {} },
     ], () => { this.draftDeck ??= [...this.state!.actor.deck]; this.draftDeck.push(card.id); this.editDeck(); });
   }
   private editDeck() {
     if (!this.debugUi) { this.closeModal(); this.navigate('cards'); return; }
     this.draftDeck ??= [...this.state!.actor.deck];
-    this.choose(`待保存卡组 · ${this.draftDeck.length} 张`, this.draftDeck.map((id, index) => ({ label: `${String(this.catalog!.scopes.main.cards[id.split(':').at(-1)!]?.raw.Name ?? id)} · 移除`, action: '', payload: { index } })), item => {
+    this.choose(`待保存卡组 · ${this.draftDeck.length} 张`, this.draftDeck.map((id, index) => ({ label: `${cardName(this.catalog!,id)} · 移除`, action: '', payload: { index } })), item => {
       this.draftDeck!.splice(Number(item.payload?.index), 1); this.editDeck();
     }, [{ label: '保存卡组', callback: () => { const cards = [...this.draftDeck!]; this.draftDeck = undefined; this.closeModal(); void this.run('deck.save', { cards }); } },
       { label: '加入已有卡牌', callback: () => this.choose('选择卡牌', Object.entries(this.state!.actor.cards).filter(([,count]) => count > 0).map(([id]) => ({
-        label: String(this.catalog!.scopes.main.cards[id.split(':').at(-1)!]?.raw.Name ?? id), action: '', payload: { id } })), item => { this.draftDeck!.push(String(item.payload?.id)); this.editDeck(); }) }]);
+        label: cardName(this.catalog!,id), action: '', payload: { id } })), item => { this.draftDeck!.push(String(item.payload?.id)); this.editDeck(); }) }]);
   }
   private renderGrowth() {
     const sections = this.state!.growth.sections; const selected = sections.find(section => section.id === this.section) ?? sections[0];
@@ -525,7 +543,7 @@ export class TianxuGame extends Component {
     ]);
   }
   private spareCards() { return Object.entries(this.state!.actor.cards).filter(([id, count]) => count > this.state!.actor.deck.filter(card => card === id).length); }
-  private assetName(id: unknown) { return this.state?.assetNames[String(id)] ?? this.catalog?.scopes.main.cards[String(id).split(':').at(-1)!]?.raw.Name ?? '未知物品'; }
+  private assetName(id: unknown) { return this.state?.assetNames[String(id)] ?? (this.catalog?cardName(this.catalog,String(id)):undefined) ?? '未知物品'; }
   private goodsLabel(goods: unknown) { const row = goods as Row | undefined; return row ? `${this.assetName(row.id)} × ${row.quantity}` : ''; }
   private renderTrade() {
     this.title('交易与拍卖');
@@ -741,7 +759,7 @@ export class TianxuGame extends Component {
       const art = this.catalog!.assets[card?.art[0]];
       if (art?.path) void this.ui.image(slot, 'OriginalCard', this.apiBase + '/recovered/' + art.path, 85, 116);
       if (selected.includes(option.value)) this.ui.label(slot, 'Selected', '✓', 24, 37, 32, 35, 27, Theme.green);
-      this.ui.label(slot, 'CardName', String(card?.raw.Name ?? option.label), 0, -50, 83, 25, 10, Theme.text);
+      this.ui.label(slot, 'CardName', card ? cardName(this.catalog!,card.id) : option.label, 0, -50, 83, 25, 10, Theme.text);
     });
     this.ui.label(panel, 'DraftInstructions', `已选择 ${selected.length} 张\n\n${selected.map(id => this.assetName(id)).join('\n')}`,
       192, 30, 290, 330, 13, Theme.text, true);

@@ -1,0 +1,49 @@
+{
+  "scope": "Current main playable Type1 linked monster and Type2 linked skill. Includes currently available card-pool, atlas, reward and upgrades; excludes deprecated/Abandoned and other-version media scope.",
+  "sourceManifest": "5254333315581813739",
+  "activeCards": 7032,
+  "distinctNames": 1852,
+  "cardNames": {
+    "recovered-context": 109,
+    "candidate": 6919,
+    "recovered": 4
+  },
+  "effects": {
+    "candidate": 2792,
+    "recovered": 2,
+    "missing": 10
+  },
+  "skillDescriptions": {
+    "recovered": 103,
+    "candidate": 636,
+    "missing": 11
+  },
+  "missing": {
+    "cardNames": [],
+    "effects": [
+      "main:effect:4304",
+      "main:effect:3967",
+      "main:effect:16204",
+      "main:effect:16205",
+      "main:effect:16206",
+      "main:effect:7503",
+      "main:effect:7504",
+      "main:effect:6147",
+      "main:effect:17201",
+      "main:effect:6184"
+    ],
+    "skillDescriptions": [
+      "main:card:50731",
+      "main:card:50732",
+      "main:card:50733",
+      "main:card:50734",
+      "main:card:50741",
+      "main:card:50742",
+      "main:card:50743",
+      "main:card:50744",
+      "main:card:50806",
+      "main:card:50807",
+      "main:card:50810"
+    ]
+  }
+}

@@ -47,6 +47,7 @@ export interface RecoveredScope {
   areas: Record<string, RawRow>;
 }
 export interface RecoveredCatalog {
+  localization?: import('./GameText.ts').GameLocalization;
   version: 1;
   sourceManifest: string;
   activeScope: DataScope;

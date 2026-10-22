@@ -1,0 +1,24 @@
+{
+  "repository": "https://github.com/jeremylongworth-source/AgentSkills",
+  "commit": "45f314d2a3d3201dd5a0304a3a4f3a5f23a905a2",
+  "path": "skills/game-ui-design/",
+  "license": "MIT; Copyright (c) 2026 Jeremy Longworth",
+  "installedAt": "2026-10-21T14:56:01.042935+08:00",
+  "installation": "User-wide independent copy at ~/.agents/skills/game-ui-design; audited project copy archived outside discovery roots",
+  "contents": [
+    "SKILL.md",
+    "references/game-ui-checklist.md",
+    "agents/openai.yaml"
+  ],
+  "dependencies": "No scripts, executables, package dependencies, remote runtime calls or global configuration requested; Markdown and Codex interface metadata only.",
+  "scope": "Global reusable skill unchanged; on 2026-10-22 user authorized formal A integration, real save and local commits only. No main merge/push/public deployment.",
+  "sha256": {
+    "LICENSE": "11f5e60786b82e616ba07f5abe671291f23916f60d197babde5ea46353c441a3",
+    "SKILL.md": "3291770337d611d6fc6425e1d273c4dffdc6d5a8634eac8a2c23459f356c303a",
+    "references/game-ui-checklist.md": "e996d7c0ff61bc2e5900810457d8cbd18f2171a2c40edc6a7a836ecc1c974a7a",
+    "agents/openai.yaml": "75cc88078c67ae24ab0dd620224adc23a948327b93ea1380031d5e81faf1d1ef"
+  },
+  "globalPath": "/Users/jokermok/.agents/skills/game-ui-design",
+  "discoveryEvidence": "skill-discovery.json",
+  "scopeAtInstallation": "Reusable global game UI skill; this project authorizes only documentation and isolated Cocos preview, not formal merge or push."
+}

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { MISSING_MONSTERS, BOARD_SCENES, FALLBACK_MAP } from './compatibility.mjs';
 import { reconstructMissingScenes } from './scene-compatibility.mjs';
@@ -8,6 +8,8 @@ export class ServerContent extends RecoveredContent {
   constructor(folder) {
     super(JSON.parse(readFileSync(path.join(folder, 'catalog.json'), 'utf8')));
     this.folder = folder;
+    const localization = path.join(folder, '../localization/game-zh.json');
+    if (existsSync(localization)) this.catalog.localization=JSON.parse(readFileSync(localization,'utf8'));
     this.tables = {};
     for (const [key, table] of Object.entries(this.catalog.tables)) {
       if (key.startsWith('main:')) this.tables[key.slice(5)] = JSON.parse(readFileSync(path.join(folder, table.path), 'utf8')).rows;

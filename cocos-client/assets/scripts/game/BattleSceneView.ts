@@ -1,3 +1,4 @@
+import { cardName } from './GameText.ts';
 import { Color, Graphics, instantiate, Label, Node, tween, UIOpacity, UITransform, Vec3, EventTouch } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import { OriginalUi } from './OriginalUi.ts';
@@ -85,7 +86,7 @@ export class BattleSceneView {
         display = { node, animation, ready, team: unit.team, dying: false, generation: 0,
           hp: this.ui.label(node, 'Health', `${unit.hp}`, 16, -34, 35, 22, 16, Theme.red),
           attack: this.ui.label(node, 'Attack', `${unit.attack}`, -16, -34, 35, 22, 16, Theme.text),
-          name: this.ui.label(node, 'Name', unit.flags.hero ? owner?.name ?? '' : String(this.catalog.scopes.main.monsters[String(unit.monsterId)]?.Name ?? ''), 0, 119, 140, 18, 12,
+          name: this.ui.label(node, 'Name', unit.flags.hero ? owner?.name ?? '' : cardName(this.catalog,unit.cardId), 0, 119, 140, 18, 12,
           unit.team === 0 ? Theme.green : Theme.red) };
         this.ui.label(node, 'StatsSeparator', '/', 0, -34, 12, 20, 14);
         this.displays.set(unit.id, display);
@@ -286,7 +287,7 @@ export class BattleSceneView {
       'chengxingxiao', 'hongxingxiao', 'jinxingxiao'][quality], 0, 50);
     this.sourceCardSkin(parent, 'RaceOrProfession', this.cardBadge(card), 31, 44);
     if (selected) this.sourceCardSkin(parent, 'PlayableRing', 'raoquan', 0, 0, 85, 116);
-    this.ui.label(parent, 'CardName', String(card.raw.Name), 0, -46, 80, 22, 11);
+    const cardLabel=this.ui.label(parent, 'CardName', cardName(this.catalog,card.id), 0, -47, 80, 24, 11);cardLabel.overflow=Label.Overflow.CLAMP;cardLabel.lineHeight=12;
     if (!showStats) return;
     const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID)];
     if (monster) {
@@ -358,6 +359,7 @@ export class BattleSceneView {
     this.ui.skin(this.result, 'Result:source-art', skin, sx + source.width! / 2 - 600, 300 - sy - source.height! / 2);
     this.ui.label(this.result, 'Result:round', `${state.turn}`, sx + (won ? 260 : 230) - 600, 300 - sy - (won ? 201 : 118), 80, 30, 24, Theme.gold);
     this.ui.label(this.result, 'Result:rewards', `银币 +${outcome?.silver ?? 0}    经验 +${outcome?.xp ?? 0}`, 0, -82, 500, 35, 18, Theme.gold);
-    this.skinButton(this.result, 'Battle:Dismiss', 'kapaixiangqing_1', 'kapaixiangqing_2', '领取并返回地图', 0, -130, 220, 38, () => this.hooks.dismiss());
+    if(outcome?.cards?.length)this.ui.label(this.result,'RewardCards',outcome.cards.map(c=>cardName(this.catalog,c.id)+' ×'+c.count).join('、'),0,-113,560,32,13,Theme.gold);
+    this.skinButton(this.result, 'Battle:Dismiss', 'kapaixiangqing_1', 'kapaixiangqing_2', '领取并返回地图', 0, -160, 220, 38, () => this.hooks.dismiss());
   }
 }

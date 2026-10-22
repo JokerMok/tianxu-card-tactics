@@ -1,3 +1,4 @@
+import { cardName } from './GameText.ts';
 import { Color, Node } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import type { OriginalUi } from './OriginalUi.ts';
@@ -748,7 +749,7 @@ export class SecondaryWindows {
 
   private assetName(id: unknown): string {
     const key = String(id ?? '');
-    return this.state!.assetNames?.[key] ?? String(this.catalog.scopes.main.cards[key.split(':').at(-1) ?? '']?.raw.Name ?? key);
+    return this.state!.assetNames?.[key] ?? cardName(this.catalog,key);
   }
 
   private goodsLabel(value: unknown): string {

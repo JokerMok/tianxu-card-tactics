@@ -1,0 +1,14 @@
+{
+  "baselineCommit": "b7285398b92b85705a2ea5e69b28b5cd01bb2e3d",
+  "checkpointBranch": "codex/checkpoint-before-ui-integration-20261022",
+  "integrationBranch": "codex/integrate-revision-a-ui",
+  "privateCheckpoint": ".local/ui-integration/checkpoint-20261022",
+  "contains": [
+    "tracked.patch",
+    "prior untracked review files",
+    "SQLite online backup",
+    "web-before"
+  ],
+  "rollbackMethod": "Inspect in separate worktree; preserve current work and personal DB; no reset/clean required.",
+  "remoteActions": "No push, main merge or public deployment."
+}

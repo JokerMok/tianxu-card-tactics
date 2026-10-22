@@ -1,0 +1,31 @@
+{
+  "originalAssetsReadOnly": true,
+  "assets": [
+    {
+      "file": "ajda_1.png",
+      "sha256": "632fba9ffcd449c22882705fb187048626cbacb7dfaad08b3291e8d85b3793da",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/ajda_1.png",
+      "reuse": "byte-for-byte copy from reviewed A preview"
+    },
+    {
+      "file": "book-textless.png",
+      "sha256": "656e291c224718d62df1cba2ab30c27db7bac27c4f727424c5fe4b8ab036d4f0",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/KaPaiBianJi-0.png",
+      "reuse": "byte-for-byte copy from reviewed A preview",
+      "derivative": "Image generation edit: remove baked Current Deck/My cards letters, preserve book/frame/parchment. Not an unmodified original."
+    },
+    {
+      "file": "window-material.png",
+      "sha256": "9b74f4cffeffe00d30c09cbe0a99e20220d8502ee63626fd78aeed9f8b543d1e",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/dtks_1-0.png",
+      "reuse": "byte-for-byte copy from reviewed A preview",
+      "displayCrop": [
+        0,
+        0,
+        477,
+        240
+      ],
+      "excludedBakedText": "Deck Name / Deck Power below y=249 are outside the displayed SpriteFrame rectangle."
+    }
+  ]
+}

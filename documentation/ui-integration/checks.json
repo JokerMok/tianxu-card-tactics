@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-22",
+  "typescript": "strict formal game source passed with Creator 3.8.8 declarations",
+  "realCocosBuild": "Creator 3.8.8 web-desktop successful; build-source.json verifies 21 staged source files identical",
+  "tests": [
+    "backend/game/deck-ui-integration.test.mjs",
+    "backend/game/presentation.test.mjs",
+    "cocos-client/assets/scripts/game/DeckDraft.test.mjs"
+  ],
+  "testResult": {
+    "passed": 7,
+    "failed": 0
+  },
+  "canvas": "See validation.md and captures/index.json; no mock engine used for visual acceptance",
+  "notRun": [
+    "whole game regression",
+    "all multiplayer modes",
+    "physical touch devices",
+    "long-duration GPU stress"
+  ]
+}

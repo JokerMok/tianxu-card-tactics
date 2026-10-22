@@ -1,0 +1,675 @@
+{
+  "scope": "CardManagementUi texture pool and fixed card slots only, not total process/GPU memory",
+  "samples": [
+    {
+      "at": "2026-10-22T03:23:38.489Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 14,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.494Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.501Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.501Z",
+      "event": "detail-open",
+      "id": "main:card:1",
+      "name": "卫兵",
+      "textHeight": 209.98,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.774Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 20,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.774Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 20,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:38.805Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 21600,
+      "textures": 20,
+      "referenced": 16,
+      "pending": 6,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:44.508Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 43200,
+      "textures": 26,
+      "referenced": 16,
+      "pending": 7,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:44.681Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 33,
+      "referenced": 23,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:44.685Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 33,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:52.036Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 16200,
+      "textures": 33,
+      "referenced": 16,
+      "pending": 6,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:52.203Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 38,
+      "referenced": 21,
+      "pending": 1,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:52.207Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 38,
+      "referenced": 19,
+      "pending": 4,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:23:52.238Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 16200,
+      "textures": 38,
+      "referenced": 17,
+      "pending": 10,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:10.795Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 35100,
+      "textures": 48,
+      "referenced": 16,
+      "pending": 13,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:10.969Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 56,
+      "referenced": 29,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:10.972Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 56,
+      "referenced": 18,
+      "pending": 5,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:11.002Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 18900,
+      "textures": 56,
+      "referenced": 16,
+      "pending": 13,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:11.168Z",
+      "event": "gesture-start",
+      "id": "main:card:9565",
+      "side": "library",
+      "textures": 56,
+      "referenced": 16,
+      "pending": 13,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:11.175Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 56,
+      "referenced": 16,
+      "pending": 13,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:24:11.175Z",
+      "event": "detail-open",
+      "id": "main:card:9565",
+      "name": "贪欲年煞",
+      "textHeight": 222.17999999999998,
+      "textures": 56,
+      "referenced": 16,
+      "pending": 13,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:25:39.941Z",
+      "event": "gesture-start",
+      "id": "main:card:9568",
+      "side": "library",
+      "textures": 56,
+      "referenced": 25,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:25:39.947Z",
+      "event": "drag-start",
+      "side": "library",
+      "id": "main:card:9568",
+      "textures": 56,
+      "referenced": 25,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:27:12.483Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 14,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:27:12.489Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:27:12.496Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:27:12.497Z",
+      "event": "detail-open",
+      "id": "main:card:1",
+      "name": "卫兵",
+      "textHeight": 209.98,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:05.040Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 4018,
+      "textures": 20,
+      "referenced": 20,
+      "pending": 4,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:05.070Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:14.280Z",
+      "event": "gesture-start",
+      "id": "main:card:9402",
+      "side": "deck",
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:14.287Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:14.287Z",
+      "event": "detail-open",
+      "id": "main:card:9402",
+      "name": "情报侦察专家·灵耳",
+      "textHeight": 307.06,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:14.315Z",
+      "event": "detail-scroll",
+      "offset": 55,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:14.344Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.128Z",
+      "event": "gesture-start",
+      "id": "main:card:2",
+      "side": "library",
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.140Z",
+      "event": "drag-start",
+      "side": "library",
+      "id": "main:card:2",
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.202Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.204Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.544Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:28:25.546Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.332Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 14,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.338Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.345Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.345Z",
+      "event": "detail-open",
+      "id": "main:card:1",
+      "name": "卫兵",
+      "textHeight": 209.98,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.552Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 4018,
+      "textures": 20,
+      "referenced": 20,
+      "pending": 4,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.590Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.788Z",
+      "event": "gesture-start",
+      "id": "main:card:9402",
+      "side": "deck",
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.796Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:40:45.796Z",
+      "event": "detail-open",
+      "id": "main:card:9402",
+      "name": "情报侦察专家·灵耳",
+      "textHeight": 307.06,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.194Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 14,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.201Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.209Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.209Z",
+      "event": "detail-open",
+      "id": "main:card:1",
+      "name": "卫兵",
+      "textHeight": 209.98,
+      "textures": 0,
+      "referenced": 0,
+      "pending": 20,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.482Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 4018,
+      "textures": 20,
+      "referenced": 20,
+      "pending": 4,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.505Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.665Z",
+      "event": "gesture-start",
+      "id": "main:card:9402",
+      "side": "deck",
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.671Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:45:43.671Z",
+      "event": "detail-open",
+      "id": "main:card:9402",
+      "name": "情报侦察专家·灵耳",
+      "textHeight": 307.06,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:17.506Z",
+      "event": "detail-scroll",
+      "offset": 55,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:51.251Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 24,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:51.258Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:51.277Z",
+      "event": "card-scroll",
+      "side": "deck",
+      "offset": 154,
+      "textures": 24,
+      "referenced": 20,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:51.282Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 0,
+      "textures": 24,
+      "referenced": 17,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:46:51.331Z",
+      "event": "card-scroll",
+      "side": "library",
+      "offset": 41650,
+      "textures": 24,
+      "referenced": 17,
+      "pending": 6,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:47:14.903Z",
+      "event": "gesture-start",
+      "id": "main:card:65532",
+      "side": "library",
+      "textures": 30,
+      "referenced": 23,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:47:14.909Z",
+      "event": "detail-scroll",
+      "offset": 0,
+      "textures": 30,
+      "referenced": 23,
+      "pending": 0,
+      "slots": 30
+    },
+    {
+      "at": "2026-10-22T03:47:14.909Z",
+      "event": "detail-open",
+      "id": "main:card:65532",
+      "name": "熔岩",
+      "textHeight": 156.29999999999998,
+      "textures": 30,
+      "referenced": 23,
+      "pending": 0,
+      "slots": 30
+    }
+  ],
+  "maxTextures": 56,
+  "maxSlots": 30
+}

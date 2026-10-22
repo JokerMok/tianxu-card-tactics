@@ -61,7 +61,7 @@ export class GameService {
       if (socialActions.includes(action)) return operateSocial(ctx, action, payload);
       if (action === 'deck.save') {
         actor.deck = this.content.validateDeck(actor, payload.cards);
-        actor.stats.deckEdits++; return { message: '卡组已保存' };
+        actor.stats.deckEdits++; return { message: '卡组已保存', cards: [...actor.deck] };
       }
       if (action === 'settings.save') {
         const allowed = ['music', 'sound', 'rejectPrivate', 'rejectInvites'];
@@ -446,7 +446,7 @@ export class GameService {
     const assets = new Set([...Object.keys(actor.inventory), ...Object.keys(actor.cards), ...Object.keys(actor.warehouse ?? {}), ...Object.values(actor.equipment ?? {}),
       ...social.trades.map(row => row.goods?.id), ...social.auctions.map(row => row.goods?.id), ...social.mail.map(row => row.attachment?.id)].filter(Boolean));
     const assetNames = Object.fromEntries(Array.from(assets, id => [id, names[id] ?? (id.includes(':item:') ? `物品 #${id.split(':').at(-1)}` : `卡牌 #${id.split(':').at(-1)}`)]));
-    return { revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor, battle, league, assetNames, ...playerUi(this.content, assets),
+    return { revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
       story: String(this.content.table('stringres').find(row => row.ID === 10100)?.des ?? ''),
       scenes: this.content.sceneSummary(actor), tasks: this.tasks(actor), growth, pve, social,
       roomInvites: Object.values(world.roomInvites ?? {}).filter(invite => invite.to === actor.id && invite.expires > this.clock() && world.rooms[invite.roomId]?.status === 'waiting'),

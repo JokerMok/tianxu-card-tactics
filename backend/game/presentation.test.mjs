@@ -13,7 +13,8 @@ test('source asset names cover all item id key variants and cards and are cached
   assert.equal(names['main:item:2'], 'Class Selection Crystal', 'medicament uses 物品ID');
   assert.equal(names['main:item:60'], 'Halfblood Soul Fragment', 'warrant uses 物品ID');
   assert.equal(names['main:item:10001'], 'Crown of Trials', 'equipment uses the newline-suffixed 物品ID key');
-  assert.equal(names['main:card:1'], 'Guard');
+  assert.equal(names['main:card:1'], '卫兵');
+  assert.equal(content.card('main:card:1').raw.Name, 'Guard', 'display localization does not alter original fields');
   assert.ok(Object.keys(names).length > 1_000);
   assert.equal(presentationNames(content), names, 'the same content instance reuses its source-name map');
 });
@@ -66,8 +67,8 @@ test('section presentation replaces object names without changing actions, param
   assert.equal(items[0].detail, '出售 1 件换取 60 银币', 'an amount equal to the asset id is not renamed');
   assert.equal(items[1].label, '制造装备 Crown of Trials，手续费 3 银币');
   assert.equal(items[1].detail, '消耗 3 件，价格 10001 银币', 'prices and quantities remain literal numbers');
-  assert.equal(items[2].label, '合成 Guard');
-  assert.deepEqual(items[2].fields[0].options.map(option => option.label), ['Guard · 品质0', 'Guard · 品质0']);
+  assert.equal(items[2].label, '合成 卫兵');
+  assert.deepEqual(items[2].fields[0].options.map(option => option.label), ['卫兵 · 品质0', '卫兵 · 品质0']);
   assert.deepEqual(items.slice(3, 8).map(item => item.label), ['升级 城堡', '升级 码头', '升级 炼金房', '升级 铁匠铺', '升级 城防']);
   assert.equal(items[3].detail, '城堡 等级 1');
   assert.equal(items[8].label, '出售 物品 #999999');

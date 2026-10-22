@@ -1,551 +1,98 @@
-import { BlockInputEvents, Color, EventTouch, Node, UITransform, Vec3 } from 'cc';
-import { CocosUi, Theme } from './CocosUi.ts';
+import { Node, UITransform, Label, Color, EventTouch, Vec3, input, Input, EventKeyboard, KeyCode, BlockInputEvents } from 'cc';
+import { CardManagementUi,palette } from './CardManagementUi.ts';
+import { ScrollRegion,type Point } from './CardScrollRegion.ts';
+import { CocosUi } from './CocosUi.ts';
 import type { OriginalUi } from './OriginalUi.ts';
-import type { RecoveredCard, RecoveredCatalog } from './RecoveredContent.ts';
-
-type CardFilter = 1 | 2 | 3;
-
-interface DeckActor {
-  id?: string;
-  name?: string;
-  level?: number;
-  profession?: number;
-  cards?: Record<string, number>;
-  deck?: string[];
-}
-
-const WINDOW_WIDTH = 922;
-const WINDOW_HEIGHT = 540;
-const PAGE_SIZE = 9;
-const DECK_PAGE_SIZE = 9;
-const PROFESSIONS = ['', '战士', '游侠', '法师', '牧师'];
-const RACES: Record<number, string> = {
-  1: '人类', 2: '亡灵', 3: '野兽', 4: '地精', 5: '巨魔', 6: '精灵', 7: '兽人',
-  8: '异界', 9: '龙族', 10: '天使', 11: '恶魔', 12: '圣军', 13: '仙灵', 14: '半精灵',
-  15: '暗巨魔', 16: '多头龙', 17: '艾什魔', 100: '战士', 101: '游侠', 102: '法师', 103: '牧师',
-};
-const NORMAL_RACE_ORDER = [1, 6, 7, 2, 4, 5, 3, 8, 9, 10, 11];
-const NORMAL_RACE_SKINS = ['renlei', 'jingling', 'shouren', 'wangling', 'dijing', 'jumo', 'yeshou', 'yijie', 'longzu', 'tianshi', 'emo'];
-const PROFESSION_TROOP_ORDER = [100, 101, 102, 103, 12, 13, 14, 15, 16, 17];
-const PROFESSION_TROOP_SKINS = ['zhanshi', 'youxia', 'fashi', 'mushi', 'shengjun', 'xianling', 'banjingling', 'anjumo', 'duotoulong', 'aishimo'];
-const DECK_CAPACITY_BY_LEVEL = [4, 5, 6, 7, 7, 8, 9, 9, 10, 11, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-  21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
-const QUALITY_POWER = [100, 120, 150, 180, 210, 250, 300];
-
-/**
- * Source-shaped card library and deck editor. It owns presentation state only;
- * the supplied callback remains the sole persistence boundary.
- */
+import type { RecoveredCatalog } from './RecoveredContent.ts';
+import { cardDisplay,activeCard,type CardDisplay as Card } from './GameText.ts';
+import { DeckDraft } from './DeckDraft.ts';
+interface Pane{region:ScrollRegion;pool:Node[];items:Card[];side:'deck'|'library';key:string}
+interface Actor{id:string;name:string;profession:number;cards:Record<string,number>;deck:string[];deckCapacity?:number}
 export class CardDeckWindow {
-  private root?: Node;
-  private parent?: Node;
-  private actor?: DeckActor;
-  private draft: string[] = [];
-  private initialDeck = '';
-  private actorKey = '';
-  private showAll = false;
-  private type: CardFilter = 1;
-  private race = 0;
-  private profession = 0;
-  private page = 0;
-  private deckPage = 0;
-  private dirty = false;
-  private pendingSave?: string;
-  private closeAfterSave = false;
-  private tooltip?: Node;
-
-  constructor(
-    private readonly ui: CocosUi,
-    private readonly original: OriginalUi,
-    private readonly catalog: RecoveredCatalog,
-    private readonly base: string,
-    private readonly callbacks: { close(): void; save(cards: string[]): void; detail(card: any): void; growth(): void },
-  ) {}
-
-  render(parent: Node, actor: any, all = false): void {
-    const nextActor = actor as DeckActor;
-    const actorKey = String(nextActor.id ?? nextActor.name ?? 'actor');
-    const normalizedDeck = (nextActor.deck ?? []).map(id => this.cardId(id)).filter(id => this.card(id));
-    const deckSignature = normalizedDeck.join('|');
-    if (this.pendingSave === deckSignature) {
-      const unchangedSinceSave = this.draft.join('|') === this.pendingSave;
-      this.initialDeck = deckSignature;
-      this.pendingSave = undefined;
-      this.dirty = !unchangedSinceSave;
-      if (unchangedSinceSave) this.draft = normalizedDeck;
-      if (this.closeAfterSave && unchangedSinceSave) {
-        this.closeAfterSave = false;
-        this.callbacks.close();
-        return;
-      }
-      this.closeAfterSave = false;
-    }
-    if (actorKey !== this.actorKey || (!this.dirty && this.initialDeck !== deckSignature)) {
-      this.actorKey = actorKey;
-      this.draft = normalizedDeck;
-      this.initialDeck = deckSignature;
-      this.page = 0;
-      this.deckPage = 0;
-      this.type = 1;
-      this.race = 0;
-      this.profession = 0;
-      this.dirty = false;
-    }
-    this.parent = parent;
-    this.actor = nextActor;
-    this.showAll = all;
-    this.ensureSecondaryFilter();
-    this.redraw();
-  }
-
-  private redraw(): void {
-    if (!this.parent || !this.actor) return;
-    if (this.root?.isValid) this.root.destroy();
-    // CardEditWnd source location is (160,0) in the 1200×600 stage.
-    const root = this.ui.node(this.parent, 'CardDeckWindow', WINDOW_WIDTH, WINDOW_HEIGHT, 21, 30);
-    root.addComponent(BlockInputEvents);
-    this.root = root;
-
-    // CardEditWnd.as:25-45 and CardManagerBook.as:51-99.
-    this.safeSkin(root, 'Book', 'KaPaiBianJi', 145 + 767 / 2, 17 + 515 / 2, 767, 515);
-    this.safeSkin(root, 'LeftBackground', 'kpbjbeijing', 72, 18 + 501 / 2, 144, 501);
-    this.ui.label(root, 'WindowTitle', '卡牌编辑', this.x(455), this.y(17), 220, 34, 20, Theme.gold);
-
-    this.sourceButton(root, 'Close', 'guanbi', '', '', 876, 25, 36, 35, () => this.close());
-    this.drawLeftPane(root);
-    this.drawFilters(root);
-    this.drawDeck(root);
-    this.drawLibrary(root);
-  }
-
-  private drawLeftPane(root: Node): void {
-    const capacity = this.deckCapacity();
-    const power = this.draft.reduce((sum, id) => {
-      const quality = Number(this.card(id)?.raw.Quality ?? 0);
-      return sum + (QUALITY_POWER[Math.max(0, Math.min(QUALITY_POWER.length - 1, quality))] ?? 0);
-    }, 0);
-    // CardCount.as positions are relative to the left pane at source y=18.
-    this.ui.label(root, 'DeckCount', `${this.draft.length}/${capacity}`, this.x(75), this.y(93), 80, 30, 25,
-      this.draft.length < Math.floor(capacity / 2) || this.draft.length > capacity ? Theme.red : Theme.gold);
-    this.ui.label(root, 'DeckMinimum', String(Math.floor(capacity / 2)), this.x(109), this.y(120), 20, 16, 14, Theme.gold);
-    this.ui.label(root, 'DeckPower', String(power), this.x(72.5), this.y(171), 75, 16, 14, Theme.gold);
-    this.ui.button(root, 'AutoDeck', '自动组牌', this.x(72), this.y(196.5), 74, 27, () => this.autoBuild(), false, true);
-
-    this.safeSkin(root, 'DetailFolder', 'kapaixiangqing_2', 72, 231.5, 121, 27);
-    const units = this.draft.filter(id => Number(this.card(id)?.raw.Type ?? 0) === 1).length;
-    const skills = this.draft.filter(id => Number(this.card(id)?.raw.Type ?? 0) === 2).length;
-    const unitPercent = this.draft.length ? Math.round(units * 100 / this.draft.length) : 0;
-    const skillPercent = this.draft.length ? Math.round(skills * 100 / this.draft.length) : 0;
-    this.ui.label(root, 'DeckTypes', `Troops: ${units} (${unitPercent}%)\nSkills: ${skills} (${skillPercent}%)`,
-      this.x(72), this.y(275), 118, 45, 13, Theme.gold, true);
-    const ready = Array.from({ length: 6 }, (_, index) => this.draft.filter(id => {
-      const value = Number(this.card(id)?.raw.InitReady ?? 0); return index === 5 ? value >= 6 : value === index + 1;
-    }).length);
-    this.ui.label(root, 'DeckReady', `Ready\n1  2  3  4  5  6+\n${ready.join('  ')}`,
-      this.x(72), this.y(350), 124, 70, 12, Theme.text, true);
-
-    // CardEditLeftInfoPane places the manual button at (6,462) inside the pane.
-    this.sourceButton(root, 'Codex', 'ajkptj', '', '', 6, 480, 134, 36, () => {
-      this.showAll = true; this.page = 0; this.ensureSecondaryFilter(); this.redraw();
-    }, this.showAll);
-  }
-
-  private drawFilters(root: Node): void {
-    const top = 34;
-    // TypeBtns.as uses a right-aligned 3×74 group with a 40px east inset.
-    this.typeSkinButton(root, 'TypeProfessionTroop', 'zhiyeshibing_2', 'zhiyeshibing_1', 653, top,
-      this.type === 3, '职业兵', () => this.setType(3));
-    this.typeSkinButton(root, 'TypeTroop', 'shibing_2', 'shibing_1.png', 727, top,
-      this.type === 1, '兵种', () => this.setType(1));
-    this.typeSkinButton(root, 'TypeSkill', 'jineng_2.png', 'jineng_1.png', 801, top,
-      this.type === 2, '技能', () => this.setType(2));
-
-    const available = this.type === 1 ? this.availableRaces(false)
-      : this.type === 3 ? this.availableRaces(true) : this.availableProfessions();
-    const order = this.type === 1 ? NORMAL_RACE_ORDER
-      : this.type === 3 ? PROFESSION_TROOP_ORDER : [1, 2, 3, 4];
-    const skins = this.type === 1 ? NORMAL_RACE_SKINS
-      : this.type === 3 ? PROFESSION_TROOP_SKINS : ['zhanshi', 'youxia', 'fashi', 'mushi'];
-    order.filter(value => available.includes(value)).forEach((value, index) => {
-      const selected = this.type === 2 ? this.profession === value : this.race === value;
-      this.verticalFilterButton(root, `Secondary:${value}`, skins[order.indexOf(value)], value, 878, 88 + index * 36,
-        selected, () => {
-          if (this.type === 2) this.profession = value; else this.race = value;
-          this.page = 0; this.redraw();
-        });
-    });
-  }
-
-  private drawDeck(root: Node): void {
-    this.ui.label(root, 'DeckTitle', `卡组 ${this.draft.length}`, this.x(242), this.y(29), 94, 18, 15, Theme.gold);
-    const start = this.deckPage * DECK_PAGE_SIZE;
-    const cards = this.draft.slice(start, start + DECK_PAGE_SIZE);
-    cards.forEach((id, index) => {
-      const card = this.card(id);
-      if (!card) return;
-      const sourceX = 195 + (index % 3) * 100;
-      const sourceY = 74 + Math.floor(index / 3) * 143;
-      this.drawCard(root, card, sourceX, sourceY, 'deck', start + index, this.draftCount(id), this.owned(id));
-    });
-    this.pager(root, 'DeckPager', this.deckPage, Math.ceil(this.draft.length / DECK_PAGE_SIZE), 425, 58, page => {
-      this.deckPage = page; this.redraw();
-    });
-  }
-
-  private drawLibrary(root: Node): void {
-    const cards = this.filteredCards();
-    const pageCount = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
-    this.page = Math.min(this.page, pageCount - 1);
-    this.ui.label(root, 'LibraryTitle', `${this.showAll ? '图鉴' : '持有'} ${cards.length}`, this.x(597), this.y(29), 94, 18, 15, Theme.gold);
-    cards.slice(this.page * PAGE_SIZE, (this.page + 1) * PAGE_SIZE).forEach((card, index) => {
-      const sourceX = 547 + (index % 3) * 100;
-      const sourceY = 74 + Math.floor(index / 3) * 143;
-      this.drawCard(root, card, sourceX, sourceY, 'library', index, this.draftCount(card.id), this.owned(card.id));
-    });
-    this.pager(root, 'LibraryPager', this.page, pageCount, 790, 58, page => {
-      this.page = page; this.redraw();
-    });
-  }
-
-  private drawCard(root: Node, card: RecoveredCard, sourceX: number, sourceY: number,
-      side: 'deck' | 'library', index: number, inDeck: number, owned: number): void {
-    const centerX = sourceX + 50;
-    const centerY = sourceY + 71.5;
-    const quality = Number(card.raw.Quality ?? 0);
-    const qualityColor = [new Color(170, 170, 160), new Color(80, 190, 105), new Color(75, 135, 235),
-      new Color(178, 100, 225), new Color(235, 155, 58), new Color(230, 205, 100)][Math.max(0, Math.min(5, quality))];
-    const slot = this.ui.node(root, `${side}:Slot:${index}`, 100, 143, this.x(centerX), this.y(centerY));
-    const panel = this.ui.panel(slot, `${side}:Card:${index}`, 85, 116, 0, 6, new Color(18, 22, 22, 245), qualityColor);
-    const art = this.catalog.assets[card.art[0]];
-    if (art?.path) void this.ui.image(panel, 'Portrait', this.assetUrl(art.path), 79, 110);
-    this.cardFrame(panel, card);
-    this.optionalLocalSkin(panel, 'ReadyPlate', 'feiyongxiao', -30, 44);
-    this.optionalLocalSkin(panel, 'RaceOrProfession', this.cardBadge(card), 31, 44);
-    this.ui.label(panel, 'Ready', String(card.raw.InitReady ?? ''), -31, 44, 18, 18, 12, Theme.gold);
-    this.qualityMarker(panel, quality);
-    const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID ?? '')];
-    if (monster) {
-      this.ui.panel(panel, 'StatShade', 79, 24, 0, -43, new Color(3, 8, 8, 165));
-      if (!(Number(monster.Type) === 2 && Number(monster.Attack) === 0)) {
-        this.ui.label(panel, 'Attack', String(monster.Attack ?? 0), -29, -43, 25, 24, 18, Theme.text);
-      }
-      this.ui.label(panel, 'HP', String(monster.HP ?? 0), 29, -43, 25, 24, 18, Theme.text);
-    }
-    const countText = side === 'deck' ? `${inDeck}/${owned}` : this.showAll ? `${inDeck} / ${owned}` : `${Math.max(0, owned - inDeck)}可用`;
-    this.ui.label(slot, 'Count', countText, 0, -64, 85, 15, 11,
-      side === 'library' && owned <= inDeck ? Theme.red : Theme.dim);
-
-    // CardToolTipUI installs an EditBigCarPanel (202×276), not a menu.
-    slot.on(Node.EventType.MOUSE_ENTER, () => this.showCardTooltip(card, sourceX, sourceY));
-    slot.on(Node.EventType.MOUSE_LEAVE, () => { this.tooltip?.destroy(); this.tooltip = undefined; });
-    this.bindCardGesture(slot, side, card.id);
-  }
-
-  private showCardTooltip(card: RecoveredCard, sourceX: number, sourceY: number): void {
-    this.tooltip?.destroy();
-    if (!this.root?.isValid) return;
-    const left = sourceX > 600 ? sourceX - 210 : sourceX + 94;
-    const top = Math.min(235, Math.max(66, sourceY));
-    const box = this.ui.node(this.root, 'CardToolTipUI:EditBigCarPanel', 202, 276,
-      this.x(left + 101), this.y(top + 138));
-    this.tooltip = box;
-    const art = this.catalog.assets[card.art[0]];
-    if (art?.path) void this.ui.image(box, 'OriginalPortrait', this.assetUrl(art.path), 196, 270);
-    const frame = this.ui.node(box, 'BigCardFrame', 85, 116); frame.setScale(202 / 85, 276 / 116, 1);
-    this.cardFrame(frame, card);
-    this.ui.panel(box, 'ContentShade', 192, 122, 0, -64, new Color(4, 8, 9, 220));
-    this.ui.label(box, 'Name', String(card.raw.Name), 0, 105, 176, 30, 14, Theme.gold);
-    const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID ?? '')];
-    const skill = this.catalog.scopes.main.skills[String(card.raw.SkillID ?? '')];
-    const description = monster ? [1, 2, 3, 4, 5].map(index =>
-      this.catalog.scopes.main.effects[String(monster[`ability${index}`])]?.EffectDes ?? '').filter(Boolean).join('\n')
-      : String(skill?.raw?.Des ?? card.raw.Des ?? '');
-    this.ui.label(box, 'Description', description.replace(/<br\s*\/?\s*>/gi, '\n').replace(/<[^>]*>/g, ''),
-      0, -58, 178, 100, 11, Theme.text, true);
-    this.ui.label(box, 'Ready', String(card.raw.InitReady ?? 0), -76, 113, 30, 28, 21, Theme.gold);
-    if (monster) this.ui.label(box, 'AttackHP', `${monster.Attack}                 ${monster.HP}`,
-      0, -120, 178, 26, 18, Theme.text);
-  }
-
-  private bindCardGesture(node: Node, side: 'deck' | 'library', id: string): void {
-    let startX = 0;
-    let startY = 0;
-    node.on(Node.EventType.TOUCH_START, (event: EventTouch) => {
-      const point = event.getUILocation(); startX = point.x; startY = point.y;
-    });
-    const finish = (event: EventTouch, cancelled = false) => {
-      const point = event.getUILocation();
-      const dragged = Math.hypot(point.x - startX, point.y - startY) > 12;
-      if (!dragged) {
-        if (cancelled) return;
-        if (side === 'library') this.add(id); else this.remove(id);
-        return;
-      }
-      const local = this.root?.getComponent(UITransform)?.convertToNodeSpaceAR(new Vec3(point.x, point.y, 0));
-      if (!local) return;
-      // Source split: centerCards starts at x=175 after its 30px inset; the
-      // preferred 342px deck pane therefore ends at source x=517.
-      const sourceX = local.x + WINDOW_WIDTH / 2;
-      if (side === 'library' && sourceX < 517) this.add(id);
-      else if (side === 'deck' && sourceX >= 517) this.remove(id);
-    };
-    node.on(Node.EventType.TOUCH_END, (event: EventTouch) => finish(event));
-    // Cocos emits TOUCH_CANCEL for a captured touch released outside the
-    // original card bounds. It is the normal cross-pane drop path.
-    node.on(Node.EventType.TOUCH_CANCEL, (event: EventTouch) => finish(event, true));
-  }
-
-  private add(id: string): void {
-    if (this.draftCount(id) >= this.owned(id)) return;
-    this.draft.push(id);
-    this.dirty = this.draft.join('|') !== this.initialDeck;
-    this.deckPage = Math.max(0, Math.ceil(this.draft.length / DECK_PAGE_SIZE) - 1);
-    this.redraw();
-  }
-
-  private remove(id: string): void {
-    const index = this.draft.lastIndexOf(id);
-    if (index < 0) return;
-    this.draft.splice(index, 1);
-    this.dirty = this.draft.join('|') !== this.initialDeck;
-    this.deckPage = Math.min(this.deckPage, Math.max(0, Math.ceil(this.draft.length / DECK_PAGE_SIZE) - 1));
-    this.redraw();
-  }
-
-  private save(): void {
-    this.pendingSave = this.draft.join('|');
-    this.closeAfterSave = false;
-    this.callbacks.save([...this.draft]);
-  }
-
-  private close(): void {
-    if (!this.dirty) { this.callbacks.close(); return; }
-    this.pendingSave = this.draft.join('|');
-    this.closeAfterSave = true;
-    this.callbacks.save([...this.draft]);
-  }
-
-  private autoBuild(): void {
-    const capacity = this.deckCapacity();
-    const next: string[] = [];
-    for (const card of this.filteredCards()) {
-      if (next.length >= capacity) break;
-      const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID ?? '')];
-      const maxCopies = Number(monster?.Unique ?? 0) > 0 ? 1 : 3;
-      const copies = Math.min(this.owned(card.id), maxCopies, capacity - next.length);
-      for (let index = 0; index < copies; index++) next.push(card.id);
-    }
-    if (next.length) {
-      this.draft = next;
-      this.dirty = this.draft.join('|') !== this.initialDeck;
-      this.deckPage = 0;
-      this.redraw();
-    }
-  }
-
-  private deckCapacity(): number {
-    const level = Math.max(1, Math.floor(Number(this.actor?.level ?? 1)));
-    return DECK_CAPACITY_BY_LEVEL[Math.min(level, DECK_CAPACITY_BY_LEVEL.length) - 1] ?? 30;
-  }
-
-  private filteredCards(): RecoveredCard[] {
-    const cards = Object.values(this.catalog.scopes.main.cards).filter(card => {
-      if (!this.showAll && this.owned(card.id) < 1) return false;
-      const rawType = Number(card.raw.Type ?? 0);
-      const phyle = this.monsterPhyle(card);
-      if (this.type === 1 && (rawType !== 1 || phyle >= 12 || phyle >= 100)) return false;
-      if (this.type === 2 && rawType !== 2) return false;
-      if (this.type === 3 && (rawType !== 1 || (phyle < 12 && phyle < 100))) return false;
-      if ((this.type === 1 || this.type === 3) && this.race && phyle !== this.race) return false;
-      if (this.type === 2 && this.profession && this.skillProfession(card) !== this.profession) return false;
-      return true;
-    });
-    return cards.sort((a, b) => Number(a.raw.ID ?? 0) - Number(b.raw.ID ?? 0));
-  }
-
-  private availableRaces(professionTroops: boolean): number[] {
-    const races = new Set<number>();
-    for (const card of Object.values(this.catalog.scopes.main.cards)) {
-      if (Number(card.raw.Type) !== 1 || (!this.showAll && this.owned(card.id) < 1)) continue;
-      const race = this.monsterPhyle(card);
-      if (race > 0 && (professionTroops ? (race >= 12 || race >= 100) : race < 12)) races.add(race);
-    }
-    return Array.from(races).sort((a, b) => a - b);
-  }
-
-  private availableProfessions(): number[] {
-    const professions = new Set<number>();
-    for (const card of Object.values(this.catalog.scopes.main.cards)) {
-      if (Number(card.raw.Type) !== 2 || (!this.showAll && this.owned(card.id) < 1)) continue;
-      const profession = this.skillProfession(card); if (profession > 0) professions.add(profession);
-    }
-    return Array.from(professions).sort((a, b) => a - b);
-  }
-
-  private monsterPhyle(card: RecoveredCard): number {
-    const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID ?? '')];
-    return Number(monster?.Phyle ?? card.raw.Race ?? 0);
-  }
-
-  private skillProfession(card: RecoveredCard): number {
-    const skillId = String(card.raw.SkillID ?? card.raw.skillID ?? '');
-    const raw = this.catalog.scopes.main.skills[skillId]?.raw;
-    return Number(raw?.['使用职业'] ?? raw?.Occ ?? raw?.occ ?? 0);
-  }
-
-  private setType(type: CardFilter): void {
-    this.type = type; this.race = 0; this.profession = 0; this.page = 0; this.ensureSecondaryFilter(); this.redraw();
-  }
-
-  private ensureSecondaryFilter(): void {
-    if (this.type === 2) {
-      const available = this.availableProfessions();
-      if (!available.includes(this.profession)) this.profession = available[0] ?? 0;
-      return;
-    }
-    const available = this.availableRaces(this.type === 3);
-    const order = this.type === 3 ? PROFESSION_TROOP_ORDER : NORMAL_RACE_ORDER;
-    if (!available.includes(this.race)) this.race = order.find(value => available.includes(value)) ?? available[0] ?? 0;
-  }
-
-  private card(id: string): RecoveredCard | undefined {
-    return this.catalog.scopes.main.cards[this.localId(id)];
-  }
-
-  private cardId(id: string): string {
-    return this.catalog.scopes.main.cards[this.localId(id)]?.id ?? id;
-  }
-
-  private localId(id: string): string { return String(id).split(':').at(-1) ?? String(id); }
-
-  private owned(id: string): number {
-    const cards = this.actor?.cards ?? {};
-    const canonical = this.cardId(id);
-    return Math.max(0, Number(cards[canonical] ?? cards[this.localId(canonical)] ?? 0));
-  }
-
-  private draftCount(id: string): number {
-    const canonical = this.cardId(id);
-    return this.draft.reduce((count, value) => count + (this.cardId(value) === canonical ? 1 : 0), 0);
-  }
-
-  private pager(root: Node, name: string, page: number, count: number, sourceX: number, sourceY: number,
-      setPage: (page: number) => void): void {
-    const pages = Math.max(1, count);
-    this.sourceButton(root, name + ':Prev', 'zuo', '', '', sourceX - 55, sourceY - 13, 24, 30,
-      () => setPage(Math.max(0, page - 1)), page <= 0);
-    this.ui.label(root, name + ':Text', `${page + 1}/${pages}`, this.x(sourceX), this.y(sourceY), 70, 25, 12, Theme.dim);
-    this.sourceButton(root, name + ':Next', 'you', '', '', sourceX + 43, sourceY - 13, 24, 30,
-      () => setPage(Math.min(pages - 1, page + 1)), page >= pages - 1);
-  }
-
-  private typeSkinButton(root: Node, name: string, normal: string, selectedSkin: string, sourceX: number,
-      sourceY: number, selected: boolean, label: string, callback: () => void): void {
-    const skin = selected ? selectedSkin : normal;
-    const node = this.safeSkin(root, name, skin, sourceX + 37, sourceY + 18, 74, 36, this.sourceSkinVariant(skin));
-    if (!this.original.catalog.skins[skin]) this.ui.label(node, name + ':FallbackLabel', label, 0, 0, 65, 28, 12, new Color(255, 245, 210));
-    if (!selected) node.on(Node.EventType.TOUCH_END, callback);
-  }
-
-  private verticalFilterButton(root: Node, name: string, skinRoot: string, value: number, sourceX: number,
-      sourceY: number, selected: boolean, callback: () => void): void {
-    const suffix = selected ? '_1.png' : '_2.png';
-    let skin = skinRoot + suffix;
-    if (!this.original.catalog.skins[skin]) {
-      skin = skinRoot + (selected ? '_1' : '_2');
-    }
-    const node = this.safeSkin(root, name, skin, sourceX + 18.5, sourceY + 16.5, 37, 33, this.sourceSkinVariant(skin));
-    if (!this.original.catalog.skins[skin]) this.ui.label(node, name + ':Label',
-      (this.type === 2 ? PROFESSIONS[value] : RACES[value] ?? String(value)).slice(0, 2),
-      0, 0, 34, 27, 10, selected ? Theme.gold : Theme.text);
-    if (!selected) node.on(Node.EventType.TOUCH_END, callback);
-  }
-
-  private cardFrame(parent: Node, card: RecoveredCard): void {
-    const phyle = this.monsterPhyle(card);
-    const names = ['renleikuang', 'renleikuang', 'wanglingkuang', 'yeshoukuang', 'dijingkuang', 'jumokuang',
-      'jinglingkuang', 'shourenkuang', 'yijiekuang', 'longzukuang', 'tianshikuang', 'emokuang',
-      'ronghekuang_shengjun', 'ronghekuang_xianling', 'ronghekuang_banjingling', 'ronghekuang_anjumo',
-      'ronghekuang_duotoulong', 'ronghekuang_aishimo', 'ronghekuang_longnu', 'ronghekuang_pinjiejumo'];
-    const name = Number(card.raw.SkillID ?? 0) > 0 || phyle >= 100 ? 'jineng' : names[phyle] ?? 'jinglingkuang';
-    const skin = this.original.catalog.skins[name];
-    if (!skin) return;
-    const variant = skin.path ? undefined : this.newPlayerVariant(name);
-    try { this.ui.skin(parent, 'SourceFrame:' + name, name, 0, 0, 85, 116, variant); } catch { /* Imported source gap. */ }
-  }
-
-  private cardBadge(card: RecoveredCard): string {
-    const skillId = String(card.raw.SkillID ?? '');
-    if (skillId) {
-      const profession = this.skillProfession(card);
-      return ['ZSxiao', 'ZSxiao', 'LRxiao', 'FSxiao', 'MSxiao', 'MSxiao'][profession] ?? 'ZSxiao';
-    }
-    const phyle = this.monsterPhyle(card);
-    if (phyle >= 100) return ['ZSxiao', 'ZSxiao', 'LRxiao', 'FSxiao', 'MSxiao', 'MSxiao'][phyle - 99] ?? 'ZSxiao';
-    return ['renleizhongzuxiao', 'renleizhongzuxiao', 'wanglingbiaozhixiao', 'yeshoubiaozhixiao',
-      'dijingbiaozhixiao', 'jumobiaozhixiao', 'jinglingbiaozhixiao', 'shourenbiaozhixiao',
-      'yijietubiaoxiao', 'longzubiaozhixiao', 'tianshibiaozhixiao', 'emobiaozhixiao',
-      'shengjuntubiaoxiao', 'xianlingtubiaoxiao', 'banjinglingtubiaoxiao', 'anjumotubiaoxiao',
-      'duotoulongtubiaoxiao', 'aishimotubiaoxiao'][phyle] ?? 'jinglingbiaozhixiao';
-  }
-
-  private optionalLocalSkin(parent: Node, name: string, skinName: string, x: number, y: number,
-      width?: number, height?: number): void {
-    const skin = this.original.catalog.skins[skinName];
-    if (!skin) return;
-    const variant = skin.path ? undefined : this.newPlayerVariant(skinName);
-    try { this.ui.skin(parent, name, skinName, x, y, width, height, variant); } catch { /* Imported source gap. */ }
-  }
-
-  private qualityMarker(parent: Node, quality: number): void {
-    const names = ['baixingxiao', 'lvxingxiao', 'lanxingxiao', 'zixingxiao', 'chengxingxiao', 'hongxingxiao', 'jinxingxiao'];
-    const name = names[Math.max(0, Math.min(names.length - 1, quality))];
-    const skin = this.original.catalog.skins[name];
-    if (!skin) return;
-    const variant = skin.path ? undefined : this.newPlayerVariant(name);
-    this.safeSkin(parent, 'Quality', name, 0, 49, 24, 12, variant, true);
-  }
-
-  private sourceSkinVariant(name: string): string | undefined {
-    const skin = this.original.catalog.skins[name];
-    if (!skin || skin.path) return undefined;
-    return Object.keys(skin.variants).find(key => key.startsWith('game/data/img/ui/kapaibianji.swf'))
-      ?? Object.keys(skin.variants)[0];
-  }
-
-  private newPlayerVariant(name: string): string | undefined {
-    const skin = this.original.catalog.skins[name];
-    if (!skin || skin.path) return undefined;
-    return Object.keys(skin.variants).find(key => key.startsWith('game/data/newplayer.swf'))
-      ?? Object.keys(skin.variants)[0];
-  }
-
-  private sourceButton(parent: Node, name: string, skin: string, pressed: string, text: string,
-      sourceX: number, sourceY: number, width: number, height: number, callback: () => void, disabled = false): Node {
-    try {
-      return this.ui.sourceButton(parent, name, skin, pressed, text, this.x(sourceX + width / 2), this.y(sourceY + height / 2),
-        width, height, callback, disabled);
-    } catch {
-      return this.ui.button(parent, name, text || '·', this.x(sourceX + width / 2), this.y(sourceY + height / 2),
-        width, height, callback, disabled, true);
-    }
-  }
-
-  private safeSkin(parent: Node, name: string, skin: string, sourceCenterX: number, sourceCenterY: number,
-      width: number, height: number, variant?: string, local = false): Node {
-    try {
-      return this.ui.skin(parent, name, skin, local ? sourceCenterX : this.x(sourceCenterX), local ? sourceCenterY : this.y(sourceCenterY),
-        width, height, variant);
-    } catch {
-      return this.ui.panel(parent, name, width, height, local ? sourceCenterX : this.x(sourceCenterX), local ? sourceCenterY : this.y(sourceCenterY),
-        new Color(28, 42, 42, 235), Theme.gold);
-    }
-  }
-
-  private assetUrl(path: string): string {
-    return this.base.replace(/\/$/, '') + '/recovered/' + path.replace(/^\//, '');
-  }
-
-  private x(sourceX: number): number { return sourceX - WINDOW_WIDTH / 2; }
-  private y(sourceY: number): number { return WINDOW_HEIGHT / 2 - sourceY; }
+ private ui:CardManagementUi;private root!:Node;private data:{cards:Card[];skins:Record<string,string>};private cards=new Map<string,Card>();readonly model=new DeckDraft();private actor!:Actor;
+ private owned:Record<string,number>={};private capacity=4;private deck!:Pane;private library!:Pane;private mode:'owned'|'atlas'='owned';private type='全部';private race=0;private profession=0;private offsets=new Map<string,number>();
+ private detailOffsets=new Map<string,number>();private selected='';private detailBody!:ScrollRegion;private detailNodes!:Node;private detailHeader!:Node;
+ private footer!:Node;private countNode!:Node;private saveNode!:Node;private filterNode!:Node;private titleNode!:Node;
+ private dragLayer!:Node;private drag?:{side:'deck'|'library';id:string;start:Point;last:Point;at:number;mode:'pending'|'scroll'|'drag';pane:Pane};private ghost?:Node;private target?:Node;
+ private nativeReleaseAt=0;private released=()=>{this.nativeReleaseAt=Date.now();};private message='点击卡牌固定详情；横向拖动可加入或移除。';private closeDialog?:Node;private closeAfterSave?:()=>void;private blur=()=>this.cancelDrag('窗口失去焦点，拖放已取消。');
+ constructor(_ui:CocosUi,original:OriginalUi,private catalog:RecoveredCatalog,private base:string,private callbacks:{close():void;save(cards:string[],requestId:string,actorId:string):Promise<string[]>;detail(card:any):void;growth():void}){
+ this.ui=new CardManagementUi(base+'/ui-assets/');const skins:Record<string,string>={};for(const [name,skin]of Object.entries(original.catalog.skins)){const v=skin.path||skin.file?skin:Object.entries(skin.variants).find(([key])=>key.includes('newplayer.swf'))?.[1]??Object.values(skin.variants)[0];const path=v?.file||('path'in v&&v.path?v.path+'.png':undefined);if(path)skins[name]=base+'/recovered/'+path;}
+ this.data={cards:Object.values(catalog.scopes.main.cards).filter(c=>activeCard(catalog,c)).map(c=>cardDisplay(catalog,c,base)),skins};for(const c of this.data.cards)this.cards.set(c.id,c);
+ input.on(Input.EventType.KEY_DOWN,this.key,this);globalThis.addEventListener('mouseup',this.released,true);globalThis.addEventListener('touchend',this.released,true);globalThis.addEventListener('blur',this.blur);globalThis.addEventListener('touchcancel',this.blur,true);globalThis.addEventListener('pointercancel',this.blur,true);
+ }
+ render(parent:Node,actor:Actor,all=false){const changed=this.model.sync(actor.id,actor.deck);this.actor=actor;this.owned=actor.cards;this.capacity=Number(actor.deckCapacity??4);if(changed){this.offsets.clear();this.detailOffsets.clear();this.selected='';this.type='全部';this.race=0;this.profession=0;this.mode=all?'atlas':'owned';this.closeAfterSave=undefined;}
+ // Preserve legacy owned special entries even when they are outside the regular atlas.
+ for(const id of Object.keys(actor.cards)){const raw=this.catalog.scopes.main.cards[id.split(':').at(-1)!];if(raw&&!this.cards.has(id)){const c=cardDisplay(this.catalog,raw,this.base);this.cards.set(id,c);this.data.cards.push(c);}}
+ this.detach();this.root=this.ui.node(parent,'CardDeckWindow',-600,-300,1200,600);this.root.setPosition(-600,300);this.root.addComponent(BlockInputEvents);this.build();}
+ updateActor(actor:Actor){if(actor.id!==this.actor?.id)return;const before=this.model.cards.join('|'),owned=JSON.stringify(this.owned),capacity=this.capacity;this.model.sync(actor.id,actor.deck);this.actor=actor;this.owned=actor.cards;this.capacity=Number(actor.deckCapacity??4);if(this.root?.isValid&&(before!==this.model.cards.join('|')||owned!==JSON.stringify(this.owned)||capacity!==this.capacity))this.refreshLists();}
+ detach(){this.clearDrag();if(this.root?.isValid)this.ui.destroy(this.root);this.closeDialog=undefined;}
+ destroy(){this.detach();input.off(Input.EventType.KEY_DOWN,this.key,this);globalThis.removeEventListener('mouseup',this.released,true);globalThis.removeEventListener('touchend',this.released,true);globalThis.removeEventListener('blur',this.blur);globalThis.removeEventListener('touchcancel',this.blur,true);globalThis.removeEventListener('pointercancel',this.blur,true);this.ui.pool.dispose();}
+ private audit(event:string,data:Record<string,unknown>){if(new URLSearchParams(globalThis.location?.search??'').has('metrics'))console.info('CardManagementMetrics',JSON.stringify({event,...data,...this.ui.pool.stats(),slots:(this.deck?.pool.length??0)+(this.library?.pool.length??0)}));}
+ setLibraryMode(all:boolean){this.mode=all?'atlas':'owned';}
+ private point(e:EventTouch):Point{const p=e.getUILocation();const v=this.root.getComponent(UITransform)!.convertToNodeSpaceAR(new Vec3(p.x,p.y));return{x:v.x,y:-v.y};}
+ private build(){this.ui.clear(this.root);this.ui.rect(this.root,'Backdrop',0,0,1200,600,new Color(14,24,25));
+ this.ui.text(this.root,'Title','卡组编辑',178,9,410,31,20,palette.gold);this.ui.text(this.root,'Character',this.actor.name,15,13,160,32,12,palette.dim);
+ this.ui.image(this.root,'Book:TextlessDerivative',this.base+'/ui-assets/book-textless.png',178,57,792,532);
+ this.ui.panel(this.root,'ManagerSidebar',10,57,150,532);this.ui.text(this.root,'SideTitle','卡牌管理',22,69,126,30,18,palette.gold,true);
+ this.countNode=this.ui.node(this.root,'DeckCountFixed',22,110,126,112);this.saveNode=this.ui.node(this.root,'SaveStatusFixed',22,350,126,118);this.footer=this.ui.node(this.root,'FeedbackFixed',206,520,725,28);
+ this.ui.button(this.root,'OwnedMode','持有卡牌',716,12,113,31,()=>this.setMode('owned'));this.ui.button(this.root,'AtlasMode','卡牌图鉴',839,12,113,31,()=>this.setMode('atlas'));
+ this.ui.button(this.root,'AutoDeck','自动组牌',22,256,126,30,()=>this.autoBuild());this.ui.button(this.root,'Growth','卡牌加工',22,294,126,30,()=>this.close(()=>this.callbacks.growth()));
+ this.ui.button(this.root,'Close','关闭',1080,12,100,31,()=>this.close());
+ this.titleNode=this.ui.node(this.root,'BookTitlesFixed',0,0,1200,100);this.filterNode=this.ui.node(this.root,'LibraryFiltersFixed',585,99,334,30);
+ this.deck=this.makePane('deck',212,145,330,350);this.library=this.makePane('library',585,145,330,350);
+ this.ui.panel(this.root,'PinnedDetails',978,57,212,532);this.detailHeader=this.ui.node(this.root,'PinnedHeader',989,69,190,222);
+ this.detailBody=new ScrollRegion(this.ui,this.root,'DetailScroll',990,320,180,252,e=>this.point(e),v=>{this.detailNodes.setPosition(0,v);this.detailOffsets.set(this.selected,v);this.audit('detail-scroll',{offset:Math.round(v)});});this.detailNodes=this.detailBody.content;
+ this.dragLayer=this.ui.node(this.root,'IndependentDragLayer',0,0,1200,600);this.refreshLists();this.select(this.selected&&this.cards.has(this.selected)?this.selected:this.model.cards[0]||this.data.cards[0]?.id);this.refreshStatus();}
+ private makePane(side:'deck'|'library',x:number,y:number,w:number,h:number):Pane{let pane!:Pane;const region=new ScrollRegion(this.ui,this.root,side==='deck'?'DeckScroll':'LibraryScroll',x,y,w,h,e=>this.point(e),v=>{this.offsets.set(pane.key,v);this.paint(pane);this.audit('card-scroll',{side,offset:Math.round(v)});});const pool=Array.from({length:15},(_,i)=>this.ui.node(region.content,side+':RecycledCard:'+i,0,0,100,168));pane={region,pool,items:[],side,key:side};for(const slot of pool)this.gesture(slot,pane);return pane;}
+ private setMode(mode:'owned'|'atlas'){this.offsets.set(this.library.key,this.library.region.offset);this.mode=mode;this.refreshLists();this.message=mode==='atlas'?'图鉴浏览当前可用卡牌；未持有卡只能查看。':'只显示当前角色持有卡牌。';this.refreshStatus();}
+ private refreshLists(){this.deck.items=this.model.cards.map(id=>this.cards.get(id)!).filter(Boolean);this.deck.key='deck';this.deck.region.setTotal(Math.ceil(this.deck.items.length/3)*168);this.deck.region.restore(this.offsets.get('deck')||0);
+ this.library.key=this.mode+':'+this.type+':'+this.race+':'+this.profession;this.library.items=this.data.cards.filter(c=>(this.mode==='atlas'||this.owned[c.id]>0)&&(this.type==='全部'||c.type===this.type)&&(!this.race||c.raceId===this.race)&&(!this.profession||c.profession===this.profession));this.library.region.setTotal(Math.ceil(this.library.items.length/3)*168);this.library.region.restore(this.offsets.get(this.library.key)||0);
+ this.ui.clear(this.titleNode);this.ui.text(this.titleNode,'DeckTitle','当前卡组',213,58,128,25,15,palette.gold,true);this.ui.text(this.titleNode,'LibraryTitle',this.mode==='atlas'?'卡牌图鉴':'持有卡牌',582,58,128,25,15,palette.gold,true);this.ui.text(this.titleNode,'DeckHint','卡牌可上下滚动 · 拖出移除',216,104,326,27,13,palette.paper,true);
+ this.ui.clear(this.filterNode);['全部','兵种','技能'].forEach((t,i)=>{const b=this.ui.button(this.filterNode,'Type:'+t,(t===this.type?'✓ ':'')+t,i*109,0,101,27,()=>{this.offsets.set(this.library.key,this.library.region.offset);this.type=t;this.refreshLists();this.refreshStatus();});});this.drawSecondaryFilters();this.refreshStatus();}
+ private secondaryFilters?:Node;
+ private drawSecondaryFilters(){if(this.secondaryFilters?.isValid)this.ui.destroy(this.secondaryFilters);const holder=this.secondaryFilters=this.ui.node(this.root,'SecondaryFiltersFixed',0,0,160,540);const races=[0].concat(Array.from(new Set(this.data.cards.map(c=>c.raceId).filter(Boolean)))).sort((a,b)=>a-b);const title=this.race?this.data.cards.find(c=>c.raceId===this.race)?.race??'特殊':'全部';this.ui.button(holder,'RaceFilter','种族：'+title,22,223,126,26,()=>{this.offsets.set(this.library.key,this.library.region.offset);this.race=races[(races.indexOf(this.race)+1)%races.length];this.refreshLists();});this.ui.button(holder,'ProfessionFilter','职业：'+['不限','战士','游侠','法师','牧师'][this.profession],22,500,126,26,()=>{this.offsets.set(this.library.key,this.library.region.offset);this.profession=(this.profession+1)%5;this.refreshLists();});}
+ private paint(pane:Pane){const first=Math.floor(pane.region.offset/168)*3;
+ pane.pool.forEach((slot,i)=>{const index=first+i,c=pane.items[index];slot.active=Boolean(c);if(!c)return;slot.setPosition((index%3)*110,-(Math.floor(index/3)*168-pane.region.offset));const key=c.id+':'+index+':'+this.count(c.id)+':'+this.selected+':'+(this.owned[c.id]||0);
+ if((slot as any).__key===key)return;(slot as any).__key=key;this.ui.clear(slot);(slot as any).__card=c;
+ this.drawCard(slot,c,pane.side,index);});}
+ private drawCard(slot:Node,c:Card,side:'deck'|'library',index:number){const frameKey=c.frame;this.ui.image(slot,'OriginalPortrait',c.art,7,0,85,116);this.ui.image(slot,'OriginalRaceFrame',this.data.skins[frameKey]||this.data.skins.renleikuang,7,0,85,116);
+ this.ui.text(slot,'Ready',String(c.ready),9,3,18,21,16,palette.text,true);this.ui.text(slot,'Attack',c.attack==null?'':String(c.attack),10,91,24,21,16,palette.text,true);this.ui.text(slot,'HP',c.hp==null?'':String(c.hp),66,91,24,21,16,palette.text,true);
+ const star=['baixingxiao','lvxingxiao','lanxingxiao','zixingxiao','chengxingxiao','hongxingxiao','jinxingxiao'][Math.min(6,c.quality)];if(this.data.skins[star])this.ui.image(slot,'OriginalQualityStar',this.data.skins[star],38,1,22,12);
+ if(this.selected===c.id)this.ui.outline(slot,'Selected',5,-2,89,120);
+ this.ui.text(slot,'ChineseName',c.name.length>7?c.name.replace('·','\n'):c.name,0,118,100,34,13,palette.paper,true);
+ const available=(this.owned[c.id]||0)-this.count(c.id),text=side==='deck'?`${this.count(c.id)}/${this.owned[c.id]||0} 已加入`:available>0?`可用 ${available}`:this.owned[c.id]?'已全部加入':'尚未持有';
+ this.ui.text(slot,'Quantity',text,0,153,77,15,12,available>0||side==='deck'?palette.paper:new Color(107,55,39),true);
+ const action=this.ui.button(slot,side==='deck'?'Remove':'Add',side==='deck'?'−':available>0?'+':'?',78,151,20,17,()=>{if(side==='deck')this.remove(c.id);else this.add(c.id);});
+ }
+ // Cocos reports a mouse release outside the source card as TOUCH_CANCEL. Only a native end may commit; true OS cancel/blur/Esc never commits.
+ private gesture(slot:Node,pane:Pane){slot.on(Node.EventType.TOUCH_MOVE,this.moveGesture,this);slot.on(Node.EventType.TOUCH_END,this.endGesture,this);slot.on(Node.EventType.TOUCH_CANCEL,(e:EventTouch)=>{if(Date.now()-this.nativeReleaseAt<150)this.endGesture(e);else this.cancelGesture();});slot.on(Node.EventType.TOUCH_START,(e:EventTouch)=>{const c=(slot as any).__card as Card;if(!c)return;const p=this.point(e);if(!pane.region.contains(p))return;e.propagationStopped=true;this.nativeReleaseAt=0;this.drag={side:pane.side,id:c.id,start:p,last:p,at:Date.now(),mode:'pending',pane};this.audit('gesture-start',{id:c.id,side:pane.side});});}
+ private moveGesture(e:EventTouch){const d=this.drag;if(!d)return;const p=this.point(e),dx=p.x-d.start.x,dy=p.y-d.start.y;
+ if(d.mode==='pending'&&Math.hypot(dx,dy)>9){d.mode=Math.abs(dy)>Math.abs(dx)*1.25&&Date.now()-d.at<260?'scroll':'drag';if(d.mode==='drag')this.beginGhost(this.cards.get(d.id)!,d.side);}
+ if(d.mode==='scroll')d.pane.region.set(d.pane.region.offset+d.last.y-p.y);
+ if(d.mode==='drag'&&this.ghost){this.ghost.setPosition(p.x-42,-(p.y-58));const region=d.side==='library'?this.deck.region:this.library.region;this.target!.active=region.contains(p)&&(d.side==='deck'||!this.addReason(d.id));}d.last=p;
+ }
+ private endGesture(e:EventTouch){const d=this.drag;if(!d)return;const p=this.point(e);if(d.mode==='pending')this.select(d.id);else if(d.mode==='drag'){const region=d.side==='library'?this.deck.region:this.library.region;if(region.contains(p)){if(d.side==='library')this.add(d.id);else this.remove(d.id);}else{this.message='已取消拖放：请释放到高亮内容区域内。';this.audit('drop-cancel',{x:Math.round(p.x),y:Math.round(p.y),draft:this.model.cards.length});this.refreshStatus();}}this.clearDrag();}
+ private cancelGesture(){this.cancelDrag('指针操作取消，卡组未改变。');}
+ private beginGhost(c:Card,side:'deck'|'library'){this.ghost=this.ui.node(this.dragLayer,'DragGhost',0,0,85,116);this.ui.image(this.ghost,'Portrait',c.art,0,0,85,116);this.ui.image(this.ghost,'Frame',this.data.skins[c.frame]||this.data.skins.renleikuang,0,0,85,116);const r=side==='library'?this.deck.region:this.library.region;this.target=this.ui.outline(this.dragLayer,'LegalDropRegion',r.x,r.y,r.w,r.h);this.target.active=false;this.audit('drag-start',{side,id:c.id});}
+ private clearDrag(){if(this.ghost)this.ui.destroy(this.ghost);if(this.target)this.ui.destroy(this.target);this.ghost=undefined;this.target=undefined;this.drag=undefined;}
+ private cancelDrag(reason:string){if(!this.drag)return;this.clearDrag();this.message=reason;this.refreshStatus();}
+ private key(e:EventKeyboard){if(e.keyCode!==KeyCode.ESCAPE)return;if(this.drag)this.cancelDrag('拖放已取消，草稿保留。');else if(this.closeDialog?.isValid){this.ui.destroy(this.closeDialog);this.closeDialog=undefined;}else if(this.root?.isValid)this.close();}
+ private count(id:string){return this.model.cards.filter(x=>x===id).length;}
+ private addReason(id:string){const c=this.cards.get(id)!;return this.count(id)>=(this.owned[id]||0)?(this.owned[id]?'持有卡牌已全部加入。':'这张卡牌尚未持有。'):this.model.cards.length>=this.capacity?'当前卡组已达到容量上限。':this.count(id)>=(c.unique?1:3)?'已达到该卡牌的同名数量上限。':c.profession>0&&c.profession!==this.actor.profession?'卡牌职业不符。':'';}
+ private add(id:string){const reason=this.addReason(id);if(reason)this.message='不可加入：'+reason;else{this.model.cards.push(id);this.model.error='';this.message='已加入「'+this.cards.get(id)!.name+'」，请保存卡组。';this.refreshLists();}this.refreshStatus();}
+ private remove(id:string){const i=this.model.cards.lastIndexOf(id);if(i<0)return;this.model.cards.splice(i,1);this.model.error='';this.message='已移除「'+this.cards.get(id)!.name+'」，'+(this.model.dirty?'草稿尚未保存。':'已恢复已保存内容。');this.refreshLists();this.refreshStatus();}
+ private select(id:string){if(!id||!this.cards.has(id))return;if(this.selected===id&&this.detailNodes.children.length)return;this.detailOffsets.set(this.selected,this.detailBody.offset);this.selected=id;this.paint(this.deck);this.paint(this.library);this.ui.clear(this.detailHeader);this.ui.clear(this.detailNodes);const c=this.cards.get(id)!;
+ this.ui.text(this.detailHeader,'DetailTitle','卡牌详情',0,-8,190,25,15,palette.gold,true);this.ui.text(this.detailHeader,'ChineseTitle',c.name,0,25,190,40,16,palette.gold,true);this.ui.text(this.detailHeader,'Classification',c.race+' · '+c.type+' · 准备 '+c.ready,0,65,190,24,12,palette.text,true);
+ this.ui.image(this.detailHeader,'OriginalPortrait',c.art,52,94,85,116);this.ui.image(this.detailHeader,'OriginalFrame',this.data.skins[c.frame]||this.data.skins.renleikuang,52,94,85,116);
+ this.ui.text(this.detailHeader,'Stats',c.attack==null?'技能卡':`攻击 ${c.attack}    生命 ${c.hp}`,0,211,190,23,14,palette.gold,true);
+ let y=2;for(const [i,a]of c.abilities.entries()){const title=this.ui.paragraph(this.detailNodes,'AbilityName:'+i,a.name,3,y,172,14,palette.gold);y+=title.node.getComponent(UITransform)!.height+3;const body=this.ui.paragraph(this.detailNodes,'AbilityText:'+i,a.text,3,y,172,14);y+=body.node.getComponent(UITransform)!.height+15;}
+ if(c.flavor){const t=this.ui.paragraph(this.detailNodes,'OriginalChineseFlavor','背景\n'+c.flavor,3,y,172,13,palette.dim);y+=t.node.getComponent(UITransform)!.height+15;}
+ const note=this.ui.paragraph(this.detailNodes,'TranslationStatus',(c.nameStatus==='candidate'?'候选译名，待确认。':c.nameStatus==='missing'?'缺少可靠中文，保留原名核对。':'名称有原始中文依据。')+'\n技能译文保留原条件与数值。',3,y,172,12,palette.dim);y+=note.node.getComponent(UITransform)!.height+12;
+ this.detailBody.setTotal(y);this.detailBody.restore(this.detailOffsets.get(id)||0);this.audit('detail-open',{id,name:c.name,textHeight:y});}
+ private refreshStatus(){if(!this.countNode?.isValid)return;this.ui.clear(this.countNode);this.ui.text(this.countNode,'Count',`${this.model.cards.length} / ${this.capacity}`,0,0,126,37,26,palette.gold,true);this.ui.text(this.countNode,'Capacity','当前角色卡组',0,39,126,25,12,palette.text,true);const n=this.model.cards.filter(id=>this.cards.get(id)?.type==='兵种').length;this.ui.text(this.countNode,'Composition',`兵种 ${n}    技能 ${this.model.cards.length-n}`,0,77,126,26,13,palette.text,true);
+ this.ui.clear(this.saveNode);const state=this.model.saving?'保存中…':this.model.error?'保存失败':this.model.dirty?'未保存':this.model.confirmed?'已保存':'未修改';const note=this.model.saving?'等待服务器确认':this.model.error?this.model.error:this.model.pending?'请重试确认上次请求':this.model.dirty?'草稿尚未保存':'与服务器记录一致';this.ui.text(this.saveNode,'SaveState',state+'\n'+note,0,0,126,53,12,this.model.error?palette.red:this.model.dirty?palette.gold:palette.green,true);
+ this.ui.button(this.saveNode,'Save',this.model.pending?'重试上次保存':'保存卡组',0,66,126,31,()=>{void this.save();},this.model.saving);this.ui.button(this.saveNode,'Revert','撤销修改',0,107,126,26,()=>{this.model.revert();this.message='已撤销本地修改。';this.refreshLists();},this.model.saving||Boolean(this.model.pending));this.ui.clear(this.footer);this.ui.text(this.footer,'Feedback',this.message,0,0,725,28,13,this.message.startsWith('不可')?new Color(111,38,25):palette.paper,true);}
+ private async save(){const submitted=this.model.begin();if(!submitted)return;this.refreshStatus();try{const deck=await this.callbacks.save(submitted.cards,submitted.requestId,submitted.actorId);this.model.acknowledge(submitted,deck);if(this.actor.id!==submitted.actorId)return;this.message=this.model.dirty?'提交的版本已保存；后续修改仍未保存。':'服务器已确认保存。';this.refreshStatus();if(this.closeAfterSave&&!this.model.dirty&&!this.model.saving){const close=this.closeAfterSave;this.closeAfterSave=undefined;close();}}catch(error){this.model.fail(submitted,/[\u4e00-\u9fff]/.test(String(error))?String(error).replace(/^Error: /,''):'网络连接中断，请重试确认；草稿已保留。',!(error as {definitive?:boolean}).definitive);if(this.actor.id!==submitted.actorId)return;this.closeAfterSave=undefined;this.message='保存失败：'+this.model.error;this.refreshStatus();}}
+ private autoBuild(){const next:string[]=[];for(const c of this.data.cards){if(c.profession>0&&c.profession!==this.actor.profession)continue;for(let i=0;i<Math.min(this.owned[c.id]||0,c.unique?1:3)&&next.length<this.capacity;i++)next.push(c.id);if(next.length>=this.capacity)break;}this.model.cards=next;this.model.error='';this.message='自动组牌已生成草稿，请保存。';this.refreshLists();}
+ private close(next=()=>this.callbacks.close()){if(this.model.saving){this.message='保存请求进行中，请等待服务器响应。';this.refreshStatus();return;}if(!this.model.dirty&&!this.model.pending){next();return;}if(this.closeDialog?.isValid)return;const d=this.closeDialog=this.ui.node(this.root,'UnsavedConfirmation',300,170,580,220);d.addComponent(BlockInputEvents);this.ui.panel(d,'Dialog',0,0,580,220);this.ui.text(d,'Question',this.model.pending?'上次保存结果尚未确认，请重试；草稿将保留。':'卡组尚未保存，要如何处理？',25,45,530,70,18,palette.text,true);this.ui.button(d,'Stay','继续编辑',35,147,145,35,()=>{this.ui.destroy(d);this.closeDialog=undefined;});this.ui.button(d,'SaveClose','保存后关闭',217,147,145,35,()=>{this.ui.destroy(d);this.closeDialog=undefined;this.closeAfterSave=next;void this.save();});this.ui.button(d,'Discard','放弃修改',400,147,145,35,()=>{this.model.revert();next();},Boolean(this.model.pending));}
 }
