@@ -9905,9 +9905,9 @@
       "originalText": "All friendly Beasts gain status: Rage 1 (Whenever this creature takes damage, it gains +1 Attack)."
     },
     "main:effect:3967": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "位面鼓舞",
+      "text": "本版本说明：全场其他友方位面生物获得“攻击1”（攻击+1）。",
+      "status": "runtime-description",
       "source": "config_row:a9760f2e3a41a29583a4",
       "originalName": "",
       "originalText": ""
@@ -10265,9 +10265,9 @@
       "originalText": "Deals 3 Fire damage to an enemy hero each turn."
     },
     "main:effect:4304": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗影直击",
+      "text": "本版本说明：每回合有50%概率对敌方英雄造成2点暗影伤害。",
+      "status": "runtime-description",
       "source": "config_row:2aa4b900b2dbf3bd7f5b",
       "originalName": "",
       "originalText": ""
@@ -11705,9 +11705,9 @@
       "originalText": "Summons 1 Dread Phantom（5/3/7/Soulbound/Incorporeal/Fear）in an adjacent square every 7 turns."
     },
     "main:effect:6147": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "圣骑士召唤",
+      "text": "本版本说明：每回合在相邻空位召唤1个圣骑士。",
+      "status": "runtime-description",
       "source": "config_row:0235166ea4ed8052b1d6",
       "originalName": "",
       "originalText": ""
@@ -11849,9 +11849,9 @@
       "originalText": "Summon a Floating Sword in an adjacent square each turn (1/3/1 Windwalk/suddenly appear), max. 3."
     },
     "main:effect:6184": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "飞行坦克召唤",
+      "text": "本版本说明：每回合在相邻空位召唤1个飞行坦克。",
+      "status": "runtime-description",
       "source": "config_row:a51eaf9234ae3bbc2413",
       "originalName": "",
       "originalText": ""
@@ -12313,17 +12313,17 @@
       "originalText": "When this creature deals damage to hero, summon 1 Elfin (1/1/2) in an adjacent square."
     },
     "main:effect:7503": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗翼刺客召唤",
+      "text": "本版本说明：此生物对英雄造成伤害时，在相邻空位召唤1个暗翼刺客（编号9041）。",
+      "status": "runtime-description",
       "source": "config_row:84f0f1e8d0b174ee2e66",
       "originalName": "",
       "originalText": ""
     },
     "main:effect:7504": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗翼刺客召唤",
+      "text": "本版本说明：此生物对英雄造成伤害时，在相邻空位召唤1个暗翼刺客（编号9042）。",
+      "status": "runtime-description",
       "source": "config_row:11f5ecb90491ec6ff770",
       "originalName": "",
       "originalText": ""
@@ -16913,25 +16913,25 @@
       "originalText": "When no. of friendly human creatures is 4 or more, all other friendly human creatures gain ability Heroic 1."
     },
     "main:effect:16204": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 2",
+      "text": "本版本说明：友方人类生物不少于2个时，所有其他友方人类生物获得“生命1”（生命值+1）。",
+      "status": "runtime-description",
       "source": "config_row:babdd4fddf7574ebe40b",
       "originalName": "",
       "originalText": ""
     },
     "main:effect:16205": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 3",
+      "text": "本版本说明：友方人类生物不少于3个时，所有其他友方人类生物获得“魔抗3”（受到的魔法伤害减少3点）。",
+      "status": "runtime-description",
       "source": "config_row:00a6b4d670433546ce45",
       "originalName": "",
       "originalText": ""
     },
     "main:effect:16206": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 4",
+      "text": "本版本说明：友方人类生物不少于4个时，所有其他友方人类生物获得“英勇1”（造成伤害后攻击+1）。",
+      "status": "runtime-description",
       "source": "config_row:9d7c7bea0c2ac2a303cc",
       "originalName": "",
       "originalText": ""
@@ -17049,9 +17049,9 @@
       "originalText": "On death, deals 5 Fire damage to all adjacent enemy creatures."
     },
     "main:effect:17201": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "石化降临",
+      "text": "本版本说明：进场时必定获得“石化29”，持续20回合：生命值+100，失去所有能力，无法移动或攻击，且不能成为单体技能的目标。",
+      "status": "runtime-description",
       "source": "config_row:ec2e46e9349e51fc3fca",
       "originalName": "",
       "originalText": ""
@@ -23319,16 +23319,6 @@
     "main:effect:2897",
     "main:effect:2898",
     "main:effect:2899",
-    "main:effect:3967",
-    "main:effect:4304",
-    "main:effect:6147",
-    "main:effect:6184",
-    "main:effect:7503",
-    "main:effect:7504",
-    "main:effect:16204",
-    "main:effect:16205",
-    "main:effect:16206",
-    "main:effect:17201",
     "main:effect:28100",
     "main:effect:28101",
     "main:effect:28102",

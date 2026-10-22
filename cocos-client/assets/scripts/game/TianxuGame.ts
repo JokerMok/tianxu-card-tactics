@@ -5,7 +5,7 @@ import type { RecoveredCatalog, RecoveredCard } from './RecoveredContent.ts';
 import type { BattleState, LegalPlay, BattleAction } from './GameContracts.ts';
 import { OriginalUi, type OriginalUiCatalog, type OriginalUiMount } from './OriginalUi.ts';
 import { BattleSceneView } from './BattleSceneView.ts';
-import { cardName, cardDisplay } from './GameText.ts';
+import { cardName, cardDisplay, presentationName } from './GameText.ts';
 import { CardDeckWindow } from './CardDeckWindow.ts';
 import { GrowthWindows } from './GrowthWindows.ts';
 import { WorldMapWindow } from './WorldMapWindow.ts';
@@ -435,20 +435,20 @@ export class TianxuGame extends Component {
   private openOriginalNode(node: SceneNodeView, page = 0) {
     this.closeModal();
     this.modal = this.ui.panel(this.root, 'PathPoint:shade', 1200, 600, 0, 0, new Color(0, 0, 0, 128));
-    const panel = this.ui.skin(this.modal, 'PathPointPane', 'dtks_1', 0, 0, 472, 346);
-    this.ui.label(panel, 'Title', node.name, 0, 154, 380, 26, 18, Theme.gold);
+    const panel = this.ui.skin(this.modal, 'PathPointPane', 'kpglk_1', 0, 0, 472, 346);
+    this.ui.label(panel, 'Title', presentationName(node.name), 0, 154, 380, 26, 18, Theme.gold);
     this.ui.sourceButton(panel, 'PathPoint:Close', 'ajguanbixiao', '', '', 218, 155, 24, 24, () => this.closeModal());
-    const story = (node.story || node.name).replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&'); const chunks = story.match(/[\s\S]{1,300}/g) ?? [story];
+    const story = (node.name === 'Cathedral of the Goddess' ? '1—1 女神大教堂\n\n教堂钟声急促响起，既是警报，也是集结号。哥布林强盗正在袭击这座庄严的教堂，卫兵已快要抵挡不住。请尽快前去支援！' : node.story || presentationName(node.name)).replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&'); const chunks = story.match(/[\s\S]{1,300}/g) ?? [story];
     this.ui.label(panel, 'Description', chunks[page] ?? '', -83, 37, 256, 200, 13, Theme.text, true);
     this.ui.label(panel, 'DeckName', `当前卡组 ${this.state!.actor.deck.length} 张`, -63, -94, 210, 26, 14, Theme.gold);
-    this.ui.sourceButton(panel, 'PathPoint:Deck', 'ajtpgg_1', '', '', -39, -133, 114, 36, () => { this.closeModal(); this.navigate('cards'); });
+    this.ui.button(panel, 'PathPoint:Deck', '更换卡组', -39, -133, 114, 36, () => { this.closeModal(); this.navigate('cards'); });
     const scene = this.catalog!.scopes.main.scenes.find(scene => scene.id === node.id.split(':node:')[0]);
     const pathpoint = scene?.nodes.find(row => row._tag === 'pathpoint' && String(row.id) === node.originalId);
     const card = this.catalog!.scopes.main.cards[String(pathpoint?.cardid ?? '')]; const art = this.catalog!.assets[card?.art[0]];
     if (art?.path) void this.ui.image(panel, 'PathPoint:EnemyCard', this.apiBase + '/recovered/' + art.path, 121, 166, 139, 40);
-    this.ui.sourceButton(panel, 'PathPoint:Start', 'ajks_1', '', '', 139, -89, 114, 36, () => {
+    this.ui.button(panel, 'PathPoint:Start', '开始挑战', 139, -89, 114, 36, () => {
       this.closeModal(); this.battleHidden = false; void this.run('pve.start', { nodeId: node.id });
-    }, !node.accessible, 'game/data/img/ui/ui_step1.swf#177');
+    }, !node.accessible);
     this.ui.button(panel, 'PathPoint:Coop', '合作挑战', 139, -132, 114, 27, () => {
       this.closeModal(); this.battleHidden = false; void this.run('room.create', { mode: 'coop', nodeId: node.id });
     }, !node.accessible);

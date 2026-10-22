@@ -30,7 +30,7 @@ for c in active:
   t=skills.get(c['id']);desc=r.get('Des','')
   linked=d['skills'].get(str(r.get('SkillID')),{}).get('raw')or{}
   linked_text=linked.get('Des')
-  if c['id'] in ['main:card:50808','main:card:50809','main:card:50903'] and linked_text:
+  if c['id'] in ['main:card:50808','main:card:50809','main:card:50903'] and linked_text and (not t or t.get('status')=='missing'):
    translated='进入该格子的生物受到3点火焰伤害；在该格子结束回合的生物受到'+('5'if c['id']=='main:card:50809'else'3')+'点火焰伤害。' if c['id']!='main:card:50903'else'任意玩家的生物进入结界之地时，移除其全部增益效果；停留其中时无法获得增益效果。'
    t={'name':shown['name'],'text':translated,'status':'candidate','source':'linked Skill.Des; Card.Des is non-text zero','originalText':linked_text}
   if t:result['skills'][c['id']]=dict(t,name=shown['name'])
@@ -43,5 +43,5 @@ for k,e in result['effects'].items():
  if e['status']=='missing':missing['effects'].append(k)
 for k,s in result['skills'].items():
  if s['status']=='missing':missing['skillDescriptions'].append(k)
-coverage={'scope':'Current main playable Type1 linked monster and Type2 linked skill. Includes currently available card-pool, atlas, reward and upgrades; excludes deprecated/Abandoned and other-version media scope.','sourceManifest':cat['sourceManifest'],'activeCards':len(active),'distinctNames':len(set(c['raw']['Name']for c in active)),'cardNames':dict(collections.Counter(v['status']for v in result['cards'].values())),'effects':dict(collections.Counter(v['status']for v in result['effects'].values())),'skillDescriptions':dict(collections.Counter(v['status']for v in result['skills'].values())),'missing':missing}
+coverage={'scope':'Current main player-visible Type1 linked monster and Type2 linked skill. Runtime support is tracked separately in unsupportedSkillCards. Includes card-pool, atlas, reward and upgrades; excludes deprecated/Abandoned and other-version media scope.','sourceManifest':cat['sourceManifest'],'activeCards':len(active),'distinctNames':len(set(c['raw']['Name']for c in active)),'cardNames':dict(collections.Counter(v['status']for v in result['cards'].values())),'effects':dict(collections.Counter(v['status']for v in result['effects'].values())),'skillDescriptions':dict(collections.Counter(v['status']for v in result['skills'].values())),'missing':missing,'unsupportedSkillCards':[k for k,v in result['skills'].items()if v['status']=='unsupported']}
 (LOC/'game-zh.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));out=ROOT/'documentation/ui-integration';out.mkdir(parents=True,exist_ok=True);(out/'chinese-coverage.json').write_text(json.dumps(coverage,ensure_ascii=False,indent=2));print(json.dumps({k:v for k,v in coverage.items()if k!='missing'},ensure_ascii=False))

@@ -651,7 +651,7 @@
       "source": "English Name; candidate translation"
     },
     "Baphomet Champion": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -1101,7 +1101,7 @@
       "source": "English Name; candidate translation"
     },
     "Brutal Ogre Mage": {
-      "name": "残忍巨魔法师",
+      "name": "残忍食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -1391,7 +1391,7 @@
       "source": "English Name; candidate translation"
     },
     "Chaos Champion Andar": {
-      "name": "混沌冠军安德",
+      "name": "混沌勇士·安德",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -1401,7 +1401,7 @@
       "source": "English Name; candidate translation"
     },
     "Chariot Reversed": {
-      "name": "战车逆转",
+      "name": "逆位战车",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -1531,7 +1531,7 @@
       "source": "English Name; candidate translation"
     },
     "Christmas Loli Ogre": {
-      "name": "圣诞萝莉巨魔",
+      "name": "圣诞萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -1611,7 +1611,7 @@
       "source": "English Name; candidate translation"
     },
     "Colossal Ogre Hercules": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -2081,7 +2081,7 @@
       "source": "English Name; candidate translation"
     },
     "Devil AcFun": {
-      "name": "恶魔·AC 友",
+      "name": "恶魔·AcFun",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -2231,7 +2231,7 @@
       "source": "English Name; candidate translation"
     },
     "Dragon Surrendering Fugeni": {
-      "name": "归顺·富格尼",
+      "name": "归顺巨龙·富格尼",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -2251,7 +2251,7 @@
       "source": "English Name; candidate translation"
     },
     "Dread Champion": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -2516,7 +2516,7 @@
       "source": "English Name; candidate translation"
     },
     "Elven Legionnaire": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -2881,12 +2881,12 @@
       "source": "English Name; candidate translation"
     },
     "Feles Assassin": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Feles Assassin Master": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -3896,17 +3896,17 @@
       "source": "English Name; candidate translation"
     },
     "Hammer Ogre": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Hammer Ogre Crusher": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Hammer Ogre Destroyer": {
-      "name": "锤巨魔毁灭者",
+      "name": "战锤食人魔·毁灭者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -4076,7 +4076,7 @@
       "source": "English Name; candidate translation"
     },
     "Hellish Skeleton": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -4541,7 +4541,7 @@
       "source": "English Name; candidate translation"
     },
     "Juliet EX": {
-      "name": "EX 朱丽叶",
+      "name": "朱丽叶 EX",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -4801,7 +4801,7 @@
       "source": "English Name; candidate translation"
     },
     "LaviniaEX": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -4981,7 +4981,7 @@
       "source": "English Name; candidate translation"
     },
     "Loli Ogre": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -5696,67 +5696,67 @@
       "source": "English Name; candidate translation"
     },
     "Ogre": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Berserker": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Bloodrager": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Bone Heap": {
-      "name": "巨魔骨堆",
+      "name": "食人魔骨堆",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Goddess": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Hercules": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Hercules Ringleader": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Mage": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Ringleader": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Ruins Wall": {
-      "name": "巨魔废墟墙",
+      "name": "食人魔遗迹墙",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Shaman": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Warlock": {
-      "name": "巨魔术士",
+      "name": "食人魔术士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Ogre Warrior": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -5786,7 +5786,7 @@
       "source": "English Name; candidate translation"
     },
     "Original Ogre": {
-      "name": "原版巨魔",
+      "name": "初代食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -5871,7 +5871,7 @@
       "source": "English Name; candidate translation"
     },
     "Pegasus Champion": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -5881,7 +5881,7 @@
       "source": "English Name; candidate translation"
     },
     "Pegasus Legionnaire": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -6146,7 +6146,7 @@
       "source": "English Name; candidate translation"
     },
     "Priest": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -6966,7 +6966,7 @@
       "source": "English Name; candidate translation"
     },
     "Senior Ogre": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -7896,7 +7896,7 @@
       "source": "English Name; candidate translation"
     },
     "Temperance Reversed": {
-      "name": "逆节",
+      "name": "逆位节制",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -7991,7 +7991,7 @@
       "source": "English Name; candidate translation"
     },
     "The Devil Reversed": {
-      "name": "逆魔",
+      "name": "逆位恶魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8011,7 +8011,7 @@
       "source": "English Name; candidate translation"
     },
     "The Enchantress": {
-      "name": "魅魔女",
+      "name": "魅惑女巫",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8036,7 +8036,7 @@
       "source": "English Name; candidate translation"
     },
     "The Great Slime": {
-      "name": "大史莱姆王",
+      "name": "巨型史莱姆",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8266,7 +8266,7 @@
       "source": "English Name; candidate translation"
     },
     "Tomb Corpse Eater": {
-      "name": "墓尸食者",
+      "name": "墓地食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8281,27 +8281,27 @@
       "source": "English Name; candidate translation"
     },
     "Touch of Azrael 1": {
-      "name": "阿兹拉耳触碰 1",
+      "name": "阿兹拉耳之触 1",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Touch of Azrael 2": {
-      "name": "阿兹拉耳触碰 2",
+      "name": "阿兹拉耳之触 2",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Touch of Azrael 3": {
-      "name": "阿兹拉耳触碰 3",
+      "name": "阿兹拉耳之触 3",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Touch of Azrael 4": {
-      "name": "阿兹拉耳触碰 4",
+      "name": "阿兹拉耳之触 4",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Touch of Azrael 5": {
-      "name": "阿兹拉耳触碰 5",
+      "name": "阿兹拉耳之触 5",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8401,7 +8401,7 @@
       "source": "BGDes contains recovered Chinese title"
     },
     "True Shot": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8411,7 +8411,7 @@
       "source": "English Name; candidate translation"
     },
     "Turban Brute": {
-      "name": "头巾暴徒",
+      "name": "头巾蛮兵",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8521,7 +8521,7 @@
       "source": "English Name; candidate translation"
     },
     "Valentine's Day Loli Ogre": {
-      "name": "情人节萝莉巨魔",
+      "name": "情人节萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8636,7 +8636,7 @@
       "source": "English Name; candidate translation"
     },
     "Vile Skeleton": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8676,22 +8676,22 @@
       "source": "English Name; candidate translation"
     },
     "Virtuous Angel": {
-      "name": "贤良天使",
+      "name": "圣德天使",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Virtuous Champion": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Virtuous Knight": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
     "Virtuous Rider": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8831,7 +8831,7 @@
       "source": "English Name; candidate translation"
     },
     "Warrior-Rat": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8866,7 +8866,7 @@
       "source": "English Name; candidate translation"
     },
     "Werewolf Fleshripper": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8921,7 +8921,7 @@
       "source": "English Name; candidate translation"
     },
     "Wild Corpse Eater": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -8946,7 +8946,7 @@
       "source": "English Name; candidate translation"
     },
     "Wind Shelter Wall": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -9116,7 +9116,7 @@
       "source": "English Name; candidate translation"
     },
     "Younger sister Esther": {
-      "name": "妹妹艾丝特",
+      "name": "妹妹·艾丝特",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -9216,7 +9216,7 @@
       "source": "English Name; candidate translation"
     },
     "Zombie Champion": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },
@@ -9226,7 +9226,7 @@
       "source": "English Name; candidate translation"
     },
     "Zombie Legionnaire": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation"
     },

@@ -1033,42 +1033,42 @@
       "sourceRow": "config_row:daf40efee9e013b839c2"
     },
     "main:card:187": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
       "sourceRow": "config_row:b1e2595baff667c26d10"
     },
     "main:card:188": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
       "sourceRow": "config_row:7c06ac6ea1aa4c22acfa"
     },
     "main:card:189": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
       "sourceRow": "config_row:05df8d34144c0f05713e"
     },
     "main:card:190": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
       "sourceRow": "config_row:dbeb0fdb6f49bade4a64"
     },
     "main:card:191": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
       "sourceRow": "config_row:599cbae6cc35c0db0ea6"
     },
     "main:card:192": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
@@ -2300,21 +2300,21 @@
       "sourceRow": "config_row:3f80e460fa9629f39754"
     },
     "main:card:400": {
-      "name": "EX 朱丽叶",
+      "name": "朱丽叶 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Juliet EX",
       "sourceRow": "config_row:750b81e8caac22a396ad"
     },
     "main:card:401": {
-      "name": "EX 朱丽叶",
+      "name": "朱丽叶 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Juliet EX",
       "sourceRow": "config_row:43ea9d81991f9299d30c"
     },
     "main:card:402": {
-      "name": "EX 朱丽叶",
+      "name": "朱丽叶 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Juliet EX",
@@ -3721,28 +3721,28 @@
       "sourceRow": "config_row:41f79b683819dbd6fb60"
     },
     "main:card:5099": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Champion",
       "sourceRow": "config_row:625e2537aa7c7e066664"
     },
     "main:card:5100": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Champion",
       "sourceRow": "config_row:161f8181b1f3744ef6bf"
     },
     "main:card:5101": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Champion",
       "sourceRow": "config_row:e4e3b42a659e5d53ff08"
     },
     "main:card:5102": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Champion",
@@ -3791,35 +3791,35 @@
       "sourceRow": "config_row:010707fff28b71e4c247"
     },
     "main:card:5110": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
       "sourceRow": "config_row:31cfee961d09b9efb12b"
     },
     "main:card:5111": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
       "sourceRow": "config_row:85f39b700307e9ffe4bb"
     },
     "main:card:5112": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
       "sourceRow": "config_row:84c96476f27536307fff"
     },
     "main:card:5113": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
       "sourceRow": "config_row:f4f070e4b17d108effcd"
     },
     "main:card:5114": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
@@ -4057,28 +4057,28 @@
       "sourceRow": "config_row:b8e107896de76580b6ec"
     },
     "main:card:5159": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Elven Legionnaire",
       "sourceRow": "config_row:d6af4b35446f21fe9ed3"
     },
     "main:card:5160": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Elven Legionnaire",
       "sourceRow": "config_row:2b87541561ccc8ba5337"
     },
     "main:card:5161": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Elven Legionnaire",
       "sourceRow": "config_row:d7c6f414c196e0a7c5ae"
     },
     "main:card:5162": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Elven Legionnaire",
@@ -5513,63 +5513,63 @@
       "sourceRow": "config_row:a53c2f8def4e839c260b"
     },
     "main:card:6008": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:1bb96eb26cee20a17389"
     },
     "main:card:6009": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:f9de9e086b8b1467710d"
     },
     "main:card:6010": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:2ae4445fecd87025a87d"
     },
     "main:card:6011": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:a39493d4d299cb23e752"
     },
     "main:card:6012": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:9e6f2033caae052084a7"
     },
     "main:card:6015": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
       "sourceRow": "config_row:dfc9dd8cb024e65de240"
     },
     "main:card:6016": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
       "sourceRow": "config_row:95a87421b78a0d3b8728"
     },
     "main:card:6017": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
       "sourceRow": "config_row:6567874bf486f729f20f"
     },
     "main:card:6018": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
@@ -6577,28 +6577,28 @@
       "sourceRow": "config_row:b228735fd8268515104c"
     },
     "main:card:6207": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Werewolf Fleshripper",
       "sourceRow": "config_row:2e5632ae376507114d64"
     },
     "main:card:6208": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Werewolf Fleshripper",
       "sourceRow": "config_row:96a637f51a620f88417e"
     },
     "main:card:6209": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Werewolf Fleshripper",
       "sourceRow": "config_row:12a909655628920e07f1"
     },
     "main:card:6210": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Werewolf Fleshripper",
@@ -6668,35 +6668,35 @@
       "sourceRow": "config_row:5da9d6eeb0c02c94ddd1"
     },
     "main:card:6224": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Warrior-Rat",
       "sourceRow": "config_row:76c3654e3b1859ac670d"
     },
     "main:card:6225": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Warrior-Rat",
       "sourceRow": "config_row:c88d2bbc339325df81d7"
     },
     "main:card:6226": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Warrior-Rat",
       "sourceRow": "config_row:cf326954d728b271127b"
     },
     "main:card:6227": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Warrior-Rat",
       "sourceRow": "config_row:fa74f43cb1cba8b9fed5"
     },
     "main:card:6228": {
-      "name": "战士鼠",
+      "name": "鼠人战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Warrior-Rat",
@@ -7032,63 +7032,63 @@
       "sourceRow": "config_row:2fa1acd75aecd27c0ff8"
     },
     "main:card:1026": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:403a352aa2c09eb0bfa8"
     },
     "main:card:1027": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:8cb5c38ffe1a158a7ce6"
     },
     "main:card:1028": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:68f76672e1f8e20de489"
     },
     "main:card:1029": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:f1cb6cdf92014c2f1875"
     },
     "main:card:1030": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:33631905f3e77405e728"
     },
     "main:card:1033": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Champion",
       "sourceRow": "config_row:085801841f3ca015d033"
     },
     "main:card:1034": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Champion",
       "sourceRow": "config_row:a8d61df17bb201ef3228"
     },
     "main:card:1035": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Champion",
       "sourceRow": "config_row:662bd0e0eaa50ebf9f02"
     },
     "main:card:1036": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Champion",
@@ -7578,42 +7578,42 @@
       "sourceRow": "config_row:9a5bfedbea454b2fe79b"
     },
     "main:card:1127": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:f8b8016a26b2c0c906c4"
     },
     "main:card:1128": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:91b2f256c70d9d0a547b"
     },
     "main:card:1129": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:3b55f1874e42b18a4d3d"
     },
     "main:card:1130": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:21ba419a5d222675a11c"
     },
     "main:card:1131": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:e50947946a5076c01286"
     },
     "main:card:1132": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
@@ -7655,28 +7655,28 @@
       "sourceRow": "config_row:55bb2add344aa48f0947"
     },
     "main:card:1141": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:b496ceb558b3dd23b71b"
     },
     "main:card:1142": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:d164b4add032ed8e4991"
     },
     "main:card:1143": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:4f9166ca2d14451fbf79"
     },
     "main:card:1144": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
@@ -7809,42 +7809,42 @@
       "sourceRow": "config_row:de0e5dbdf5d89802b042"
     },
     "main:card:1169": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:dab195a14002aafa471c"
     },
     "main:card:1170": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:e749b7106612786e1a5d"
     },
     "main:card:1171": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:b3d323e5892893902621"
     },
     "main:card:1172": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:fb6a41ec16d29d1978b1"
     },
     "main:card:1173": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
       "sourceRow": "config_row:8c47303369a098cc6939"
     },
     "main:card:1174": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
@@ -7886,28 +7886,28 @@
       "sourceRow": "config_row:81e3a88f9500cc307dbf"
     },
     "main:card:1183": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:58ef2e699357f83af0c0"
     },
     "main:card:1184": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:f08f507e332cd662534f"
     },
     "main:card:1185": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
       "sourceRow": "config_row:e82d3d4af7261ac2fc94"
     },
     "main:card:1186": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
@@ -8117,28 +8117,28 @@
       "sourceRow": "config_row:fafedd7254120e8078f9"
     },
     "main:card:1225": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dread Champion",
       "sourceRow": "config_row:05231692aacd6a6493c1"
     },
     "main:card:1226": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dread Champion",
       "sourceRow": "config_row:6a8e9ea640f34cc6df6c"
     },
     "main:card:1227": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dread Champion",
       "sourceRow": "config_row:324231f4fff2c9ccc663"
     },
     "main:card:1228": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dread Champion",
@@ -8796,63 +8796,63 @@
       "sourceRow": "config_row:d33a6cecf93c022c1494"
     },
     "main:card:1347": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wild Corpse Eater",
       "sourceRow": "config_row:89e347818a7c18e1b151"
     },
     "main:card:1348": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wild Corpse Eater",
       "sourceRow": "config_row:fcbffe15dfacd706f024"
     },
     "main:card:1349": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wild Corpse Eater",
       "sourceRow": "config_row:371fc0727a972a856d47"
     },
     "main:card:1350": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wild Corpse Eater",
       "sourceRow": "config_row:d01afb01cdcb408969b5"
     },
     "main:card:1351": {
-      "name": "野性尸食者",
+      "name": "荒野食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wild Corpse Eater",
       "sourceRow": "config_row:91534a608290fef3ba44"
     },
     "main:card:1354": {
-      "name": "墓尸食者",
+      "name": "墓地食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Tomb Corpse Eater",
       "sourceRow": "config_row:216d85b8ee2a1821083b"
     },
     "main:card:1355": {
-      "name": "墓尸食者",
+      "name": "墓地食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Tomb Corpse Eater",
       "sourceRow": "config_row:4a0064a26c4d373b7a1d"
     },
     "main:card:1356": {
-      "name": "墓尸食者",
+      "name": "墓地食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Tomb Corpse Eater",
       "sourceRow": "config_row:9422d0bc85026e8fd20b"
     },
     "main:card:1357": {
-      "name": "墓尸食者",
+      "name": "墓地食尸者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Tomb Corpse Eater",
@@ -12275,315 +12275,315 @@
       "sourceRow": "config_row:679e7facb6ed2abfe81f"
     },
     "main:card:4001": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:0be1860038a8cfd0b41c"
     },
     "main:card:4002": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:4e3329553e91c8d80d00"
     },
     "main:card:4003": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:19023e58b3c294aca405"
     },
     "main:card:4004": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:7271965caebd08c7cc25"
     },
     "main:card:4005": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:09791f68d3dfe6635918"
     },
     "main:card:4006": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:c46c76a7fd4f43b3c09b"
     },
     "main:card:4008": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:42e7ed6f703990098c95"
     },
     "main:card:4009": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:bda14af545e6207ca94e"
     },
     "main:card:4010": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:c81a94c16e7c2cba971f"
     },
     "main:card:4011": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:9268d47f46d16d857036"
     },
     "main:card:4012": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:5ecf05284b803cfd48c7"
     },
     "main:card:4015": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ringleader",
       "sourceRow": "config_row:dfe7c491a00b41d215dd"
     },
     "main:card:4016": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ringleader",
       "sourceRow": "config_row:0d60226e1a2f0a67e881"
     },
     "main:card:4017": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ringleader",
       "sourceRow": "config_row:924ffcc9fa16d1e0a9e1"
     },
     "main:card:4018": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ringleader",
       "sourceRow": "config_row:68ea28f78b7a6f981b6e"
     },
     "main:card:4019": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:5d9deed3d98609aa3941"
     },
     "main:card:4020": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:4fd4b2128e4b80273ec9"
     },
     "main:card:4021": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:8d9cfbba585290a6ac63"
     },
     "main:card:4022": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:44270c4de09f23d64454"
     },
     "main:card:4023": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:c9c9bd83389a3c505959"
     },
     "main:card:4024": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:f8ace4cd63bca576ae72"
     },
     "main:card:4026": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:6539a22cf0a5bc5c8eb3"
     },
     "main:card:4027": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:2a987a5f15cc9b93ff21"
     },
     "main:card:4028": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:ef609cb3d4f352909a23"
     },
     "main:card:4029": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:fa1d595487debfb204a3"
     },
     "main:card:4030": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:9f1f0a03ceed37332e77"
     },
     "main:card:4033": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bloodrager",
       "sourceRow": "config_row:8e99e53f6e366269366e"
     },
     "main:card:4034": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bloodrager",
       "sourceRow": "config_row:b866bd6c988a8e46bbfb"
     },
     "main:card:4035": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bloodrager",
       "sourceRow": "config_row:72aa1f5853349158bb91"
     },
     "main:card:4036": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bloodrager",
       "sourceRow": "config_row:ff30ac10588451f9301f"
     },
     "main:card:4037": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:07004c678194242da292"
     },
     "main:card:4038": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:9a4c3679bd07530cee51"
     },
     "main:card:4039": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:c01a65ad32d0c00b05ac"
     },
     "main:card:4040": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:f04bd6d7e1260adab11d"
     },
     "main:card:4041": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:6a4a56b27bc8e3947ca8"
     },
     "main:card:4042": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:173a582513a7a6dd94a9"
     },
     "main:card:4044": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:b8fbd9fba403d2c3b3f9"
     },
     "main:card:4045": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:b95b3f1a682cbf358505"
     },
     "main:card:4046": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:12e788cb1425957a0544"
     },
     "main:card:4047": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:cac7f8227e5d037bddf0"
     },
     "main:card:4048": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:a8a821756fdca69feeeb"
     },
     "main:card:4051": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules Ringleader",
       "sourceRow": "config_row:61e4f3a0138cc263fe27"
     },
     "main:card:4052": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules Ringleader",
       "sourceRow": "config_row:28bfab670a198dcba648"
     },
     "main:card:4053": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules Ringleader",
       "sourceRow": "config_row:004ecd43e2fa0bf55db3"
     },
     "main:card:4054": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules Ringleader",
@@ -12842,105 +12842,105 @@
       "sourceRow": "config_row:1ca8957b3434dd8e8797"
     },
     "main:card:4103": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:9565543d61db4a59d565"
     },
     "main:card:4104": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:b8c1f150e3b2851a5553"
     },
     "main:card:4105": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:6f79f0f7849b19fd6875"
     },
     "main:card:4106": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:eb9196b87ed0f5757f4c"
     },
     "main:card:4107": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:651e19fb4d4807d63f04"
     },
     "main:card:4108": {
-      "name": "巨魔法师",
+      "name": "食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Mage",
       "sourceRow": "config_row:b4716e88b23b48c2a149"
     },
     "main:card:4110": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Shaman",
       "sourceRow": "config_row:9b1bdc2512a0d832c3ca"
     },
     "main:card:4111": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Shaman",
       "sourceRow": "config_row:24efac16a95a49923e73"
     },
     "main:card:4112": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Shaman",
       "sourceRow": "config_row:f8c7d62971f3d694984b"
     },
     "main:card:4113": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Shaman",
       "sourceRow": "config_row:6f551f0ad7f07d9175ec"
     },
     "main:card:4114": {
-      "name": "巨魔萨满",
+      "name": "食人魔萨满",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Shaman",
       "sourceRow": "config_row:2a9df40ca8aa069df5bf"
     },
     "main:card:4117": {
-      "name": "巨魔术士",
+      "name": "食人魔术士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warlock",
       "sourceRow": "config_row:bd16748b0293e4ddb5c0"
     },
     "main:card:4118": {
-      "name": "巨魔术士",
+      "name": "食人魔术士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warlock",
       "sourceRow": "config_row:6247f29560aba7e08880"
     },
     "main:card:4119": {
-      "name": "巨魔术士",
+      "name": "食人魔术士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warlock",
       "sourceRow": "config_row:3f187a562eed92760a5d"
     },
     "main:card:4120": {
-      "name": "巨魔术士",
+      "name": "食人魔术士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warlock",
@@ -12968,105 +12968,105 @@
       "sourceRow": "config_row:419f59edb9d93e3bbafd"
     },
     "main:card:4127": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:21d726829ef5194af443"
     },
     "main:card:4128": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:f6b8618bab539cffce60"
     },
     "main:card:4129": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:496822c4b3a6f8be2637"
     },
     "main:card:4130": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:420d460257bfb7b3f519"
     },
     "main:card:4131": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:d3bfef672d04bc3d46a7"
     },
     "main:card:4132": {
-      "name": "锤巨魔",
+      "name": "战锤食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre",
       "sourceRow": "config_row:547242245b2353c4b541"
     },
     "main:card:4134": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Crusher",
       "sourceRow": "config_row:b2dfa56a2a5394894688"
     },
     "main:card:4135": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Crusher",
       "sourceRow": "config_row:844987e4c8534a6586ab"
     },
     "main:card:4136": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Crusher",
       "sourceRow": "config_row:7e930e7f2175dcdf5882"
     },
     "main:card:4137": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Crusher",
       "sourceRow": "config_row:b593cb9f831db82d92e3"
     },
     "main:card:4138": {
-      "name": "锤巨魔粉碎者",
+      "name": "战锤食人魔·粉碎者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Crusher",
       "sourceRow": "config_row:f56d60c166c6f545ceff"
     },
     "main:card:4141": {
-      "name": "锤巨魔毁灭者",
+      "name": "战锤食人魔·毁灭者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Destroyer",
       "sourceRow": "config_row:176a3c0f444cb9d62dd4"
     },
     "main:card:4142": {
-      "name": "锤巨魔毁灭者",
+      "name": "战锤食人魔·毁灭者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Destroyer",
       "sourceRow": "config_row:1b48148f8b903b4fb2c8"
     },
     "main:card:4143": {
-      "name": "锤巨魔毁灭者",
+      "name": "战锤食人魔·毁灭者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Destroyer",
       "sourceRow": "config_row:049cdb4d469d7fd563b7"
     },
     "main:card:4144": {
-      "name": "锤巨魔毁灭者",
+      "name": "战锤食人魔·毁灭者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hammer Ogre Destroyer",
@@ -13871,21 +13871,21 @@
       "sourceRow": "config_row:9c6b52d6d75e4363f1b7"
     },
     "main:card:7148": {
-      "name": "巨魔骨堆",
+      "name": "食人魔骨堆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bone Heap",
       "sourceRow": "config_row:8bbad3e2ef8c49dfb7b7"
     },
     "main:card:7149": {
-      "name": "巨魔骨堆",
+      "name": "食人魔骨堆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bone Heap",
       "sourceRow": "config_row:d5e6ffe9e3438e8e4e94"
     },
     "main:card:7150": {
-      "name": "巨魔骨堆",
+      "name": "食人魔骨堆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bone Heap",
@@ -14109,35 +14109,35 @@
       "sourceRow": "config_row:2d15be795a9f87f471b0"
     },
     "main:card:7200": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wind Shelter Wall",
       "sourceRow": "config_row:14b83f2af3652fb89272"
     },
     "main:card:7201": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wind Shelter Wall",
       "sourceRow": "config_row:edde969166e21a5e906f"
     },
     "main:card:7202": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wind Shelter Wall",
       "sourceRow": "config_row:fa02583b6b66dac6d272"
     },
     "main:card:7203": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wind Shelter Wall",
       "sourceRow": "config_row:9a73e42fc0875a90571c"
     },
     "main:card:7204": {
-      "name": "风遮墙",
+      "name": "风之庇护墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Wind Shelter Wall",
@@ -15971,21 +15971,21 @@
       "sourceRow": "config_row:ccfd53275e3c1705c801"
     },
     "main:card:10220": {
-      "name": "大史莱姆王",
+      "name": "巨型史莱姆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Great Slime",
       "sourceRow": "config_row:cdf22405708f4b5cb600"
     },
     "main:card:10221": {
-      "name": "大史莱姆王",
+      "name": "巨型史莱姆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Great Slime",
       "sourceRow": "config_row:4e6ba5ad9b17285165b4"
     },
     "main:card:10222": {
-      "name": "大史莱姆王",
+      "name": "巨型史莱姆",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Great Slime",
@@ -18218,42 +18218,42 @@
       "sourceRow": "config_row:20c92e2dd79100f9cc9d"
     },
     "main:card:21199": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
       "sourceRow": "config_row:a9d230395226f08aee5a"
     },
     "main:card:21200": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
       "sourceRow": "config_row:728dbd07ac9b406e56ae"
     },
     "main:card:21201": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
       "sourceRow": "config_row:05ed4f0845559d6a83e8"
     },
     "main:card:21202": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
       "sourceRow": "config_row:489721908cf8ed9e62c7"
     },
     "main:card:21203": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
       "sourceRow": "config_row:4f6cf8444d5db6307c1e"
     },
     "main:card:21204": {
-      "name": "EX 拉维妮亚",
+      "name": "拉维妮亚 EX",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "LaviniaEX",
@@ -20892,21 +20892,21 @@
       "sourceRow": "config_row:80f77f06048e2bb77c61"
     },
     "main:card:21868": {
-      "name": "贤良天使",
+      "name": "圣德天使",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Angel",
       "sourceRow": "config_row:45ea092c601ad3470ac1"
     },
     "main:card:21869": {
-      "name": "贤良天使",
+      "name": "圣德天使",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Angel",
       "sourceRow": "config_row:a972c6487c575929f2a7"
     },
     "main:card:21870": {
-      "name": "贤良天使",
+      "name": "圣德天使",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Angel",
@@ -21431,7 +21431,7 @@
       "sourceRow": "config_row:3cdd029975fd0d3caf0a"
     },
     "main:card:22000": {
-      "name": "头巾暴徒",
+      "name": "头巾蛮兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Turban Brute",
@@ -21529,21 +21529,21 @@
       "sourceRow": "config_row:34231222705a95b7d3d1"
     },
     "main:card:11016": {
-      "name": "恶魔·AC 友",
+      "name": "恶魔·AcFun",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Devil AcFun",
       "sourceRow": "config_row:39bbdec3a035767e24b4"
     },
     "main:card:11017": {
-      "name": "恶魔·AC 友",
+      "name": "恶魔·AcFun",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Devil AcFun",
       "sourceRow": "config_row:8622baca1adc98abdff5"
     },
     "main:card:11018": {
-      "name": "恶魔·AC 友",
+      "name": "恶魔·AcFun",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Devil AcFun",
@@ -27262,105 +27262,105 @@
       "sourceRow": "config_row:cb1b24eacf01a589ccc0"
     },
     "main:card:13145": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:60a7a66cf42eb68b94bc"
     },
     "main:card:13146": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:a42efd0fc52c2191e365"
     },
     "main:card:13147": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:a0c31f64043be06cba7f"
     },
     "main:card:13148": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:1592613af79425d6ed71"
     },
     "main:card:13149": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:637ce200051df29333f8"
     },
     "main:card:13150": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:d91f948befd0700dfd95"
     },
     "main:card:13152": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:5cff68392af768261484"
     },
     "main:card:13153": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:155e2a932117d54ce447"
     },
     "main:card:13154": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:594bd304e48fba8022a3"
     },
     "main:card:13155": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:4a979906c038ddfa57ec"
     },
     "main:card:13156": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:4704c9254212eb77bae4"
     },
     "main:card:13159": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Champion",
       "sourceRow": "config_row:46a52f808fdc5497c502"
     },
     "main:card:13160": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Champion",
       "sourceRow": "config_row:0739f10342c7ddeb6a34"
     },
     "main:card:13161": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Champion",
       "sourceRow": "config_row:74f4286b0a59ecd14ba1"
     },
     "main:card:13162": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Champion",
@@ -29509,28 +29509,28 @@
       "sourceRow": "config_row:7abb733a145b582b76dc"
     },
     "main:card:14207": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Baphomet Champion",
       "sourceRow": "config_row:75c4856b4099ac97d2d5"
     },
     "main:card:14208": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Baphomet Champion",
       "sourceRow": "config_row:892379af25a245f5750c"
     },
     "main:card:14209": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Baphomet Champion",
       "sourceRow": "config_row:525ec77dedb771d620e7"
     },
     "main:card:14210": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Baphomet Champion",
@@ -29992,21 +29992,21 @@
       "sourceRow": "config_row:5073871d73b29db2a18c"
     },
     "main:card:14309": {
-      "name": "魅魔女",
+      "name": "魅惑女巫",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Enchantress",
       "sourceRow": "config_row:c07dbb867aae2f916051"
     },
     "main:card:14310": {
-      "name": "魅魔女",
+      "name": "魅惑女巫",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Enchantress",
       "sourceRow": "config_row:d1a8cea1547b58034be0"
     },
     "main:card:14311": {
-      "name": "魅魔女",
+      "name": "魅惑女巫",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Enchantress",
@@ -33534,14 +33534,14 @@
       "sourceRow": "config_row:68306b3f3844264c92f9"
     },
     "main:card:19979": {
-      "name": "战车逆转",
+      "name": "逆位战车",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Chariot Reversed",
       "sourceRow": "config_row:9039015a3cea0f9f8503"
     },
     "main:card:19980": {
-      "name": "战车逆转",
+      "name": "逆位战车",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Chariot Reversed",
@@ -33702,14 +33702,14 @@
       "sourceRow": "config_row:90fd623453592362c30a"
     },
     "main:card:26504": {
-      "name": "逆节",
+      "name": "逆位节制",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Temperance Reversed",
       "sourceRow": "config_row:c9aaef4f99e364dea3e4"
     },
     "main:card:26505": {
-      "name": "逆节",
+      "name": "逆位节制",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Temperance Reversed",
@@ -33744,14 +33744,14 @@
       "sourceRow": "config_row:23d30ee542df6cebe842"
     },
     "main:card:26510": {
-      "name": "逆魔",
+      "name": "逆位恶魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Devil Reversed",
       "sourceRow": "config_row:fef36166ede822ff28be"
     },
     "main:card:26511": {
-      "name": "逆魔",
+      "name": "逆位恶魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Devil Reversed",
@@ -35074,7 +35074,7 @@
       "sourceRow": "config_row:abd077a498a840ad77f9"
     },
     "main:card:9074": {
-      "name": "妹妹艾丝特",
+      "name": "妹妹·艾丝特",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Younger sister Esther",
@@ -35452,7 +35452,7 @@
       "sourceRow": "config_row:ee439a4fbcb90ef09437"
     },
     "main:card:9152": {
-      "name": "混沌冠军安德",
+      "name": "混沌勇士·安德",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Chaos Champion Andar",
@@ -35697,28 +35697,28 @@
       "sourceRow": "config_row:8e7f84732af03253c6f4"
     },
     "main:card:9187": {
-      "name": "原版巨魔",
+      "name": "初代食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Original Ogre",
       "sourceRow": "config_row:f08ae77858978868a17c"
     },
     "main:card:9188": {
-      "name": "原版巨魔",
+      "name": "初代食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Original Ogre",
       "sourceRow": "config_row:3bbd4ea86256ac7d6418"
     },
     "main:card:9189": {
-      "name": "巨魔废墟墙",
+      "name": "食人魔遗迹墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ruins Wall",
       "sourceRow": "config_row:dab46418575e53a10d2f"
     },
     "main:card:9190": {
-      "name": "巨魔废墟墙",
+      "name": "食人魔遗迹墙",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ruins Wall",
@@ -36159,7 +36159,7 @@
       "sourceRow": "config_row:9b12239ea2bf78a07430"
     },
     "main:card:9406": {
-      "name": "归顺·富格尼",
+      "name": "归顺巨龙·富格尼",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dragon Surrendering Fugeni",
@@ -37573,7 +37573,7 @@
       "sourceRow": "config_row:2053a5dbb7008ee96b0e"
     },
     "main:card:9624": {
-      "name": "逆魔",
+      "name": "逆位恶魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "The Devil Reversed",
@@ -38413,14 +38413,14 @@
       "sourceRow": "config_row:abcfdc390dace1065840"
     },
     "main:card:18023": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:a14f27c43b27525997a0"
     },
     "main:card:18024": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
@@ -39519,84 +39519,84 @@
       "sourceRow": "config_row:7f1bef86e9de91b25011"
     },
     "main:card:18229": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:4bc894b53e0fadf047ed"
     },
     "main:card:18230": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:b7094fa23f24dc0f0872"
     },
     "main:card:18231": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:f1040661f704df19d4b7"
     },
     "main:card:18232": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:18aaf8b8d59870c89739"
     },
     "main:card:18233": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:66a91ec2f71bef85748c"
     },
     "main:card:18234": {
-      "name": "萝莉巨魔",
+      "name": "萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Loli Ogre",
       "sourceRow": "config_row:41e130e603092cf6e5ed"
     },
     "main:card:18238": {
-      "name": "圣诞萝莉巨魔",
+      "name": "圣诞萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Christmas Loli Ogre",
       "sourceRow": "config_row:b45ab2bef80723ca28ae"
     },
     "main:card:18239": {
-      "name": "圣诞萝莉巨魔",
+      "name": "圣诞萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Christmas Loli Ogre",
       "sourceRow": "config_row:19f9cdb5dcd56957fd88"
     },
     "main:card:18240": {
-      "name": "圣诞萝莉巨魔",
+      "name": "圣诞萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Christmas Loli Ogre",
       "sourceRow": "config_row:cd7001299f18521a160c"
     },
     "main:card:18244": {
-      "name": "情人节萝莉巨魔",
+      "name": "情人节萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Valentine's Day Loli Ogre",
       "sourceRow": "config_row:b95dd727c613cbf88505"
     },
     "main:card:18245": {
-      "name": "情人节萝莉巨魔",
+      "name": "情人节萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Valentine's Day Loli Ogre",
       "sourceRow": "config_row:f64aa0954fdba8adf672"
     },
     "main:card:18246": {
-      "name": "情人节萝莉巨魔",
+      "name": "情人节萝莉食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Valentine's Day Loli Ogre",
@@ -40023,42 +40023,42 @@
       "sourceRow": "config_row:b571f7040900de2959c4"
     },
     "main:card:18313": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
       "sourceRow": "config_row:541f64b43557f18ee523"
     },
     "main:card:18314": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
       "sourceRow": "config_row:7026a4453fe1d3c827ba"
     },
     "main:card:18315": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
       "sourceRow": "config_row:8b6a3b8a59d15fdc1c3b"
     },
     "main:card:18316": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
       "sourceRow": "config_row:8e67f6b67f8f4add90d0"
     },
     "main:card:18317": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
       "sourceRow": "config_row:6019470890d442401127"
     },
     "main:card:18318": {
-      "name": "巨魔女神",
+      "name": "食人魔女神",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Goddess",
@@ -40366,35 +40366,35 @@
       "sourceRow": "config_row:9236ce49a4cbf0631793"
     },
     "main:card:40000": {
-      "name": "阿兹拉耳触碰 1",
+      "name": "阿兹拉耳之触 1",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Touch of Azrael 1",
       "sourceRow": "config_row:9be4bb4be052aa57b60c"
     },
     "main:card:40001": {
-      "name": "阿兹拉耳触碰 2",
+      "name": "阿兹拉耳之触 2",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Touch of Azrael 2",
       "sourceRow": "config_row:e4a389d3518c0df8f6b4"
     },
     "main:card:40002": {
-      "name": "阿兹拉耳触碰 3",
+      "name": "阿兹拉耳之触 3",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Touch of Azrael 3",
       "sourceRow": "config_row:efd71cb893b967cfc5d1"
     },
     "main:card:40003": {
-      "name": "阿兹拉耳触碰 4",
+      "name": "阿兹拉耳之触 4",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Touch of Azrael 4",
       "sourceRow": "config_row:ba7227c12cbfd1403e2d"
     },
     "main:card:40004": {
-      "name": "阿兹拉耳触碰 5",
+      "name": "阿兹拉耳之触 5",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Touch of Azrael 5",
@@ -41248,42 +41248,42 @@
       "sourceRow": "config_row:512ba60a9bb869ede548"
     },
     "main:card:42001": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
       "sourceRow": "config_row:e67ccc7c6aa90516a173"
     },
     "main:card:42002": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
       "sourceRow": "config_row:4d168d381acc6b6bcc7b"
     },
     "main:card:42003": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
       "sourceRow": "config_row:3da47c8f1efe73c857cc"
     },
     "main:card:42004": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
       "sourceRow": "config_row:4fd68d6cb406d4436917"
     },
     "main:card:42005": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
       "sourceRow": "config_row:a8599e0c3d992957415e"
     },
     "main:card:42006": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
@@ -43691,7 +43691,7 @@
       "sourceRow": "config_row:37e9e154e6c6818492c2"
     },
     "main:card:52001": {
-      "name": "真射",
+      "name": "精准射击",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "True Shot",
@@ -45644,7 +45644,7 @@
       "sourceRow": "config_row:a744fce22a8948ba8914"
     },
     "main:card:60145": {
-      "name": "残忍巨魔法师",
+      "name": "残忍食人魔法师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Brutal Ogre Mage",
@@ -45959,7 +45959,7 @@
       "sourceRow": "config_row:45bdace23b38ea18af48"
     },
     "main:card:23034": {
-      "name": "祭司",
+      "name": "牧师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Priest",
@@ -46120,7 +46120,7 @@
       "sourceRow": "config_row:c394177dde0ca3412854"
     },
     "main:card:23057": {
-      "name": "天马冠军",
+      "name": "天马勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Champion",
@@ -46134,7 +46134,7 @@
       "sourceRow": "config_row:48954fe8f04aa3272272"
     },
     "main:card:23059": {
-      "name": "天马军团兵",
+      "name": "天马军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Pegasus Legionnaire",
@@ -46204,7 +46204,7 @@
       "sourceRow": "config_row:3988e86e459f98aa0325"
     },
     "main:card:23069": {
-      "name": "精灵军团兵",
+      "name": "精灵军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Elven Legionnaire",
@@ -46295,14 +46295,14 @@
       "sourceRow": "config_row:16c41d79b4952c2c602c"
     },
     "main:card:23082": {
-      "name": "猫人杀手",
+      "name": "猫人刺客",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin",
       "sourceRow": "config_row:d0be16f4b4835b5459eb"
     },
     "main:card:23083": {
-      "name": "猫人杀手大师",
+      "name": "猫人刺客大师",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Feles Assassin Master",
@@ -46533,7 +46533,7 @@
       "sourceRow": "config_row:699eab6cf72382c9a221"
     },
     "main:card:23116": {
-      "name": "狼人·肉撕者",
+      "name": "狼人·撕肉者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Werewolf Fleshripper",
@@ -46596,14 +46596,14 @@
       "sourceRow": "config_row:9a17365b4dd57795badb"
     },
     "main:card:23125": {
-      "name": "僵尸军团兵",
+      "name": "僵尸军团战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Legionnaire",
       "sourceRow": "config_row:7decc1e837a20b58956b"
     },
     "main:card:23126": {
-      "name": "僵尸冠军",
+      "name": "僵尸勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Zombie Champion",
@@ -46736,7 +46736,7 @@
       "sourceRow": "config_row:505afc38def522cddadb"
     },
     "main:card:23145": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
@@ -46750,7 +46750,7 @@
       "sourceRow": "config_row:ad70bc9f4f4eb04daec5"
     },
     "main:card:23147": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
@@ -46785,7 +46785,7 @@
       "sourceRow": "config_row:d7e79a7c940d5aefa31b"
     },
     "main:card:23152": {
-      "name": "恶臭骷髅",
+      "name": "邪秽骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Vile Skeleton",
@@ -46799,7 +46799,7 @@
       "sourceRow": "config_row:68c79fa1e0731c5865e9"
     },
     "main:card:23154": {
-      "name": "恶骸",
+      "name": "地狱骷髅",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Hellish Skeleton",
@@ -46848,7 +46848,7 @@
       "sourceRow": "config_row:6cd2d9091da3116d3d4d"
     },
     "main:card:23161": {
-      "name": "恐惧冠军",
+      "name": "恐惧勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Dread Champion",
@@ -47044,63 +47044,63 @@
       "sourceRow": "config_row:3b53328085ab604206e3"
     },
     "main:card:23189": {
-      "name": "巨魔",
+      "name": "食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre",
       "sourceRow": "config_row:40377bd7759f55b0ea7f"
     },
     "main:card:23190": {
-      "name": "高级巨魔",
+      "name": "高阶食人魔",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Senior Ogre",
       "sourceRow": "config_row:9a704a8928256142159e"
     },
     "main:card:23191": {
-      "name": "巨魔首领",
+      "name": "食人魔首领",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Ringleader",
       "sourceRow": "config_row:479a8a03395b75315509"
     },
     "main:card:23192": {
-      "name": "巨魔战士",
+      "name": "食人魔战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Warrior",
       "sourceRow": "config_row:cbdc8f0e42ef23c6b1f7"
     },
     "main:card:23193": {
-      "name": "巨魔狂战士",
+      "name": "食人魔狂战士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Berserker",
       "sourceRow": "config_row:3f9720c8b73b3ca003eb"
     },
     "main:card:23194": {
-      "name": "巨魔血怒者",
+      "name": "食人魔血怒者",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Bloodrager",
       "sourceRow": "config_row:bc531e7e073bb8d10980"
     },
     "main:card:23195": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules",
       "sourceRow": "config_row:f6f44e22a03dbaa1a225"
     },
     "main:card:23196": {
-      "name": "巨魔赫拉克勒斯",
+      "name": "巨型食人魔·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Colossal Ogre Hercules",
       "sourceRow": "config_row:8eeea60adb0492fc9c81"
     },
     "main:card:23197": {
-      "name": "巨魔赫拉克勒斯首领",
+      "name": "食人魔首领·赫拉克勒斯",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Ogre Hercules Ringleader",
@@ -47912,21 +47912,21 @@
       "sourceRow": "config_row:4709e1e2317e669a2a25"
     },
     "main:card:23313": {
-      "name": "贤良骑乘者",
+      "name": "圣德骑兵",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Rider",
       "sourceRow": "config_row:1c9e061e461eb5a8212c"
     },
     "main:card:23314": {
-      "name": "贤良骑士",
+      "name": "圣德骑士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Knight",
       "sourceRow": "config_row:40603953e26ba387c4b4"
     },
     "main:card:23315": {
-      "name": "贤良冠军",
+      "name": "圣德勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Virtuous Champion",
@@ -48297,7 +48297,7 @@
       "sourceRow": "config_row:206ce6ce7a606c313e62"
     },
     "main:card:23368": {
-      "name": "巴风特冠军",
+      "name": "巴风特勇士",
       "status": "candidate",
       "source": "English Name; candidate translation",
       "originalName": "Baphomet Champion",
@@ -59517,9 +59517,9 @@
       "sourceRow": "config_row:ebeaa1d067a61d4e80e3"
     },
     "main:effect:4304": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗影直击",
+      "text": "本版本说明：每回合有50%概率对敌方英雄造成2点暗影伤害。",
+      "status": "runtime-description",
       "source": "config_row:2aa4b900b2dbf3bd7f5b",
       "originalName": "",
       "originalText": "",
@@ -59571,9 +59571,9 @@
       "sourceRow": "config_row:002556edcf7b80379dc5"
     },
     "main:effect:3967": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "位面鼓舞",
+      "text": "本版本说明：全场其他友方位面生物获得“攻击1”（攻击+1）。",
+      "status": "runtime-description",
       "source": "config_row:a9760f2e3a41a29583a4",
       "originalName": "",
       "originalText": "",
@@ -60939,27 +60939,27 @@
       "sourceRow": "config_row:32c638611e49533e833c"
     },
     "main:effect:16204": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 2",
+      "text": "本版本说明：友方人类生物不少于2个时，所有其他友方人类生物获得“生命1”（生命值+1）。",
+      "status": "runtime-description",
       "source": "config_row:babdd4fddf7574ebe40b",
       "originalName": "",
       "originalText": "",
       "sourceRow": "config_row:babdd4fddf7574ebe40b"
     },
     "main:effect:16205": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 3",
+      "text": "本版本说明：友方人类生物不少于3个时，所有其他友方人类生物获得“魔抗3”（受到的魔法伤害减少3点）。",
+      "status": "runtime-description",
       "source": "config_row:00a6b4d670433546ce45",
       "originalName": "",
       "originalText": "",
       "sourceRow": "config_row:00a6b4d670433546ce45"
     },
     "main:effect:16206": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "人道 4",
+      "text": "本版本说明：友方人类生物不少于4个时，所有其他友方人类生物获得“英勇1”（造成伤害后攻击+1）。",
+      "status": "runtime-description",
       "source": "config_row:9d7c7bea0c2ac2a303cc",
       "originalName": "",
       "originalText": "",
@@ -61155,18 +61155,18 @@
       "sourceRow": "config_row:84857181654f7dd542cb"
     },
     "main:effect:7503": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗翼刺客召唤",
+      "text": "本版本说明：此生物对英雄造成伤害时，在相邻空位召唤1个暗翼刺客（编号9041）。",
+      "status": "runtime-description",
       "source": "config_row:84f0f1e8d0b174ee2e66",
       "originalName": "",
       "originalText": "",
       "sourceRow": "config_row:84f0f1e8d0b174ee2e66"
     },
     "main:effect:7504": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "暗翼刺客召唤",
+      "text": "本版本说明：此生物对英雄造成伤害时，在相邻空位召唤1个暗翼刺客（编号9042）。",
+      "status": "runtime-description",
       "source": "config_row:11f5ecb90491ec6ff770",
       "originalName": "",
       "originalText": "",
@@ -70713,9 +70713,9 @@
       "sourceRow": "config_row:ecc1e57ed6592ccb20c5"
     },
     "main:effect:6147": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "圣骑士召唤",
+      "text": "本版本说明：每回合在相邻空位召唤1个圣骑士。",
+      "status": "runtime-description",
       "source": "config_row:0235166ea4ed8052b1d6",
       "originalName": "",
       "originalText": "",
@@ -71730,9 +71730,9 @@
       "sourceRow": "config_row:3cf804f37f82a85ba75d"
     },
     "main:effect:17201": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "石化降临",
+      "text": "本版本说明：进场时必定获得“石化29”，持续20回合：生命值+100，失去所有能力，无法移动或攻击，且不能成为单体技能的目标。",
+      "status": "runtime-description",
       "source": "config_row:ec2e46e9349e51fc3fca",
       "originalName": "",
       "originalText": "",
@@ -71883,9 +71883,9 @@
       "sourceRow": "config_row:1b714981419fc5ce4e17"
     },
     "main:effect:6184": {
-      "name": "",
-      "text": "",
-      "status": "missing",
+      "name": "飞行坦克召唤",
+      "text": "本版本说明：每回合在相邻空位召唤1个飞行坦克。",
+      "status": "runtime-description",
       "source": "config_row:a51eaf9234ae3bbc2413",
       "originalName": "",
       "originalText": "",
@@ -74468,7 +74468,7 @@
   },
   "skills": {
     "main:card:40000": {
-      "name": "阿兹拉耳触碰 1",
+      "name": "阿兹拉耳之触 1",
       "text": "对指定士兵或英雄造成999点暗影伤害.",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -74476,7 +74476,7 @@
       "originalText": "对指定士兵或英雄造成999点暗影伤害."
     },
     "main:card:40001": {
-      "name": "阿兹拉耳触碰 2",
+      "name": "阿兹拉耳之触 2",
       "text": "对2×1范围内的所有士兵或英雄造成999点近战伤害.",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -74484,7 +74484,7 @@
       "originalText": "对2×1范围内的所有士兵或英雄造成999点近战伤害."
     },
     "main:card:40002": {
-      "name": "阿兹拉耳触碰 3",
+      "name": "阿兹拉耳之触 3",
       "text": "对3×1范围内的所有士兵或英雄造成999点闪电伤害.",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -74492,7 +74492,7 @@
       "originalText": "对3×1范围内的所有士兵或英雄造成999点闪电伤害."
     },
     "main:card:40003": {
-      "name": "阿兹拉耳触碰 4",
+      "name": "阿兹拉耳之触 4",
       "text": "对2×2范围内的所有士兵或英雄造成999点神圣伤害.",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -74500,7 +74500,7 @@
       "originalText": "对2×2范围内的所有士兵或英雄造成999点神圣伤害."
     },
     "main:card:40004": {
-      "name": "阿兹拉耳触碰 5",
+      "name": "阿兹拉耳之触 5",
       "text": "对十字范围内的所有士兵或英雄造成999点远程伤害.",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -75476,7 +75476,7 @@
       "originalText": "Deals 5 unavoidable melee damage to all enemy creatures in a 2×2 area, dealing 4× damage to creatures with Magic Reflection. Disables the Magic Reflection effect of damaged creatures for 3 turns."
     },
     "main:card:42001": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成5点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -75484,7 +75484,7 @@
       "originalText": "Single-target Skill.Deals 5 Ranged damage to target enemy creature."
     },
     "main:card:42002": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成6点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -75492,7 +75492,7 @@
       "originalText": "Single-target Skill.Deals 6 Ranged damage to target enemy creature."
     },
     "main:card:42003": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成7点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -75500,7 +75500,7 @@
       "originalText": "Single-target Skill.Deals 7 Ranged damage to target enemy creature."
     },
     "main:card:42004": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成8点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -75508,7 +75508,7 @@
       "originalText": "Single-target Skill.Deals 8 Ranged damage to target enemy creature."
     },
     "main:card:42005": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成10点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -75516,7 +75516,7 @@
       "originalText": "Single-target Skill.Deals 10 Ranged damage to target enemy creature."
     },
     "main:card:42006": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体技能。对指定敌方生物造成12点远程伤害。",
       "status": "candidate",
       "source": "census.raw.Des (English source; Chinese translation candidate)",
@@ -78268,7 +78268,7 @@
       "originalText": "单体增益技能。指定友方士兵获得能力：顺劈斩，攻击目标及目标上下两格内的所有敌方士兵和英雄。"
     },
     "main:card:52001": {
-      "name": "真射",
+      "name": "精准射击",
       "text": "单体伤害技能。对指定敌方士兵造成12点远程伤害。令受伤士兵受到的所有伤害+1。",
       "status": "recovered",
       "source": "census.raw.Des (verbatim recovered Chinese)",
@@ -79141,64 +79141,64 @@
     },
     "main:card:50731": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50732": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50733": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50734": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50741": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50742": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50743": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50744": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
@@ -79261,38 +79261,40 @@
     },
     "main:card:50806": {
       "name": "孵化",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Hatch",
       "originalText": "0"
     },
     "main:card:50807": {
       "name": "孵化",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Hatch",
       "originalText": "0"
     },
     "main:card:50808": {
       "name": "岩浆",
-      "text": "进入该格子的生物受到3点火焰伤害；在该格子结束回合的生物受到3点火焰伤害。",
-      "status": "candidate",
-      "source": "linked Skill.Des; Card.Des is non-text zero",
-      "originalText": "Deals 3 Fire Damage to creatures who enter and 3 Fire damage to creatures who end their turn in this tile."
+      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到3点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
+      "originalName": "Magma",
+      "originalText": "0"
     },
     "main:card:50809": {
       "name": "岩浆",
-      "text": "进入该格子的生物受到3点火焰伤害；在该格子结束回合的生物受到5点火焰伤害。",
-      "status": "candidate",
-      "source": "linked Skill.Des; Card.Des is non-text zero",
-      "originalText": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile."
+      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到5点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
+      "originalName": "Magma",
+      "originalText": "0"
     },
     "main:card:50810": {
       "name": "火焰柱",
-      "text": "",
-      "status": "missing",
+      "text": "本版本说明：对指定列4格范围内的所有敌方士兵或英雄造成99点神圣伤害。",
+      "status": "runtime-description",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Pillar of Flame",
       "originalText": "0"
@@ -79323,10 +79325,11 @@
     },
     "main:card:50903": {
       "name": "结界之地",
-      "text": "任意玩家的生物进入结界之地时，移除其全部增益效果；停留其中时无法获得增益效果。",
-      "status": "candidate",
-      "source": "linked Skill.Des; Card.Des is non-text zero",
-      "originalText": "Any player creature entering Warded Ground has all buffs removed and cannot gain buffs whilst inside."
+      "text": "原规则说明：任一玩家的生物进入结界之地时移除全部增益，且处于其中时无法获得增益。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
+      "originalName": "Warded Ground",
+      "originalText": "0"
     },
     "main:card:50904": {
       "name": "审判",

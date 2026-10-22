@@ -4674,64 +4674,64 @@
     },
     "main:card:50731": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50732": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50733": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50734": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50741": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50742": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50743": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
     },
     "main:card:50744": {
       "name": "岩浆注入",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Magma Injection",
       "originalText": "0"
@@ -4794,40 +4794,40 @@
     },
     "main:card:50806": {
       "name": "孵化",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Hatch",
       "originalText": "0"
     },
     "main:card:50807": {
       "name": "孵化",
-      "text": "",
-      "status": "missing",
+      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
+      "status": "unsupported",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Hatch",
       "originalText": "0"
     },
     "main:card:50808": {
       "name": "岩浆",
-      "text": "",
-      "status": "missing",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到3点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
       "originalName": "Magma",
       "originalText": "0"
     },
     "main:card:50809": {
       "name": "岩浆",
-      "text": "",
-      "status": "missing",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到5点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
       "originalName": "Magma",
       "originalText": "0"
     },
     "main:card:50810": {
       "name": "烈焰之柱",
-      "text": "",
-      "status": "missing",
+      "text": "本版本说明：对指定列4格范围内的所有敌方士兵或英雄造成99点神圣伤害。",
+      "status": "runtime-description",
       "source": "census.raw.Des (non-text value; effect unavailable)",
       "originalName": "Pillar of Flame",
       "originalText": "0"
@@ -4858,9 +4858,9 @@
     },
     "main:card:50903": {
       "name": "结界之地",
-      "text": "",
-      "status": "missing",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "原规则说明：任一玩家的生物进入结界之地时移除全部增益，且处于其中时无法获得增益。本版本限制：持续地形规则尚未实现，当前不能施放。",
+      "status": "unsupported",
+      "source": "linked skill Des + BattleKernel runtime boundary",
       "originalName": "Warded Ground",
       "originalText": "0"
     },
@@ -6001,20 +6001,5 @@
       "originalText": "地形技能.在指定格召唤生命之泉.生命之泉对进入或停留的友方士兵治疗1点伤害.场地存在8回合."
     }
   },
-  "missing": [
-    "main:card:50731",
-    "main:card:50732",
-    "main:card:50733",
-    "main:card:50734",
-    "main:card:50741",
-    "main:card:50742",
-    "main:card:50743",
-    "main:card:50744",
-    "main:card:50806",
-    "main:card:50807",
-    "main:card:50808",
-    "main:card:50809",
-    "main:card:50810",
-    "main:card:50903"
-  ]
+  "missing": []
 }

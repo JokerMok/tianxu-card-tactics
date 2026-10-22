@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-22",
+  "scope": "Current main playable card names plus presentation-only names emitted by the main scene and dungeon tables. Media scope, abandoned cards and dead variants are excluded.",
+  "cardNames": {
+    "reviewedUniqueSourceNames": 1852,
+    "missingMappings": 0,
+    "statusesPreserved": {
+      "candidate": 1833,
+      "recovered-context": 17,
+      "recovered": 2
+    },
+    "candidateNamesChanged": 62,
+    "reviewMethod": "Deterministic full-key checks plus direct semantic review by word families; no network translator, local auxiliary model or Ollama was invoked in this pass.",
+    "families": {
+      "species": {
+        "Ogre": { "entries": 23, "term": "食人魔", "violationsAfterReview": 0 },
+        "Troll": { "entries": 7, "term": "巨魔", "violationsAfterReview": 0 },
+        "Goblin": { "entries": 16, "term": "哥布林", "violationsAfterReview": 0 },
+        "Lich": { "entries": 3, "term": "巫妖", "violationsAfterReview": 0 },
+        "Elf": { "entries": 22, "term": "精灵", "violationsAfterReview": 0 }
+      },
+      "professionsAndUnits": {
+        "Warrior": { "entries": 13, "term": "战士", "violationsAfterReview": 0 },
+        "Ranger": { "entries": 2, "term": "游侠", "violationsAfterReview": 0 },
+        "Mage": { "entries": 7, "term": "法师", "violationsAfterReview": 0 },
+        "Assassin": { "entries": 7, "term": "刺客", "violationsAfterReview": 0 },
+        "Priest": { "entries": 2, "standaloneProfession": "牧师", "titleException": "Forbidden Priest Norbert remains 禁咒祭司诺伯特" }
+      },
+      "tarotReversed": { "entries": 47, "allUseInverseMarker": true },
+      "normalizedUnicodeVariantMismatches": 0,
+      "latinDisplayFragments": {
+        "entries": 30,
+        "reason": "Only source series/version/proper tokens remain, including 20E, ARK, EX, BB, AcFun, Plan B, Big T and Roman numerals."
+      },
+      "punctuationAndExplanatoryText": { "explanatoryCandidateTextFound": 0, "asciiSentencePunctuationFound": 0 }
+    },
+    "changedGroups": {
+      "OgreVersusTrollSpecies": 23,
+      "ChampionUnitTerm": 6,
+      "LegionnaireUnitTerm": 3,
+      "FelesAssassin": 2,
+      "VirtuousFamily": 3,
+      "TarotReversed": 3,
+      "AzraelTouchSeries": 5,
+      "otherDirectLiteralOrConsistencyFixes": 17
+    }
+  },
+  "presentationNames": {
+    "implementation": "cocos-client/assets/scripts/game/GameText.ts#presentationName",
+    "staticEntries": 262,
+    "mainNodeSourceNames": { "unique": 259, "englishBearing": 235, "unmappedEnglishAfterReview": 0 },
+    "mainSceneHeaders": { "unique": 61, "englishBearing": 29, "unmappedEnglishAfterReview": 0 },
+    "mainDungeonRows": { "unique": 65, "englishBearing": 65, "unmappedEnglishAfterReview": 0 },
+    "stableIdsChanged": 0,
+    "rawSourceNamesChanged": 0,
+    "mediaScopeTranslated": false
+  },
+  "bakedTextAssets": [
+    {
+      "file": "cocos-client/assets/resources/ui-revision-a/victory-textless.png",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/shengli-0.png",
+      "size": "458x272",
+      "sha256": "e880e5c4c1f5ddb17ec28ff77b94b165a78de8ca098a604c3397d2d05019c8c2"
+    },
+    {
+      "file": "cocos-client/assets/resources/ui-revision-a/defeat-textless.png",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/shibai-0.png",
+      "size": "384x192",
+      "sha256": "a53f639eab2132a82e5d7999a050bd79fb51bafa44fe6f3c0245c17237fe0301"
+    }
+  ],
+  "limits": [
+    "The 1833 candidate mappings remain working Chinese names, not recovered official names.",
+    "A complete-key family review catches consistency and obvious semantic errors but is not equivalent to independent native-language editorial sign-off for every proper name.",
+    "This record is a source review. Final visual fit and runtime asset loading require the coordinating Cocos build and acceptance run."
+  ]
+}

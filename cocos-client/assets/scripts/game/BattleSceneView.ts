@@ -1,4 +1,4 @@
-import { cardName } from './GameText.ts';
+import { cardName,cardDisplay,sourceDisplayName } from './GameText.ts';
 import { Color, Graphics, instantiate, Label, Node, tween, UIOpacity, UITransform, Vec3, EventTouch } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import { OriginalUi } from './OriginalUi.ts';
@@ -86,7 +86,7 @@ export class BattleSceneView {
         display = { node, animation, ready, team: unit.team, dying: false, generation: 0,
           hp: this.ui.label(node, 'Health', `${unit.hp}`, 16, -34, 35, 22, 16, Theme.red),
           attack: this.ui.label(node, 'Attack', `${unit.attack}`, -16, -34, 35, 22, 16, Theme.text),
-          name: this.ui.label(node, 'Name', unit.flags.hero ? owner?.name ?? '' : cardName(this.catalog,unit.cardId), 0, 119, 140, 18, 12,
+          name: this.ui.label(node, 'Name', unit.flags.hero ? (owner?.ai?sourceDisplayName(this.catalog,owner.name):owner?.name??'') : cardName(this.catalog,unit.cardId), 0, 119, 140, 18, 12,
           unit.team === 0 ? Theme.green : Theme.red) };
         this.ui.label(node, 'StatsSeparator', '/', 0, -34, 12, 20, 14);
         this.displays.set(unit.id, display);
@@ -302,9 +302,9 @@ export class BattleSceneView {
     this.hud?.destroy(); this.hud = this.ui.node(this.parent, 'BattleWnd:original-layout', 1200, 600);
     const hud = this.hud; const active = state.players[state.activePlayer];
     this.ui.label(hud, 'Round', `${state.turn}`, -20, 269.5, 100, 35, 35);
-    this.ui.label(hud, 'TurnName', this.locked ? '战斗进行中' : active?.name + '行动', 0, 224, 350, 24, 14);
+    this.ui.label(hud, 'TurnName', this.locked ? '战斗进行中' : (active?.ai?sourceDisplayName(this.catalog,active.name):active?.name??'') + '行动', 0, 224, 350, 24, 14);
     this.skinButton(hud, 'Battle:Menu', 'ajbangzhu', '', '设置', 551, 274, 75, 27, () => this.hooks.hide());
-    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${event.type} ${event.amount ?? ''}`).join('\n')));
+    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${({move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.amount ?? ''}`).join('\n')));
     // BattleWnd rightContent is aligned EAST, not a full-width replacement panel.
     const skin = this.original.catalog.skins.zdjm_1;
     if (skin?.path) this.ui.skin(hud, 'HandPane:source-zdjm_1', 'zdjm_1', 173, -228, 854, 144);
@@ -319,7 +319,7 @@ export class BattleSceneView {
       const x = -143 + index * 89; const y = -228 + (this.selected === hand.instanceId ? 15 : 0);
       const box = this.ui.node(hud, 'Hand:' + index, 85, 116, x, y);
       void this.drawSmallCard(box, card, hand.wait, this.selected === hand.instanceId);
-      box.on(Node.EventType.TOUCH_START, () => { if (mine && hand.wait === 0) { this.selected = hand.instanceId; box.setPosition(x, y + 15); } });
+      box.on(Node.EventType.TOUCH_START, () => { if (mine && hand.wait === 0) {const unsupported=cardDisplay(this.catalog,card,this.base).abilities.find(a=>a.status==='unsupported');if(unsupported){this.hooks.notice(unsupported.text);return;} this.selected = hand.instanceId; box.setPosition(x, y + 15); } });
       box.on(Node.EventType.TOUCH_MOVE, (event: EventTouch) => { if (this.selected !== hand.instanceId || !mine) return;
         const p = event.getUILocation(); const local = hud.getComponent(UITransform)!.convertToNodeSpaceAR(new Vec3(p.x, p.y)); box.setPosition(local); });
       box.on(Node.EventType.TOUCH_END, (event: EventTouch) => {
@@ -332,7 +332,7 @@ export class BattleSceneView {
       this.selectedHandPositions.set(hand.instanceId, new Vec3(x, y));
     });
     this.skinButton(hud, 'Battle:End', 'hhjs_1', '', '结束回合', 528.5, -136, 139, 35, () => this.hooks.command({ type: 'end' }), !mine);
-    this.skinButton(hud, 'Battle:Auto', this.autoplay ? 'tg_4' : 'tg_1', '', '', 432, -136, 50, 35, () => { this.autoplay = !this.autoplay; this.renderHud(true); }, this.latest.settled);
+    this.skinButton(hud, 'Battle:Auto', 'ajbangzhu', '', this.autoplay ? '自动' : '手动', 432, -136, 50, 35, () => { this.autoplay = !this.autoplay; this.renderHud(true); }, this.latest.settled);
     this.skinButton(hud, 'Battle:Surrender', 'tx_1', '', '', 382, -136, 50, 35, () => this.hooks.command({ type: 'surrender' }), this.locked || this.latest.settled);
     this.skinButton(hud, 'Battle:Speed', 'ajbangzhu', '', `${this.speed}倍速`, 312, -136, 75, 27, () => { this.speed = this.speed === 1 ? 2 : 1; this.renderHud(true); });
     if (mine) for (const [index, play] of this.latest.legalPlays.filter(play => play.instanceId === this.selected).entries()) {
@@ -354,10 +354,16 @@ export class BattleSceneView {
     const state = this.presentation.visibleState!; const outcome = this.latest.rewards;
     this.result = this.ui.node(this.parent, 'BattleResultWnd', 1200, 600);
     const won = outcome?.won ?? state.winner === state.players.find(p => p.id === this.me)?.team;
-    const skin = won ? 'shengli' : 'shibai'; const source = this.original.skin(skin);
+    const skin = won ? 'victory-textless.png' : 'defeat-textless.png';
+    const source = this.original.skin(won ? 'shengli' : 'shibai');
     const sx = won ? 425 : 432, sy = won ? 56 : 120;
-    this.ui.skin(this.result, 'Result:source-art', skin, sx + source.width! / 2 - 600, 300 - sy - source.height! / 2);
-    this.ui.label(this.result, 'Result:round', `${state.turn}`, sx + (won ? 260 : 230) - 600, 300 - sy - (won ? 201 : 118), 80, 30, 24, Theme.gold);
+    const resultX = sx + source.width! / 2 - 600;
+    const resultY = 300 - sy - source.height! / 2;
+    void this.ui.image(this.result, 'Result:textless-art', this.base + '/ui-assets/' + skin,
+      source.width!, source.height!, resultX, resultY);
+    this.ui.label(this.result, 'Result:title', won ? '战斗胜利' : '战斗失败', resultX,
+      resultY + (won ? 36 : 23), won ? 300 : 260, 62, won ? 44 : 40, won ? Theme.gold : new Color(220, 224, 232));
+    this.ui.label(this.result, 'Result:round', `回合数：${state.turn}`, resultX, resultY - (won ? 67 : 48), 180, 30, 18, Theme.gold);
     this.ui.label(this.result, 'Result:rewards', `银币 +${outcome?.silver ?? 0}    经验 +${outcome?.xp ?? 0}`, 0, -82, 500, 35, 18, Theme.gold);
     if(outcome?.cards?.length)this.ui.label(this.result,'RewardCards',outcome.cards.map(c=>cardName(this.catalog,c.id)+' ×'+c.count).join('、'),0,-113,560,32,13,Theme.gold);
     this.skinButton(this.result, 'Battle:Dismiss', 'kapaixiangqing_1', 'kapaixiangqing_2', '领取并返回地图', 0, -160, 220, 38, () => this.hooks.dismiss());

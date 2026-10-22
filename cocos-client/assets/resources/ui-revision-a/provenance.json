@@ -26,6 +26,868 @@
         240
       ],
       "excludedBakedText": "Deck Name / Deck Power below y=249 are outside the displayed SpriteFrame rectangle."
+    },
+    {
+      "file": "victory-textless.png",
+      "sha256": "e880e5c4c1f5ddb17ec28ff77b94b165a78de8ca098a604c3397d2d05019c8c2",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/shengli-0.png",
+      "sourceSha256": "49f454404f68da2b1ed9c37148cfc49b7ef9e407ff8430773f9238a4cf8929ee",
+      "derivative": "Built-in image generation edit removed baked Victory / Turns / Time lettering and reconstructed the transparent gold ornament; resized to the source 458x272 canvas. Original remains read-only."
+    },
+    {
+      "file": "defeat-textless.png",
+      "sha256": "a53f639eab2132a82e5d7999a050bd79fb51bafa44fe6f3c0245c17237fe0301",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/shibai-0.png",
+      "sourceSha256": "88334b7c9ad90381d3b99e8b4d596719fbcf0682aeba0c5498c89e2314622477",
+      "derivative": "Built-in image generation edit removed baked Defeat / Turns / Time lettering and reconstructed the transparent silver ornament; resized to the source 384x192 canvas. Original remains read-only."
+    },
+    {
+      "file": "worldmap-region-1-textless.png",
+      "sha256": "b3cdf52522ff08a04717e641ce45a43add5ebe446cc38b6f5aff50580d815c98",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-1.png",
+      "sourceSha256": "ab96bf02646f42db72a4f1bd7d55ea6aff47b81564fd166ce73de8316509c296",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 21,
+      "sourceSize": [
+        194,
+        193
+      ],
+      "textNeighborhood": [
+        30,
+        45,
+        170,
+        145
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-2-textless.png",
+      "sha256": "58ea8f1711b190339bd2692f03844fcd2ca061484332b1ba4609f753696d0bdc",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-2.png",
+      "sourceSha256": "3a75a21f0d7d9377fb30927af54d08792219460c2f480f995978e76ba9199a3f",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 15,
+      "sourceSize": [
+        187,
+        125
+      ],
+      "textNeighborhood": [
+        45,
+        15,
+        187,
+        120
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-3-textless.png",
+      "sha256": "cc5b93025d37e174fdf92738ab6614c02f39691f3785ae10f1ca860c8562ec64",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-3.png",
+      "sourceSha256": "cf8e07c3f88d9da82d8b0980da1e72dca1e9712d68613b7bf368c45f060f0cec",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 9,
+      "sourceSize": [
+        315,
+        201
+      ],
+      "textNeighborhood": [
+        35,
+        25,
+        260,
+        140
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-4-textless.png",
+      "sha256": "7dc663cb78b7d82adddc1d9a05dcc2158c0d7f40b556cd586591812dabf43ef1",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-4.png",
+      "sourceSha256": "e92da1ef10fe542f0e3d3e5ac7d22e9f2e5b50446abbd1b3f9d33f8789e51248",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 3,
+      "sourceSize": [
+        155,
+        177
+      ],
+      "textNeighborhood": [
+        10,
+        40,
+        155,
+        130
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-5-textless.png",
+      "sha256": "6354e10979754143865d8db9cf4b7e79b3d1f361c4c6188bc1a39abf1604ece5",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-5.png",
+      "sourceSha256": "282f2b9ca2584333388916fa348b589a054b7afd1bf07c1dc2b0cf9383f30d53",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 27,
+      "sourceSize": [
+        241,
+        251
+      ],
+      "textNeighborhood": [
+        40,
+        55,
+        230,
+        160
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-6-textless.png",
+      "sha256": "ee2f2c0784bbb1206d427dbf972b31fef5f493b2a800c43fb8d484fd3b0c1f04",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-6.png",
+      "sourceSha256": "1712b4fc9bd04f91c17a5388657d6ff7ea112dc8609a7937ae6badb1b88ec1d4",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 33,
+      "sourceSize": [
+        193,
+        166
+      ],
+      "textNeighborhood": [
+        20,
+        35,
+        193,
+        135
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-7-textless.png",
+      "sha256": "8670f424e34945105211acc6c79c0b40fd8bc97932776bb757b9e67a610f604d",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-7.png",
+      "sourceSha256": "6952842a6e5c8575fa583d8cb661b0dada88a800e59294b88e649577c2407a0d",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 39,
+      "sourceSize": [
+        194,
+        198
+      ],
+      "textNeighborhood": [
+        10,
+        45,
+        185,
+        150
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-8-textless.png",
+      "sha256": "ac727e71b707d4b1cea9bb4bd94279626495336111a61c6babeec80ab455e93f",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-8.png",
+      "sourceSha256": "ebd28da5aa8098ec26607c85ab7c4b4872601d91f1847bc01ce0896832017f69",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 45,
+      "sourceSize": [
+        292,
+        248
+      ],
+      "textNeighborhood": [
+        50,
+        60,
+        245,
+        155
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-9-textless.png",
+      "sha256": "bca4e1036a138e373a574b82dea04b469c387d6a04976f99a1b91d800f529ecb",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-9.png",
+      "sourceSha256": "51ff1ef4d222b127c8fa78039a626a9ec1661d39dc828f8671b33d831f9d8e1c",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 57,
+      "sourceSize": [
+        188,
+        130
+      ],
+      "textNeighborhood": [
+        25,
+        25,
+        188,
+        120
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-10-textless.png",
+      "sha256": "e8fb9679120da3ba43530ff06370c29df5d6dd7a0e649a749938aed84f0d96af",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-10.png",
+      "sourceSha256": "b83246ae72753775d26a8e0c6b6cd3d43bd5de4510193ba84d213cfb08b307ec",
+      "sourceContainer": "game/data/maps/worldmap.swf",
+      "sourceCharacterId": 51,
+      "sourceSize": [
+        196,
+        193
+      ],
+      "textNeighborhood": [
+        20,
+        40,
+        196,
+        140
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-11-textless.png",
+      "sha256": "40843a621786ad847958cb20143f768cdceba27283e75e2ca456f8ffedcd71a8",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-11.png",
+      "sourceSha256": "5256996a53fbe18103e5bd106cd1a140144616d613d9695e13a3b421ce0deeec",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 38,
+      "sourceSize": [
+        206,
+        183
+      ],
+      "textNeighborhood": [
+        0,
+        20,
+        206,
+        115
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-12-textless.png",
+      "sha256": "925b2a00121f8add3cead15585b65d3ef2c699b31e3d9977b707da129721294b",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-12.png",
+      "sourceSha256": "40c48c53a4a061726d2eb3182a81b2c8ed7b084720e0880d631dcb0c7bb032b7",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 44,
+      "sourceSize": [
+        155,
+        161
+      ],
+      "textNeighborhood": [
+        10,
+        30,
+        155,
+        130
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-13-textless.png",
+      "sha256": "8dc0a55eb9f4c4220c2dca83b26c0f17412df5d520dd138a4cacd7730abe1fb7",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-13.png",
+      "sourceSha256": "40d9d94095dd5f33ce4bc5972e60dfc0cbced4b220064ce1e56480534a0a9001",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 56,
+      "sourceSize": [
+        100,
+        103
+      ],
+      "textNeighborhood": [
+        -10,
+        15,
+        110,
+        95
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-14-textless.png",
+      "sha256": "0a6845dd86ab719124edb06c29e27b923ad7162a5b16f6b10ae6b260191d4d5c",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-14.png",
+      "sourceSha256": "68d15e9368ba1ace7d5f1540dc478c9e8a915ba5bc7720ca54d449fb40f472c3",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 50,
+      "sourceSize": [
+        124,
+        122
+      ],
+      "textNeighborhood": [
+        -10,
+        10,
+        135,
+        105
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-15-textless.png",
+      "sha256": "c1338e523d519b1868906539873c37d7e4180d44b4665506d9674425ad89cb1c",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-15.png",
+      "sourceSha256": "6c004a062a33a9c7c2760fcf4b482e7eee4385674d5dbc75b728fa37a2da45f1",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 31,
+      "sourceSize": [
+        186,
+        231
+      ],
+      "textNeighborhood": [
+        0,
+        45,
+        186,
+        145
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-16-textless.png",
+      "sha256": "ed262941631843dd025a666e5d8eed3246eb864fc895dacd327837831fa40998",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-16.png",
+      "sourceSha256": "c24d9d5e833b1d46b1cb3a52160ee115c3b3d34f94a81bb65f7443f2c7fa332e",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 25,
+      "sourceSize": [
+        307,
+        266
+      ],
+      "textNeighborhood": [
+        10,
+        120,
+        300,
+        225
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-17-textless.png",
+      "sha256": "bfb665149afa9b89dff82432541e199f0909441176c825b0e1e4b9ca0a030f03",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-17.png",
+      "sourceSha256": "79dbfcd6fb6684666a515d0b9b56c61b5d096de2eb2b3e434168e0e9e64b27f3",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 19,
+      "sourceSize": [
+        189,
+        169
+      ],
+      "textNeighborhood": [
+        0,
+        35,
+        189,
+        140
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-18-textless.png",
+      "sha256": "f36fe75d9c0b080dc3ddb89f01247a40bfcbf2159a7f4cf456ce19a0ae770bf3",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-18.png",
+      "sourceSha256": "bf8680fcb0d0001f943545b2f1ffeb8776592230741fb08ae116a887ff089d9e",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 13,
+      "sourceSize": [
+        220,
+        188
+      ],
+      "textNeighborhood": [
+        10,
+        35,
+        220,
+        140
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "worldmap-region-19-textless.png",
+      "sha256": "24dbb8d03cc06b96cdf34f6349a92f3f7691a7e031f00f0596423e14c5b16e0e",
+      "source": "cocos-client/assets/resources/recovered/original-ui/legacy/worldmap-region-19.png",
+      "sourceSha256": "fe7870b07de5b06ff8a4fcf65fe0036f278920d665d0634ea915350464e2a7a9",
+      "sourceContainer": "game/data/maps/worldmap2.swf",
+      "sourceCharacterId": 4,
+      "sourceSize": [
+        162,
+        138
+      ],
+      "textNeighborhood": [
+        -10,
+        20,
+        172,
+        110
+      ],
+      "derivative": "Built-in image generation removed the baked English region/chapter lettering. Generated terrain was composited only inside textNeighborhood with a 1.5 px feather; source alpha and all pixels outside the feathered boundary remain unchanged.",
+      "featherRadius": 1.5
+    },
+    {
+      "file": "chapter-title-textless.png",
+      "sha256": "2e5c33ef4fb4a65c5144801361707cc935b83e6a5b45687599582c67bcd2a9c2",
+      "source": "cocos-client/assets/resources/recovered/images/7b62bc1f0ed85be19896.jpg",
+      "sourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "derivative": "Built-in image generation isolated the Chapter 15 ribbon and removed all baked English lettering. It is an intermediate used to bake the 19 textless full-scene derivatives; runtime does not overlay it on an English source image."
+    },
+    {
+      "file": "scene-background-1-textless.jpg",
+      "sha256": "c8a705706fb2bc91e081fa033f73b339fc11f69d792a6ccfed886362c12c551b",
+      "source": "cocos-client/assets/resources/recovered/images/cf73698140568071ee24.jpg",
+      "sourceSha256": "52656881f2d17be59609676606338d2dd575becef9403923836ccc14bc6294b7",
+      "sourceContainer": "game/data/img/scene/human1.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-2-textless.jpg",
+      "sha256": "13530f36f79819396408ec93111553f58d4bfe35e589dff7007407b1d9db48c9",
+      "source": "cocos-client/assets/resources/recovered/images/7b7f5cd38b583b51ef33.jpg",
+      "sourceSha256": "8f8572f5ea55da3139013ef89e129ff732693ad3943f3b7362e9e9365469797f",
+      "sourceContainer": "game/data/img/scene/human2.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-3-textless.jpg",
+      "sha256": "977435cb50b3ed3b7f21aa5c4751b1f78b38e281810975bfd6f78ecc76c51947",
+      "source": "cocos-client/assets/resources/recovered/images/aba351586177051728f2.jpg",
+      "sourceSha256": "370097562e3659a6c6d34e7ac8a64acebaa7edcedf2c54b2e6f16303e2046b94",
+      "sourceContainer": "game/data/img/scene/elf1.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-4-textless.jpg",
+      "sha256": "b2c4196a57cbe842cf219cf664746c92b7a538d0cc07e6a0663da568105c088e",
+      "source": "cocos-client/assets/resources/recovered/images/4b85730e2cf9197b9fb6.jpg",
+      "sourceSha256": "59b4f5d8771e6e44b7216f1e00c4442b8ec342eda33a933c98e3d1c38df9b725",
+      "sourceContainer": "game/data/img/scene/elf2.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-5-textless.jpg",
+      "sha256": "38ed922207e24c2f6b44605dd27752056b1bb48f1416b32e43e69f12776873ff",
+      "source": "cocos-client/assets/resources/recovered/images/f9b062df334b83a68521.jpg",
+      "sourceSha256": "4f4ffecacc958ce4549762be511472e69d277f3e6248de47dec7535ab40b3fc1",
+      "sourceContainer": "game/data/img/scene/org.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-6-textless.jpg",
+      "sha256": "5bdbefc902f095c85e1e8772e79622e5e6d8a6321c599186c347c55c203f7cab",
+      "source": "cocos-client/assets/resources/recovered/images/af360c96ac7e26df0124.jpg",
+      "sourceSha256": "cc44deb48a2a4c7c86a72d5c29b952d99808c89293255d72ab7a89df98c6c9bd",
+      "sourceContainer": "game/data/img/scene/org2.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-7-textless.jpg",
+      "sha256": "56206098aa2e41f7bdd16c83bb7ca21ab9765774dfca2c9eec82b800d9cb49fb",
+      "source": "cocos-client/assets/resources/recovered/images/b1e7dfdf7ee9a1a9444e.jpg",
+      "sourceSha256": "0549d24c1f2d36aa87a611bceacc99122e5e6c282c620d07c8540f6f00d33660",
+      "sourceContainer": "game/data/img/scene/undead1.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-8-textless.jpg",
+      "sha256": "143b2e8d4d836cfa3629be3559953eb790dbf6cfdb2c5ad960ae6fbb655fae8f",
+      "source": "cocos-client/assets/resources/recovered/images/d2194cbcc4bd9febc7e3.jpg",
+      "sourceSha256": "28911927b147e7dcf216fcc3ae08ebfb55213163c7ffdc48d6f2bfb3322adea4",
+      "sourceContainer": "game/data/img/scene/undead2.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-9-textless.jpg",
+      "sha256": "a0a428b805b1b4248f86e2835f215245878d73a0b80987338a3a2f0330c96b07",
+      "source": "cocos-client/assets/resources/recovered/images/cea242d3c170603199a1.jpg",
+      "sourceSha256": "bbe054aaab2bf2626003e7bb30f858251f1a82a96c36c9569228f6c3f453e322",
+      "sourceContainer": "game/data/img/scene/huangmoyiji.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-10-textless.jpg",
+      "sha256": "6bbb7c190ba2e9a047cefeab11f33e9308a44bf616112afe2a1fc59e4df7c50b",
+      "source": "cocos-client/assets/resources/recovered/images/b8aef8807334fea37d8d.jpg",
+      "sourceSha256": "3a95e5c8e5096d1a7a9cadf6629d13e8f5428360791f0eeab5c446345d3f10ed",
+      "sourceContainer": "game/data/img/scene/fengyinzhidi.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-11-textless.jpg",
+      "sha256": "0291a5a67181ea4353342f33c285614baf1b3321957370c70c21fe3f469bb7e7",
+      "source": "cocos-client/assets/resources/recovered/images/e1489ee7fee832490c6d.jpg",
+      "sourceSha256": "b162937f6f83a247c9a8535540248e4c33c9bb203c9a0bafa3da12a0d53c156e",
+      "sourceContainer": "game/data/img/scene/longmianhuangye.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-12-textless.jpg",
+      "sha256": "80fc7b3d2e53fb9966f0634df8556883df951ba7efdb24289433deb29eee486b",
+      "source": "cocos-client/assets/resources/recovered/images/4322b5eec7832464892e.jpg",
+      "sourceSha256": "0e2d5ebf50646991b3dee12be35946d97570a0d01ee9ccdbe8313de7999b76d1",
+      "sourceContainer": "game/data/img/scene/chenshuisenlindian.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-13-textless.jpg",
+      "sha256": "504173335e861b21c511ac7479be7d2187f0007b810b3fecf4865674e1b77c20",
+      "source": "cocos-client/assets/resources/recovered/images/68507c111b9650489f28.jpg",
+      "sourceSha256": "b5650645f356457e64afc5fa4e9868d8e8316facd0d67afc8dfa830646d1f8af",
+      "sourceContainer": "game/data/img/scene/jiaozhuoyiji.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-14-textless.jpg",
+      "sha256": "477655a98d697df21897f9eda88e50f0528ea43f8e16cc7385a722d5d3c3f560",
+      "source": "cocos-client/assets/resources/recovered/images/b28fcb26b80789a8e988.jpg",
+      "sourceSha256": "df192921483b6c59c7910ada01f67fb421f5e37d8bfdb4141d98d6895d590f09",
+      "sourceContainer": "game/data/img/scene/huangmugucheng.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-15-textless.jpg",
+      "sha256": "5971be04ca24cd008ccd2abd370bd1f38d1c2b0ae6968a1fe7d00fbc33836622",
+      "source": "cocos-client/assets/resources/recovered/images/7b62bc1f0ed85be19896.jpg",
+      "sourceSha256": "305574fe64a3841e5651bf9f7718c58439fe6dbf3ada3b105640e7d8422006ef",
+      "sourceContainer": "game/data/img/scene/shenmizhidi.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-16-textless.jpg",
+      "sha256": "3abc89eb08137ab16053d698d364bd184f64f7482557a62af367b7442c0085b3",
+      "source": "cocos-client/assets/resources/recovered/images/f718ab6eeb015fae2351.jpg",
+      "sourceSha256": "2cb13e75cf6da6f05f169decff3be557565b28ba4e81b9933a051c74ee1c8672",
+      "sourceContainer": "game/data/img/scene/bingxuezhidi.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-17-textless.jpg",
+      "sha256": "a7772dab848c0d2187685714e57b8706f937ab08ae3ba64426ddf4a360325002",
+      "source": "cocos-client/assets/resources/recovered/images/436e42798ffb136dff7b.jpg",
+      "sourceSha256": "ec492132140868e5089438a636db74f009a49c525a9814e8eb4d43ea91b3047e",
+      "sourceContainer": "game/data/img/scene/kongzhongqundao.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-18-textless.jpg",
+      "sha256": "ff04a7d7d8e8cb77c2e7282d4851c2d7f9d110367f8b582caf3c220f719eb010",
+      "source": "cocos-client/assets/resources/recovered/images/214ea85dbf3839246833.jpg",
+      "sourceSha256": "c9e6c44a5c1ae33068201baad14a7796157d3b0b7e4037ab10c387253661e61c",
+      "sourceContainer": "game/data/img/scene/hundunhuochao.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
+    },
+    {
+      "file": "scene-background-19-textless.jpg",
+      "sha256": "4fa0489dbb03d4f2b13d4db989fc95e1692b535636f34ba546f15bd78a352e33",
+      "source": "cocos-client/assets/resources/recovered/images/12a48a34c97dc73eba28.jpg",
+      "sourceSha256": "222269acbf0c87ee892018560ef411aab75733e2c02291933533c442b3be4389",
+      "sourceContainer": "game/data/img/scene/diyuzhisen.jpg",
+      "sourceSize": [
+        740,
+        441
+      ],
+      "inspectedSourceCrop": [
+        590,
+        0,
+        150,
+        70
+      ],
+      "replacementRect": [
+        598,
+        0,
+        138,
+        56
+      ],
+      "derivative": "Full-size scene derivative. The baked English Chapter ribbon area was replaced before flattening with the textless generated ribbon, then exported as one 740x441 JPEG. Runtime loads this derivative alone and draws the Chinese chapter label separately."
     }
   ]
 }
