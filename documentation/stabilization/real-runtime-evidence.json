@@ -1,0 +1,92 @@
+{
+  "isolated": true,
+  "fixture": "level30 / 77 owned types, not natural player progress",
+  "alpha": {
+    "cards": 10,
+    "deck": [
+      "main:card:1",
+      "main:card:19",
+      "main:card:43",
+      "main:card:61",
+      "main:card:41001",
+      "main:card:1",
+      "main:card:1",
+      "main:card:9402",
+      "main:card:93",
+      "main:card:2"
+    ],
+    "silver": 10030,
+    "battleId": "454ba5df-63e0-4690-b32d-53d0c5f8e1ce",
+    "battleRevision": 6,
+    "settled": true,
+    "rewards": {
+      "won": true,
+      "silver": 30,
+      "xp": 6,
+      "cards": [
+        {
+          "id": "main:card:5019",
+          "count": 1
+        }
+      ],
+      "extras": {
+        "items": [],
+        "cards": [],
+        "currencies": {},
+        "reputation": [],
+        "growth": {},
+        "xp": 0,
+        "randomGroups": [],
+        "preview": null
+      }
+    }
+  },
+  "beta": {
+    "cards": 9,
+    "deck": [
+      "main:card:1",
+      "main:card:19",
+      "main:card:43",
+      "main:card:61",
+      "main:card:41001",
+      "main:card:1",
+      "main:card:1",
+      "main:card:9402",
+      "main:card:2"
+    ],
+    "silver": 10000
+  },
+  "final": {
+    "alpha": {
+      "deck": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1",
+        "main:card:9402",
+        "main:card:93",
+        "main:card:2"
+      ],
+      "silver": 10050,
+      "battle": null
+    },
+    "beta": {
+      "deck": [
+        "main:card:1",
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:41001",
+        "main:card:1",
+        "main:card:1",
+        "main:card:9402",
+        "main:card:2"
+      ],
+      "silver": 10000,
+      "battle": null
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { ActionOutbox, type PendingAction } from './ActionOutbox.ts';
 import { Component, Node, Label, EditBox, Color, UITransform, view, screen, Size, ResolutionPolicy, profiler, Button, BlockInputEvents } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import { GameAudio } from './GameAudio.ts';
@@ -18,10 +19,10 @@ interface SceneNodeView { id: string; originalId: string; name: string; story?: 
   battle: boolean; transitions: number[]; triggers: { id: string; name: string; repeat: number }[] }
 interface SceneView { id: string; name: string; unlocked: boolean; minLevel: number; nodes: SceneNodeView[] }
 interface ActorView { id: string; name: string; profession: number; level: number; xp: number; tutorialStep: number;
-  currencies: { silver: number; gold: number; crystal: number }; cards: Record<string, number>; deck: string[]; deckCapacity: number;
+  currencies: { silver: number; gold: number; crystal: number }; cards: Record<string, number>; deck: string[]; deckCapacity: number; commandRevision:number;
   inventory: Record<string, number>; progress: { sceneId: number }; guildId?: string; settings: Record<string, boolean> }
 type Row = Record<string, unknown>;
-interface Snapshot { assetNames: Record<string, string>; story: string; revision: number; now: number; actor: ActorView; scenes: SceneView[];
+interface Snapshot { serverInstance:string; assetNames: Record<string, string>; story: string; revision: number; now: number; actor: ActorView; scenes: SceneView[];
   tasks: { id: string; name: string; detail: string; ready: boolean; claimed: boolean; reward: number }[];
   growth: { profile: { avatarAssetId: string | null }; summary: {energy: number}; sections: Section[] }; social: { people: Row[]; friends: Row[]; friendRequests: Row[]; chat: Row[]; mail: Row[]; guilds: Row[]; trades: Row[]; auctions: Row[] };
   rooms: Row[]; roomInvites: Row[]; rankings: Row[]; dungeons: Row[];
@@ -35,7 +36,7 @@ const AUTH_KEY = 'tianxu.auth.v1';
 export class TianxuGame extends Component {
   private ui = new CocosUi(); private root!: Node; private body!: Node; private modal?: Node;
   private token = ''; private characterId = ''; private characters: Character[] = [];
-  private catalog?: RecoveredCatalog; private state?: Snapshot;
+  private catalog?: RecoveredCatalog; private state?: Snapshot; private networkInterrupted = false;
   private page = 'home'; private listPage = 0; private section = ''; private selectedScene = 1;
   private cardsAll = false; private draftDeck?: string[]; private busy = false; private polling = false;
   private notice = ''; private noticeUntil = 0; private noticeLabel?: Label;
@@ -47,6 +48,7 @@ export class TianxuGame extends Component {
   private worldWindow?: WorldMapWindow; private debugUi = false;
   private secondaryWindows?: SecondaryWindows;
 
+  private outbox!:ActionOutbox;private online=()=>{if(this.state)void this.poll();else void this.boot();};
   private viewportObserver?: ResizeObserver; private viewportKey='';
   private syncViewport=()=>{
     if(typeof window==='undefined')return;const width=window.innerWidth,height=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,2),key=width+':'+height+':'+dpr;
@@ -65,6 +67,7 @@ export class TianxuGame extends Component {
     const destination = new URL(origin);
     this.apiBase = ['localhost','127.0.0.1','[::1]'].includes(destination.hostname) ? destination.origin : globalThis.location.origin;
     const slot = params.get('client'); if (slot && /^[a-zA-Z0-9_-]{1,30}$/.test(slot)) this.authKey += ':' + slot;
+    this.outbox=new ActionOutbox(localStorage,this.authKey+':outbox');globalThis.addEventListener('online',this.online);
     this.root = this.ui.node(this.node, 'TianxuRoot', 1200, 600);
     try { const cached = JSON.parse(localStorage.getItem(this.authKey) ?? '{}'); this.token = cached.token ?? ''; this.characterId = cached.characterId ?? ''; } catch { /* Old campaign save keys are intentionally independent. */ }
     (globalThis as unknown as { __TIANXU_UI__: unknown }).__TIANXU_UI__ = {
@@ -75,7 +78,7 @@ export class TianxuGame extends Component {
     this.pollTimer = setInterval(() => { void this.poll(); }, 1000);
   }
   onDestroy() {
-    this.viewportObserver?.disconnect();globalThis.removeEventListener('resize',this.syncViewport);
+    globalThis.removeEventListener('online',this.online);this.viewportObserver?.disconnect();globalThis.removeEventListener('resize',this.syncViewport);
     if (this.pollTimer) clearInterval(this.pollTimer);
     this.deckWindow?.destroy(); this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
   }
@@ -92,10 +95,18 @@ export class TianxuGame extends Component {
     }
   }
   private async api<T>(route: string, payload?: unknown, characterId = this.characterId): Promise<T> {
-    const response = await fetch(this.apiBase + route, { method: payload === undefined ? 'GET' : 'POST',
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);try{
+    const response = await fetch(this.apiBase + route, { signal:controller.signal,method: payload === undefined ? 'GET' : 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}`, 'X-Character-Id': characterId },
       ...(payload === undefined ? {} : { body: JSON.stringify(payload) }) });
-    const value = await response.json(); if (!response.ok) { const error = new Error(value.error ?? `请求失败 ${response.status}`) as Error & {definitive:boolean}; error.definitive=response.status>=400&&response.status<500; throw error; } return value as T;
+    const value = await response.json(); if (!response.ok) { const error = new Error(value.error ?? `请求失败 ${response.status}`) as Error & {definitive:boolean;status:number;code:string;currentDeck?:string[]}; error.definitive=response.status>=400&&response.status<500&&response.status!==401;error.status=response.status;error.code=value.code;error.currentDeck=value.currentDeck; throw error; } return value as T;
+    }catch(error){if(!(error as {status?:number}).status || (error as {status?:number}).status! >= 500)this.networkInterrupted=true;if(controller.signal.aborted)throw new Error('请求超时，结果尚未确认，请重试确认。');throw error;}finally{clearTimeout(timer);}
+  }
+  private acceptSnapshot(next: Snapshot) {
+    if (this.networkInterrupted || (this.state && next.serverInstance !== this.state.serverInstance)) {
+      this.entryReplayBattleId = ''; this.battleView?.destroy(); this.battleView = undefined;
+    }
+    this.networkInterrupted = false; this.state = next;
   }
   private saveAuth() { localStorage.setItem(this.authKey, JSON.stringify({ token: this.token, characterId: this.characterId })); }
   private async boot() {
@@ -109,26 +120,30 @@ export class TianxuGame extends Component {
     }
     if (!this.token) { this.renderLogin(); return; }
     try {
+      const pending=this.outbox.pending(this.characterId);if(pending){try{const response=await this.transmit(pending);if(response.result?.characterId)this.characterId=response.result.characterId;}catch(e){if(!(e as {definitive?:boolean}).definitive)throw e;this.toast(String(e));}}
       this.characters = (await this.api<{ characters: Character[] }>('/api/characters')).characters;
       if (!this.characters.some(char => char.id === this.characterId)) this.characterId = '';
       if (!this.characterId) { this.renderCharacters(); return; }
       if (!this.catalog) this.catalog = await this.api<RecoveredCatalog>('/api/catalog');
       this.audio ??= new GameAudio(this.node, this.catalog, this.apiBase + '/recovered/');
-      this.state = await this.api<Snapshot>('/api/state'); this.selectedScene = Number(this.state.actor.progress.sceneId); this.saveAuth(); this.render();
-    } catch (error) { this.token = ''; this.renderLogin(); this.toast(String(error)); }
+      this.acceptSnapshot(await this.api<Snapshot>('/api/state')); this.selectedScene = Number(this.state!.actor.progress.sceneId); this.saveAuth(); this.render();
+    } catch (error) { if((error as {status?:number}).status===401){this.token='';this.state=undefined;this.renderLogin();}else if(!this.state)this.renderReconnect();this.toast(String(error)); }
   }
+  private renderReconnect(){this.clear();this.ui.label(this.root,'ReconnectTitle','连接暂时中断',0,85,620,50,28,Theme.gold);this.ui.label(this.root,'ReconnectNote','请求编号和已保存进度保留，重连后同步服务器。',0,15,780,60,18);this.ui.button(this.root,'Reconnect','重新连接',0,-65,180,40,()=>{void this.boot();});}
+  private async transmit(p:PendingAction):Promise<any>{try{const response=await this.api('/api/act',{requestId:p.requestId,action:p.action,payload:p.payload,...(p.expectedActorRevision===undefined?{}:{expectedActorRevision:p.expectedActorRevision})},p.actorId);this.outbox.complete(p);return response;}catch(e){if((e as {definitive?:boolean}).definitive)this.outbox.complete(p);throw e;}}
   private async poll() {
     if (!this.state || this.busy || this.polling || this.modal?.isValid) return;
+    const pending=this.outbox.pending(this.characterId);if(pending&&pending.action!=='deck.save'){await this.run(pending.action,pending.payload);return;}
     this.polling = true;
     try {
       const actorId=this.characterId;const next = await this.api<Snapshot>('/api/state',undefined,actorId);
       if(actorId!==this.characterId||!this.state)return;
-      if (next.revision > this.state.revision) {
+      if (next.revision > this.state.revision||next.serverInstance!==this.state.serverInstance||this.networkInterrupted) {
         if (next.battle && next.battle.id !== this.state.battle?.id) {
           this.battleHidden = false;
-          this.entryReplayBattleId = next.battle.id;
+          this.entryReplayBattleId = '';
         }
-        this.state = next;
+        this.acceptSnapshot(next);
         if (this.original && !this.debugUi && this.page === 'rooms' && this.body?.isValid
             && (!next.battle || this.battleHidden)) this.renderModuleWindow();
         else if(this.page==='cards'&&this.body?.isValid&&this.deckWindow&&(!next.battle||this.battleHidden))this.deckWindow.updateActor(next.actor);
@@ -139,28 +154,28 @@ export class TianxuGame extends Component {
   }
   private async run(action: string, payload: Record<string, unknown> = {}) {
     if (this.busy) return; this.busy = true;
-    const previousBattleId = this.state?.battle?.id;
+    const actorId=this.characterId;const previousBattleId = this.state?.battle?.id;
     try {
-      const response = await this.api<{ result: { message?: string; characterId?: string; roomId?: string; battleId?: string }; replayed: boolean }>('/api/act', {
-        requestId: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`, action, payload });
+      const pending=this.outbox.prepare(actorId,action,payload,actorId?this.state?.actor.commandRevision:undefined);
+      const response=await this.transmit(pending);if(actorId!==this.characterId)return;
       if (response.result.characterId) { this.characterId = response.result.characterId; this.saveAuth(); await this.boot(); }
-      else { this.state = await this.api<Snapshot>('/api/state');
-        if (['pve.dungeon', 'pve.enterScene', 'pve.transition'].includes(action)) this.selectedScene = Number(this.state.actor.progress.sceneId);
+      else { this.acceptSnapshot(await this.api<Snapshot>('/api/state'));
+        if (['pve.dungeon', 'pve.enterScene', 'pve.transition'].includes(action)) this.selectedScene = Number(this.state!.actor.progress.sceneId);
         if (response.result.roomId) this.page = 'rooms';
         if (response.result.battleId) {
           this.battleHidden = false;
-          if (response.result.battleId !== previousBattleId && this.state.battle?.id === response.result.battleId)
+          if (!response.replayed&&response.result.battleId !== previousBattleId && this.state!.battle?.id === response.result.battleId)
             this.entryReplayBattleId = response.result.battleId;
         }
         this.render(); }
       this.toast(response.result.message ?? '操作完成');
-    } catch (error) { this.toast(String(error)); }
+    } catch (error) {if((error as {code?:string}).code?.endsWith('CONFLICT')&&actorId===this.characterId){try{const next=await this.api<Snapshot>('/api/state');this.acceptSnapshot(next);this.render();}catch{}}this.toast(String(error)); }
     finally { this.busy = false; }
   }
-  private async saveDeck(cards:string[],requestId:string,actorId:string):Promise<string[]> {
-    const response=await this.api<{result:{cards:string[]};revision:number;replayed:boolean}>('/api/act',{action:'deck.save',payload:{cards},requestId},actorId);
+  private async saveDeck(cards:string[],requestId:string,actorId:string,expectedDeck:string[]):Promise<string[]> {
+    const pending=this.outbox.prepare(actorId,'deck.save',{cards,expectedDeck},undefined,requestId);const response=await this.transmit(pending);
     if(!Array.isArray(response.result.cards))throw new Error('保存响应缺少确认卡组，请重试确认');
-    if(this.state?.actor.id===actorId){this.state.actor.deck=[...response.result.cards];this.state.revision=Math.max(this.state.revision,response.revision);}
+    if(this.state?.actor.id===actorId&&response.revision>=this.state.revision){this.state.actor.deck=[...response.result.cards];this.state.actor.commandRevision=response.result.commandRevision;this.state.revision=response.revision;}
     return response.result.cards;
   }
   private toast(message: string) { this.notice = /Failed to fetch|NetworkError|Load failed/i.test(message)?'网络连接中断，请稍后重试。':message.replace(/^Error: /, ''); this.noticeUntil = Date.now() + 5500;
@@ -350,7 +365,7 @@ export class TianxuGame extends Component {
     this.body = this.ui.node(this.root, 'PlayerWindow:' + this.page, 1200, 600);
     if (this.page === 'cards') {
       this.deckWindow ??= new CardDeckWindow(this.ui, this.original!, this.catalog!, this.apiBase, {
-        close: () => this.navigate('home'), save: (cards, requestId, actorId) => this.saveDeck(cards, requestId, actorId),
+        close: () => this.navigate('home'), save: (cards, requestId, actorId,expectedDeck) => this.saveDeck(cards, requestId, actorId,expectedDeck),
         detail: card => this.cardDetail(card), growth: () => { this.page = 'growth'; this.section = 'cards'; this.render(); },
       }); this.deckWindow.render(this.body, this.state!.actor, this.cardsAll); return;
     }
@@ -404,12 +419,12 @@ export class TianxuGame extends Component {
     const scene = scenes.find(scene => scene.id === `main:scene:${this.selectedScene}`) ?? scenes[0];
     if (!scene) { this.ui.label(this.body, 'EmptyScene', '暂无已解锁场景', 0, 0); return; }
     this.selectedScene = Number(scene.id.split(':').at(-1));
-    this.ui.button(this.body, 'World:Scenes', `${scene.name} · 切换章节`, -245, 181, 450, 32, () => this.choose('已解锁场景', scenes.map(scene => ({
-      label: scene.name, detail: `等级${scene.minLevel}`, action: '', payload: { sceneId: Number(scene.id.split(':').at(-1)) } })), item => {
+    this.ui.button(this.body, 'World:Scenes', `${presentationName(scene.name)} · 切换章节`, -245, 181, 450, 32, () => this.choose('已解锁场景', scenes.map(scene => ({
+      label: presentationName(scene.name), detail: `等级${scene.minLevel}`, action: '', payload: { sceneId: Number(scene.id.split(':').at(-1)) } })), item => {
         this.selectedScene = Number(item.payload?.sceneId); void this.run('pve.enterScene', { sceneId: this.selectedScene });
       }));
     this.ui.button(this.body, 'World:Dungeons', '副本选择', 295, 181, 180, 32, () => this.choose('副本与难度', state.dungeons.flatMap(row => ['easy','normal','hard'].filter(key => Number(row[key]) > 0)
-      .map(key => ({ label: `${row.name} · ${{easy:'简单',normal:'普通',hard:'困难'}[key]}`, action: 'pve.dungeon', payload: { sceneId: Number(row[key]) } })))));
+      .map(key => ({ label: `${presentationName(String(row.name))} · ${{easy:'简单',normal:'普通',hard:'困难'}[key]}`, action: 'pve.dungeon', payload: { sceneId: Number(row[key]) } })))));
     const original = this.catalog?.scopes.main.scenes.find(item => item.id === scene.id);
     const background = String(original?.header.background ?? '').replaceAll('\\', '/').toLowerCase();
     const asset = Object.values(this.catalog?.assets ?? {}).find(item => String((item as unknown as Row).container ?? '').toLowerCase().endsWith(background));

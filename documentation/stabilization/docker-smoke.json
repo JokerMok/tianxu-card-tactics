@@ -1,0 +1,32 @@
+{
+  "runtimePackageOnly": true,
+  "frontEndStatus": 200,
+  "restoredAccountLoginStatus": 200,
+  "activeBattleRestored": true,
+  "battleRevisionBefore": 1,
+  "deckCards": 10,
+  "commands": 4,
+  "won": true,
+  "reward": {
+    "won": true,
+    "silver": 30,
+    "xp": 6,
+    "cards": [
+      {
+        "id": "main:card:5019",
+        "count": 1
+      }
+    ],
+    "extras": {
+      "items": [],
+      "cards": [],
+      "currencies": {},
+      "reputation": [],
+      "growth": {},
+      "xp": 0,
+      "randomGroups": [],
+      "preview": null
+    }
+  },
+  "settled": true
+}

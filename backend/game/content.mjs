@@ -5,10 +5,10 @@ import { reconstructMissingScenes } from './scene-compatibility.mjs';
 import { RecoveredContent, numeric } from '../../cocos-client/assets/scripts/game/RecoveredContent.ts';
 
 export class ServerContent extends RecoveredContent {
-  constructor(folder) {
+  constructor(folder, {localizationFolder=path.join(folder, '../localization')}={}) {
     super(JSON.parse(readFileSync(path.join(folder, 'catalog.json'), 'utf8')));
     this.folder = folder;
-    const localization = path.join(folder, '../localization/game-zh.json');
+    const localization = path.join(localizationFolder,'game-zh.json');
     if (existsSync(localization)) this.catalog.localization=JSON.parse(readFileSync(localization,'utf8'));
     this.tables = {};
     for (const [key, table] of Object.entries(this.catalog.tables)) {

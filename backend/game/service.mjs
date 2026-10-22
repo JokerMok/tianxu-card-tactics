@@ -9,7 +9,7 @@ import { leagueActions, operateLeague, leagueView, tickLeague, validateLeagueRoo
 import { grantCampaignExtras } from './campaign-rewards.mjs';
 import { presentationNames, presentSections } from './presentation.mjs';
 import { playerUi } from './player-ui.mjs';
-import { requireText, requireCount } from './store.mjs';
+import { requireText, requireCount, conflict, stable } from './store.mjs';
 
 const nowDay = now => new Date(now + 8 * 3600000).toISOString().slice(0, 10);
 function grantSilver(actor, amount, reason, now) {
@@ -18,7 +18,7 @@ function grantSilver(actor, amount, reason, now) {
   actor.economicLog.push({ id: randomUUID(), currency: 'silver', amount, reason, at: now });
 }
 export class GameService {
-  constructor(store, content, { clock = () => Date.now() } = {}) { this.store = store; this.content = content; this.clock = clock; }
+  constructor(store, content, { clock = () => Date.now() } = {}) { this.store = store; this.content = content; this.clock = clock;this.instanceId=randomUUID(); }
   characters(accountId) {
     return Object.values(this.store.read().characters).filter(char => char.accountId === accountId)
       .map(char => ({ id: char.id, name: char.name, profession: char.profession, level: char.level }));
@@ -28,12 +28,13 @@ export class GameService {
     if (!actor || actor.accountId !== accountId) throw new Error('角色不存在或不属于当前账号');
     return actor;
   }
-  act(accountId, characterId, requestId, action, payload = {}) {
+  act(accountId, characterId, requestId, action, payload = {}, {expectedActorRevision} = {}) {
     const now = this.clock();
-    return this.store.transaction(`${accountId}:${characterId ?? 'new'}`, requestId, action, payload, world => {
+    return this.store.transaction(`${accountId}:${characterId ?? 'new'}`, requestId, action, expectedActorRevision===undefined?payload:{payload,expectedActorRevision}, world => {
       if (action === 'character.create') return this.createCharacter(world, accountId, payload, now);
       tickLeague(world, this.content.tables, now);
       const actor = this.actor(world, accountId, characterId);
+      if(expectedActorRevision!==undefined&&(!Number.isSafeInteger(expectedActorRevision)||expectedActorRevision!==(actor.commandRevision??0)))throw conflict('角色已被另一页面更新，请同步后重新操作','ACTOR_CONFLICT',{actorRevision:actor.commandRevision??0});
       const ctx = { world, actor, content: this.content, tables: this.content.tables, now, randomInt,
         makePlayer: (candidate, team) => this.playerSpec(world, candidate, team) };
       touchActorActivity(ctx);
@@ -60,6 +61,7 @@ export class GameService {
       }
       if (socialActions.includes(action)) return operateSocial(ctx, action, payload);
       if (action === 'deck.save') {
+        if(payload.expectedDeck!==undefined&&stable(payload.expectedDeck)!==stable(actor.deck))throw conflict('卡组已被另一页面更新。草稿已保留，请核对后再次保存','DECK_CONFLICT',{currentDeck:[...actor.deck]});
         actor.deck = this.content.validateDeck(actor, payload.cards);
         actor.stats.deckEdits++; return { message: '卡组已保存', cards: [...actor.deck] };
       }
@@ -154,7 +156,8 @@ export class GameService {
       })();
       actor.name = requireText(actor.name, '角色名称', 14);
       onPveAction(ctx, action, payload, result, before);
-      return result;
+      actor.commandRevision=(actor.commandRevision??0)+1;
+      return {...result,commandRevision:actor.commandRevision};
     }, now);
   }
   createCharacter(world, accountId, payload, now) {
@@ -165,7 +168,7 @@ export class GameService {
     if (Object.values(world.characters).some(char => char.name === name)) throw new Error('角色名称已存在');
     if (Object.values(world.characters).filter(char => char.accountId === accountId).length >= 4) throw new Error('每个账号最多4个角色');
     const id = randomUUID(); const deck = [1, 19, 43, 61].map(key => this.content.card(key).id);
-    const actor = { id, accountId, name, profession, gender, level: 1, xp: 0,
+    const actor = { id, accountId, name, profession, gender, level: 1, xp: 0, commandRevision:0,
       currencies: { silver: 300, gold: 20, crystal: 0 }, cards: Object.fromEntries(deck.map(id => [id, 1])),
       deck, inventory: {}, equipment: {}, enhancements: {}, warehouse: {},
       progress: { sceneId: 1, clearedNodes: [], clearedTriggers: [], unlockedScenes: [1], positionByScene: {} },
@@ -265,8 +268,8 @@ export class GameService {
   battleCommand(world, actor, payload, now) {
     const record = world.battles[payload.battleId];
     if (!record?.participants.includes(actor.id) || record.settled) throw new Error('战斗不存在或已结束');
-    if (!Number.isSafeInteger(payload.revision) || payload.revision !== record.state.revision) throw new Error('战斗已更新，请重新同步');
-    record.state = advanceAI(this.content, applyBattleAction(this.content, record.state, actor.id, payload.action));
+    if (!Number.isSafeInteger(payload.revision) || payload.revision !== record.state.revision) throw conflict('战斗已更新，请重新同步','BATTLE_CONFLICT',{battleRevision:record.state.revision});
+    try{record.state = advanceAI(this.content, applyBattleAction(this.content, record.state, actor.id, payload.action));}catch(e){const message=String(e.message);if(/not the active player/.test(message))throw new Error('当前不是你的回合');if(/Unsupported persistent/.test(message))throw new Error('本版本尚不支持这张持续地形牌，卡牌未消耗');if(/Illegal/.test(message))throw new Error('此卡牌当前没有合法落点或目标');throw e;}
     this.settle(world, record, now);
     return { message: record.settled ? '战斗结束' : '操作已确认', battleId: record.id };
   }
@@ -295,6 +298,7 @@ export class GameService {
     }
     if (record.roomId && world.rooms[record.roomId]) world.rooms[record.roomId].status = 'settled';
     for (const id of record.participants) {
+      if(!this.store.reserveSettlement(record.id,id,now)){record.rewards[id]=this.store.settlement(record.id,id)??{};continue;}
       const actor = world.characters[id]; const player = record.state.players.find(player => player.id === id);
       const won = record.state.winner === player.team; actor.stats.battles++;
       let silver = 0; let xp = 0; const cards = [];
@@ -351,6 +355,7 @@ export class GameService {
         record.rewards[id] = { won, silver: actor.currencies.silver - balanceBefore,
           xp: Number(record.pveReward?.xp ?? Math.max(0, actor.xp - xpBefore)), cards, special: record.pveReward };
       }
+      this.store.finishSettlement(record.id,id,record.rewards[id]);
     }
   }
   createRoom(world, actor, payload, now) {
@@ -446,7 +451,7 @@ export class GameService {
     const assets = new Set([...Object.keys(actor.inventory), ...Object.keys(actor.cards), ...Object.keys(actor.warehouse ?? {}), ...Object.values(actor.equipment ?? {}),
       ...social.trades.map(row => row.goods?.id), ...social.auctions.map(row => row.goods?.id), ...social.mail.map(row => row.attachment?.id)].filter(Boolean));
     const assetNames = Object.fromEntries(Array.from(assets, id => [id, names[id] ?? (id.includes(':item:') ? `物品 #${id.split(':').at(-1)}` : `卡牌 #${id.split(':').at(-1)}`)]));
-    return { revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
+    return { serverInstance:this.instanceId,revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
       story: String(this.content.table('stringres').find(row => row.ID === 10100)?.des ?? ''),
       scenes: this.content.sceneSummary(actor), tasks: this.tasks(actor), growth, pve, social,
       roomInvites: Object.values(world.roomInvites ?? {}).filter(invite => invite.to === actor.id && invite.expires > this.clock() && world.rooms[invite.roomId]?.status === 'waiting'),

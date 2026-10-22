@@ -736,10 +736,28 @@ function cardKind(content: RecoveredContent, cardId: string): number {
   return optionalNumber(cardRaw(content, cardId) ?? {}, 'Type', 0);
 }
 
+function statusModifierEffectIds(content: RecoveredContent, roots: readonly number[]): number[] {
+  const result: number[] = [];
+  const seen = new Set<number>();
+  const visit = (effectId: number): void => {
+    if (seen.has(effectId)) return;
+    seen.add(effectId);
+    result.push(effectId);
+    const effect = content.data.effects[String(effectId)];
+    if (optionalNumber(effect ?? {}, 'TypeID', 0) !== 15) return;
+    for (let index = 1; index <= 8; index += 1) {
+      const child = optionalNumber(effect!, `param${index}`, 0);
+      if (child > 0) visit(child);
+    }
+  };
+  roots.forEach(visit);
+  return result;
+}
+
 function applyStatusModifiers(content: RecoveredContent, target: BattleUnit, statusId: number, direction: 1 | -1): void {
   const status = content.data.statuses[String(statusId)];
   if (!status) return;
-  for (const effectId of effectIdsFromStatus(status)) {
+  for (const effectId of statusModifierEffectIds(content, effectIdsFromStatus(status))) {
     const effect = content.data.effects[String(effectId)];
     if (!effect) continue;
     const type = optionalNumber(effect, 'TypeID');
@@ -755,6 +773,7 @@ function applyStatusModifiers(content: RecoveredContent, target: BattleUnit, sta
     else if (type === 33) target.flags.statusNoAttack = Math.max(0, (target.flags.statusNoAttack ?? 0) + direction);
     else if (type === 34) target.flags.statusNoHeal = Math.max(0, (target.flags.statusNoHeal ?? 0) + direction);
     else if (type === 55) target.flags.statusCharmed = Math.max(0, (target.flags.statusCharmed ?? 0) + direction);
+    else if (type === 67) target.flags.statusUntargetable = Math.max(0, (target.flags.statusUntargetable ?? 0) + direction);
     else if (type === 60) {
       const multiplier = Math.max(1, Math.abs(p2 || 2));
       target.flags.statusDamageMultiplier = direction === 1
@@ -1402,6 +1421,7 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
         emit(state, { type: 'status', actor: unit.id, target: unit.id, message: 'resurrect' });
         continue;
       }
+      clearTribalThresholdsFromSource(content, state, unit);
       emit(state, { type: 'death', actor: unit.id, row: unit.row, col: unit.col, cardId: unit.cardId });
       resolveDeathEffects(content, state, unit);
       const deathSkillId = unit.flags.deathSkill ?? ((() => {
@@ -1444,6 +1464,7 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
     if (!processed) break;
     state.units = state.units.filter(unit => unit.hp > 0);
     refreshAuras(content, state);
+    removeInvalidTribalThresholds(content, state);
   }
 }
 
@@ -1509,7 +1530,7 @@ function skillTargets(content: RecoveredContent, state: BattleState, owner: Batt
   const friendly = numeric(raw, 'HaveCure', 0) > 0 || (!!status && numeric(status, 'Harm', 0) === 0 && numeric(raw, 'HaveDam', 0) === 0);
   return state.units.filter(unit => {
     if (unit.hp <= 0) return false;
-    if (numeric(raw, 'SelectType', 0) === 2 && unit.flags.untargetable === 1) return false;
+    if (numeric(raw, 'SelectType', 0) === 2 && (unit.flags.untargetable === 1 || (unit.flags.statusUntargetable ?? 0) > 0)) return false;
     if (targetType === 1) return unit.team !== owner.team && unit.flags.hero !== 1;
     if (targetType === 2) return unit.team !== owner.team && unit.flags.hero === 1;
     if (targetType === 3 || targetType === 15) return unit.team !== owner.team;
@@ -1523,6 +1544,12 @@ function skillTargets(content: RecoveredContent, state: BattleState, owner: Batt
 
 function isResolvableSkill(raw: RawRow): boolean {
   const serverClass = numeric(raw, 'ServerClassID', 0);
+  const skillId = numeric(raw, 'ID', 0);
+  // ServerClass 19 links persistent battlefield cards. The recovered rows do
+  // not contain the enter/stay/leave algorithm, so exposing them as playable
+  // would consume a card without resolving its rule. Warded Ground (50903)
+  // is a ServerClass 18 terrain with the same missing lifecycle contract.
+  if (serverClass === 19 || skillId === 50903) return false;
   return serverClass > 0
     || (numeric(raw, 'HaveDam', 0) > 0 && numeric(raw, 'DamValue', 0) > 0)
     || (numeric(raw, 'HaveCure', 0) > 0 && numeric(raw, 'CureValue', 0) > 0)
@@ -1758,6 +1785,7 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
     if (ownHero) heal(state, undefined, ownHero, total, skillId);
     handled = true;
   } else if (serverClass === 18) {
+    if (skillId === 50903) throw new Error(`Unsupported persistent battlefield skill ${skillId}`);
     const terrainTargets = state.units.filter(unit => unit.hp > 0 && distance(unit, primary) <= 3);
     const attackMatch = description.match(/\+(\d+) Attack/i);
     const rangeMatch = description.match(/\+(\d+) Range/i);
@@ -1770,12 +1798,7 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
     emit(state, { type: 'terrain', actor: owner.id, skillId, row: primary.row, col: primary.col, amount: numeric(raw, 'DamValue', 0) });
     handled = true;
   } else if (serverClass === 19) {
-    const cardId = String(damageValue);
-    let summoned = 0;
-    for (let row = 0; row < state.rows && summoned < Math.max(1, cureValue); row += 1) for (let col = 1; col < state.columns - 1 && summoned < Math.max(1, cureValue); col += 1) {
-      if (Math.abs(row - primary.row) + Math.abs(col - primary.col) <= 2 && summonCardAt(content, state, owner, cardId, row, col)) summoned += 1;
-    }
-    handled = true;
+    throw new Error(`Unsupported persistent battlefield skill ${skillId}`);
   } else if (serverClass === 20 || serverClass === 34 || serverClass === 43) {
     for (const target of targets) damage(content, state, undefined, target, Math.max(1, damageValue || owner.attack || 1), false, undefined, skillId, numeric(raw, 'DamType', 0));
     handled = true;
@@ -2436,6 +2459,60 @@ function moveGraveyardToDeck(content: RecoveredContent, state: MutableState, own
   return moved;
 }
 
+function configuredEffectRows(content: RecoveredContent, unit: BattleUnit, type: number): EffectRow[] {
+  const rows: EffectRow[] = [];
+  collectEffectRows(content, unit.effects, rows, new Set<number>());
+  return rows.filter(effect => effect.type === type);
+}
+
+function removeTribalStatus(content: RecoveredContent, state: MutableState, source: BattleUnit, effect: EffectRow, target: BattleUnit, message: string): void {
+  const key = `tribalEffect:${effect.id}`;
+  const statusId = optionalNumber(effect.raw, 'param5', 0);
+  const status = target.statuses.find(candidate => candidate.id === statusId && candidate.sourceId === source.id);
+  if (status) {
+    applyStatusModifiers(content, target, status.id, -1);
+    target.statuses.splice(target.statuses.indexOf(status), 1);
+    emit(state, { type: 'status', actor: source.id, target: target.id, effectId: statusId, message });
+  }
+  delete target.flags[key];
+}
+
+function reconcileTribalThreshold(content: RecoveredContent, state: MutableState, source: BattleUnit, effect: EffectRow, allowApply: boolean): number {
+  const race = optionalNumber(effect.raw, 'param3', 0);
+  const threshold = optionalNumber(effect.raw, 'param4', 0);
+  const statusId = optionalNumber(effect.raw, 'param5', 0);
+  const key = `tribalEffect:${effect.id}`;
+  const otherAllies = state.units.filter(candidate => candidate.id !== source.id && candidate.team === source.team
+    && candidate.flags.hero !== 1 && candidate.hp > 0 && (!race || monsterValue(content, candidate, 'Phyle') === race));
+  const desired = otherAllies.length >= threshold ? new Set(otherAllies.map(candidate => candidate.id)) : new Set<string>();
+  for (const target of state.units.filter(candidate => candidate.flags[key] === 1 && !desired.has(candidate.id))) {
+    removeTribalStatus(content, state, source, effect, target, 'tribal-threshold-removed');
+  }
+  if (allowApply && statusId > 0 && content.data.statuses[String(statusId)]) for (const target of otherAllies) {
+    if (!desired.has(target.id) || target.flags[key] === 1) continue;
+    target.flags[key] = 1;
+    target.statuses.push({ id: statusId, turns: Number.MAX_SAFE_INTEGER, sourceId: source.id });
+    applyStatusModifiers(content, target, statusId, 1);
+    emit(state, { type: 'status', actor: source.id, target: target.id, effectId: statusId, message: 'tribal-threshold' });
+  }
+  return otherAllies.length;
+}
+
+function clearTribalThresholdsFromSource(content: RecoveredContent, state: MutableState, source: BattleUnit): void {
+  for (const effect of configuredEffectRows(content, source, 162)) {
+    const key = `tribalEffect:${effect.id}`;
+    for (const target of state.units.filter(candidate => candidate.flags[key] === 1)) {
+      removeTribalStatus(content, state, source, effect, target, 'tribal-source-removed');
+    }
+  }
+}
+
+function removeInvalidTribalThresholds(content: RecoveredContent, state: MutableState): void {
+  for (const source of state.units.filter(candidate => candidate.hp > 0)) {
+    for (const effect of configuredEffectRows(content, source, 162)) reconcileTribalThreshold(content, state, source, effect, false);
+  }
+}
+
 function resolveTurnEffects(content: RecoveredContent, state: MutableState, unit: BattleUnit): void {
   const owner = player(state, unit.playerId);
   for (const effect of activeEffectRows(content, unit)) {
@@ -2599,16 +2676,12 @@ function resolveTurnEffects(content: RecoveredContent, state: MutableState, unit
         break;
       }
       case 162: {
-        const race = p3;
-        const allies = state.units.filter(candidate => candidate.team === unit.team && candidate.flags.hero !== 1 && candidate.hp > 0 && (!race || monsterValue(content, candidate, 'Phyle') === race));
-        if (allies.length >= p4) for (const target of allies.filter(candidate => candidate.id !== unit.id)) {
-          const key = `tribalEffect:${effect.id}`;
-          if (target.flags[key] !== 1 && optionalNumber(effect.raw, 'param5', 0) > 0) {
-            target.flags[key] = 1;
-            applyStaticEffects(content, state, target, [optionalNumber(effect.raw, 'param5', 0)]);
-          }
-        }
-        emitEffect(state, unit, effect, 'tribal-threshold', unit, allies.length);
+        // In this family param4 counts the required *other* allies (the source
+        // descriptions say 2/3/4 friendly creatures for values 1/2/3), while
+        // param5 is a StatusID.  Treating param5 as an EffectID accidentally
+        // applied unrelated composite effects that happen to share 31/97/147.
+        const allyCount = reconcileTribalThreshold(content, state, unit, effect, true);
+        emitEffect(state, unit, effect, 'tribal-threshold', unit, allyCount);
         break;
       }
       case 166: {
@@ -2771,9 +2844,22 @@ function processUnitTurn(content: RecoveredContent, state: MutableState, unit: B
     if (hurt) heal(state, unit, hurt, unit.flags.healWeakest!);
   }
   if ((unit.flags.healAll ?? 0) > 0) for (const ally of state.units.filter(candidate => candidate.team === unit.team && candidate.hp > 0)) heal(state, unit, ally, unit.flags.healAll!);
-  if ((unit.flags.heroTickDamage ?? 0) > 0) {
-    const enemyHero = chooseTarget(content, state, unit, state.units.filter(candidate => candidate.team !== unit.team && candidate.flags.hero === 1 && candidate.hp > 0));
-    if (enemyHero) damage(content, state, unit, enemyHero, unit.flags.heroTickDamage!, true, 'direct');
+  // TypeID 43 stores amount/probability/damage type in param1/2/3.  Keeping
+  // only a single precomputed amount made the 50% rows unconditional and lost
+  // their element.  Resolve each configured row so composite abilities retain
+  // their independent probability and damage type.
+  const directEffects = activeEffectRows(content, unit, 43);
+  if (directEffects.length) {
+    const enemyHeroes = state.units.filter(candidate => candidate.team !== unit.team && candidate.flags.hero === 1 && candidate.hp > 0);
+    for (const effect of directEffects) {
+      const probability = optionalNumber(effect.raw, 'param2', 100);
+      if (!chance(state, probability)) continue;
+      const enemyHero = chooseTarget(content, state, unit, enemyHeroes);
+      if (!enemyHero) continue;
+      const amount = Math.abs(optionalNumber(effect.raw, 'param1', 0));
+      damage(content, state, unit, enemyHero, amount, true, 'direct', undefined, optionalNumber(effect.raw, 'param3', 0));
+      emitEffect(state, unit, effect, 'direct', enemyHero, amount);
+    }
   }
   if ((unit.flags.randomDamage ?? 0) > 0) {
     const enemies = state.units.filter(candidate => candidate.team !== unit.team && candidate.hp > 0);

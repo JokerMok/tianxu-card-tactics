@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "runtimeRoot": ".",
+  "fixedFiles": [
+    "deploy/game/Dockerfile",
+    "scripts/game-data.mjs",
+    "scripts/start-game.mjs",
+    "cocos-client/assets/scripts/game/BattleKernel.ts",
+    "cocos-client/assets/scripts/game/RecoveredContent.ts",
+    "cocos-client/assets/scripts/game/RecoveredEffects.ts",
+    "cocos-client/assets/scripts/game/GameContracts.ts"
+  ],
+  "backend": {
+    "directory": "backend/game",
+    "extension": ".mjs",
+    "excludeSuffix": ".test.mjs"
+  },
+  "web": {
+    "directory": ".local/web",
+    "requiredEntry": "index.html"
+  },
+  "content": {
+    "directory": "cocos-client/assets/resources/recovered",
+    "catalog": "catalog.json",
+    "metadata": [
+      "original-ui.json",
+      "item-ui.json"
+    ],
+    "tableScope": "main:",
+    "assetScope": "main",
+    "includeOriginalUiTree": true
+  },
+  "localization": {
+    "directory": "cocos-client/assets/resources/localization",
+    "files": [
+      "game-zh.json"
+    ]
+  },
+  "ui": {
+    "directory": "cocos-client/assets/resources/ui-revision-a"
+  }
+}

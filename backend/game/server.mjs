@@ -2,6 +2,8 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createReadStream, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
+import {randomUUID} from 'node:crypto';
+import {runtimeLogger} from './runtime-log.mjs';
 import { GameStore } from './store.mjs';
 import { ServerContent } from './content.mjs';
 import { GameService } from './service.mjs';
@@ -20,13 +22,18 @@ async function body(request) {
   return result;
 }
 export async function createGameServer(options = {}) {
-  const folder = options.contentFolder ?? path.join(ROOT, 'cocos-client/assets/resources/recovered');
-  const web = options.webFolder ?? path.join(ROOT, '.local/web');
-  const store = new GameStore(options.database ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
-  const content = new ServerContent(folder);
+  const folder = options.contentFolder ?? process.env.TIANXU_CONTENT_DIR ?? path.join(ROOT, 'cocos-client/assets/resources/recovered');
+  const web = options.webFolder ?? process.env.TIANXU_WEB_DIR ?? path.join(ROOT, '.local/web');
+  const uiFolder=options.uiFolder??process.env.TIANXU_UI_DIR??path.join(folder,'../ui-revision-a');
+  const localizationFolder=options.localizationFolder??process.env.TIANXU_LOCALIZATION_DIR??path.join(folder,'../localization');
+  const log=runtimeLogger(options.logDir??process.env.TIANXU_LOG_DIR);
+  if(!existsSync(path.join(folder,'catalog.json')))throw new Error('缺少运行资源catalog.json，请先按资源清单打包/导入，不需要逆向目录');
+  const content = new ServerContent(folder,{localizationFolder});
+  const store = new GameStore(options.database ?? process.env.TIANXU_DATABASE ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
   const service = new GameService(store, content, { clock: options.clock });
   const rates = new Map();
   const server = http.createServer(async (request, response) => {
+    const traceId=randomUUID();response.setHeader('X-Trace-Id',traceId);
     response.setHeader('X-Content-Type-Options', 'nosniff');
     const json = (status, value) => {
       response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
@@ -34,7 +41,7 @@ export async function createGameServer(options = {}) {
     };
     try {
       const url = new URL(request.url, 'http://localhost');
-      if (request.method === 'GET' && url.pathname === '/api/health') return json(200, { ready: true, game: '天墟：万象战阵', version: 1, sourceManifest: content.catalog.sourceManifest });
+      if (request.method === 'GET' && url.pathname === '/api/health') return json(200, { ready: true, game: '天墟：万象战阵', version: 2, schema:2, sourceManifest: content.catalog.sourceManifest });
       if (request.method === 'GET' && url.pathname === '/api/bootstrap') {
         const backdrop = content.catalog.assets[content.catalog.ui?.backgroundAssetId]?.path;
         return json(200, { title: '天墟：万象战阵', backdrop: backdrop ? '/recovered/' + backdrop : null });
@@ -58,14 +65,16 @@ export async function createGameServer(options = {}) {
         if (request.method === 'POST' && url.pathname === '/api/act') {
           const data = await body(request);
           if (typeof data.action !== 'string') throw new Error('缺少操作');
-          return json(200, service.act(accountId, characterId, data.requestId, data.action, data.payload));
+          const result=service.act(accountId,characterId,data.requestId,data.action,data.payload,{expectedActorRevision:data.expectedActorRevision});
+          log('info','operation',{traceId,accountId,characterId,action:data.action,requestId:data.requestId,revision:result.revision,replayed:result.replayed});
+          return json(200,result);
         }
         return json(404, { error: '接口不存在' });
       }
       if (request.method !== 'GET' && request.method !== 'HEAD') return json(405, { error: '不支持此请求' });
       const isResource = url.pathname.startsWith('/recovered/');
       const isUi=url.pathname.startsWith('/ui-assets/');
-      const base = isUi ? path.join(folder,'../ui-revision-a') : isResource ? folder : web;
+      const base = isUi ? uiFolder : isResource ? folder : web;
       const relative = decodeURIComponent(isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
       const filename = path.resolve(base, relative);
       if (!filename.startsWith(path.resolve(base) + path.sep) || !existsSync(filename) || !statSync(filename).isFile()) return json(404, { error: '资源不存在' });
@@ -75,20 +84,29 @@ export async function createGameServer(options = {}) {
       if (request.method === 'HEAD') return response.end();
       createReadStream(filename).pipe(response);
     } catch (error) {
-      if (!response.headersSent) json(/登录|角色不存在或/.test(error.message) ? 401 : 400, { error: error.message });
+      if(error instanceof SyntaxError)error=new Error('数据格式无效，请检查请求或存档');
+      const internal=error instanceof TypeError||error instanceof ReferenceError||String(error.code??'').startsWith('ERR_SQLITE');
+      const status=internal?500:(error.status??(/登录|角色不存在或/.test(error.message)?401:400));
+      log(status>=500?'error':'warn','request-rejected',{traceId,status,code:error.code??'VALIDATION_REJECTED',message:error.message,...(internal?{stack:error.stack}:{})});
+      if (!response.headersSent) json(status, { error:internal?'服务暂时异常，操作未确认，请用原请求重试':error.message,code:error.code??(internal?'INTERNAL_ERROR':'VALIDATION_REJECTED'),...(error.details??{}),traceId });
       else response.end();
     }
   });
   const timer = options.scheduler === false ? null : setInterval(() => {
-    try { service.tick(); } catch (error) { console.error('定时结算失败:', error.message); }
+    try { service.tick(); } catch (error) { log('error','scheduler-error',{message:error.message,stack:error.stack}); }
   }, 1000);
   timer?.unref();
-  const close = () => new Promise(resolve => server.close(() => { if (timer) clearInterval(timer); store.close(); resolve(); }));
-  return { server, store, content, service, close };
+  let stopping;const close=()=>stopping??=(async()=>{if(timer)clearInterval(timer);await new Promise(resolve=>{const deadline=setTimeout(()=>server.closeAllConnections(),10000);deadline.unref();server.close(()=>{clearTimeout(deadline);resolve();});server.closeIdleConnections?.();});store.close();log('info','stopped');})();
+  return { server, store, content, service, close, log };
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const app = await createGameServer();
-  const port = Number(process.env.TIANXU_PORT ?? 7400);
-  app.server.listen(port, '127.0.0.1', () => console.log(`天墟：万象战阵 http://127.0.0.1:${port}\n数据库：backend/data/tianxu.sqlite`));
-  for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => app.close().then(() => process.exit(0)));
+export async function startConfiguredServer(){
+ const port=Number(process.env.TIANXU_PORT??7400),host=process.env.TIANXU_HOST??'127.0.0.1';
+ if(!Number.isInteger(port)||port<1||port>65535)throw new Error('TIANXU_PORT需为1至65535');const app=await createGameServer();
+ await new Promise((resolve,reject)=>{app.server.once('error',reject);app.server.listen(port,host,resolve);}).catch(async e=>{await app.close();throw e;});
+ console.log(`天墟服务已启动 http://${host}:${port}；数据库：${app.store.filename}`);app.log('info','started',{port,host,schema:2});
+ let stopping=false;const stop=async code=>{if(stopping)return;stopping=true;try{await app.close();}finally{process.exitCode=code;}};
+ for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>void stop(0));
+ process.once('uncaughtException',e=>{app.log('error','uncaught-exception',{message:e.message,stack:e.stack});void stop(1);});
+ process.once('unhandledRejection',e=>{app.log('error','unhandled-rejection',{message:String(e)});void stop(1);});return app;
 }
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))startConfiguredServer().catch(e=>{console.error('启动失败：'+e.message);process.exitCode=1;});

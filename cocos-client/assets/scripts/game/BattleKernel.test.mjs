@@ -593,7 +593,140 @@ test('all status-linked effect families use explicit TypeID compatibility rules'
   }
 });
 
-test('all recovered nonzero ServerClass skill cards are legal and execute in a populated battle', () => {
+test('TypeID 43 preserves configured probability and elemental damage type', () => {
+  const monster = content.data.monsters['1'];
+  const originalMonster = { ...monster };
+  const effectId = '999943';
+  const originalEffect = content.data.effects[effectId];
+  try {
+    Object.assign(monster, originalMonster, { ability1: Number(effectId), ability2: 0, ability3: 0, ability4: 0, ability5: 0 });
+    content.data.effects[effectId] = { EffectID: Number(effectId), TypeID: 43, param1: 2, param2: 50, param3: 6 };
+
+    let skipped = createBattle(content, spec({ initialUnits: [{ playerId: 'p0', monsterId: 1, row: 0, col: 2 }] }));
+    skipped.rng = 1; // first Mulberry32 sample is > 0.5
+    const skippedHp = skipped.players[1].hp;
+    skipped = applyBattleAction(content, skipped, 'p0', { type: 'end' });
+    assert.equal(skipped.players[1].hp, skippedHp, '50% row does not execute when its deterministic roll fails');
+    assert.equal(skipped.events.some(event => event.effectId === Number(effectId) && event.message === 'direct'), false);
+
+    let immune = createBattle(content, spec({ initialUnits: [{ playerId: 'p0', monsterId: 1, row: 0, col: 2 }] }));
+    immune.rng = 424242; // first sample is < 0.5
+    const enemyHero = immune.units.find(unit => unit.id === 'hero:p1');
+    enemyHero.flags.damageImmunityMask = 1 << 6;
+    const immuneHp = immune.players[1].hp;
+    immune = applyBattleAction(content, immune, 'p0', { type: 'end' });
+    assert.equal(immune.players[1].hp, immuneHp, 'param3=6 reaches shadow-damage immunity');
+    assert.ok(immune.events.some(event => event.effectId === Number(effectId) && event.message === 'direct'));
+  } finally {
+    Object.assign(monster, originalMonster);
+    if (originalEffect === undefined) delete content.data.effects[effectId];
+    else content.data.effects[effectId] = originalEffect;
+  }
+});
+
+test('TypeID 162 counts other allies and applies param5 as its conditional status ID', () => {
+  const leader = content.data.monsters['1'];
+  const originalLeader = { ...leader };
+  const effectId = '999962';
+  const originalEffect = content.data.effects[effectId];
+  try {
+    Object.assign(leader, originalLeader, { ability1: Number(effectId), ability2: 0, ability3: 0, ability4: 0, ability5: 0 });
+    content.data.effects[effectId] = { EffectID: Number(effectId), TypeID: 162, param3: 1, param4: 1, param5: 31 };
+
+    let alone = createBattle(content, spec({ initialUnits: [{ playerId: 'p0', monsterId: 1, row: 0, col: 2 }] }));
+    alone = applyBattleAction(content, alone, 'p0', { type: 'end' });
+    assert.equal(alone.units.some(unit => unit.statuses.some(status => status.id === 31)), false, 'the leader itself does not satisfy the other-ally threshold');
+
+    let grouped = createBattle(content, spec({ initialUnits: [
+      { playerId: 'p0', monsterId: 1, row: 0, col: 2 },
+      { playerId: 'p0', monsterId: 2, row: 1, col: 2 },
+    ] }));
+    const allyBefore = grouped.units.find(unit => unit.monsterId === 2);
+    const maxHpBefore = allyBefore.maxHp;
+    grouped = applyBattleAction(content, grouped, 'p0', { type: 'end' });
+    const allyAfter = grouped.units.find(unit => unit.id === allyBefore.id);
+    assert.ok(allyAfter.statuses.some(status => status.id === 31 && status.turns > 1_000_000));
+    assert.equal(allyAfter.maxHp, maxHpBefore + 1, 'Life 1 status modifies HP instead of resolving unrelated EffectID 31');
+    grouped.units.find(unit => unit.monsterId === 1).hp = 0;
+    grouped = applyBattleAction(content, grouped, 'p1', { type: 'end' });
+    const allyAfterSourceDeath = grouped.units.find(unit => unit.id === allyBefore.id);
+    assert.equal(allyAfterSourceDeath.statuses.some(status => status.id === 31), false);
+    assert.equal(allyAfterSourceDeath.maxHp, maxHpBefore, 'the conditional modifier is reverted when its source dies');
+  } finally {
+    Object.assign(leader, originalLeader);
+    if (originalEffect === undefined) delete content.data.effects[effectId];
+    else content.data.effects[effectId] = originalEffect;
+  }
+});
+
+test('TypeID 162 removes its status when the friendly-creature threshold falls', () => {
+  const leader = content.data.monsters['1'];
+  const originalLeader = { ...leader };
+  const effectId = '999963';
+  const originalEffect = content.data.effects[effectId];
+  try {
+    Object.assign(leader, originalLeader, { ability1: Number(effectId), ability2: 0, ability3: 0, ability4: 0, ability5: 0 });
+    content.data.effects[effectId] = { EffectID: Number(effectId), TypeID: 162, param3: 1, param4: 2, param5: 31 };
+    let state = createBattle(content, spec({ initialUnits: [
+      { playerId: 'p0', monsterId: 1, row: 0, col: 2 },
+      { playerId: 'p0', monsterId: 2, row: 1, col: 2 },
+      { playerId: 'p0', monsterId: 2, row: 2, col: 2 },
+      { playerId: 'p1', monsterId: 2, row: 1, col: 8 },
+    ] }));
+    state = applyBattleAction(content, state, 'p0', { type: 'end' });
+    const allies = state.units.filter(unit => unit.playerId === 'p0' && unit.monsterId === 2);
+    assert.equal(allies.length, 2);
+    assert.ok(allies.every(unit => unit.statuses.some(status => status.id === 31)));
+    const survivorBaseHp = allies[1].maxHp - 1;
+    allies[0].hp = 0;
+    state = applyBattleAction(content, state, 'p1', { type: 'end' });
+    const survivor = state.units.find(unit => unit.id === allies[1].id);
+    assert.equal(survivor.maxHp, survivorBaseHp);
+    assert.equal(survivor.statuses.some(status => status.id === 31), false);
+  } finally {
+    Object.assign(leader, originalLeader);
+    if (originalEffect === undefined) delete content.data.effects[effectId];
+    else content.data.effects[effectId] = originalEffect;
+  }
+});
+
+test('TypeID 172 applies configured turns and nested Petrified status restrictions', () => {
+  const state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('40000') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1'), ai: true },
+    ],
+    initialUnits: [{ playerId: 'p1', monsterId: 9521, row: 1, col: 8 }],
+  }));
+  const petrified = state.units.find(unit => unit.monsterId === 9521);
+  assert.ok(petrified.statuses.some(status => status.id === 43091 && status.turns === 20));
+  assert.equal(petrified.maxHp, 110);
+  assert.ok((petrified.flags.statusNoMove ?? 0) > 0);
+  assert.ok((petrified.flags.statusNoAttack ?? 0) > 0);
+  assert.ok((petrified.flags.statusUntargetable ?? 0) > 0);
+  assert.equal(legalPlays(content, state, 'p0').some(play => play.targetId === petrified.id), false);
+});
+
+test('unsupported persistent battlefield cards cannot be played or consumed', () => {
+  for (const cardId of ['50731', '50808', '50809', '50903']) {
+    const state = createBattle(content, spec({
+      players: [
+        { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill(cardId) },
+        { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1'), ai: true },
+      ],
+    }));
+    state.players[0].hand.forEach(card => { card.wait = 0; });
+    assert.equal(legalPlays(content, state, 'p0').length, 0, `${cardId} has no legal placement`);
+    const snapshot = JSON.stringify(state);
+    const hand = state.players[0].hand[0];
+    assert.throws(() => applyBattleAction(content, state, 'p0', {
+      type: 'play', instanceId: hand.instanceId, row: 0, col: 8,
+    }), /Illegal card play/);
+    assert.equal(JSON.stringify(state), snapshot, `${cardId} rejection preserves the authoritative state and hand`);
+  }
+});
+
+test('all supported recovered nonzero ServerClass skill cards are legal and execute in a populated battle', () => {
   const executedClasses = new Set();
   let executedCards = 0;
   for (const [cardId, card] of Object.entries(content.data.cards)) {
@@ -602,6 +735,7 @@ test('all recovered nonzero ServerClass skill cards are legal and execute in a p
     const raw = content.data.skills[skillId]?.raw;
     const serverClass = Number(raw?.ServerClassID ?? 0);
     if (!raw || serverClass <= 0) continue;
+    if (serverClass === 19 || Number(raw.ID) === 50903) continue;
     let state = createBattle(content, spec({
       players: [
         { id: 'p0', name: 'Caster', team: 0, hp: 300, attack: 5, deck: Array(5).fill(cardId) },
@@ -620,11 +754,11 @@ test('all recovered nonzero ServerClass skill cards are legal and execute in a p
     executedClasses.add(serverClass);
     executedCards += 1;
   }
-  assert.equal(executedCards, 292);
-  assert.deepEqual([...executedClasses].sort((a, b) => a - b), [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 35, 36, 37, 38, 39, 44]);
+  assert.equal(executedCards, 279);
+  assert.deepEqual([...executedClasses].sort((a, b) => a - b), [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 35, 36, 37, 38, 39, 44]);
 });
 
-test('every recovered nonzero ServerClassID has an executable authoritative path', () => {
+test('every supported recovered nonzero ServerClassID has an executable authoritative path', () => {
   const firstSkillByClass = new Map();
   for (const [skillId, skill] of Object.entries(content.data.skills)) {
     const serverClass = Number(skill.raw?.ServerClassID ?? 0);
@@ -634,6 +768,7 @@ test('every recovered nonzero ServerClassID has an executable authoritative path
   const template = content.data.cards['40000'];
   try {
     for (const [serverClass, skillId] of firstSkillByClass) {
+      if (serverClass === 19) continue;
       content.data.cards[cardId] = {
         ...template,
         id: `main:card:${cardId}`,

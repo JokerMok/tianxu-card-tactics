@@ -1,0 +1,10 @@
+{
+  "dryRun": false,
+  "output": ".local/stabilization/runtime",
+  "files": 30567,
+  "bytes": 1016359861,
+  "mebibytes": 969.3,
+  "manifestSha256": "10a3e7e040442756c84d7de591c3d3b5b62356fc764e195f3dcbca863ddb1442",
+  "containsDatabaseOrCredentials": false,
+  "runtimeValidated": "macOS standalone package + Linux arm64 Docker, Node22.18.0"
+}

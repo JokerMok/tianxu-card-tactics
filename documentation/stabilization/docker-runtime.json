@@ -1,0 +1,27 @@
+{
+  "platform": "linux arm64 v22.18.0",
+  "image": "sha256:91637413578fc2e1a3a3bdfa46d9ccacec15cdd9822c88666eddbc51e712f16a",
+  "readOnlyRoot": true,
+  "containerUser": "501:20",
+  "published": "127.0.0.1:7423",
+  "ready": true,
+  "restartPersisted": {
+    "cards": 10,
+    "activeResult": true,
+    "currenciesUnchanged": true,
+    "rewardsUnchanged": true
+  },
+  "stopMs": 393.443541,
+  "backup": {
+    "schema": 2,
+    "bytes": 126976,
+    "sha256": "7f82d0c499a240fe18163a2a4d12732735cede1c85bb893527dd9ee89e40d564"
+  },
+  "restore": {
+    "alreadyRestored": false
+  },
+  "repeat": {
+    "alreadyRestored": true
+  },
+  "frontEndBundleMatches": true
+}

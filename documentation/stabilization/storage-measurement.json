@@ -1,0 +1,16 @@
+{
+  "fixtures": "two isolated accounts, 77 owned card types each",
+  "viewAverageMs": 367.0094854,
+  "viewBytes": 1371094,
+  "storage": {
+    "reads": 22,
+    "writes": 1,
+    "readMs": 2.51653900000008,
+    "writeMs": 0.04862499999995862,
+    "lastWorldBytes": 8397,
+    "schemaVersion": 2,
+    "receipts": 3,
+    "tombstones": 3,
+    "settlements": 0
+  }
+}

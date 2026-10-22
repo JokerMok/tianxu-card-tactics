@@ -1,0 +1,37 @@
+services:
+  tianxu:
+    build:
+      context: ../../.local/game-runtime
+      dockerfile: deploy/game/Dockerfile
+    image: ${TIANXU_IMAGE:-tianxu-game:local}
+    user: "${TIANXU_UID:-1000}:${TIANXU_GID:-1000}"
+    init: true
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    environment:
+      NODE_ENV: production
+      TIANXU_CONTENT_DIR: ${TIANXU_CONTENT_DIR:-/srv/tianxu/cocos-client/assets/resources/recovered}
+      TIANXU_WEB_DIR: ${TIANXU_WEB_DIR:-/srv/tianxu/.local/web}
+      TIANXU_UI_DIR: ${TIANXU_UI_DIR:-/srv/tianxu/cocos-client/assets/resources/ui-revision-a}
+      TIANXU_LOCALIZATION_DIR: ${TIANXU_LOCALIZATION_DIR:-/srv/tianxu/cocos-client/assets/resources/localization}
+      TIANXU_DATABASE: ${TIANXU_DATABASE:-/var/lib/tianxu/tianxu.sqlite}
+      TIANXU_PORT: ${TIANXU_PORT:-7400}
+      TIANXU_HOST: ${TIANXU_HOST:-0.0.0.0}
+      TIANXU_LOG_DIR: ${TIANXU_LOG_DIR:-/var/log/tianxu}
+    ports:
+      - "127.0.0.1:${TIANXU_PUBLISHED_PORT:-7400}:${TIANXU_PORT:-7400}"
+    volumes:
+      - type: bind
+        source: ${TIANXU_DATA_DIR:-../../.local/deploy/data}
+        target: /var/lib/tianxu
+      - type: bind
+        source: ${TIANXU_LOG_HOST_DIR:-../../.local/deploy/logs}
+        target: /var/log/tianxu
+      - type: bind
+        source: ${TIANXU_BACKUP_DIR:-../../.local/deploy/backups}
+        target: /var/backups/tianxu
+    stop_grace_period: 30s
