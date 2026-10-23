@@ -4,7 +4,7 @@ FROM ${NODE_IMAGE}
 WORKDIR /srv/tianxu
 COPY --chown=node:node . .
 
-RUN chmod -R a+rX /srv/tianxu && install -d -o node -g node /var/lib/tianxu /var/log/tianxu /var/backups/tianxu
+RUN install -d -o node -g node /var/lib/tianxu /var/log/tianxu /var/backups/tianxu
 
 ENV NODE_ENV=production \
     TIANXU_CONTENT_DIR=/srv/tianxu/cocos-client/assets/resources/recovered \
