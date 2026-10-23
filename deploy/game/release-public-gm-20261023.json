@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-23",
+  "version": "public-gm-20261023-107863fa",
+  "applicationCommit": "107863fac0a44a2e3a8bf304d46149109120ea98",
+  "branch": "codex/public-registration-gm",
+  "previousApplicationCommit": "6098c0a9b787ec41e24225058719c5a3f5811f3b",
+  "image": "tianxu-game:public-gm-20261023-107863fa",
+  "imageId": "sha256:22395210592a7625e559e5a77380fa2ac680213e43dc53abfcfad1207ea4a871",
+  "architecture": "linux/amd64",
+  "runtimeManifestSha256": "6a9185b66252bcdd5c14038b92c463f328bc8d5302dbc585d2d7e952076debca",
+  "runtimeFiles": 30581,
+  "patchSha256": "cd794b39728070baa6de9919630b45d5da968e39052569557aabebec0d24591d",
+  "unchangedClientBundleSha256": "48f5875433da8ba04eaae1c4d198c54af071881d486d1477ec75722ed16ae978",
+  "cocosSourceHashesVerified": 22,
+  "migration": [
+    {
+      "name": "gm-v1",
+      "checksum": "415bb7eae0ac9bdf48139100f09ef761c123f1fd7f4fb86aae9a278a22cdaceb"
+    }
+  ],
+  "worldSchema": 2,
+  "root": "/srv/apps/tianxu",
+  "composeProject": "tianxu",
+  "publishedPort": "127.0.0.1:18875",
+  "database": "shared/data/tianxu.sqlite",
+  "beforeBackup": "shared/backups/before-public-gm-20261023",
+  "afterBackup": "shared/backups/public-gm-107863fa-20261023",
+  "superAdminInitialized": false,
+  "temporaryGmRevoked": true,
+  "otherProjectContainerIdsAndSiteHashesUnchanged": true,
+  "publicRequests": [
+    {
+      "route": "/",
+      "status": 200,
+      "ms": 306,
+      "bytes": 1675
+    },
+    {
+      "route": "/gm/",
+      "status": 200,
+      "ms": 275,
+      "bytes": 8247
+    },
+    {
+      "route": "/gm/app.js",
+      "status": 200,
+      "ms": 50,
+      "bytes": 35115
+    },
+    {
+      "route": "/api/bootstrap",
+      "status": 200,
+      "ms": 16,
+      "bytes": 89
+    },
+    {
+      "route": "/recovered/catalog.json",
+      "status": 200,
+      "ms": 14508,
+      "bytes": 64731855
+    },
+    {
+      "route": "/release.json",
+      "status": 200,
+      "ms": 15,
+      "bytes": 3189
+    }
+  ],
+  "restart": {
+    "assetsPersisted": true,
+    "revokedOldSessionDenied": true,
+    "revokedGmLoginDenied": true,
+    "normalLoginPreserved": true,
+    "activePveStatePreserved": true
+  },
+  "backupRestore": {
+    "allCharactersRestoredExactly": true,
+    "integrity": {
+      "integrity_check": "ok"
+    },
+    "gmAuditRows": 16,
+    "gmOperationRows": 16,
+    "oldApplicationCanReadNewDbOnIndependentCopy": true
+  },
+  "scope": "Public registration and GM changes only; not full game acceptance or public concurrency testing",
+  "backupChecksums": {
+    "before": "98f7f8b4e1801b6b1c83bd1afd75d615cd0c68b30ee7ec9ad6a4d355f5d3c451",
+    "after": "feb3cc26ded760735412953d15234c366b5bfff83daedcb410c2baef902244b0"
+  },
+  "otherProjectHttpResponses": {
+    "zhenwork": 302,
+    "accounts": 200,
+    "personWeb": 200
+  }
+}

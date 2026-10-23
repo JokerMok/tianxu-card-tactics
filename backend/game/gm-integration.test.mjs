@@ -77,6 +77,10 @@ test('public entry and GM HTTP enforce roles, atomic grants, revocation, replay 
     assert.equal((await req('/api/gm/access',{gm:root,data:{...access,operationId:randomUUID(),targetAccountId:admin.accountId,role:'player'}})).status,409);
     const revoke={...access,operationId:randomUUID(),role:'player',reason:'验收后撤销GM'};assert.equal((await req('/api/gm/access',{gm:root,data:revoke})).status,200);
     assert.equal((await req('/api/gm/grants',{gm,data:{...baseGrant,operationId:randomUUID()}})).status,401);
+    terminal(manager,'gm',{...DEFAULT_PERMISSIONS,currency:false},{...DEFAULT_LIMITS,gold:5});
+    const restricted=await gmLogin(manager),restrictedBefore=structuredClone(current());
+    assert.equal((await req('/api/gm/grants',{gm:restricted,data:{...baseGrant,operationId:randomUUID(),quantity:1}})).status,403);assert.deepEqual(current(),restrictedBefore);
+    terminal(manager,'player');
     const after=current();await app.close();await start();assert.equal(app.gm.access(admin.accountId).role,'super_admin');assert.equal(app.gm.access(manager.accountId).role,'player');assert.deepEqual(current().currencies,after.currencies);
     assert.equal((await req('/api/gm/operations/'+baseGrant.operationId,{gm:root})).value.operation.after,first.value.after);
     await app.store.backup(path.join(dir,'backup'));restoreBackup(path.join(dir,'backup'),path.join(dir,'restore.sqlite'));const restored=new GameStore(path.join(dir,'restore.sqlite'));try{assert.equal(new GmService(restored,app.content).access(admin.accountId).role,'super_admin');assert.equal(restored.db.prepare('SELECT count(*) AS n FROM gm_audit').get().n,app.store.db.prepare('SELECT count(*) AS n FROM gm_audit').get().n);}finally{restored.close();}
