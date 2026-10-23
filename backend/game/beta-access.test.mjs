@@ -117,6 +117,7 @@ test('real HTTP gate protects navigation, assets and APIs while preserving Beare
   assert.equal(navigation.headers.location, '/beta');
 
   const betaPage = await request(port, '/beta');
+  assert.equal(betaPage.headers['referrer-policy'], 'same-origin', 'browser form Origin must survive the invitation page policy');
   assert.equal(betaPage.status, 200);
   assert.match(betaPage.body, /邀请码/);
   assert.doesNotMatch(betaPage.body, /<(?:script|link|img)\b/i);

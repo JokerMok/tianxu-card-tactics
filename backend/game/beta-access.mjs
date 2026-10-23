@@ -90,7 +90,8 @@ function sendPage(res, status, message = '') {
   send(res, status, {
     'Content-Type': 'text/html; charset=utf-8',
     'Content-Security-Policy': "default-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
-    'Referrer-Policy': 'no-referrer',
+    // Browser form POSTs need their same-origin Origin for the CSRF check.
+    'Referrer-Policy': 'same-origin',
     'X-Frame-Options': 'DENY',
   }, page(message));
 }
