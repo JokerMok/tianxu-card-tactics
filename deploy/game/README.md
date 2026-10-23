@@ -29,10 +29,10 @@ node scripts/start-game.mjs
 
 ## Docker Compose
 
-首次启动前创建三个独立的可写目录，并将 `.env` 的 `TIANXU_UID` / `TIANXU_GID` 设为这些目录的拥有者（用 `id -u` / `id -g` 查看）。默认1000适用于常见Linux用户，macOS通常不同；不要放宽个人库权限来迁就容器。
+首次启动前创建配置目录和三个独立的可写目录，并将 `.env` 的 `TIANXU_UID` / `TIANXU_GID` 设为这些目录的拥有者（用 `id -u` / `id -g` 查看）。默认1000适用于常见Linux用户，macOS通常不同；不要放宽个人库权限来迁就容器。
 
 ```bash
-mkdir -p .local/deploy/data .local/deploy/logs .local/deploy/backups
+mkdir -p .local/deploy/config .local/deploy/data .local/deploy/logs .local/deploy/backups
 cp deploy/game/.env.example deploy/game/.env
 docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml up --build -d
 ```
@@ -45,3 +45,5 @@ docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml ps
 ```
 
 更换运行包时先备份数据库，再在新目录生成新包和新镜像。回滚时恢复上一个镜像与与之兼容的 SQLite 备份。不要把数据库、日志或备份复制进 `.local/game-runtime`。
+
+腾讯云邀请内测运行与回退见 [tencent.md](tencent.md)。生产必须设置 `TIANXU_BETA_REQUIRED=1`、私有邀请配置及 HTTPS origin；本地未配置门禁的开发行为保持不变。

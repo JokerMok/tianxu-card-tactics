@@ -62,8 +62,9 @@ export class TianxuGame extends Component {
     globalThis.addEventListener('resize',this.syncViewport);
     profiler.hideStats();
     const params = new URLSearchParams(globalThis.location?.search ?? '');
-    this.debugUi = params.get('debug') === '1';
-    const origin = params.get('api') ?? globalThis.location?.origin ?? 'http://127.0.0.1:7400';
+    const localPage = ['localhost', '127.0.0.1', '[::1]'].includes(globalThis.location?.hostname ?? '');
+    this.debugUi = localPage && params.get('debug') === '1';
+    const origin = (localPage ? params.get('api') : null) ?? globalThis.location?.origin ?? 'http://127.0.0.1:7400';
     const destination = new URL(origin);
     this.apiBase = ['localhost','127.0.0.1','[::1]'].includes(destination.hostname) ? destination.origin : globalThis.location.origin;
     const slot = params.get('client'); if (slot && /^[a-zA-Z0-9_-]{1,30}$/.test(slot)) this.authKey += ':' + slot;

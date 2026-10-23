@@ -4,6 +4,7 @@ import { createReadStream, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {runtimeLogger} from './runtime-log.mjs';
+import {createBetaAccess} from './beta-access.mjs';
 import { GameStore } from './store.mjs';
 import { ServerContent } from './content.mjs';
 import { GameService } from './service.mjs';
@@ -27,6 +28,8 @@ export async function createGameServer(options = {}) {
   const uiFolder=options.uiFolder??process.env.TIANXU_UI_DIR??path.join(folder,'../ui-revision-a');
   const localizationFolder=options.localizationFolder??process.env.TIANXU_LOCALIZATION_DIR??path.join(folder,'../localization');
   const log=runtimeLogger(options.logDir??process.env.TIANXU_LOG_DIR);
+  const betaAccess=createBetaAccess({configPath:options.betaConfig??process.env.TIANXU_BETA_CONFIG,
+    required:options.betaRequired??process.env.TIANXU_BETA_REQUIRED==='1',publicOrigin:options.publicOrigin??process.env.TIANXU_PUBLIC_ORIGIN});
   if(!existsSync(path.join(folder,'catalog.json')))throw new Error('缺少运行资源catalog.json，请先按资源清单打包/导入，不需要逆向目录');
   const content = new ServerContent(folder,{localizationFolder});
   const store = new GameStore(options.database ?? process.env.TIANXU_DATABASE ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
@@ -41,6 +44,7 @@ export async function createGameServer(options = {}) {
     };
     try {
       const url = new URL(request.url, 'http://localhost');
+      if(await betaAccess(request,response,url))return;
       if (request.method === 'GET' && url.pathname === '/api/health') return json(200, { ready: true, game: '天墟：万象战阵', version: 2, schema:2, sourceManifest: content.catalog.sourceManifest });
       if (request.method === 'GET' && url.pathname === '/api/bootstrap') {
         const backdrop = content.catalog.assets[content.catalog.ui?.backgroundAssetId]?.path;

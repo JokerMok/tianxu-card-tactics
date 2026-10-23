@@ -1,7 +1,7 @@
 services:
   tianxu:
     build:
-      context: ../../.local/game-runtime
+      context: ${TIANXU_BUILD_CONTEXT:-../../.local/game-runtime}
       dockerfile: deploy/game/Dockerfile
     image: ${TIANXU_IMAGE:-tianxu-game:local}
     user: "${TIANXU_UID:-1000}:${TIANXU_GID:-1000}"
@@ -14,6 +14,10 @@ services:
       - /tmp:size=64m,mode=1777
     environment:
       NODE_ENV: production
+      NODE_OPTIONS: ${TIANXU_NODE_OPTIONS:---max-old-space-size=512}
+      TIANXU_BETA_CONFIG: ${TIANXU_BETA_CONFIG:-}
+      TIANXU_BETA_REQUIRED: ${TIANXU_BETA_REQUIRED:-0}
+      TIANXU_PUBLIC_ORIGIN: ${TIANXU_PUBLIC_ORIGIN:-}
       TIANXU_CONTENT_DIR: ${TIANXU_CONTENT_DIR:-/srv/tianxu/cocos-client/assets/resources/recovered}
       TIANXU_WEB_DIR: ${TIANXU_WEB_DIR:-/srv/tianxu/.local/web}
       TIANXU_UI_DIR: ${TIANXU_UI_DIR:-/srv/tianxu/cocos-client/assets/resources/ui-revision-a}
@@ -26,6 +30,10 @@ services:
       - "127.0.0.1:${TIANXU_PUBLISHED_PORT:-7400}:${TIANXU_PORT:-7400}"
     volumes:
       - type: bind
+        source: ${TIANXU_CONFIG_DIR:-../../.local/deploy/config}
+        target: /etc/tianxu
+        read_only: true
+      - type: bind
         source: ${TIANXU_DATA_DIR:-../../.local/deploy/data}
         target: /var/lib/tianxu
       - type: bind
@@ -35,3 +43,17 @@ services:
         source: ${TIANXU_BACKUP_DIR:-../../.local/deploy/backups}
         target: /var/backups/tianxu
     stop_grace_period: 30s
+    mem_limit: ${TIANXU_MEMORY_LIMIT:-768m}
+    cpus: ${TIANXU_CPUS:-1.0}
+    pids_limit: 128
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${TIANXU_SUBNET:-10.238.75.0/28}
