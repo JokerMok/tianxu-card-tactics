@@ -34,6 +34,7 @@ export async function createGameServer(options = {}) {
   const content = new ServerContent(folder,{localizationFolder});
   const store = new GameStore(options.database ?? process.env.TIANXU_DATABASE ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
   const service = new GameService(store, content, { clock: options.clock });
+  const allowTestActions = options.allowTestActions === true && process.env.NODE_ENV !== 'production';
   const rates = new Map();
   const server = http.createServer(async (request, response) => {
     const traceId=randomUUID();response.setHeader('X-Trace-Id',traceId);
@@ -64,11 +65,18 @@ export async function createGameServer(options = {}) {
         const characterId = String(request.headers['x-character-id'] ?? '');
         if (request.method === 'GET' && url.pathname === '/api/characters') return json(200, { characters: service.characters(accountId) });
         if (request.method === 'GET' && url.pathname === '/api/catalog') return json(200, content.catalog);
-        if (request.method === 'GET' && url.pathname === '/api/state') return json(200, service.view(accountId, characterId));
+        if (request.method === 'GET' && url.pathname === '/api/state') {
+          const view = service.view(accountId, characterId);
+          if (!allowTestActions && view.growth?.sections) view.growth.sections = view.growth.sections
+            .filter(section => section.id !== 'local-tools')
+            .map(section => ({ ...section, items: section.items.filter(item => !String(item.action ?? '').startsWith('test.')) }));
+          return json(200, view);
+        }
         if (request.method === 'POST' && url.pathname === '/api/logout') { store.logout(token); return json(200, { loggedOut: true }); }
         if (request.method === 'POST' && url.pathname === '/api/act') {
           const data = await body(request);
           if (typeof data.action !== 'string') throw new Error('缺少操作');
+          if (!allowTestActions && data.action.startsWith('test.')) throw Object.assign(new Error('当前服务器未开放测试操作'), { status: 403, code: 'TEST_ACTION_DISABLED' });
           const result=service.act(accountId,characterId,data.requestId,data.action,data.payload,{expectedActorRevision:data.expectedActorRevision});
           log('info','operation',{traceId,accountId,characterId,action:data.action,requestId:data.requestId,revision:result.revision,replayed:result.replayed});
           return json(200,result);
