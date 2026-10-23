@@ -931,7 +931,7 @@ export function onPveAction(ctx, action, payload = {}, response = undefined, bef
   if (['test.grant', 'activity.weeklyGrant', 'activity.rewardBonus'].includes(action)) {
     const gold = Math.max(0, number(after.currencies.gold) - number(before.currencies?.gold));
     add('localGrantedGold', gold);
-  } else if (action === 'deck.save') {
+  } else if (action === 'deck.save' && payload.openingShuffle === true) {
     const previous = [...(before.deck ?? [])], current = [...after.deck];
     const sameCards = previous.length === current.length
       && [...previous].sort().every((card, index) => card === [...current].sort()[index]);

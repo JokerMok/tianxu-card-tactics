@@ -441,12 +441,12 @@ test('local gold grants count only their real positive gold delta and unlock sou
   assert.equal(operatePve(ctx, 'task.claim', { taskId: 3907 }).result.taskId, 3907);
 });
 
-test('reordered saved deck is charged once and counts only after a real two-account PvP start', () => {
+test('explicit opening shuffle is charged once and counts only after a real two-account PvP start', () => {
   const { ctx, actor, world } = setup(); actor.level = 100; actor.deck = ['a', 'b', 'c', 'd'];
   const opponent = character('c2'); opponent.accountId = 'a2'; world.characters.c2 = opponent;
   let before = pveActionSnapshot(ctx); actor.deck = ['b', 'a', 'd', 'c'];
   const saved = { message: '卡组已保存' };
-  onPveAction(ctx, 'deck.save', { cards: actor.deck }, saved, before);
+  onPveAction(ctx, 'deck.save', { cards: actor.deck, openingShuffle: true }, saved, before);
   assert.equal(actor.currencies.gold, 499);
   assert.match(saved.message, /消耗1金币/);
   assert.equal(actor.pve.tasks.counters.pvpDeckShuffles, undefined);
@@ -465,7 +465,7 @@ test('opening shuffle accepts balanced real four-account and eight-account PvP s
   for (const teamSize of [2, 4]) {
     const { ctx, actor, world } = setup(); actor.deck = ['a', 'b', 'c', 'd'];
     let before = pveActionSnapshot(ctx); actor.deck = ['d', 'c', 'b', 'a'];
-    onPveAction(ctx, 'deck.save', { cards: actor.deck }, { message: '卡组已保存' }, before);
+    onPveAction(ctx, 'deck.save', { cards: actor.deck, openingShuffle: true }, { message: '卡组已保存' }, before);
     const participants = ['c1'];
     for (let index = 2; index <= teamSize * 2; index += 1) {
       const id = `c${index}`, candidate = character(id); candidate.accountId = `a${index}`;
@@ -506,4 +506,18 @@ test('authoritative tick closes elapsed shared seasons once', () => {
   assert.equal(world.pve.worldBoss['2026-10-20:0'].closed, true);
   assert.equal(world.pve.forbidden['2026-10-20'].closed, true);
   assert.equal(tickPve(world, tables, atCst(21, 2)), false);
+});
+
+
+test('ordinary deck reorder stays free and never registers a paid PvP opening shuffle', () => {
+  for (const gold of [0, 500]) {
+    const { ctx, actor } = setup(); actor.currencies.gold = gold; actor.deck = ['a','b','c','d'];
+    const before = pveActionSnapshot(ctx); actor.deck = ['b','c','d','a'];
+    const saved = { message: '卡组已保存' };
+    onPveAction(ctx, 'deck.save', { cards: actor.deck }, saved, before);
+    assert.equal(actor.currencies.gold, gold);
+    assert.equal(actor.economicLog.length, 0);
+    assert.equal(actor.pve.operations.pendingPvpShuffle, undefined);
+    assert.equal(saved.message, '卡组已保存');
+  }
 });
