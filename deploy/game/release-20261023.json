@@ -1,0 +1,88 @@
+{
+  "version": "beta-20261023-6098c0a9",
+  "commit": "6098c0a9b787ec41e24225058719c5a3f5811f3b",
+  "baseline": [
+    "4e05cbabd5bdaffd8d41c2ab814d8751e1a6b190",
+    "87a2ca6d592cea0e4bd76170d91f7d440c11c81b"
+  ],
+  "creator": "3.8.8",
+  "build": {
+    "creator": "3.8.8",
+    "debug": false,
+    "sources": {
+      "assets/scripts/a0/BattleA0Bootstrap.ts": "0da37bfd0c46a1952ec6bb2ee2106ed28313b136ef1fb46a56cbb16ca4d965ff",
+      "assets/scripts/game/ActionOutbox.ts": "980a2080a42456d0052faf290fb5b9e2c7b4eb6ffb7448666e3226e6a439ee79",
+      "assets/scripts/game/AdvancedGrowthWindows.ts": "b5554e4c7122d02842c37a1c280e2bd17027d5e2832dfb29411eeb7c66b5f633",
+      "assets/scripts/game/BattlePresentation.ts": "0caab0e38eb0a8adb0e352b92c80f1321dc2a61f321e8efa8ef02c2c1cc0f0be",
+      "assets/scripts/game/BattleSceneView.ts": "67ea66dcfa4607266c026d7cd91ff5cb8ab121229148994faa34c644b2d04bf5",
+      "assets/scripts/game/CardDeckWindow.ts": "a93b80ad19e1b9d5b8361755580b8ecb75bd62b35dff36a0e13aa097af4c005d",
+      "assets/scripts/game/CardManagementUi.ts": "36861e81e0812070218c0be7d87b4c0ead2c8e8c1765b415f844a12b22f42b42",
+      "assets/scripts/game/CardScrollRegion.ts": "21fec24c1821b671a1365cb071d5d22949670b48080a0c36ff3b91e142ac08cf",
+      "assets/scripts/game/CocosUi.ts": "eea40dd54ffc51ddeea236b6373f7d81c8053a592c1bae3537f53c03299bc483",
+      "assets/scripts/game/DeckDraft.ts": "b7c71102afc30ec22858b19326ac848ada3d394572b6e072dcdf3283c00d25b7",
+      "assets/scripts/game/GameAudio.ts": "fbdc36bd584318ea2301715ff4a80ea7c6df386f45a6dccdf93cb0b8770d4eb2",
+      "assets/scripts/game/GameContracts.ts": "ef21e364d9ca1680c1038dd7b54df93532a2bf075284cd79adaa85f22d616352",
+      "assets/scripts/game/GameText.ts": "4b64b9c6199d4478873dc02e57e9055d89c5e5782740795077ad459b99885436",
+      "assets/scripts/game/GrowthWindows.ts": "f15c0fca7c398eb04aa79a0c57cdd3a8cd57fdd8a3c4bd251da412dbbbd4738d",
+      "assets/scripts/game/OriginalUi.ts": "df4f05dcb337a63c0148f1b88ba25b90ab6751fd4f974ea94719256c865090d5",
+      "assets/scripts/game/RecoveredAnimation.ts": "0642cb17c4a3d795e96c2e5e913b80254ecfe8fbeb2031a5a0a7ba04e1e61119",
+      "assets/scripts/game/RecoveredContent.ts": "72efe1cc6fe8934ebc7100bf0752ec633aaa4b16b8ba14461c733939abb1d8ab",
+      "assets/scripts/game/RecoveredEffects.ts": "c50fd49eb9d7e354fd32c536fcc93a51221f315ffb2903487e07f3f6aafb5860",
+      "assets/scripts/game/RecoveredTimeline.ts": "8321922081c4cf5740ed7a18f2bf247325892d2ebeadf41501ea1fa3913df580",
+      "assets/scripts/game/SecondaryWindows.ts": "6fc1b5999804aaeb37f0e813f55ce6ded16941c72903daff90ec5e3c63a3769d",
+      "assets/scripts/game/TianxuGame.ts": "78de1b3697334cf5f072d1c065c144624bfb498d8c852a6a9ea0c555443f8912",
+      "assets/scripts/game/WorldMapWindow.ts": "cfeb7fcbfd0ad3f3ccd254224576e910d3d8f5735e51c8dd67cb11e8c79382a3"
+    },
+    "bundleSha256": "48f5875433da8ba04eaae1c4d198c54af071881d486d1477ec75722ed16ae978",
+    "bundleBytes": 324919,
+    "launchScene": "db://assets/scenes/BattleA0.scene"
+  },
+  "date": "2026-10-23",
+  "url": "https://tianxu.shizibandu.icu/",
+  "scope": "invitation-only beta; user experience and full reconstruction not accepted",
+  "branch": "codex/tencent-invite-beta",
+  "architecture": "linux/amd64",
+  "image": "tianxu-game:beta-20261023-6098c0a9",
+  "imageId": "sha256:327eed38e8b0f0422ba6ece5d2c15982eaf5d03ba2e806fbb81792072a52212a",
+  "package": {
+    "path": "/srv/apps/tianxu/releases/beta-20261023-6098c0a9.tar.gz",
+    "bytes": 911162111,
+    "sha256": "633e0182e1002d3036dfdf848801656b1cc41dc06dd0e685cdc00c67b5ef0546",
+    "runtimeManifestSha256": "7a85a36bab1c55c4aec5f2363b2bd6d8fe13824d39da9dbad2a8b11a4c4b59de",
+    "files": 30573
+  },
+  "nodeBase": {
+    "version": "22.18.0",
+    "source": "https://nodejs.org/dist/v22.18.0/node-v22.18.0-linux-x64.tar.xz",
+    "officialArchiveSha256": "c1bfeecf1d7404fa74728f9db72e697decbd8119ccc6f5a294d795756dfcfca7"
+  },
+  "server": {
+    "root": "/srv/apps/tianxu",
+    "compose": "tianxu",
+    "port": "127.0.0.1:18875",
+    "network": "10.238.75.0/28",
+    "databaseSchema": 2,
+    "memoryMiB": 768,
+    "cpus": 1,
+    "nodeHeapMiB": 512
+  },
+  "backup": {
+    "directory": "/srv/apps/tianxu/shared/backups/beta-release-6098c0a9-20261023",
+    "databaseSha256": "b0430134ebe98f72baff034bdd913edb943066eda66af37f20b9cd33741d8169",
+    "bytes": 139264
+  },
+  "rollback": {
+    "previous": "beta-20261023-17e3f47a",
+    "schemaCompatible": true,
+    "allowedOnline": false,
+    "reason": "Transition release still allowed test actions. First fully gated beta has no earlier equally safe online rollback; stop only this game, preserve data and fix forward."
+  },
+  "changes": [
+    "Invitation cookie gate for static resources and API; Bearer retained",
+    "Public client same-origin API and no debug UI",
+    "Actual Cocos rebuild; catalog read timeout60s, ordinary requests15s",
+    "Cloud account/save wording",
+    "Ordinary deck.save reorder no implicit paid PvP openingShuffle",
+    "HTTP test.* denied403 and debug rewards menu hidden; production cannot enable test options"
+  ]
+}

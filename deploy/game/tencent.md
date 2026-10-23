@@ -56,3 +56,18 @@ sudo docker compose -p tianxu --env-file /srv/apps/tianxu/.env -f /srv/apps/tian
 同schema兼容更新：备份→构建新镜像→更新.env的镜像和构建路径→原子切换previous/current→`up -d --no-build`→检查健康和游玩。兼容回退：先备份当前新进度，切回previous和相应.env镜像，再up；持久库不切换、不回灌旧快照。本次schema仍为2。
 
 遇不兼容迁移时须先停本游戏并保留新库，评估向前修复或兼容迁移；不能只切旧镜像，也不能擅自恢复旧库丢弃新玩家进度。首次发布无旧运行版本，必要时停止本游戏或让站点返回维护提示，保留全部数据与配置。
+
+## 本次精确版本与应急恢复
+
+当前beta-20261023-6098c0a9，应用6098c0a9b787ec41e24225058719c5a3f5811f3b。previous指向过渡版17e3f47a；它还允许test.*，不得作为好友在线回退目标。f322142b还有普通卡组重排隐式扣费问题。这是本次首次满足完整内测边界的版本，没有更早经同等门禁/调试封闭验证的可用线上版本。
+
+当前版本若需应急处理，先执行上文一致性备份，再只停止本游戏；Caddy仍把后端故障显示为维护期不可用，不开放临时端口。保留shared、当前镜像和包，向前修复后从新版本恢复。若误改运行配置，可恢复已核实的本版.env并重建本版容器，数据仍来自shared。
+
+```bash
+cd /srv/apps/tianxu
+sudo docker compose -p tianxu --env-file .env -f current/deploy/game/compose.yaml stop
+# 恢复已核实的本版.env/current后：
+sudo docker compose -p tianxu --env-file .env -f current/deploy/game/compose.yaml up -d --no-build
+```
+
+以后每次更新把本次6098c0a9及其.env留作可用回退点：先备份新进度，兼容schema时切旧镜像/指针/环境，再up -d --no-build，持久库保持不动。不兼容迁移先停服评估兼容修复，不直接回灌旧库。不要重复执行原始上传脚本覆盖已有版本。
