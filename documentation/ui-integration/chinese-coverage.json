@@ -16,27 +16,12 @@
   "skillDescriptions": {
     "recovered": 103,
     "candidate": 633,
-    "unsupported": 13,
-    "runtime-description": 1
+    "runtime-description": 14
   },
   "missing": {
     "cardNames": [],
     "effects": [],
     "skillDescriptions": []
   },
-  "unsupportedSkillCards": [
-    "main:card:50731",
-    "main:card:50732",
-    "main:card:50733",
-    "main:card:50734",
-    "main:card:50741",
-    "main:card:50742",
-    "main:card:50743",
-    "main:card:50744",
-    "main:card:50806",
-    "main:card:50807",
-    "main:card:50808",
-    "main:card:50809",
-    "main:card:50903"
-  ]
+  "unsupportedSkillCards": []
 }

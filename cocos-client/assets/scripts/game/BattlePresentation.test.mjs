@@ -189,3 +189,39 @@ test('events from another connection are queued solely by authoritative sequence
   assert.equal(step.actorId, 'b');
   assert.equal(step.kind, 'move');
 });
+
+test('terrain appears before its hit, expiry follows its last hit, and refresh never replays triggers', () => {
+  const presenter = new BattlePresentation();
+  const baseline = state();
+  presenter.bootstrap(baseline);
+  const terrain = { id:'terrain:4',skillId:50808,topographyId:50808,ownerId:'p0',team:0,
+    cells:[{row:0,col:6}],remainingTurns:null,createdTurn:1,occupants:['b'] };
+  const damaged = unit('b', 'p1', 1, 0, 6, 2);
+  const snapshot = state({ revision:1, terrains:[], units:[baseline.units[0], damaged], events:[
+    {seq:1,type:'terrain-add',terrainId:terrain.id,terrain:structuredClone(terrain)},
+    withViews({seq:2,type:'damage',target:'b',skillId:50808,amount:3,hpBefore:5,hpAfter:2}, {b:damaged}),
+    {seq:3,type:'terrain-remove',terrainId:terrain.id,terrain:structuredClone(terrain)},
+  ] });
+  presenter.sync(snapshot);
+  assert.equal(presenter.visibleState.terrains, undefined, 'final snapshot cannot prematurely erase pending ground');
+  let step = presenter.nextStep();
+  assert.equal(step.events[0].type, 'terrain-add');
+  assert.equal(presenter.visibleState.terrains[0].id,terrain.id);
+  assert.equal(presenter.visibleState.units[1].hp,5);
+  presenter.complete(step.token);
+  step = presenter.nextStep();
+  assert.equal(step.kind,'impact');
+  assert.equal(presenter.visibleState.terrains.length,1);
+  presenter.cue(step.token,'impact');
+  assert.equal(presenter.visibleState.units[1].hp,2);
+  presenter.complete(step.token);
+  step = presenter.nextStep();
+  assert.equal(step.events[0].type,'terrain-remove');
+  assert.equal(presenter.visibleState.terrains.length,1,'keep last terrain pose until end feedback completes');
+  presenter.complete(step.token);
+  assert.deepEqual(presenter.visibleState.terrains,[]);
+  presenter.sync({...snapshot,terrains:[terrain]}, {baseline:true});
+  assert.equal(presenter.nextStep(),undefined);
+  assert.equal(presenter.visibleState.terrains.length,1);
+  assert.equal(presenter.visibleState.units[1].hp,2);
+});

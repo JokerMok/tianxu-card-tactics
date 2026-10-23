@@ -6,7 +6,7 @@ import { BattlePresentation, type BattlePresentationStep } from './BattlePresent
 import { RecoveredAnimation } from './RecoveredAnimation.ts';
 import { RecoveredEffects } from './RecoveredEffects.ts';
 import type { RecoveredCatalog } from './RecoveredContent.ts';
-import type { BattleAction, BattleState, BattleUnit, LegalPlay } from './GameContracts.ts';
+import type { BattleAction, BattleState, BattleUnit, BattleTerrain, LegalPlay } from './GameContracts.ts';
 
 interface BattleView { id: string; settled: boolean; state: BattleState; entryState?: BattleState; legalPlays: LegalPlay[];
   rewards?: { won: boolean; silver: number; xp: number; cards?: { id: string; count: number }[] } }
@@ -17,7 +17,7 @@ interface Hooks { command(action: BattleAction): void; hide(): void; dismiss(): 
 /** Server snapshots never directly move, hurt or remove a live presentation entity. */
 export class BattleSceneView {
   readonly presentation = new BattlePresentation();
-  private scene: Node; private actors: Node; private hud?: Node; private result?: Node;
+  private scene: Node; private actors: Node; private ground: Node; private groundKey = ''; private hud?: Node; private result?: Node;
   private effects: RecoveredEffects; private displays = new Map<string, Display>();
   private latest!: BattleView; private me = ''; private selected = ''; private activeToken = '';
   private disposed = false; private uiKey = ''; private processing = false;
@@ -29,6 +29,7 @@ export class BattleSceneView {
   constructor(private parent: Node, private ui: CocosUi, private original: OriginalUi,
       private catalog: RecoveredCatalog, private base: string, private hooks: Hooks) {
     this.scene = ui.node(parent, 'BattleScene:source-layers', 1200, 600);
+    this.ground = ui.node(this.scene, 'Terrain:authoritative-ground', 1200, 600);
     this.actors = ui.node(this.scene, 'Actors:feet-sorted', 1200, 600);
     this.effects = new RecoveredEffects(this.scene, catalog, base + '/recovered/');
   }
@@ -74,6 +75,7 @@ export class BattleSceneView {
   private direction(display: Display) { return display.team === 0 ? 'east' as const : 'west' as const; }
   private syncDisplays() {
     const state = this.presentation.visibleState; if (!state || this.disposed) return;
+    this.syncTerrainDisplays(state);
     for (const unit of state.units) {
       let display = this.displays.get(unit.id);
       if (!display && unit.hp > 0) {
@@ -110,6 +112,38 @@ export class BattleSceneView {
     for (const [id, display] of this.displays) if (!state.units.some(unit => unit.id === id) && !display.dying) this.release(id);
     const ordered = Array.from(this.displays.values()).sort((a, b) => b.node.position.y - a.node.position.y);
     ordered.forEach((display, index) => display.node.setSiblingIndex(index));
+  }
+  private terrainText(terrain: BattleTerrain): string {
+    const name = cardName(this.catalog, String(terrain.skillId));
+    const duration = terrain.remainingTurns === null ? '持续至被覆盖或战斗结束' : `剩余${terrain.remainingTurns}个玩家回合`;
+    return `${name} · ${terrain.cells.length}格 · ${duration}`;
+  }
+  private syncTerrainDisplays(state: BattleState): void {
+    const terrains = state.terrains ?? [];
+    const key = JSON.stringify(terrains.map(t => [t.id, t.cells, t.remainingTurns]));
+    if (key === this.groundKey) return;
+    this.groundKey = key; for (const child of [...this.ground.children]) { child.active = false; child.destroy(); }
+    for (const terrain of terrains) {
+      const hatch = terrain.topographyId === 50806 || terrain.topographyId === 50807;
+      const ward = terrain.topographyId === 50903;
+      const color = ward ? new Color(108, 191, 236, 110) : hatch ? new Color(139, 203, 108, 110) : new Color(229, 105, 46, 105);
+      for (const cell of terrain.cells) {
+        const point = this.position(cell.row, cell.col);
+        const node = this.ui.node(this.ground, `Terrain:${terrain.id}:${cell.row}:${cell.col}`, 84, 88, point.x, point.y);
+        const graphic = node.addComponent(Graphics);
+        graphic.fillColor = color; graphic.roundRect(-40, -39, 80, 78, 9); graphic.fill();
+        graphic.strokeColor = terrain.team === 0 ? new Color(239, 206, 122, 195) : new Color(222, 128, 105, 195);
+        graphic.lineWidth = 2; graphic.roundRect(-40, -39, 80, 78, 9); graphic.stroke();
+        // These markers are current-version feedback, not a replacement source map or character texture.
+        const label = this.ui.label(node, 'Terrain:state', `${ward ? '净' : hatch ? '孵' : '炎'} ${terrain.remainingTurns ?? '∞'}`, 20, -27, 39, 19, 12, Theme.text);
+        label.overflow = Label.Overflow.CLAMP;
+        node.on(Node.EventType.TOUCH_END, () => {
+          const card = this.catalog.scopes.main.cards[String(terrain.skillId)];
+          const description = card ? cardDisplay(this.catalog, card, this.base).abilities.map(a => a.text).join('\n') : '';
+          this.hooks.log(this.terrainText(terrain) + '\n' + description);
+        });
+      }
+    }
   }
   private release(id: string) { const display = this.displays.get(id); if (!display) return;
     display.animation.destroy(); display.node.destroy(); this.displays.delete(id); }
@@ -207,6 +241,19 @@ export class BattleSceneView {
       const summonedEvent = step.events.find(event => event.type === 'summon');
       const spawned = step.after.target ?? summonedEvent?.targetView;
       if (spawned) { const instance = this.displays.get(spawned.id); if (instance) await instance.ready; }
+    } else if (step.events.some(event => event.type.startsWith('terrain-'))) {
+      const event = step.events.find(event => event.type.startsWith('terrain-'))!;
+      if (event.type === 'terrain-update') return;
+      const terrain = event.terrain;
+      const point = terrain?.cells[0];
+      if (point) {
+        const p = this.position(point.row, point.col);
+        const text = event.type === 'terrain-remove' ? '地形结束' : event.type === 'terrain-add' ? '地形生效' : `地形剩余 ${terrain!.remainingTurns ?? '∞'}`;
+        const label = this.ui.label(this.scene, 'Terrain:feedback', text, p.x, p.y + 39, 150, 24, 16, Theme.gold);
+        await new Promise<void>(resolve => tween(label.node).by(.4 / this.speed, { position: new Vec3(0, 17, 0) }).call(() => {
+          if (label.node.isValid) label.node.destroy(); resolve();
+        }).start());
+      }
     } else if (step.events.some(event => event.type === 'play' && event.cardId)) {
       const event = step.events.find(event => event.type === 'play')!;
       const card = this.catalog.scopes.main.cards[event.cardId!.split(':').at(-1)!];
@@ -304,13 +351,15 @@ export class BattleSceneView {
     this.ui.label(hud, 'Round', `${state.turn}`, -20, 269.5, 100, 35, 35);
     this.ui.label(hud, 'TurnName', this.locked ? '战斗进行中' : (active?.ai?sourceDisplayName(this.catalog,active.name):active?.name??'') + '行动', 0, 224, 350, 24, 14);
     this.skinButton(hud, 'Battle:Menu', 'ajbangzhu', '', '设置', 551, 274, 75, 27, () => this.hooks.hide());
-    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${({move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.amount ?? ''}`).join('\n')));
+    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${({move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','terrain-add':'地形生效','terrain-update':'地形变化','terrain-remove':'地形结束','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.amount ?? ''}`).join('\n')));
     // BattleWnd rightContent is aligned EAST, not a full-width replacement panel.
     const skin = this.original.catalog.skins.zdjm_1;
     if (skin?.path) this.ui.skin(hud, 'HandPane:source-zdjm_1', 'zdjm_1', 173, -228, 854, 144);
     else this.ui.panel(hud, 'HandPane:missing-source', 854, 144, 173, -228, new Color(45, 34, 20, 210));
     const me = state.players.find(player => player.id === this.me); if (!me) return;
     const mine = !this.locked && !this.latest.settled && active?.id === this.me;
+    const terrainCount = (state.terrains ?? []).reduce((sum, t) => sum + t.cells.length, 0);
+    if (terrainCount) this.ui.label(hud, 'Terrain:legend', `地形 ${terrainCount}格 · 点击格子查看效果 · 数字为玩家回合`, -302, -136, 510, 25, 13, Theme.gold);
     this.ui.label(hud, 'DrawPile', `${me.drawPile.length}`, -191, -228, 44, 30, 22, Theme.gold);
     this.ui.label(hud, 'Graveyard', `${me.graveyard.length}`, 555, -228, 44, 30, 22, Theme.gold);
     this.selectedHandPositions.clear();
@@ -338,7 +387,7 @@ export class BattleSceneView {
     if (mine) for (const [index, play] of this.latest.legalPlays.filter(play => play.instanceId === this.selected).entries()) {
       const p = this.position(play.row, play.col);
       const hand = me.hand.find(card => card.instanceId === play.instanceId);
-      this.ui.button(hud, 'Legal:' + index, play.targetId ? '目标' : '部署', p.x, p.y, 78, 82,
+      this.ui.button(hud, 'Legal:' + index, play.targetId ? '目标' : hand && Number(this.catalog.scopes.main.cards[hand.cardId.split(':').at(-1)!]?.raw.Type) === 2 ? '施放' : '部署', p.x, p.y, 78, 82,
         () => { if (hand) this.playFromHand(hand.cardId, play); }, false, true);
     }
     if (this.settledReady) this.renderResult();

@@ -1,0 +1,93 @@
+{
+  "videos": [
+    {
+      "path": "documentation/stabilization/captures/terrain-hatch-live.mp4",
+      "sha256": "05236f187964dc7f1357de5f7dc8599428bfdc1655cb1c29ff437d0852cc75f7",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1200,
+            "height": 600
+          }
+        ],
+        "format": {
+          "duration": "53.683333",
+          "size": "1551680"
+        }
+      },
+      "classification": "formal configured PVE; recovery clip includes explicitly injected HTTP503",
+      "capture": "actual Cocos canvas.captureStream(30), no audio; continuous capture, transcoded without timing edits"
+    },
+    {
+      "path": "documentation/stabilization/captures/terrain-lava-hit-settle-live.mp4",
+      "sha256": "767c5555a877b49c71eacc1ad8f8b364e2e99188d542051cebee80179435dae1",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1440,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "60.400000",
+          "size": "1630366"
+        }
+      },
+      "classification": "formal configured PVE; recovery clip includes explicitly injected HTTP503",
+      "capture": "actual Cocos canvas.captureStream(30), no audio; continuous capture, transcoded without timing edits"
+    },
+    {
+      "path": "documentation/stabilization/captures/terrain-lava-recovery-live.mp4",
+      "sha256": "86b7f7ae28eb86e2441be668eb572c2f9837132f7f68d93e2093924b5fed1cde",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1440,
+            "height": 900
+          }
+        ],
+        "format": {
+          "duration": "101.034267",
+          "size": "2116698"
+        }
+      },
+      "classification": "formal configured PVE; recovery clip includes explicitly injected HTTP503",
+      "capture": "actual Cocos canvas.captureStream(30), no audio; continuous capture, transcoded without timing edits"
+    },
+    {
+      "path": "documentation/stabilization/captures/terrain-movement-fixture-live.mp4",
+      "sha256": "5e8ea6faf5a1794ab6f7a5accebf2e36d74d95035d5bbb998256e63c5d3c1dc8",
+      "media": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1200,
+            "height": 600
+          }
+        ],
+        "format": {
+          "duration": "37.966016",
+          "size": "1024046"
+        }
+      },
+      "classification": "isolated movement fixture",
+      "capture": "actual Cocos canvas.captureStream(30), no audio; continuous capture, transcoded without timing edits"
+    }
+  ],
+  "contactSheet": {
+    "path": "documentation/stabilization/captures/terrain-movement-continuous-frames.png",
+    "source": "terrain-movement-fixture-live.mp4",
+    "method": "first16 frames sampled every0.5s, 4x4; presentation observation, not original-client screenshots"
+  }
+}

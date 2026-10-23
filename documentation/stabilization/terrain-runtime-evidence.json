@@ -1,0 +1,874 @@
+[
+  {
+    "stage": "lava-before-recovery",
+    "slot": "secondary",
+    "at": "2026-10-23T01:00:28.451Z",
+    "serverInstance": "36ea83df-7c0d-402a-96c3-7204962fac9e",
+    "actorLevel": 30,
+    "deck": [
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:9506"
+    ],
+    "battle": {
+      "id": "b04f348a-7735-4bad-ae43-828120668444",
+      "turn": 1,
+      "revision": 1,
+      "rng": 1598680412,
+      "status": "playing",
+      "terrains": [
+        {
+          "id": "terrain:10",
+          "skillId": 50809,
+          "topographyId": 50809,
+          "ownerId": 0,
+          "team": 0,
+          "cells": [
+            {
+              "row": 0,
+              "col": 2
+            },
+            {
+              "row": 0,
+              "col": 3
+            },
+            {
+              "row": 0,
+              "col": 4
+            },
+            {
+              "row": 0,
+              "col": 7
+            },
+            {
+              "row": 0,
+              "col": 8
+            },
+            {
+              "row": 0,
+              "col": 9
+            }
+          ],
+          "remainingTurns": null,
+          "createdTurn": 1,
+          "occupants": []
+        }
+      ],
+      "events": 13,
+      "eventDigest": "cd060f8e95a809b184aa4cb124cc5c35a1c866b28a98e993c91b85a45cdd22a5",
+      "lastEvents": [
+        {
+          "seq": 1,
+          "type": "draw"
+        },
+        {
+          "seq": 2,
+          "type": "draw"
+        },
+        {
+          "seq": 3,
+          "type": "draw"
+        },
+        {
+          "seq": 4,
+          "type": "draw"
+        },
+        {
+          "seq": 5,
+          "type": "draw"
+        },
+        {
+          "seq": 6,
+          "type": "draw"
+        },
+        {
+          "seq": 7,
+          "type": "draw"
+        },
+        {
+          "seq": 8,
+          "type": "draw"
+        },
+        {
+          "seq": 9,
+          "type": "draw"
+        },
+        {
+          "seq": 10,
+          "type": "battle-start",
+          "amount": 526832663
+        },
+        {
+          "seq": 11,
+          "type": "turn-start",
+          "amount": 1
+        },
+        {
+          "seq": 12,
+          "type": "play",
+          "skillId": 50809,
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 13,
+          "type": "terrain-add",
+          "skillId": 50809
+        }
+      ],
+      "hand": [
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:9506",
+          "wait": 6
+        },
+        {
+          "cardId": "main:card:50809",
+          "wait": 0
+        }
+      ],
+      "graveyard": [
+        "main:card:50809"
+      ],
+      "units": [
+        {
+          "id": "hero:29b6c7a5-e17c-43a3-ba87-0df629c04dee",
+          "monsterId": 0,
+          "row": 0,
+          "col": 0,
+          "hp": 18,
+          "team": 0
+        },
+        {
+          "id": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0",
+          "monsterId": 60001,
+          "row": 0,
+          "col": 11,
+          "hp": 2,
+          "team": 1
+        }
+      ]
+    }
+  },
+  {
+    "stage": "lava-after-network-recovery",
+    "slot": "secondary",
+    "at": "2026-10-23T01:00:59.613Z",
+    "serverInstance": "36ea83df-7c0d-402a-96c3-7204962fac9e",
+    "actorLevel": 30,
+    "deck": [
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:9506"
+    ],
+    "battle": {
+      "id": "b04f348a-7735-4bad-ae43-828120668444",
+      "turn": 1,
+      "revision": 1,
+      "rng": 1598680412,
+      "status": "playing",
+      "terrains": [
+        {
+          "id": "terrain:10",
+          "skillId": 50809,
+          "topographyId": 50809,
+          "ownerId": 0,
+          "team": 0,
+          "cells": [
+            {
+              "row": 0,
+              "col": 2
+            },
+            {
+              "row": 0,
+              "col": 3
+            },
+            {
+              "row": 0,
+              "col": 4
+            },
+            {
+              "row": 0,
+              "col": 7
+            },
+            {
+              "row": 0,
+              "col": 8
+            },
+            {
+              "row": 0,
+              "col": 9
+            }
+          ],
+          "remainingTurns": null,
+          "createdTurn": 1,
+          "occupants": []
+        }
+      ],
+      "events": 13,
+      "eventDigest": "cd060f8e95a809b184aa4cb124cc5c35a1c866b28a98e993c91b85a45cdd22a5",
+      "lastEvents": [
+        {
+          "seq": 1,
+          "type": "draw"
+        },
+        {
+          "seq": 2,
+          "type": "draw"
+        },
+        {
+          "seq": 3,
+          "type": "draw"
+        },
+        {
+          "seq": 4,
+          "type": "draw"
+        },
+        {
+          "seq": 5,
+          "type": "draw"
+        },
+        {
+          "seq": 6,
+          "type": "draw"
+        },
+        {
+          "seq": 7,
+          "type": "draw"
+        },
+        {
+          "seq": 8,
+          "type": "draw"
+        },
+        {
+          "seq": 9,
+          "type": "draw"
+        },
+        {
+          "seq": 10,
+          "type": "battle-start",
+          "amount": 526832663
+        },
+        {
+          "seq": 11,
+          "type": "turn-start",
+          "amount": 1
+        },
+        {
+          "seq": 12,
+          "type": "play",
+          "skillId": 50809,
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 13,
+          "type": "terrain-add",
+          "skillId": 50809
+        }
+      ],
+      "hand": [
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:9506",
+          "wait": 6
+        },
+        {
+          "cardId": "main:card:50809",
+          "wait": 0
+        }
+      ],
+      "graveyard": [
+        "main:card:50809"
+      ],
+      "units": [
+        {
+          "id": "hero:29b6c7a5-e17c-43a3-ba87-0df629c04dee",
+          "monsterId": 0,
+          "row": 0,
+          "col": 0,
+          "hp": 18,
+          "team": 0
+        },
+        {
+          "id": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0",
+          "monsterId": 60001,
+          "row": 0,
+          "col": 11,
+          "hp": 2,
+          "team": 1
+        }
+      ]
+    }
+  },
+  {
+    "stage": "lava-after-service-restart",
+    "slot": "secondary",
+    "at": "2026-10-23T01:01:35.443Z",
+    "serverInstance": "2126e457-3106-4db6-a17f-975743acd615",
+    "actorLevel": 30,
+    "deck": [
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:9506"
+    ],
+    "battle": {
+      "id": "b04f348a-7735-4bad-ae43-828120668444",
+      "turn": 1,
+      "revision": 1,
+      "rng": 1598680412,
+      "status": "playing",
+      "terrains": [
+        {
+          "id": "terrain:10",
+          "skillId": 50809,
+          "topographyId": 50809,
+          "ownerId": 0,
+          "team": 0,
+          "cells": [
+            {
+              "row": 0,
+              "col": 2
+            },
+            {
+              "row": 0,
+              "col": 3
+            },
+            {
+              "row": 0,
+              "col": 4
+            },
+            {
+              "row": 0,
+              "col": 7
+            },
+            {
+              "row": 0,
+              "col": 8
+            },
+            {
+              "row": 0,
+              "col": 9
+            }
+          ],
+          "remainingTurns": null,
+          "createdTurn": 1,
+          "occupants": []
+        }
+      ],
+      "events": 13,
+      "eventDigest": "cd060f8e95a809b184aa4cb124cc5c35a1c866b28a98e993c91b85a45cdd22a5",
+      "lastEvents": [
+        {
+          "seq": 1,
+          "type": "draw"
+        },
+        {
+          "seq": 2,
+          "type": "draw"
+        },
+        {
+          "seq": 3,
+          "type": "draw"
+        },
+        {
+          "seq": 4,
+          "type": "draw"
+        },
+        {
+          "seq": 5,
+          "type": "draw"
+        },
+        {
+          "seq": 6,
+          "type": "draw"
+        },
+        {
+          "seq": 7,
+          "type": "draw"
+        },
+        {
+          "seq": 8,
+          "type": "draw"
+        },
+        {
+          "seq": 9,
+          "type": "draw"
+        },
+        {
+          "seq": 10,
+          "type": "battle-start",
+          "amount": 526832663
+        },
+        {
+          "seq": 11,
+          "type": "turn-start",
+          "amount": 1
+        },
+        {
+          "seq": 12,
+          "type": "play",
+          "skillId": 50809,
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 13,
+          "type": "terrain-add",
+          "skillId": 50809
+        }
+      ],
+      "hand": [
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:9506",
+          "wait": 6
+        },
+        {
+          "cardId": "main:card:50809",
+          "wait": 0
+        }
+      ],
+      "graveyard": [
+        "main:card:50809"
+      ],
+      "units": [
+        {
+          "id": "hero:29b6c7a5-e17c-43a3-ba87-0df629c04dee",
+          "monsterId": 0,
+          "row": 0,
+          "col": 0,
+          "hp": 18,
+          "team": 0
+        },
+        {
+          "id": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0",
+          "monsterId": 60001,
+          "row": 0,
+          "col": 11,
+          "hp": 2,
+          "team": 1
+        }
+      ]
+    }
+  },
+  {
+    "stage": "lava-after-turn",
+    "slot": "secondary",
+    "at": "2026-10-23T01:02:41.414Z",
+    "serverInstance": "2126e457-3106-4db6-a17f-975743acd615",
+    "actorLevel": 30,
+    "deck": [
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:9506"
+    ],
+    "battle": {
+      "id": "b04f348a-7735-4bad-ae43-828120668444",
+      "turn": 3,
+      "revision": 4,
+      "rng": 1598680412,
+      "status": "playing",
+      "terrains": [
+        {
+          "id": "terrain:10",
+          "skillId": 50809,
+          "topographyId": 50809,
+          "ownerId": 0,
+          "team": 0,
+          "cells": [
+            {
+              "row": 0,
+              "col": 2
+            },
+            {
+              "row": 0,
+              "col": 3
+            },
+            {
+              "row": 0,
+              "col": 4
+            },
+            {
+              "row": 0,
+              "col": 7
+            },
+            {
+              "row": 0,
+              "col": 8
+            },
+            {
+              "row": 0,
+              "col": 9
+            }
+          ],
+          "remainingTurns": null,
+          "createdTurn": 1,
+          "occupants": []
+        }
+      ],
+      "events": 26,
+      "eventDigest": "f0ae9bbc289e23a9cda3c538c458c35a3bfaf877fab67e537c04c39de61918d0",
+      "lastEvents": [
+        {
+          "seq": 9,
+          "type": "draw"
+        },
+        {
+          "seq": 10,
+          "type": "battle-start",
+          "amount": 526832663
+        },
+        {
+          "seq": 11,
+          "type": "turn-start",
+          "amount": 1
+        },
+        {
+          "seq": 12,
+          "type": "play",
+          "skillId": 50809,
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 13,
+          "type": "terrain-add",
+          "skillId": 50809
+        },
+        {
+          "seq": 14,
+          "type": "turn-end",
+          "amount": 1
+        },
+        {
+          "seq": 15,
+          "type": "damage",
+          "amount": 1,
+          "message": "fatigue",
+          "target": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0"
+        },
+        {
+          "seq": 16,
+          "type": "fatigue",
+          "amount": 1
+        },
+        {
+          "seq": 17,
+          "type": "turn-start",
+          "amount": 2
+        },
+        {
+          "seq": 18,
+          "type": "play",
+          "row": 0,
+          "col": 8,
+          "target": "unit:11"
+        },
+        {
+          "seq": 19,
+          "type": "summon",
+          "row": 0,
+          "col": 8,
+          "target": "unit:11"
+        },
+        {
+          "seq": 20,
+          "type": "terrain-update",
+          "skillId": 50809
+        },
+        {
+          "seq": 21,
+          "type": "damage",
+          "amount": 5,
+          "skillId": 50809,
+          "message": "terrain-entry",
+          "target": "unit:11"
+        },
+        {
+          "seq": 22,
+          "type": "death",
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 23,
+          "type": "terrain-update",
+          "skillId": 50809
+        },
+        {
+          "seq": 24,
+          "type": "turn-end",
+          "amount": 2
+        },
+        {
+          "seq": 25,
+          "type": "draw"
+        },
+        {
+          "seq": 26,
+          "type": "turn-start",
+          "amount": 3
+        }
+      ],
+      "hand": [
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:9506",
+          "wait": 5
+        },
+        {
+          "cardId": "main:card:50809",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        }
+      ],
+      "graveyard": [
+        "main:card:50809"
+      ],
+      "units": [
+        {
+          "id": "hero:29b6c7a5-e17c-43a3-ba87-0df629c04dee",
+          "monsterId": 0,
+          "row": 0,
+          "col": 0,
+          "hp": 18,
+          "team": 0
+        },
+        {
+          "id": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0",
+          "monsterId": 60001,
+          "row": 0,
+          "col": 11,
+          "hp": 1,
+          "team": 1
+        }
+      ]
+    }
+  },
+  {
+    "stage": "lava-settled",
+    "slot": "secondary",
+    "at": "2026-10-23T01:03:20.518Z",
+    "serverInstance": "2126e457-3106-4db6-a17f-975743acd615",
+    "actorLevel": 30,
+    "deck": [
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50808",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50809",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:50903",
+      "main:card:9506"
+    ],
+    "battle": {
+      "id": "b04f348a-7735-4bad-ae43-828120668444",
+      "turn": 4,
+      "revision": 5,
+      "rng": 1598680412,
+      "status": "settled",
+      "terrains": [],
+      "events": 33,
+      "eventDigest": "76c3b518ce4321339769b46f1021069b22afb6cf4a1daad3fec9d6d53793f488",
+      "lastEvents": [
+        {
+          "seq": 16,
+          "type": "fatigue",
+          "amount": 1
+        },
+        {
+          "seq": 17,
+          "type": "turn-start",
+          "amount": 2
+        },
+        {
+          "seq": 18,
+          "type": "play",
+          "row": 0,
+          "col": 8,
+          "target": "unit:11"
+        },
+        {
+          "seq": 19,
+          "type": "summon",
+          "row": 0,
+          "col": 8,
+          "target": "unit:11"
+        },
+        {
+          "seq": 20,
+          "type": "terrain-update",
+          "skillId": 50809
+        },
+        {
+          "seq": 21,
+          "type": "damage",
+          "amount": 5,
+          "skillId": 50809,
+          "message": "terrain-entry",
+          "target": "unit:11"
+        },
+        {
+          "seq": 22,
+          "type": "death",
+          "row": 0,
+          "col": 8
+        },
+        {
+          "seq": 23,
+          "type": "terrain-update",
+          "skillId": 50809
+        },
+        {
+          "seq": 24,
+          "type": "turn-end",
+          "amount": 2
+        },
+        {
+          "seq": 25,
+          "type": "draw"
+        },
+        {
+          "seq": 26,
+          "type": "turn-start",
+          "amount": 3
+        },
+        {
+          "seq": 27,
+          "type": "turn-end",
+          "amount": 3
+        },
+        {
+          "seq": 28,
+          "type": "damage",
+          "amount": 2,
+          "message": "fatigue",
+          "target": "hero:ai:b04f348a-7735-4bad-ae43-828120668444:0"
+        },
+        {
+          "seq": 29,
+          "type": "fatigue",
+          "amount": 2
+        },
+        {
+          "seq": 30,
+          "type": "turn-start",
+          "amount": 4
+        },
+        {
+          "seq": 31,
+          "type": "death",
+          "row": 0,
+          "col": 11
+        },
+        {
+          "seq": 32,
+          "type": "terrain-remove",
+          "skillId": 50809
+        },
+        {
+          "seq": 33,
+          "type": "settled",
+          "amount": 0
+        }
+      ],
+      "hand": [
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:9506",
+          "wait": 5
+        },
+        {
+          "cardId": "main:card:50809",
+          "wait": 0
+        },
+        {
+          "cardId": "main:card:50808",
+          "wait": 0
+        }
+      ],
+      "graveyard": [
+        "main:card:50809"
+      ],
+      "units": [
+        {
+          "id": "hero:29b6c7a5-e17c-43a3-ba87-0df629c04dee",
+          "monsterId": 0,
+          "row": 0,
+          "col": 0,
+          "hp": 18,
+          "team": 0
+        }
+      ]
+    }
+  }
+]

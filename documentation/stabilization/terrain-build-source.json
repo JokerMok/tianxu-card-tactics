@@ -1,0 +1,41 @@
+{
+  "creator": "3.8.8",
+  "baseline": "c64c085",
+  "buildMethod": "existing isolated Cocos editor project with explicit source reimport and command-build",
+  "sourceMatchesBuild": true,
+  "sources": {
+    "assets/scripts/a0/BattleA0Bootstrap.ts": "0da37bfd0c46a1952ec6bb2ee2106ed28313b136ef1fb46a56cbb16ca4d965ff",
+    "assets/scripts/game/ActionOutbox.ts": "980a2080a42456d0052faf290fb5b9e2c7b4eb6ffb7448666e3226e6a439ee79",
+    "assets/scripts/game/AdvancedGrowthWindows.ts": "b5554e4c7122d02842c37a1c280e2bd17027d5e2832dfb29411eeb7c66b5f633",
+    "assets/scripts/game/BattlePresentation.ts": "0caab0e38eb0a8adb0e352b92c80f1321dc2a61f321e8efa8ef02c2c1cc0f0be",
+    "assets/scripts/game/BattleSceneView.ts": "67ea66dcfa4607266c026d7cd91ff5cb8ab121229148994faa34c644b2d04bf5",
+    "assets/scripts/game/CardDeckWindow.ts": "a93b80ad19e1b9d5b8361755580b8ecb75bd62b35dff36a0e13aa097af4c005d",
+    "assets/scripts/game/CardManagementUi.ts": "36861e81e0812070218c0be7d87b4c0ead2c8e8c1765b415f844a12b22f42b42",
+    "assets/scripts/game/CardScrollRegion.ts": "21fec24c1821b671a1365cb071d5d22949670b48080a0c36ff3b91e142ac08cf",
+    "assets/scripts/game/CocosUi.ts": "eea40dd54ffc51ddeea236b6373f7d81c8053a592c1bae3537f53c03299bc483",
+    "assets/scripts/game/DeckDraft.ts": "b7c71102afc30ec22858b19326ac848ada3d394572b6e072dcdf3283c00d25b7",
+    "assets/scripts/game/GameAudio.ts": "fbdc36bd584318ea2301715ff4a80ea7c6df386f45a6dccdf93cb0b8770d4eb2",
+    "assets/scripts/game/GameContracts.ts": "ef21e364d9ca1680c1038dd7b54df93532a2bf075284cd79adaa85f22d616352",
+    "assets/scripts/game/GameText.ts": "4b64b9c6199d4478873dc02e57e9055d89c5e5782740795077ad459b99885436",
+    "assets/scripts/game/GrowthWindows.ts": "f15c0fca7c398eb04aa79a0c57cdd3a8cd57fdd8a3c4bd251da412dbbbd4738d",
+    "assets/scripts/game/OriginalUi.ts": "df4f05dcb337a63c0148f1b88ba25b90ab6751fd4f974ea94719256c865090d5",
+    "assets/scripts/game/RecoveredAnimation.ts": "0642cb17c4a3d795e96c2e5e913b80254ecfe8fbeb2031a5a0a7ba04e1e61119",
+    "assets/scripts/game/RecoveredContent.ts": "72efe1cc6fe8934ebc7100bf0752ec633aaa4b16b8ba14461c733939abb1d8ab",
+    "assets/scripts/game/RecoveredEffects.ts": "c50fd49eb9d7e354fd32c536fcc93a51221f315ffb2903487e07f3f6aafb5860",
+    "assets/scripts/game/RecoveredTimeline.ts": "8321922081c4cf5740ed7a18f2bf247325892d2ebeadf41501ea1fa3913df580",
+    "assets/scripts/game/SecondaryWindows.ts": "6fc1b5999804aaeb37f0e813f55ce6ded16941c72903daff90ec5e3c63a3769d",
+    "assets/scripts/game/TianxuGame.ts": "fc254e3f2a60bfe1e53ced8e904dae3ad2d0b011e5c5e4b7325065c724137532",
+    "assets/scripts/game/WorldMapWindow.ts": "cfeb7fcbfd0ad3f3ccd254224576e910d3d8f5735e51c8dd67cb11e8c79382a3"
+  },
+  "bundleSha256": "09c61703a6899764b9ce3fd5796ec56d035e79495d38c31ae80d7f04f4f4d53e",
+  "bundleBytes": 672762,
+  "launchScene": "db://assets/scenes/BattleA0.scene",
+  "builderLog": ".local/stabilization/build-map-input/project/temp/builder/log/web-desktop10-23-2026 08-51.log",
+  "localizationSha256": "028e7d885523b2c6e832f9cdb3380f2c122ea14a8648eff22dc2a72ff7a34a56",
+  "localizationDelivery": "remote runtime JSON, loaded by formal backend; not embedded in Cocos bundle",
+  "authoritativeSources": {
+    "cocos-client/assets/scripts/game/BattleKernel.ts": "43063a1bf46de46deee68df754faad53ed6d289b6b4160af3ec46d978fefb8d9",
+    "cocos-client/assets/scripts/game/TerrainRules.ts": "80e4975f5a75edfb039bc5e46fb1a395b94918117e225ca8f569026d00c963b2",
+    "cocos-client/assets/scripts/game/GameContracts.ts": "ef21e364d9ca1680c1038dd7b54df93532a2bf075284cd79adaa85f22d616352"
+  }
+}

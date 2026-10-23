@@ -6,7 +6,7 @@ import type { RecoveredCatalog, RecoveredCard } from './RecoveredContent.ts';
 import type { BattleState, LegalPlay, BattleAction } from './GameContracts.ts';
 import { OriginalUi, type OriginalUiCatalog, type OriginalUiMount } from './OriginalUi.ts';
 import { BattleSceneView } from './BattleSceneView.ts';
-import { cardName, cardDisplay, presentationName } from './GameText.ts';
+import { cardName, cardDisplay, presentationError, presentationName, presentationText } from './GameText.ts';
 import { CardDeckWindow } from './CardDeckWindow.ts';
 import { GrowthWindows } from './GrowthWindows.ts';
 import { WorldMapWindow } from './WorldMapWindow.ts';
@@ -106,7 +106,16 @@ export class TianxuGame extends Component {
     if (this.networkInterrupted || (this.state && next.serverInstance !== this.state.serverInstance)) {
       this.entryReplayBattleId = ''; this.battleView?.destroy(); this.battleView = undefined;
     }
-    this.networkInterrupted = false; this.state = next;
+    const growth = { ...next.growth, sections: next.growth.sections.map(section => {
+      if (!['tasks', 'quest-operations'].includes(section.id)) return section;
+      return { ...section, items: section.items.map(item => ({ ...item,
+        label: presentationText(item.label), detail: item.detail ? presentationText(item.detail) : item.detail,
+      })) };
+    }) };
+    const scenes = next.scenes.map(scene => ({ ...scene, nodes: scene.nodes.map(node => ({ ...node,
+      story: node.story ? presentationText(node.story) : node.story,
+    })) }));
+    this.networkInterrupted = false; this.state = { ...next, story: presentationText(next.story), growth, scenes };
   }
   private saveAuth() { localStorage.setItem(this.authKey, JSON.stringify({ token: this.token, characterId: this.characterId })); }
   private async boot() {
@@ -178,7 +187,7 @@ export class TianxuGame extends Component {
     if(this.state?.actor.id===actorId&&response.revision>=this.state.revision){this.state.actor.deck=[...response.result.cards];this.state.actor.commandRevision=response.result.commandRevision;this.state.revision=response.revision;}
     return response.result.cards;
   }
-  private toast(message: string) { this.notice = /Failed to fetch|NetworkError|Load failed/i.test(message)?'网络连接中断，请稍后重试。':message.replace(/^Error: /, ''); this.noticeUntil = Date.now() + 5500;
+  private toast(message: string) { this.notice = presentationError(message); this.noticeUntil = Date.now() + 5500;
     if (this.noticeLabel?.isValid) { this.noticeLabel.string = this.notice; this.noticeLabel.node.setSiblingIndex(this.root.children.length - 1); } }
   private clear() {
     this.renderGeneration++; this.home = undefined; this.deckWindow?.detach();
@@ -249,18 +258,15 @@ export class TianxuGame extends Component {
     this.ui.button(this.root, 'ReturnLogin', '返回登录', 0, -140, 160, 36, () => { this.token = ''; this.characterId = ''; this.saveAuth(); this.renderLogin(); });
   }
   private renderOriginalCharacters() {
-    this.clear(); const generation = this.renderGeneration;
-    void this.original!.mount('Login/ServerListWnd', this.root).then(mount => {
-      if (generation !== this.renderGeneration) return; mount.node.setPosition(-600, 300);
-      const list = mount.requireChild('list'); list.active = false;
-      ['nGroup0', 'nGroup1', 'nGroup2'].forEach(name => mount.setVisible(name, false));
-      this.ui.label(this.root, 'Character:LocalTitle', '本机角色', 0, 165, 600, 36, 24, Theme.gold);
-      this.characters.forEach((char, index) => this.ui.button(this.root, `Character:${char.id}`, `${char.name} · ${PROFESSIONS[char.profession]} Lv.${char.level}`,
-        0, 105 - index * 64, 350, 44, () => { this.characterId = char.id; void this.boot(); }));
-      this.ui.button(this.root, 'CreateCharacter', '创建新角色', -140, -188, 210, 34, () => this.renderCreateCharacter(), this.characters.length >= 4);
-      this.ui.button(this.root, 'ReturnLogin', '返回登录', 140, -188, 210, 34, () => { this.token = ''; this.characterId = ''; this.saveAuth(); this.renderLogin(); });
-      this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
-    }).catch(error => this.toast(String(error)));
+    this.clear();
+    const panel = this.ui.skin(this.root, 'Character:SourceFrame', 'kphcbj_1_3', 0, 0, 728, 469);
+    this.ui.label(panel, 'Character:Title', '选择角色', 0, 205, 600, 36, 24, Theme.gold);
+    if (!this.characters.length) this.ui.label(panel, 'Character:Empty', '当前账号还没有角色', 0, 52, 420, 44, 17, Theme.dim);
+    this.characters.forEach((char, index) => this.ui.button(panel, `Character:${char.id}`, `${char.name} · ${PROFESSIONS[char.profession]} · ${char.level}级`,
+      0, 125 - index * 70, 390, 44, () => { this.characterId = char.id; void this.boot(); }));
+    this.ui.button(panel, 'CreateCharacter', '创建新角色', -125, -195, 210, 34, () => this.renderCreateCharacter(), this.characters.length >= 4);
+    this.ui.button(panel, 'ReturnLogin', '返回登录', 125, -195, 210, 34, () => { this.token = ''; this.characterId = ''; this.saveAuth(); this.renderLogin(); });
+    this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
   }
   private renderCreateCharacter() {
     this.clear(); const generation = this.renderGeneration;

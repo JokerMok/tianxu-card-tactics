@@ -4674,67 +4674,107 @@
     },
     "main:card:50731": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第8至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:5d023c40e0f428593612",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50732": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第7至10列选择一格，包含落点在内随机生成至多8格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:d921b650afd51c094d01",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50733": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第6至10列选择一格，包含落点在内随机生成至多10格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:c48a603f69753fb34115",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50734": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第5至10列选择一格，包含落点在内随机生成至多12格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:9c9235b0249b9e29c842",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50741": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第9至10列选择一格，包含落点在内随机生成至多4格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:9eaf24c4a882d8df5f1d",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50742": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第8至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:7b2f5dd767ad6bb1793b",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50743": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第7至10列选择一格，包含落点在内随机生成至多8格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:27153f600dc8dc65a69d",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50744": {
       "name": "岩浆注入",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第6至10列选择一格，包含落点在内随机生成至多10格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma Injection",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:8495a7098180c41983af",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50751": {
       "name": "恐慌",
@@ -4794,35 +4834,55 @@
     },
     "main:card:50806": {
       "name": "孵化",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的孵化地形。施放者结束回合时，每个空格有90%概率召唤幼龙，10%概率召唤焰龙卫士；被占据则跳过。结算后地形消失，不补发召唤。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Hatch",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:85efdc17f84ad0ebd7e3",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50807": {
       "name": "孵化",
-      "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-      "status": "unsupported",
-      "source": "census.raw.Des (non-text value; effect unavailable)",
+      "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的孵化地形。施放者结束回合时，每个空格有90%概率召唤幼龙，10%概率召唤焰龙卫士；被占据则跳过。结算后地形消失，不补发召唤。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Hatch",
-      "originalText": "0"
+      "originalText": "0",
+      "ruleEvidence": {
+        "skillRow": "config_row:0e8e0171581ac499fe80",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50808": {
       "name": "岩浆",
-      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到3点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
-      "status": "unsupported",
-      "source": "linked skill Des + BattleKernel runtime boundary",
+      "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的岩浆。进入或在所属玩家回合结束时仍处其中的双方生物受到3点火焰伤害。持续至被覆盖或战斗结束。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma",
-      "originalText": "0"
+      "originalText": "Deals 3 Fire Damage to creatures who enter and 3 Fire damage to creatures who end their turn in this tile.",
+      "ruleEvidence": {
+        "skillRow": "config_row:f257decce9e282bbe59d",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50809": {
       "name": "岩浆",
-      "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到5点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
-      "status": "unsupported",
-      "source": "linked skill Des + BattleKernel runtime boundary",
+      "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。进入或在所属玩家回合结束时仍处其中的双方生物受到5点火焰伤害。持续至被覆盖或战斗结束。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Magma",
-      "originalText": "0"
+      "originalText": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+      "ruleEvidence": {
+        "skillRow": "config_row:a0151a5053879d21bcdf",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50810": {
       "name": "烈焰之柱",
@@ -4858,11 +4918,16 @@
     },
     "main:card:50903": {
       "name": "结界之地",
-      "text": "原规则说明：任一玩家的生物进入结界之地时移除全部增益，且处于其中时无法获得增益。本版本限制：持续地形规则尚未实现，当前不能施放。",
-      "status": "unsupported",
-      "source": "linked skill Des + BattleKernel runtime boundary",
+      "text": "在己方视角第5列施放，覆盖第5至9列全部行。任意阵营的生物进入时移除全部增益状态；停留其中时不能获得增益状态。英雄不受影响。离开后可重新获得增益，已移除的增益不恢复。持续至被覆盖或战斗结束。",
+      "status": "runtime-description",
+      "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
       "originalName": "Warded Ground",
-      "originalText": "0"
+      "originalText": "Any player creature entering Warded Ground has all buffs removed and cannot gain buffs whilst inside.",
+      "ruleEvidence": {
+        "skillRow": "config_row:eabccd98e6fd8ecd9b6c",
+        "topographyTable": "main:embeddata/scp/topography.xml",
+        "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+      }
     },
     "main:card:50904": {
       "name": "审判",

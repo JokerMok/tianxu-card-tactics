@@ -73,7 +73,83 @@ const PRESENTATION_ZH: Record<string, string> = {
   'Aire River Ford':'艾尔河浅滩','Forest Entrance':'森林入口','Thornbush Bridge':'荆棘桥','Aire Riverbank':'艾尔河岸',
   "Heaven's Scar Breach":'天痕缺口','Entwined Branches Waterfall':'盘枝瀑布','Belladonna Harbour':'颠茄港','Illusionary Harbour':'幻影港',
   'Roadside Camp':'路旁营地','Forest of Life':'生命森林',
+  'Silver Heron Ridge':'银鹭岭','Deep Winter Hills':'凛冬丘陵','Snowy Hillside':'雪岭','Elven Heartwood':'精灵心木',
+  'Hazy Marches':'迷雾沼泽','Lost Lands':'失落之地','Desert Ruins':'沙漠遗迹','Forbidden Zone':'禁区',
+  'Wyrmrest Temple':'龙眠圣殿','Sleeping Forest':'沉睡森林','Fire and Grass':'烈火草原','Troubled Uplands':'动荡高地',
+  'Sand Sores':'沙之疮痕','Sandy Wastes':'沙之荒原','The Mysterious Land':'神秘之地',
+  'The Land of Ice and Snow':'冰雪之地','Sky Islands':'空中群岛','Chaos Nest':'混沌巢穴','Whispering Forest':'低语森林',
+  'Flame Dragon Island':'炎龙岛','Haunted Mine':'幽灵矿洞','Nautical Silk Road':'海上丝路','Ghost Ship':'幽灵船',
+  'Crystals Town':'水晶镇','Tomb of the Dragon':'龙墓','Moonlit Market':'月光集市','Mysterious Waters':'神秘海域',
 };
+
+// The formal client still receives source-language quest and story strings from
+// the authoritative snapshot. Keep these presentation-only: IDs, counters and
+// server-side source text stay unchanged.
+const CORE_TEXT_ZH: Record<string, string> = {
+  'Barbarians':'蛮族来袭','Duelist\'s Challenge':'决斗者挑战','Honourable Combat':'荣耀之战',
+  'Desire drives the development and destruction of civilization. After the holy battle between the Elves and the Humans, all races retreated into a period of contemplation and reflection; recuperating from fresh wounds and broken spirits. But time is a poison which throws a deep fog over the pain of history. As the memory of collective agony fades, desires grow and new temptations bear wicked fruit. New conflicts arise between the races. Minor skirmishes erupt across the surface of Emrys and the tides of battle ebb and flow. The pain that wracked the body of history still resides in memory, but the fog deepens into shadow and new tyrants seek old gains. The Elder among the races seek to counsel the young and foolhardy, but Emrys twists in remembered agony. The situation slides irrevocably towards chaos. Hideous beasts have begun a steady migration into civilised lands. You, as the lord of Silver Heron Ridge, have already clashed fist to claw with the monsters and you know, that this is only the beginning…':
+    '欲望推动文明兴盛，也将文明拖向毁灭。精灵与人类的圣战结束后，各族退回领地，在反思中疗愈创伤。然而时间渐渐掩去历史的痛楚，欲望与诱惑再次滋长，新的冲突在艾姆里斯各地爆发。长者试图劝阻年轻而鲁莽的人们，局势却仍一步步滑向混乱。凶兽正不断迁入文明疆域。身为银鹭岭领主，你已与怪物正面交锋，也明白这一切才刚刚开始……',
+  '1-1 Cathedral of the Goddess\nCathedral bells toll, ringing out a warning and a call to arms! The solemn cathedral is under attack from Goblin Bandits, the Guardsmen can barely hold them back. You must help them, and quickly!':
+    '1—1 女神大教堂\n教堂钟声急促响起，既是警报，也是集结号。哥布林强盗正在袭击这座庄严的教堂，卫兵已快要抵挡不住。请尽快前去支援！',
+  "1-2 Eastern Church Grounds\nSilver Heron Ridge hasn't been attacked by Goblins in many years, these raids are highly unusual. There must be some mysterious force at work...":
+    '1—2 东部教会领地\n银鹭岭多年未受哥布林袭扰，这次接连发生的袭击极不寻常。背后一定有一股神秘力量在推动……',
+  "1-3 Border farm\nThe farm is a complete mess, weeds infest the fields, the barn and grain store have been burnt down! If these vile ogres aren't stopped, the entire nation will face a famine next year.":
+    '1—3 边境农场\n农场已一片狼藉：田地杂草丛生，谷仓和粮库也被焚毁。若不阻止这些凶恶的食人魔，整个国家明年都将面临饥荒。',
+  "1-4 Town of Folksvangur\nGoblins and Ogres are attacking the Town of Folksvangur! The Mayor is rallying his tired and beaten troops, he could use a hand. As the leader of Silver Heron Ridge, it's your responsibility to protect them!":
+    '1—4 福克斯万格镇\n哥布林与食人魔正在进攻福克斯万格镇。镇长正召集疲惫不堪的守军，急需支援。身为银鹭岭领主，保护这里的居民是你的责任。',
+  '1-5 Town Hall\nThe Goblin Captain has led the greenskins in a last-ditch attempt to take the town hall. Defeat them and the region will once again be secure!':
+    '1—5 市政厅\n哥布林头目带领部众孤注一掷，企图夺取市政厅。击败他们，这片区域就能重归安定。',
+};
+
+const NUMBER_ZH: Record<string, string> = {
+  one:'一', two:'两', three:'三', four:'四', five:'五', six:'六', seven:'七', eight:'八', nine:'九', ten:'十',
+};
+
+function plainText(raw: string): string {
+  return String(raw ?? '').replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\r/g, '').replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{2,}/g, '\n').trim();
+}
+
+/** Localize the quest objectives and opening story used by the main player path. */
+export function presentationText(raw: string): string {
+  const original = plainText(raw);
+  const text = original.normalize('NFKC');
+  if (!text) return '';
+  if (CORE_TEXT_ZH[text]) return CORE_TEXT_ZH[text];
+  if (PRESENTATION_ZH[text]) return PRESENTATION_ZH[text];
+
+  let match = text.match(/^Conquer Area (\d+)-(\d+):\s*(.+?)(\s+\d+\/\d+)?$/i);
+  if (match) return `通关第${match[1]}章第${match[2]}关：${presentationName(match[3])}${match[4] ?? ''}`;
+  match = text.match(/^Conquer Region (\d+):\s*(.+?)(\s+\d+\/\d+)?$/i);
+  if (match) return `通关第${match[1]}区：${presentationName(match[2])}${match[3] ?? ''}`;
+  match = text.match(/^(?:Playing through|Clear) Chapter (\d+)[,:]\s*(.+?)(\s+\d+\/\d+)?$/i);
+  if (match) return `通关第${match[1]}章：${presentationName(match[2])}${match[3] ?? ''}`;
+  match = text.match(/^Complete \(win or lose\) (\w+) (.+?) Arena Battles(\s+\d+\/\d+)?$/i);
+  if (match) return `完成${NUMBER_ZH[match[1].toLowerCase()] ?? match[1]}场${match[2]}竞技场战斗（胜负均可）${match[3] ?? ''}`;
+  match = text.match(/^Complete \(win or lose\) (\w+) Arena Battles(\s+\d+\/\d+)?$/i);
+  if (match) return `完成${NUMBER_ZH[match[1].toLowerCase()] ?? match[1]}场竞技场战斗（胜负均可）${match[2] ?? ''}`;
+  match = text.match(/^Win (\w+) Arena Battles(\s+\d+\/\d+)?$/i);
+  if (match) return `赢得${NUMBER_ZH[match[1].toLowerCase()] ?? match[1]}场竞技场战斗${match[2] ?? ''}`;
+
+  return original.replace(/远征[:：]([^；\n]+)/g, (_, name: string) => `远征：${presentationName(name)}`)
+    .replace(/\b(\d+)\s+silver\b/gi, '$1 银币').replace(/\b(\d+)\s+gold\b/gi, '$1 金币')
+    .replace(/\b(\d+)\s+crystal\b/gi, '$1 晶石');
+}
+
+/** Convert browser/runtime errors that can reach the player into actionable Chinese. */
+export function presentationError(raw: string): string {
+  const text = String(raw ?? '').replace(/^Error:\s*/i, '').trim();
+  if (/^Illegal card play$/i.test(text)) return '该位置不能施放这张卡，请检查准备值、合法落点和目标。';
+  if (/Actor is not the active player/i.test(text)) return '当前不是你的行动回合，请等待对方行动结束。';
+  if (/Battle is already settled/i.test(text)) return '战斗已结束，请确认结算。';
+  if (/Actor cannot act/i.test(text)) return '该角色当前无法行动，请刷新战斗状态。';
+  if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(text)) return '网络连接中断，请稍后重试。';
+  if (/Unauthorized|Invalid token|token expired/i.test(text)) return '登录状态已失效，请重新登录。';
+  if (/AbortError|timed?\s*out/i.test(text)) return '请求超时，结果尚未确认，请重试确认。';
+  if (/Unable to load original UI skin|Original UI .* missing|Unknown original (?:skin|component)/i.test(text)) return '界面资源加载失败，请重启游戏后重试。';
+  return text;
+}
 
 export function presentationName(raw: string): string {
   const normalized = String(raw ?? '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim();

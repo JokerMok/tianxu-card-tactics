@@ -103,7 +103,7 @@ const isImpactEvent = (event: BattleEvent): boolean => event.type === 'damage' |
 const ATTACK_FOLLOWUPS = new Set(['damage', 'heal', 'effect', 'status', 'skill']);
 const PRESENTATION_EVENTS = new Set([
   'move', 'attack', 'damage', 'heal', 'summon', 'death', 'return-hand',
-  'play', 'effect', 'status', 'skill', 'settled',
+  'play', 'effect', 'status', 'skill', 'settled', 'terrain-add', 'terrain-update', 'terrain-remove',
 ]);
 
 /**
@@ -191,6 +191,7 @@ export class BattlePresentation {
     if (step.kind === 'summon') {
       for (const event of step.events) if (event.type === 'summon') this.applyEvent(this.visible!, event);
     }
+    for (const event of step.events) if (event.type === 'terrain-add' || event.type === 'terrain-update') this.applyEvent(this.visible!, event);
     this.pushTrace('step-start', this.authoritative?.revision ?? this.visible?.revision ?? 0, step.firstSeq, step.token);
     return clone(step);
   }
@@ -321,6 +322,14 @@ export class BattlePresentation {
   }
 
   private applyEvent(state: BattleState, event: BattleEvent): void {
+    if (event.type === 'terrain-add' || event.type === 'terrain-update' || event.type === 'terrain-remove') {
+      const id = event.terrainId ?? event.terrain?.id;
+      if (!id) return;
+      const terrains = (state.terrains ?? []).filter(terrain => terrain.id !== id);
+      if (event.type !== 'terrain-remove' && event.terrain) terrains.push(clone(event.terrain));
+      state.terrains = terrains;
+      return;
+    }
     if (event.type === 'summon' && event.target) {
       const view = event.targetView ?? this.authoritative?.units.find(unit => unit.id === event.target);
       if (view) replaceUnit(state, view);
