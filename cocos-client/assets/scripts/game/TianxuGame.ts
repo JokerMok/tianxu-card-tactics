@@ -96,7 +96,7 @@ export class TianxuGame extends Component {
     }
   }
   private async api<T>(route: string, payload?: unknown, characterId = this.characterId): Promise<T> {
-    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);try{
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),route==='/api/catalog'?60000:15000);try{
     const response = await fetch(this.apiBase + route, { signal:controller.signal,method: payload === undefined ? 'GET' : 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}`, 'X-Character-Id': characterId },
       ...(payload === undefined ? {} : { body: JSON.stringify(payload) }) });
@@ -232,7 +232,7 @@ export class TianxuGame extends Component {
       await login.setController('debug', '0'); await login.setController('loginState', '0');
       if (generation !== this.renderGeneration) return;
       login.setVisible('txt_clearSite', false);
-      const username = this.sourceInput(login, 'textUserName', '本机账号');
+      const username = this.sourceInput(login, 'textUserName', '游戏账号');
       const password = this.sourceInput(login, 'textPassword', '密码（至少6位）', true);
       const auth = async (register: boolean) => {
         if (this.busy) return; this.busy = true;
@@ -241,8 +241,8 @@ export class TianxuGame extends Component {
         catch (error) { this.toast(String(error)); } finally { this.busy = false; }
       };
       login.on('logindebugBtn', Button.EventType.CLICK, () => { void auth(false); });
-      this.ui.button(this.root, 'RegisterLocal', '注册本机账号', 0, -260, 150, 27, () => { void auth(true); });
-      this.ui.label(this.root, 'LocalServer', '本机服务器 · 账号与角色保存在此电脑', 0, -294, 600, 20, 12, Theme.dim);
+      this.ui.button(this.root, 'RegisterLocal', '注册游戏账号', 0, -260, 150, 27, () => { void auth(true); });
+      this.ui.label(this.root, 'LocalServer', '账号与角色保存在当前游戏服务器', 0, -294, 600, 20, 12, Theme.dim);
       this.noticeLabel?.node.setSiblingIndex(this.root.children.length - 1);
     }).catch(error => this.toast(String(error)));
   }
