@@ -1,3 +1,5 @@
+> 历史邀请内测记录。当前注册与 GM 规格以 [gm.md](gm.md) 及 public-gm 发布记录为准；不要将下文旧邀请码要求用于当前部署。
+
 # 腾讯云邀请内测运维
 
 目标仅为受邀好友内测，部署结果与真实验收记录见本目录 `release-20261023.json` 和 `validation-20261023.md`。不自动合并或推送。原版恢复、候选中文及本版本地形规则的边界沿用 `documentation/stabilization/README.md`。

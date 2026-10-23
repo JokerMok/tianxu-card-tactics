@@ -15,9 +15,8 @@ services:
     environment:
       NODE_ENV: production
       NODE_OPTIONS: ${TIANXU_NODE_OPTIONS:---max-old-space-size=512}
-      TIANXU_BETA_CONFIG: ${TIANXU_BETA_CONFIG:-}
-      TIANXU_BETA_REQUIRED: ${TIANXU_BETA_REQUIRED:-0}
       TIANXU_PUBLIC_ORIGIN: ${TIANXU_PUBLIC_ORIGIN:-}
+      TIANXU_TRUSTED_PROXY: ${TIANXU_TRUSTED_PROXY:-}
       TIANXU_CONTENT_DIR: ${TIANXU_CONTENT_DIR:-/srv/tianxu/cocos-client/assets/resources/recovered}
       TIANXU_WEB_DIR: ${TIANXU_WEB_DIR:-/srv/tianxu/.local/web}
       TIANXU_UI_DIR: ${TIANXU_UI_DIR:-/srv/tianxu/cocos-client/assets/resources/ui-revision-a}

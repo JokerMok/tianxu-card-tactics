@@ -8,5 +8,7 @@ tianxu.shizibandu.icu {
         Referrer-Policy same-origin
         X-Frame-Options SAMEORIGIN
     }
-    reverse_proxy 127.0.0.1:18875
+    reverse_proxy 127.0.0.1:18875 {
+        header_up X-Real-IP {http.request.remote.host}
+    }
 }

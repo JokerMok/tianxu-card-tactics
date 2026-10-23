@@ -3,6 +3,7 @@ import { createHash, randomBytes, randomUUID, scryptSync, timingSafeEqual } from
 import { mkdirSync, existsSync, chmodSync, readFileSync, writeFileSync, renameSync, unlinkSync, copyFileSync, constants, rmSync, linkSync, openSync, closeSync, fsyncSync } from 'node:fs';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import path from 'node:path';
+import {migrateGm} from './gm-schema.mjs';
 
 export const freshWorld = () => ({ version: 1, revision: 0, characters: {}, rooms: {}, battles: {},
   guilds: {}, friendRequests: {}, friendships: [], chat: [], mail: {}, auctions: {}, trades: {}, seasons: {} });
@@ -59,6 +60,7 @@ export class GameStore {
       CREATE INDEX IF NOT EXISTS operation_audit_created ON operation_audit(created);
       INSERT OR IGNORE INTO request_tombstones SELECT principal,request_id,fingerprint,created FROM requests;`);
     try {
+      migrateGm(this.db);
       if(schema.version===1){
         const world=this.read();world.version=2;
         for(const a of Object.values(world.characters))a.commandRevision??=0;

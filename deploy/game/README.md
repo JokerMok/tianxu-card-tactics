@@ -44,6 +44,6 @@ curl --fail http://127.0.0.1:7400/api/health
 docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml ps
 ```
 
-更换运行包时先备份数据库，再在新目录生成新包和新镜像。回滚时恢复上一个镜像与与之兼容的 SQLite 备份。不要把数据库、日志或备份复制进 `.local/game-runtime`。
+更换运行包时先备份数据库，再在新目录生成新包和新镜像。回滚前先确认数据库兼容性；本轮 GM 为附加表迁移，切回上一版本不需要覆盖数据库。禁止用旧备份覆盖上线后玩家进度。不要把数据库、日志或备份复制进 `.local/game-runtime`。
 
-腾讯云邀请内测运行与回退见 [tencent.md](tencent.md)。生产必须设置 `TIANXU_BETA_REQUIRED=1`、私有邀请配置及 HTTPS origin；本地未配置门禁的开发行为保持不变。
+当前为无需邀请码的玩家注册版本，账号 Bearer 鉴权继续生效。GM 后台和首次管理员初始化见 [gm.md](gm.md)。生产必须设置准确的 `TIANXU_PUBLIC_ORIGIN` 与可信反代 socket 地址 `TIANXU_TRUSTED_PROXY`；Caddy 覆盖 X-Real-IP。旧 [tencent.md](tencent.md) 的邀请码要求仅保留为历史记录，已被本轮替代。

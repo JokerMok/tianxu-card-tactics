@@ -10,7 +10,11 @@
     "cocos-client/assets/scripts/game/RecoveredEffects.ts",
     "cocos-client/assets/scripts/game/GameContracts.ts",
     "cocos-client/assets/scripts/game/TerrainRules.ts",
-    "scripts/beta-invites.mjs",
+    "scripts/gm-admin.mjs",
+    "cocos-client/assets/scripts/game/GameText.ts",
+    "backend/gm-web/index.html",
+    "backend/gm-web/app.js",
+    "backend/gm-web/style.css",
     "deploy/game/compose.yaml"
   ],
   "backend": {

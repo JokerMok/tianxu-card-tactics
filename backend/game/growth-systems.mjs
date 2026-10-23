@@ -249,6 +249,18 @@ function reward(ctx, value, reason) {
   if (value?.card) { addAsset(ctx, 'cards', cardKey(value.card), value.count ?? 1, reason); out.cardId = cardKey(value.card); out.count = value.count ?? 1; }
   return out;
 }
+
+// The GM boundary validates the supported catalog, ownership and limits first.
+// Reuse normal asset/binding/economic-log primitives without task/purchase hooks
+// or activity updates, and without modifying any battle snapshot.
+export function grantManagedResource(ctx, type, resourceId, quantity, operationId) {
+  const actor = ctx.actor;
+  actor.currencies ||= {silver:0,gold:0,crystal:0};
+  actor.cards ||= {}; actor.inventory ||= {}; actor.boundItems ||= []; actor.economicLog ||= [];
+  const reason = 'gm-grant:' + operationId;
+  if (type === 'currency') grantCurrency(ctx, resourceId, quantity, reason);
+  else addAsset(ctx, type === 'card' ? 'cards' : 'inventory', resourceId, quantity, reason);
+}
 function countGrowth(ctx, counter = 'growthActions', amount = 1) {
   const g = ctx.actor.growth;
   g.counters.growthActions += amount;

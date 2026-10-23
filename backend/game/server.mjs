@@ -4,10 +4,12 @@ import { createReadStream, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {runtimeLogger} from './runtime-log.mjs';
-import {createBetaAccess} from './beta-access.mjs';
 import { GameStore } from './store.mjs';
 import { ServerContent } from './content.mjs';
 import { GameService } from './service.mjs';
+import {GmService,exactKeys} from './gm-service.mjs';
+import {createGmHttp} from './gm-http.mjs';
+import {clientAddress,rateLimiter} from './request-security.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'application/javascript', '.json': 'application/json',
@@ -22,20 +24,32 @@ async function body(request) {
   if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error('请求格式错误');
   return result;
 }
+function rejectManagementFields(data) {
+  const pending=[data];let nodes=0;
+  while(pending.length){const value=pending.pop();if(!value||typeof value!=='object')continue;
+    if(++nodes>10000)throw new Error('请求结构过于复杂');
+    for(const [key,item]of Object.entries(value)){
+      if(['role','isAdmin','permissions','accountRole','super_admin'].includes(key))throw new Error('玩家接口不接受管理权限字段');
+      if(item&&typeof item==='object')pending.push(item);
+    }
+  }
+}
 export async function createGameServer(options = {}) {
   const folder = options.contentFolder ?? process.env.TIANXU_CONTENT_DIR ?? path.join(ROOT, 'cocos-client/assets/resources/recovered');
   const web = options.webFolder ?? process.env.TIANXU_WEB_DIR ?? path.join(ROOT, '.local/web');
   const uiFolder=options.uiFolder??process.env.TIANXU_UI_DIR??path.join(folder,'../ui-revision-a');
   const localizationFolder=options.localizationFolder??process.env.TIANXU_LOCALIZATION_DIR??path.join(folder,'../localization');
   const log=runtimeLogger(options.logDir??process.env.TIANXU_LOG_DIR);
-  const betaAccess=createBetaAccess({configPath:options.betaConfig??process.env.TIANXU_BETA_CONFIG,
-    required:options.betaRequired??process.env.TIANXU_BETA_REQUIRED==='1',publicOrigin:options.publicOrigin??process.env.TIANXU_PUBLIC_ORIGIN});
+  const publicOrigin=options.publicOrigin??process.env.TIANXU_PUBLIC_ORIGIN;
+  const trustedProxies=options.trustedProxies??String(process.env.TIANXU_TRUSTED_PROXY??'').split(',').map(x=>x.trim()).filter(Boolean);
   if(!existsSync(path.join(folder,'catalog.json')))throw new Error('缺少运行资源catalog.json，请先按资源清单打包/导入，不需要逆向目录');
   const content = new ServerContent(folder,{localizationFolder});
   const store = new GameStore(options.database ?? process.env.TIANXU_DATABASE ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
   const service = new GameService(store, content, { clock: options.clock });
+  const gm=new GmService(store,content),limit=rateLimiter(),address=req=>clientAddress(req,trustedProxies);
+  const gmHttp=createGmHttp({store,gm,publicOrigin,body,limit,address});
+  const gmWeb=options.gmWebFolder??path.join(ROOT,'backend/gm-web');
   const allowTestActions = options.allowTestActions === true && process.env.NODE_ENV !== 'production';
-  const rates = new Map();
   const server = http.createServer(async (request, response) => {
     const traceId=randomUUID();response.setHeader('X-Trace-Id',traceId);
     response.setHeader('X-Content-Type-Options', 'nosniff');
@@ -45,18 +59,21 @@ export async function createGameServer(options = {}) {
     };
     try {
       const url = new URL(request.url, 'http://localhost');
-      if(await betaAccess(request,response,url))return;
+      if(url.pathname==='/beta'||url.pathname.startsWith('/beta/')){
+        response.writeHead(303,{'Location':'/','Cache-Control':'no-store','Set-Cookie':'__Host-tianxu_beta=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'});response.end();return;
+      }
+      if(url.pathname==='/'&&String(request.headers.cookie??'').includes('__Host-tianxu_beta='))response.setHeader('Set-Cookie','__Host-tianxu_beta=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0');
+      if(await gmHttp(request,response,url,json))return;
       if (request.method === 'GET' && url.pathname === '/api/health') return json(200, { ready: true, game: '天墟：万象战阵', version: 2, schema:2, sourceManifest: content.catalog.sourceManifest });
       if (request.method === 'GET' && url.pathname === '/api/bootstrap') {
         const backdrop = content.catalog.assets[content.catalog.ui?.backgroundAssetId]?.path;
         return json(200, { title: '天墟：万象战阵', backdrop: backdrop ? '/recovered/' + backdrop : null });
       }
       if (request.method === 'POST' && ['/api/register', '/api/login'].includes(url.pathname)) {
-        const origin = request.socket.remoteAddress; const now = Date.now();
-        const rate = (rates.get(origin) ?? []).filter(at => now - at < 60000);
-        if (rate.length >= 20) return json(429, { error: '登录操作过快，请稍后重试' });
-        rate.push(now); rates.set(origin, rate);
+        limit('player-auth:'+address(request),20);
         const data = await body(request);
+        exactKeys(data,['username','password']);
+        limit('player-auth-account:'+String(data.username).toLowerCase(),10);
         return json(200, url.pathname === '/api/register' ? store.register(data.username, data.password) : store.login(data.username, data.password));
       }
       if (url.pathname.startsWith('/api/')) {
@@ -75,6 +92,7 @@ export async function createGameServer(options = {}) {
         if (request.method === 'POST' && url.pathname === '/api/logout') { store.logout(token); return json(200, { loggedOut: true }); }
         if (request.method === 'POST' && url.pathname === '/api/act') {
           const data = await body(request);
+          rejectManagementFields(data);
           if (typeof data.action !== 'string') throw new Error('缺少操作');
           if (!allowTestActions && data.action.startsWith('test.')) throw Object.assign(new Error('当前服务器未开放测试操作'), { status: 403, code: 'TEST_ACTION_DISABLED' });
           const result=service.act(accountId,characterId,data.requestId,data.action,data.payload,{expectedActorRevision:data.expectedActorRevision});
@@ -84,15 +102,19 @@ export async function createGameServer(options = {}) {
         return json(404, { error: '接口不存在' });
       }
       if (request.method !== 'GET' && request.method !== 'HEAD') return json(405, { error: '不支持此请求' });
+      if(url.pathname==='/gm'){response.writeHead(308,{'Location':'/gm/','Cache-Control':'no-store'});response.end();return;}
+      const isGm=url.pathname.startsWith('/gm/');
       const isResource = url.pathname.startsWith('/recovered/');
       const isUi=url.pathname.startsWith('/ui-assets/');
-      const base = isUi ? uiFolder : isResource ? folder : web;
-      const relative = decodeURIComponent(isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
+      const base = isGm?gmWeb:isUi ? uiFolder : isResource ? folder : web;
+      const relative = decodeURIComponent(isGm?url.pathname.slice('/gm/'.length):isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
+      if(isGm&&!['index.html','app.js','style.css'].includes(relative))return json(404,{error:'资源不存在'});
+      if(isGm){response.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");response.setHeader('X-Frame-Options','DENY');}
       const filename = path.resolve(base, relative);
       if (!filename.startsWith(path.resolve(base) + path.sep) || !existsSync(filename) || !statSync(filename).isFile()) return json(404, { error: '资源不存在' });
       const stat = statSync(filename);
       response.writeHead(200, { 'Content-Type': MIME[path.extname(filename).toLowerCase()] ?? 'application/octet-stream',
-        'Content-Length': stat.size, 'Cache-Control': isResource && path.extname(filename) !== '.json' ? 'private, max-age=3600' : 'no-cache' });
+        'Content-Length': stat.size, 'Cache-Control': isGm?'no-store':isResource && path.extname(filename) !== '.json' ? 'private, max-age=3600' : 'no-cache' });
       if (request.method === 'HEAD') return response.end();
       createReadStream(filename).pipe(response);
     } catch (error) {
@@ -109,7 +131,7 @@ export async function createGameServer(options = {}) {
   }, 1000);
   timer?.unref();
   let stopping;const close=()=>stopping??=(async()=>{if(timer)clearInterval(timer);await new Promise(resolve=>{const deadline=setTimeout(()=>server.closeAllConnections(),10000);deadline.unref();server.close(()=>{clearTimeout(deadline);resolve();});server.closeIdleConnections?.();});store.close();log('info','stopped');})();
-  return { server, store, content, service, close, log };
+  return { server, store, content, service, gm, close, log };
 }
 export async function startConfiguredServer(){
  const port=Number(process.env.TIANXU_PORT??7400),host=process.env.TIANXU_HOST??'127.0.0.1';

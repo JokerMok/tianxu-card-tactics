@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'">
+    <title>天墟 GM 后台</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section id="loginView" class="auth-card" hidden>
+        <div class="brand-mark">天墟</div>
+        <h1>GM 后台</h1>
+        <p class="muted">使用已由服务器授权的管理员账号登录。</p>
+        <form id="loginForm" class="stack">
+          <label>账号<input id="loginUsername" name="username" autocomplete="username" required></label>
+          <label>密码<input id="loginPassword" name="password" type="password" autocomplete="current-password" required></label>
+          <button class="primary" type="submit">登录</button>
+        </form>
+        <p id="loginMessage" class="message" role="status"></p>
+      </section>
+
+      <section id="deniedView" class="auth-card" hidden>
+        <div class="brand-mark">天墟</div>
+        <h1>当前账号无管理权限</h1>
+        <p>初始管理员只能由服务器终端指定，网页不会自动提升账号权限。</p>
+        <div class="id-box"><span>账号 ID</span><strong id="deniedAccountId">未提供</strong></div>
+        <button id="deniedBack" type="button">返回登录</button>
+      </section>
+
+      <section id="appView" hidden>
+        <header class="topbar">
+          <div><span class="eyebrow">天墟运营工具</span><h1>GM 后台</h1></div>
+          <div class="account-area"><span id="accountSummary"></span><button id="logoutButton" type="button">退出</button></div>
+        </header>
+
+        <nav id="tabNav" class="tabs" aria-label="后台功能"></nav>
+        <section id="operationPanel" class="operation-panel" aria-live="polite" hidden></section>
+
+        <section id="grantTab" class="tab-panel" hidden>
+          <div class="section-heading"><div><span class="step">1</span><h2>查找玩家</h2></div><p>先明确账号，再选择该账号下的角色。</p></div>
+          <form id="playerSearchForm" class="search-row">
+            <label class="grow"><span>账号名或账号 ID</span><input id="playerQuery" placeholder="输入关键词，留空查看全部"></label>
+            <button type="submit">查询</button>
+          </form>
+          <p id="playerMessage" class="message" role="status"></p>
+          <div class="table-wrap">
+            <table><thead><tr><th>账号</th><th>角色</th><th>操作</th></tr></thead><tbody id="playerRows"></tbody></table>
+          </div>
+          <div id="playerPager" class="pager"></div>
+
+          <section id="grantEditor" hidden>
+            <div class="section-heading"><div><span class="step">2</span><h2>选择资源</h2></div><p id="selectedTarget"></p></div>
+            <div id="characterSnapshot" class="snapshot"></div>
+            <div class="resource-toolbar">
+              <label><span>资源类别</span><select id="resourceType"></select></label>
+              <form id="resourceSearchForm" class="search-row grow"><label class="grow"><span>资源名称或 ID</span><input id="resourceQuery" placeholder="输入关键词，留空查看全部"></label><button type="submit">查询</button></form>
+            </div>
+            <p id="resourceMessage" class="message" role="status"></p>
+            <div id="resourceList" class="resource-list"></div>
+            <div id="resourcePager" class="pager"></div>
+
+            <div class="section-heading compact"><div><span class="step">3</span><h2>填写增加数量</h2></div><p>只增加资源，不设置或覆盖余额。</p></div>
+            <form id="grantForm" class="form-grid">
+              <label><span>已选资源</span><input id="selectedResourceLabel" readonly required></label>
+              <label><span>增加数量</span><input id="grantQuantity" type="number" min="1" step="1" required></label>
+              <label class="wide"><span>操作原因</span><textarea id="grantReason" rows="3" maxlength="300" placeholder="说明本次增加资源的业务原因" required></textarea></label>
+              <div class="wide form-actions"><span id="grantLimitHint" class="muted"></span><button class="primary" type="submit">核对并提交</button></div>
+            </form>
+          </section>
+        </section>
+
+        <section id="accessTab" class="tab-panel" hidden>
+          <div class="section-heading"><div><h2>管理员权限</h2></div><p>仅超级管理员可见；修改前先读取目标账号现状。</p></div>
+          <form id="accessLookupForm" class="search-row">
+            <label class="grow"><span>目标账号 ID</span><input id="accessAccountId" required></label>
+            <button type="submit">读取权限</button>
+          </form>
+          <p id="accessMessage" class="message" role="status"></p>
+          <form id="accessForm" class="access-form" hidden>
+            <div id="accessCurrent" class="snapshot"></div>
+            <label><span>角色</span><select id="accessRole"><option value="player">普通玩家</option><option value="gm">GM</option><option value="super_admin">超级管理员</option></select></label>
+            <fieldset><legend>功能权限</legend><div id="accessPermissions" class="check-grid"></div></fieldset>
+            <fieldset><legend>单次操作上限</legend><div id="accessLimits" class="limit-grid"></div></fieldset>
+            <label><span>修改原因</span><textarea id="accessReason" rows="3" maxlength="300" required></textarea></label>
+            <button class="primary" type="submit">核对并提交</button>
+          </form>
+        </section>
+
+        <section id="logsTab" class="tab-panel" hidden>
+          <div class="section-heading"><div><h2>操作日志</h2></div><p>按操作人、目标、资源和时间筛选。</p></div>
+          <form id="logFilterForm" class="filter-grid">
+            <label><span>操作人账号 ID</span><input name="operatorAccountId"></label>
+            <label><span>目标账号 ID</span><input name="targetAccountId"></label>
+            <label><span>目标角色 ID</span><input name="targetCharacterId"></label>
+            <label><span>资源类型</span><select name="type"><option value="">全部</option><option value="currency">货币</option><option value="card">卡牌</option><option value="item">物品</option></select></label>
+            <label><span>资源 ID</span><input name="resourceId"></label>
+            <label><span>结果</span><select name="result"><option value="">全部</option><option value="success">成功</option><option value="rejected">拒绝</option></select></label>
+            <label><span>开始时间</span><input name="from" type="datetime-local"></label>
+            <label><span>结束时间</span><input name="to" type="datetime-local"></label>
+            <div class="filter-actions"><button class="primary" type="submit">筛选</button><button id="resetLogs" type="button">重置</button></div>
+          </form>
+          <p id="logMessage" class="message" role="status"></p>
+          <div class="table-wrap log-table"><table><thead><tr><th>时间 / 操作号</th><th>操作人 → 目标</th><th>动作 / 资源</th><th>变化</th><th>原因 / 结果</th></tr></thead><tbody id="logRows"></tbody></table></div>
+          <div id="logPager" class="pager"></div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="confirmDialog">
+      <form method="dialog" class="dialog-card">
+        <h2 id="confirmTitle">确认操作</h2>
+        <div id="confirmDetails" class="confirm-details"></div>
+        <p class="warning">提交后将写入审计日志。请再次核对目标与数量。</p>
+        <div class="dialog-actions"><button value="cancel">返回修改</button><button id="confirmSubmit" class="primary danger" value="confirm">确认提交</button></div>
+      </form>
+    </dialog>
+  </body>
+</html>
