@@ -1,0 +1,33 @@
+{
+  "version": "slim-pve-local-20261023",
+  "headBeforeChanges": "b60fe6c6cf484df7c0e172365d0343c3d6aca4d5",
+  "sourceFiles": {
+    "assets/scripts/a0/BattleA0Bootstrap.ts": "0da37bfd0c46a1952ec6bb2ee2106ed28313b136ef1fb46a56cbb16ca4d965ff",
+    "assets/scripts/game/ActionOutbox.ts": "980a2080a42456d0052faf290fb5b9e2c7b4eb6ffb7448666e3226e6a439ee79",
+    "assets/scripts/game/AdvancedGrowthWindows.ts": "3549a8e76398ab794d9db40b199fbb6edc980f6204585e5ff0d720e797c3075b",
+    "assets/scripts/game/BattlePresentation.ts": "0caab0e38eb0a8adb0e352b92c80f1321dc2a61f321e8efa8ef02c2c1cc0f0be",
+    "assets/scripts/game/BattleSceneView.ts": "22c42da1df10ba01e1d050747565969d7d134f338e0a5539e9bb5af347a09603",
+    "assets/scripts/game/CardDeckWindow.ts": "55ac2b4ccd51524cbc34b83ccef298893268ac6e64f42f02330bca805448707f",
+    "assets/scripts/game/CardManagementUi.ts": "36861e81e0812070218c0be7d87b4c0ead2c8e8c1765b415f844a12b22f42b42",
+    "assets/scripts/game/CardScrollRegion.ts": "21fec24c1821b671a1365cb071d5d22949670b48080a0c36ff3b91e142ac08cf",
+    "assets/scripts/game/CocosUi.ts": "eea40dd54ffc51ddeea236b6373f7d81c8053a592c1bae3537f53c03299bc483",
+    "assets/scripts/game/DeckDraft.ts": "b7c71102afc30ec22858b19326ac848ada3d394572b6e072dcdf3283c00d25b7",
+    "assets/scripts/game/GameAudio.ts": "fbdc36bd584318ea2301715ff4a80ea7c6df386f45a6dccdf93cb0b8770d4eb2",
+    "assets/scripts/game/GameContracts.ts": "ef21e364d9ca1680c1038dd7b54df93532a2bf075284cd79adaa85f22d616352",
+    "assets/scripts/game/GameText.ts": "be5c3e07bdd4e5d6043bfb41dca28aa389f129dd76aff7267a46b16d0cb3f80b",
+    "assets/scripts/game/GrowthWindows.ts": "23b950962fdfb4e28ee9199ea548e39c20e0c4298c8425eeb382479ed3818005",
+    "assets/scripts/game/OriginalUi.ts": "ebcc38dc5a461460b027561bf40ef1ba024e2129b3a85f58e766629b1bdccbf3",
+    "assets/scripts/game/RecoveredAnimation.ts": "b454cf701a405d2acd6761550065ebe08d7c1ecacf511f5af37a0d1c16804a81",
+    "assets/scripts/game/RecoveredContent.ts": "72efe1cc6fe8934ebc7100bf0752ec633aaa4b16b8ba14461c733939abb1d8ab",
+    "assets/scripts/game/RecoveredEffects.ts": "c50fd49eb9d7e354fd32c536fcc93a51221f315ffb2903487e07f3f6aafb5860",
+    "assets/scripts/game/RecoveredTimeline.ts": "8321922081c4cf5740ed7a18f2bf247325892d2ebeadf41501ea1fa3913df580",
+    "assets/scripts/game/SecondaryWindows.ts": "fa33604f993ac801dabdc4e52e10380f5c99c8df62fd56eb34e1abf4dea9298c",
+    "assets/scripts/game/StageScope.ts": "f708d210a2e80b1d2b8f23dfa8d4cb6e1af4d287e5e7707a4f770f4c22f74559",
+    "assets/scripts/game/TianxuGame.ts": "e881b47c7d66f2e289ec6a9fb5509b3d7390e53ec3ebe0be17a59f0c71daa68b",
+    "assets/scripts/game/WorldMapWindow.ts": "cfeb7fcbfd0ad3f3ccd254224576e910d3d8f5735e51c8dd67cb11e8c79382a3"
+  },
+  "bundleSha256": "2cbeb12c6d55dea87d308c0e1a60d2b72cf024adebce036920f53dd829325a4e",
+  "creator": "3.8.8",
+  "scope": "local only, isolated database",
+  "applicationCommit": "554f265a48d0ff810432a9ebc72776a4952c3984"
+}

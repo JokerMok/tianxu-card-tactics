@@ -1,0 +1,464 @@
+{
+  "start": {
+    "elapsedMs": 273804.3999998093,
+    "frames": 32832,
+    "page": "growth",
+    "nodes": 465,
+    "animations": 1,
+    "emptySamples": 5,
+    "animationSamples": 2198,
+    "rendererTreesObserved": 139,
+    "homeTreesObserved": 7,
+    "frameP50": 8.299999999988358,
+    "frameP95": 9.700000000011642,
+    "navLatency": [
+      {
+        "page": "growth",
+        "ms": 3
+      }
+    ],
+    "resources": [
+      {
+        "path": "/api/state",
+        "duration": 398.30000019073486,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 396.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.2999997138977,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 388.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 382,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 382,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 389,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 381.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.6000003814697,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 387.2999997138977,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 385.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 396,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.40000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.6000003814697,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 377.69999980926514,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 385,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 380.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.09999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 413.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 420.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 370.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.69999980926514,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      }
+    ]
+  },
+  "end": {
+    "elapsedMs": 429604.3999998093,
+    "frames": 51521,
+    "page": "growth",
+    "nodes": 465,
+    "animations": 1,
+    "emptySamples": 7,
+    "animationSamples": 20887,
+    "rendererTreesObserved": 1308,
+    "homeTreesObserved": 9,
+    "frameP50": 8.299999999988358,
+    "frameP95": 9,
+    "navLatency": [
+      {
+        "page": "growth",
+        "ms": 3
+      }
+    ],
+    "resources": [
+      {
+        "path": "/api/state",
+        "duration": 398.30000019073486,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 396.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.2999997138977,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 388.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 382,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 382,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 389,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 381.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.6000003814697,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 387.2999997138977,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 385.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 396,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.40000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 383.6000003814697,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 377.69999980926514,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 385,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 384.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 380.59999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.09999990463257,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 413.5,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 420.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 370.90000009536743,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      },
+      {
+        "path": "/api/state",
+        "duration": 386.69999980926514,
+        "transferSize": 1167219,
+        "encoded": 1166919,
+        "decoded": 1166919
+      }
+    ]
+  }
+}

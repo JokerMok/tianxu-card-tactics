@@ -1,0 +1,81 @@
+{
+  "source": "real Cocos screenshots through cua; file save timestamps, not video frame timing",
+  "sequences": {
+    "before-animation": [
+      {
+        "file": "before-animation-00.png",
+        "savedAt": "2026-10-23T14:00:48.537114+00:00"
+      },
+      {
+        "file": "before-animation-01.png",
+        "savedAt": "2026-10-23T14:00:48.569180+00:00"
+      },
+      {
+        "file": "before-animation-02.png",
+        "savedAt": "2026-10-23T14:00:48.638301+00:00"
+      },
+      {
+        "file": "before-animation-03.png",
+        "savedAt": "2026-10-23T14:00:48.731186+00:00"
+      },
+      {
+        "file": "before-animation-04.png",
+        "savedAt": "2026-10-23T14:00:48.783597+00:00"
+      },
+      {
+        "file": "before-animation-05.png",
+        "savedAt": "2026-10-23T14:00:48.823437+00:00"
+      }
+    ],
+    "after-animation": [
+      {
+        "file": "after-animation-00.png",
+        "savedAt": "2026-10-23T14:28:56.419079+00:00"
+      },
+      {
+        "file": "after-animation-01.png",
+        "savedAt": "2026-10-23T14:28:56.527739+00:00"
+      },
+      {
+        "file": "after-animation-02.png",
+        "savedAt": "2026-10-23T14:28:56.628965+00:00"
+      },
+      {
+        "file": "after-animation-03.png",
+        "savedAt": "2026-10-23T14:28:56.669117+00:00"
+      },
+      {
+        "file": "after-animation-04.png",
+        "savedAt": "2026-10-23T14:28:56.696458+00:00"
+      },
+      {
+        "file": "after-animation-05.png",
+        "savedAt": "2026-10-23T14:28:56.730843+00:00"
+      },
+      {
+        "file": "after-animation-06.png",
+        "savedAt": "2026-10-23T14:28:56.833908+00:00"
+      },
+      {
+        "file": "after-animation-07.png",
+        "savedAt": "2026-10-23T14:28:56.920930+00:00"
+      },
+      {
+        "file": "after-animation-08.png",
+        "savedAt": "2026-10-23T14:28:57.035858+00:00"
+      },
+      {
+        "file": "after-animation-09.png",
+        "savedAt": "2026-10-23T14:28:57.118877+00:00"
+      },
+      {
+        "file": "after-animation-10.png",
+        "savedAt": "2026-10-23T14:28:57.171213+00:00"
+      },
+      {
+        "file": "after-animation-11.png",
+        "savedAt": "2026-10-23T14:28:57.237762+00:00"
+      }
+    ]
+  }
+}
