@@ -4,6 +4,7 @@ import { CocosUi, Theme } from './CocosUi.ts';
 import type { OriginalUi } from './OriginalUi.ts';
 import type { RecoveredCatalog } from './RecoveredContent.ts';
 import { RecoveredAnimation } from './RecoveredAnimation.ts';
+import { stageActionReason } from './StageScope.ts';
 
 type Row = Record<string, unknown>;
 interface Field { key: string; label: string; type?: string; value?: unknown; min?: number; max?: number; options?: {label: string; value: string}[] }
@@ -18,7 +19,7 @@ interface SecondaryCallbacks {
 }
 interface SecondaryState {
   actor: { id?: string; name?: string; level?: number; profession?: number; gender?: number; sex?: number; guildId?: string; cards?: Record<string, number>; deck?: string[];
-    inventory?: Record<string, number>; settings?: Record<string, boolean>; currencies?: Record<string, number>; tutorialStep?: number };
+    inventory?: Record<string, number>; settings?: Record<string, boolean>; currencies?: Record<string, number>; tutorialStep?: number; tutorialReady?: boolean };
   tasks?: Array<{ id: string; name: string; detail: string; ready: boolean; claimed: boolean; reward: number }>;
   social: { people: Row[]; friends: Row[]; friendRequests: Row[]; chat: Row[]; mail: Row[]; guilds: Row[]; trades: Row[]; auctions: Row[] };
   rooms?: Row[];
@@ -121,20 +122,11 @@ export class SecondaryWindows {
     const right = this.ui.node(wnd, 'RightMail', 324, 369, 171, -2);
     this.safeSkin(left, 'MailListBackground', 'yjliebiao_2', 324, 344, 0, 1);
     this.ui.label(left, 'MailListTitle', '全部邮件', 0, 163, 290, 26, 17, Theme.gold);
-    this.ui.button(right, 'Mail:Compose', this.composingMail ? '返回邮件' : '写信', 116, 163, 78, 27, () => {
-      this.composingMail = !this.composingMail; this.redraw();
-    });
-    if (this.composingMail) this.renderMailComposer(right);
-    else {
-      const selected = mail.find(item => String(item.id) === this.selectedMail) ?? mail[0];
-      if (selected) this.selectedMail = String(selected.id);
-      this.mailRows(left, mail);
-      this.safeSkin(right, 'MailContentBackground', String(selected?.from) === 'system' ? 'yjneirong_2' : 'yjneirong_3', 324, 344, 0, 1);
-      this.renderMailDetail(right, selected);
-    }
-    // The source content bitmap is added after the compose control; keep the
-    // interactive control above it instead of letting the paper cover it.
-    right.getChildByName('Mail:Compose')?.setSiblingIndex(right.children.length - 1);
+    const selected = mail.find(item => String(item.id) === this.selectedMail) ?? mail[0];
+    if (selected) this.selectedMail = String(selected.id);
+    this.mailRows(left, mail);
+    this.safeSkin(right, 'MailContentBackground', String(selected?.from) === 'system' ? 'yjneirong_2' : 'yjneirong_3', 324, 344, 0, 1);
+    this.renderMailDetail(right, selected);
     const claimable = mail.filter(item => !item.claimed && item.attachment);
     const deletable = mail.filter(item => Boolean(item.claimed));
     this.ui.button(wnd, 'Mail:ClaimAll', '领取全部', -260, -203, 116, 27, () => this.callbacks.choose('选择要领取的邮件', claimable.map(item => ({
@@ -194,7 +186,7 @@ export class SecondaryWindows {
     const tutorialStep = Number(this.state!.actor.tutorialStep ?? 0);
     const tutorial: Row = { id: 'tutorial', name: `新手引导 ${Math.min(tutorialStep + 1, 4)}/4`,
       detail: ['领取出征补给', '保存一次合法卡组', '完成一场战斗', '取得PVE胜利'][tutorialStep] ?? '引导已完成',
-      reward: 20, ready: tutorialStep < 4, claimed: tutorialStep >= 4, tutorial: true };
+      reward: 20, ready: Boolean(this.state!.actor.tutorialReady), claimed: tutorialStep >= 4, tutorial: true };
     const tasks: Row[] = [tutorial, ...rows(this.state!.tasks)];
     const selected = tasks.find(task => String(task.id) === this.selectedTask) ?? tasks[0];
     if (selected) this.selectedTask = String(selected.id);
@@ -222,27 +214,14 @@ export class SecondaryWindows {
   private renderSocial(): void {
     const wnd = this.ui.node(this.root!, 'SocialWnd', 279, 509, 429.5, 25.5);
     this.safeSkin(wnd, 'SocialBackground', 'sjbeijing_1', 279, 509);
-    this.ui.label(wnd, 'SocialTitle', '社交', 0, 229, 210, 29, 19, Theme.gold);
+    this.ui.label(wnd, 'SocialTitle', '世界频道', 0, 229, 210, 29, 19, Theme.gold);
     this.closeButton(wnd, 115, 228);
-    const actor = this.state!.actor;
-    this.ui.label(wnd, 'PlayerInfo', `Lv.${actor.level ?? 1}  ${actor.name ?? ''}\n公会：${this.guildName(actor.guildId)}`, 0, 183, 244, 55, 13, Theme.text, true);
-    const search = this.ui.input(wnd, 'FriendSearch', '输入角色名称', -25, 142, 180);
-    this.safeSkin(wnd, 'FriendSearchArt', 'sousuoanjian_2', 19, 18, 98, 142);
-    this.ui.button(wnd, 'Friend:Add', '', 98, 142, 38, 30, () => this.callbacks.run('friend.request', { target: search.string }), false, true);
-    const tabs: Array<[typeof this.socialTab, string]> = [['friends', '好友'], ['requests', '申请'], ['chat', '聊天']];
-    tabs.forEach(([id, label], index) => {
-      const x = -86 + index * 86;
-      if (id === 'friends') this.safeSkin(wnd, 'FriendsTabArt', this.socialTab === id ? 'bqhaoyou_1.png' : 'bqhaoyou_2.png', 79, 23, x, 104);
-      this.ui.button(wnd, `SocialTab:${id}`, label, x, 104, 76, 28,
-        () => { this.socialTab = id; this.redraw(); }, this.socialTab === id, id === 'friends');
-    });
-    if (this.socialTab === 'friends') this.renderFriends(wnd);
-    else if (this.socialTab === 'requests') this.renderRequests(wnd);
-    else this.renderChat(wnd);
-    this.safeSkin(wnd, 'GuildTabArt', 'bqgonghui_2.png', 79, 23, -70, -222);
-    this.ui.button(wnd, 'Social:Guild', '', -70, -222, 79, 23, () => this.callbacks.navigate('guild'), false, true);
-    this.safeSkin(wnd, 'AddFriendArt', 'sjjiaohaoyou_1', 103, 31, 70, -222);
-    this.ui.button(wnd, 'Social:World', '世界发言', 70, -222, 103, 31, () => { this.socialTab = 'chat'; this.redraw(); }, false, true);
+    const chat = rows(this.state!.social.chat).filter(item => item.channel === 'world').slice(-9);
+    this.ui.label(wnd, 'WorldTranscript', chat.map(item => `${this.characterName(item.from)}：${String(item.text ?? '')}`).join('\n') || '暂无世界消息',
+      0, 42, 242, 300, 13, chat.length ? Theme.text : Theme.dim, true);
+    const input = this.ui.input(wnd, 'WorldInput', '输入世界消息', -20, -178, 190);
+    this.ui.button(wnd, 'Chat:World', '发送', 92, -178, 58, 34,
+      () => { if (input.string.trim()) this.callbacks.run('chat.send', { channel: 'world', text: input.string.trim() }); });
   }
 
   private renderFriends(parent: Node): void {
@@ -567,31 +546,19 @@ export class SecondaryWindows {
       music: Boolean(current.music), sound: Boolean(current.sound),
       rejectPrivate: Boolean(current.rejectPrivate), rejectInvites: Boolean(current.rejectInvites),
     };
-    this.ui.label(wnd, 'AudioHeading', '声音设置', 0, 140, 400, 18, 12, Theme.dim);
-    this.settingSlider(wnd, 'music', '背景音乐', 82);
-    this.settingSlider(wnd, 'sound', '游戏音效', 52);
-    this.ui.label(wnd, 'PrivacyHeading', '交互设置', 0, 1, 400, 18, 12, Theme.dim);
-    this.settingCheck(wnd, 'rejectPrivate', '拒绝私聊', -103, -28);
-    this.settingCheck(wnd, 'rejectInvites', '拒绝房间邀请', 91, -28);
-    this.ui.button(wnd, 'Settings:Characters', '切换角色', -93, -77, 150, 30, () => this.callbacks.action({ label: '切换角色', action: 'local:characters' }));
-    this.ui.button(wnd, 'Settings:Logout', '退出登录', 93, -77, 150, 30, () => this.callbacks.action({ label: '退出登录', action: 'local:logout' }));
-    this.ui.button(wnd, 'Settings:Save', '确定', -61, -112, 110, 32, () => this.callbacks.run('settings.save', { ...this.settingsDraft }));
-    this.ui.button(wnd, 'Settings:Cancel', '取消', 61, -112, 110, 32, () => { this.settingsDraft = {}; this.callbacks.close(); });
+    this.settingToggle(wnd, 'music', '背景音乐', 82);
+    this.settingToggle(wnd, 'sound', '游戏音效', 42);
+    this.settingToggle(wnd, 'rejectPrivate', '拒收私聊', 2);
+    this.settingToggle(wnd, 'rejectInvites', '拒收邀请', -38);
+    this.ui.button(wnd, 'Settings:Characters', '切换角色', -93, -78, 150, 30, () => this.callbacks.action({ label: '切换角色', action: 'local:characters' }));
+    this.ui.button(wnd, 'Settings:Logout', '退出登录', 93, -78, 150, 30, () => this.callbacks.action({ label: '退出登录', action: 'local:logout' }));
+    this.ui.button(wnd, 'Settings:Save', '保存设置', -61, -123, 110, 32, () => this.callbacks.run('settings.save', { ...this.settingsDraft }));
+    this.ui.button(wnd, 'Settings:Cancel', '取消', 61, -123, 110, 32, () => { this.settingsDraft = {}; this.callbacks.close(); });
   }
 
-  private settingSlider(parent: Node, key: 'music' | 'sound', label: string, y: number): void {
+  private settingToggle(parent: Node, key: 'music' | 'sound' | 'rejectPrivate' | 'rejectInvites', label: string, y: number): void {
     const enabled = Boolean(this.settingsDraft[key]);
-    this.ui.label(parent, `SettingLabel:${key}`, label, -154, y, 110, 22, 14, Theme.text, true);
-    this.ui.panel(parent, `SettingTrack:${key}`, 238, 8, 47, y, new Color(48, 69, 68), Theme.dim);
-    this.ui.panel(parent, `SettingFill:${key}`, enabled ? 210 : 20, 8, enabled ? 33 : -62, y, enabled ? Theme.gold : Theme.dim);
-    this.ui.button(parent, `SettingToggle:${key}`, enabled ? '开' : '关', 184, y, 48, 25, () => {
-      this.settingsDraft[key] = !enabled; this.redraw();
-    });
-  }
-
-  private settingCheck(parent: Node, key: 'rejectPrivate' | 'rejectInvites', label: string, x: number, y: number): void {
-    const enabled = Boolean(this.settingsDraft[key]);
-    this.ui.button(parent, `SettingCheck:${key}`, `${enabled ? '☑' : '☐'} ${label}`, x, y, 165, 29, () => {
+    this.ui.button(parent, `SettingToggle:${key}`, `${enabled ? '☑' : '☐'} ${label}`, 0, y, 250, 31, () => {
       this.settingsDraft[key] = !enabled; this.redraw();
     }, false, true);
   }
@@ -619,6 +586,8 @@ export class SecondaryWindows {
 
   private execute(item: ActionItem): void {
     if (item.disabled || !item.action) return;
+    const reason = stageActionReason(item.action, item.payload ?? {});
+    if (reason) { this.callbacks.info('本阶段范围', reason); return; }
     if (item.fields?.length) this.callbacks.action(item); else this.callbacks.run(item.action, item.payload ?? {});
   }
 

@@ -64,7 +64,7 @@ try {
   await writeFile(resolve(packageDir, 'package.json'), '{"type":"module","exports":"./index.js"}');
   await writeFile(resolve(packageDir, 'index.js'), `
 export class Node {
-  constructor(name=''){ this.name=name; this.children=[]; this.isValid=true; this.position={x:0,y:0,z:0}; this.scale={x:1,y:1,z:1}; }
+  constructor(name=''){ this.name=name; this.children=[]; this.isValid=true; this.active=true; this.position={x:0,y:0,z:0}; this.scale={x:1,y:1,z:1}; }
   setParent(parent){ if(this.parent)this.parent.children=this.parent.children.filter(x=>x!==this); this.parent=parent; if(parent)parent.children.push(this); }
   addComponent(Type){ return new Type(); } setPosition(x,y,z=0){ this.position={x,y,z}; } setRotationFromEuler(){}
   setScale(x,y,z){ this.scale={x,y,z}; } setSiblingIndex(){}
@@ -72,9 +72,13 @@ export class Node {
 }
 export class UITransform { setContentSize(){} } export class Sprite { static SizeMode={CUSTOM:1}; }
 export class Vec3 { constructor(x,y,z){Object.assign(this,{x,y,z});} }
-export class SpriteFrame {} export class Rect {} export class Texture2D { destroy(){} }
+export class SpriteFrame {} export class Rect {} export class Texture2D {
+  constructor(){ this.width=16; this.height=16; } set image(value){ this.width=value.width; this.height=value.height; } destroy(){}
+}
 export class ImageAsset {} export const Layers={Enum:{UI_2D:1}}; export const Color={WHITE:{}};
-export const assetManager={loadRemote(url,callback){ callback(new Error('unexpected texture load')); }};
+export const pendingRemoteLoads=[];
+export const assetManager={loadRemote(url,callback){ pendingRemoteLoads.push({url,callback}); }};
+export function resolveNextRemote(){ const request=pendingRemoteLoads.shift(); if(!request)throw new Error('no pending remote load'); request.callback(null,{width:16,height:16}); }
 `);
   const compiler = resolve(root, 'web-prototype/node_modules/typescript/bin/tsc');
   const outputDir = resolve(scratch, 'compiled');
@@ -82,20 +86,33 @@ export const assetManager={loadRemote(url,callback){ callback(new Error('unexpec
     '--moduleResolution', 'bundler', '--rewriteRelativeImportExtensions', '--outDir', outputDir,
     resolve(root, 'cocos-client/assets/scripts/game/RecoveredAnimation.ts'),
     resolve(root, 'cocos-client/assets/scripts/game/RecoveredTimeline.ts')]);
-  const [{ RecoveredAnimation }, { Node }] = await Promise.all([
+  const [{ RecoveredAnimation }, { Node, pendingRemoteLoads, resolveNextRemote }] = await Promise.all([
     import(pathToFileURL(resolve(outputDir, 'RecoveredAnimation.js')).href),
     import(pathToFileURL(resolve(packageDir, 'index.js')).href),
   ]);
-  const timeline = (id, frames, fps) => ({ id, container_path: 'mock.swf', character_id: frames,
-    declared_frames: frames, show_frame_count: frames, fps, controls: [] });
+  const timeline = (id, frames, fps, controls = []) => ({ id, container_path: 'mock.swf', character_id: frames,
+    declared_frames: frames, show_frame_count: frames, fps, controls });
   const runtimeCatalog = {
-    scopes: { main: { monsterModels: {}, actorModels: {} } }, assets: {},
-    timelines: { stand: timeline('stand', 2, 5), atk: timeline('atk', 4, 10), walk: timeline('walk', 3, 6) },
+    scopes: { main: { monsterModels: {}, actorModels: {} } }, assets: {
+      asyncFrame0: { id: 'asyncFrame0', path: 'async-0.png' },
+      asyncFrame1: { id: 'asyncFrame1', path: 'async-1.png' },
+    },
+    timelines: { stand: timeline('stand', 2, 5), weaponStand: timeline('weaponStand', 3, 5),
+      atk: timeline('atk', 4, 10), walk: timeline('walk', 3, 6), asyncStand: timeline('asyncStand', 1, 2),
+      asyncAtk: timeline('asyncAtk', 2, 2, [
+        { op: 'place', depth: 1, frame: 1, asset_id: 'asyncFrame0', matrix: identity },
+        { op: 'place', depth: 1, frame: 2, asset_id: 'asyncFrame1', matrix: identity },
+      ]) },
     models: { actor: { id: 'actor', name: 'actor',
       raw: { width: 250, height: 260, anchor: '100,100', mount: '-3,-9', scale: 0.65 }, statuses: [
       { raw: { name: 'stand', dir: 'east', loop: '1', framerate: 5 }, timeline_id: 'stand' },
       { raw: { name: 'walk', dir: 'east', loop: '1', framerate: 6 }, timeline_id: 'walk' },
       { raw: { name: 'atk', dir: 'east', loop: '0', framerate: 10, attack: '3,4,0,0' }, timeline_id: 'atk' },
+    ] }, weapon: { id: 'weapon', name: 'weapon', raw: {}, statuses: [
+      { raw: { name: 'stand', dir: 'east', loop: '1', framerate: 5 }, timeline_id: 'weaponStand' },
+    ] }, asyncActor: { id: 'asyncActor', name: 'asyncActor', raw: {}, statuses: [
+      { raw: { name: 'stand', dir: 'east', loop: '1', framerate: 2 }, timeline_id: 'asyncStand' },
+      { raw: { name: 'atk', dir: 'east', loop: '0', framerate: 2, attack: '2,0,0,0' }, timeline_id: 'asyncAtk' },
     ] } },
   };
   const animation = new RecoveredAnimation(new Node('host'), runtimeCatalog, 'mock://');
@@ -143,6 +160,50 @@ export const assetManager={loadRemote(url,callback){ callback(new Error('unexpec
   walkFromCue.completion.then(() => { walkResolved = true; });
   await Promise.resolve();
   assert.equal(walkResolved, false, 'the frame-one action must not steal its replacement Promise');
+  const reusedBeforeLoop = animation.getPerformanceStats().frameTreesReused;
+  const loopingStand = animation.play('stand', 'east');
+  const standFrameZero = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid);
+  animation.update(0.2);
+  const standFrameOne = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  assert.notEqual(standFrameOne, standFrameZero, 'the next source frame gets its own retained display tree');
+  animation.update(0.2);
+  const reusedFrameZero = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  assert.equal(reusedFrameZero, standFrameZero, 'a looping pose must reuse its retained display tree');
+  assert.equal(animation.getPerformanceStats().frameTreesReused, reusedBeforeLoop + 1);
+  loopingStand.cancel();
+  await animation.setModels(['actor', 'weapon']);
+  animation.play('stand', 'east');
+  const layeredFrameZero = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  animation.update(0.2);
+  animation.update(0.2);
+  const rootLoopWithLaterLayer = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  assert.notEqual(rootLoopWithLaterLayer, layeredFrameZero,
+    'a root loop must not freeze a longer synchronized layer at its first frame');
+  for (let frame = 0; frame < 4; frame++) animation.update(0.2);
+  assert.equal(animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false), layeredFrameZero,
+    'the composite root/layer pose is reused only when both frame clocks repeat');
+  await animation.setModels(['asyncActor'], true);
+  animation.play('stand', 'east');
+  const previousReadyTree = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  animation.play('atk', 'east');
+  assert.equal(pendingRemoteLoads.length, 1);
+  assert.equal(previousReadyTree.active, true, 'an action handoff keeps the last complete tree visible while its first texture is pending');
+  assert.equal(animation.getPerformanceStats().activeFrameTrees, 1);
+  resolveNextRemote();
+  await new Promise(resolve => setImmediate(resolve));
+  const asyncFrameZero = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  assert.notEqual(asyncFrameZero, previousReadyTree, 'the prepared first action frame replaces the handoff tree after loading');
+  animation.update(0.5);
+  assert.equal(pendingRemoteLoads.length, 1);
+  assert.equal(asyncFrameZero.active, true, 'a pending next frame must not hide the current complete frame');
+  assert.equal(animation.getPerformanceStats().pendingFrameTrees, 1);
+  animation.play('stand', 'east');
+  const replacementStand = animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false);
+  resolveNextRemote();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(animation.node.children.find(child => child.name === 'RecoveredRenderer' && child.isValid && child.active !== false), replacementStand,
+    'a stale texture completion must not roll back a newer action');
+  assert.ok(animation.getPerformanceStats().retainedFrameTrees <= 49, 'frame trees remain bounded during atomic handoff');
   const missingHit = animation.play('hit', 'east');
   assert.equal(missingHit.hasNativeState, false);
   assert.equal(missingHit.statusName, null);

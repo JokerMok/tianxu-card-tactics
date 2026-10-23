@@ -1,3 +1,4 @@
+import { stageError, stageCardAllowed, stageItemAllowed, stageRewardAllowed } from './stage-policy.mjs';
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
 
@@ -169,7 +170,9 @@ function ensure(ctx) {
   for (const key of ['growthActions', 'cardSynthesis', 'petCare']) g.dailyCounters[key] = int(g.dailyCounters[key] ?? 0, `daily counter ${key}`);
   g.repeatClaims ||= {};
   g.battlePass ||= { season: seasonKey(ctx.now), claimed: [], premium: false, ultimate: false, exp: 0, localUnlocks: [] };
-  if (g.battlePass.season !== seasonKey(ctx.now)) g.battlePass = { season: seasonKey(ctx.now), claimed: [], premium: false, ultimate: false, exp: 0, localUnlocks: [] };
+  if (g.battlePass.season !== seasonKey(ctx.now)) {
+    g.battlePassArchive??={};g.battlePassArchive[g.battlePass.season]={...structuredClone(g.battlePass),earnedLevel:earnedBattlePassLevel(g),premiumMax:ctx.actor.stageScope?.pass?.season===g.battlePass.season?ctx.actor.stageScope.passEarnedLevel:0};
+    g.battlePass = { season: seasonKey(ctx.now), claimed: [], premium: false, ultimate: false, exp: 0, localUnlocks: [] };}
   g.battlePass.claimed ||= [];
   g.battlePass.localUnlocks ||= [];
   g.battlePass.exp = int(g.battlePass.exp ?? 0, 'battle pass exp');
@@ -185,7 +188,7 @@ export function touchActorActivity(ctx, minIntervalMs = 60_000) {
     ? g.lastActiveAt
     : Number.isFinite(ctx.actor.lastLogin) ? ctx.actor.lastLogin : ctx.now;
   const wasEligible = g.returnEligible;
-  if (!g.returnClaimed && !g.returnEligible && ctx.now - previous >= 7 * DAY) g.returnEligible = true;
+  if (!ctx.actor.stageScope && !g.returnClaimed && !g.returnEligible && ctx.now - previous >= 7 * DAY) g.returnEligible = true;
   const eligibilityChanged = wasEligible !== g.returnEligible;
   const shouldRecord = !Number.isFinite(g.lastActiveAt) || eligibilityChanged || ctx.now - g.lastActiveAt >= minIntervalMs;
   if (shouldRecord) g.lastActiveAt = ctx.now;
@@ -220,9 +223,12 @@ function takeAsset(ctx, mapName, key, count, reason) {
   else { const id = numericId(key, 'item'); if (!itemDef(ctx.tables, id)) fail('item definition missing'); }
   const map = ctx.actor[mapName];
   if (own(map, key) < count) fail(`insufficient ${key}`);
+  if(mapName==='cards'&&own(map,key)-count<(ctx.actor.deck??[]).filter(id=>id===key).length)fail('请先从现用卡组移除要消耗的卡牌；本次未扣除。');
+  const transfer=reason==='equipment-equip'||reason.startsWith('warehouse-');
+  if(!transfer&&(ctx.actor.lockedItems?.includes(key)||ctx.actor.growth?.warehouseLocks?.[key]))fail('物品已锁定，请先解锁。');
   map[key] -= count;
   if (!map[key]) delete map[key];
-  const transfer = reason === 'equipment-equip' || reason.startsWith('warehouse-');
+
   if (!transfer && !own(ctx.actor.inventory, key) && !own(ctx.actor.warehouse, key) && !Object.values(ctx.actor.equipment).includes(key)) {
     ctx.actor.boundItems = ctx.actor.boundItems.filter(x => x !== key);
     ctx.actor.lockedItems = ctx.actor.lockedItems.filter(x => x !== key);
@@ -245,8 +251,8 @@ function addAsset(ctx, mapName, key, count, reason) {
 function reward(ctx, value, reason) {
   const out = {};
   for (const c of ['silver', 'gold', 'crystal']) if (value?.[c]) { grantCurrency(ctx, c, value[c], reason); out[c] = value[c]; }
-  if (value?.item) { addAsset(ctx, 'inventory', itemKey(value.item), value.count ?? 1, reason); out.itemId = itemKey(value.item); out.count = value.count ?? 1; }
-  if (value?.card) { addAsset(ctx, 'cards', cardKey(value.card), value.count ?? 1, reason); out.cardId = cardKey(value.card); out.count = value.count ?? 1; }
+  if (value?.item && (ctx.legacyRewards||stageItemAllowed(ctx.tables,value.item))) { addAsset(ctx, 'inventory', itemKey(value.item), value.count ?? 1, reason); out.itemId = itemKey(value.item); out.count = value.count ?? 1; }
+  if (value?.card && (ctx.legacyRewards||stageCardAllowed(ctx.tables,value.card))) { addAsset(ctx, 'cards', cardKey(value.card), value.count ?? 1, reason); out.cardId = cardKey(value.card); out.count = value.count ?? 1; }
   return out;
 }
 
@@ -257,6 +263,7 @@ export function grantManagedResource(ctx, type, resourceId, quantity, operationI
   const actor = ctx.actor;
   actor.currencies ||= {silver:0,gold:0,crystal:0};
   actor.cards ||= {}; actor.inventory ||= {}; actor.boundItems ||= []; actor.economicLog ||= [];
+  if(type!=='currency'&&!stageRewardAllowed(ctx.tables,type,resourceId))throw stageError('该资源的新投放本阶段暂缓；旧持有量保留。');
   const reason = 'gm-grant:' + operationId;
   if (type === 'currency') grantCurrency(ctx, resourceId, quantity, reason);
   else addAsset(ctx, type === 'card' ? 'cards' : 'inventory', resourceId, quantity, reason);
@@ -276,7 +283,7 @@ function randomChoice(ctx, values) {
 }
 function candidateCards(ctx, maxQuality = 6) {
   return dataRows(ctx.tables, 'embeddata/scp/card.xml').filter(r => numericField(r, ['ID']) > 0
-    && !/废弃/.test(String(r.Name ?? '')) && numericField(r, ['Quality'], 0) <= maxQuality
+    && (ctx.legacyRewards||stageCardAllowed(ctx.tables,r.ID)) && !/废弃/.test(String(r.Name ?? '')) && numericField(r, ['Quality'], 0) <= maxQuality
     && (numericField(r, ['Type']) === 1 ? numericField(r, ['MonsterID']) > 0 && Boolean(monsterDef(ctx.tables, numericField(r, ['MonsterID']))) : numericField(r, ['Type']) === 2 && numericField(r, ['SkillID']) > 0));
 }
 function drawCards(ctx, count, reason, maxQuality = 6) {
@@ -295,7 +302,7 @@ function drawCards(ctx, count, reason, maxQuality = 6) {
 function drawItems(ctx, count, excludedId, reason) {
   const pool = dataRows(ctx.tables, 'embeddata/scp/medicament.xml').filter(row => {
     const id = numericField(row, ['物品ID', 'ID'], 0);
-    return id > 0 && id !== excludedId && Number(prefixedField(row, '作用id', 0)) !== 5 && itemDef(ctx.tables, id);
+    return (ctx.legacyRewards||stageItemAllowed(ctx.tables,id)) && id > 0 && id !== excludedId && Number(prefixedField(row, '作用id', 0)) !== 5 && itemDef(ctx.tables, id);
   });
   const drawn = [];
   for (let i = 0; i < count; i += 1) {
@@ -472,6 +479,7 @@ const handlers = {
       if (selected.some(row => !row)) fail('selection chest choice missing');
       gained = selected.map(row => grantConfiguredReward(ctx, numericField(row, ['RewardTYPE']), numericField(row, ['RewardID']), numericField(row, ['RewardNum'], 1), 'inventory-selection-chest'));
     } else fail('item has no directly usable effect');
+    if(gained.items&&!ctx.legacyRewards){gained.items=gained.items.filter(x=>stageItemAllowed(ctx.tables,x.item));if(!gained.items.length)throw stageError('此礼包当前没有启用的奖励，礼包已保留，未消耗。');}
     if (consume) takeAsset(ctx, 'inventory', key, consume, 'inventory-use');
     for (const x of gained.items ?? []) addAsset(ctx, 'inventory', itemKey(x.item), x.count, 'inventory-use');
     countGrowth(ctx);
@@ -862,10 +870,10 @@ const handlers = {
   'activity.chest'(ctx, p) {
     const index = int(p.index, 'index', 1, 10), row = dataRows(ctx.tables, 'embeddata/scp/livelyprize.xml')[index - 1];
     if (!row) fail('activity chest missing');
-    const key = `${dayKey(ctx.now)}:${index}`;
+    const key = `${dayKey(ctx.legacyClock??ctx.now)}:${index}`;
     if (ctx.actor.growth.activities.chests.includes(key)) fail('activity chest already claimed');
     const need = numericField(row, ['需要活跃度'], index * 20);
-    if (ctx.actor.growth.dailyCounters.growthActions < need) fail('insufficient activity');
+    if ((ctx.legacyDaily??ctx.actor.growth.dailyCounters).growthActions < need) fail('insufficient activity');
     const prefix = ['战士', '游侠', '法师', '牧师'][ctx.actor.profession - 1] ?? '战士';
     const type = numericField(row, [`${prefix}奖励1 type 1银币 2金币 3道具`, `${prefix}奖励1 type`], 1);
     const id = numericField(row, [`${prefix}奖励1 ID`], 0), count = numericField(row, [`${prefix}奖励1 数量`], 1);
@@ -893,14 +901,14 @@ const handlers = {
     return { group, gained };
   },
   'activity.weeklyGrant'(ctx) {
-    const activities = ctx.actor.growth.activities, week = String(weekKey(ctx.now));
+    const activities = ctx.actor.growth.activities, week = String(weekKey(ctx.legacyClock??ctx.now));
     if (activities.weeklyClaims[week]) fail('weekly local grant already claimed');
     if (ctx.actor.growth.counters.growthActions < 7) fail('weekly local grant locked');
     activities.weeklyClaims[week] = true;
     return { week: Number(week), gained: reward(ctx, { silver: 700, crystal: 70 }, 'weekly-local-grant') };
   },
   'activity.rewardBonus'(ctx) {
-    const activities = ctx.actor.growth.activities, week = String(weekKey(ctx.now));
+    const activities = ctx.actor.growth.activities, week = String(weekKey(ctx.legacyClock??ctx.now));
     if (activities.bonusClaims[week]) fail('weekly reward bonus already claimed');
     if (ctx.actor.growth.counters.growthActions < 20) fail('weekly reward bonus locked');
     activities.bonusClaims[week] = true;
@@ -915,21 +923,22 @@ const handlers = {
     return { gained: reward(ctx, { silver: 1500, gold: 10, item: 6001, count: 3 }, 'return-reward') };
   },
   'quest.repeatClaim'(ctx, p) {
-    const id = text(p.questId, 'questId'), q = LOCAL.repeatQuests.find(x => x.id === id), day = dayKey(ctx.now), key = `${day}:${id}`;
+    const id = text(p.questId, 'questId'), q = LOCAL.repeatQuests.find(x => x.id === id), day = dayKey(ctx.legacyClock??ctx.now), key = `${day}:${id}`;
     if (!q) fail('repeat quest missing');
     if (ctx.actor.growth.repeatClaims[key]) fail('repeat quest already claimed');
-    if ((ctx.actor.growth.dailyCounters[q.counter] ?? 0) < q.need) fail('repeat quest incomplete');
+    if (((ctx.legacyDaily??ctx.actor.growth.dailyCounters)[q.counter] ?? 0) < q.need) fail('repeat quest incomplete');
     ctx.actor.growth.repeatClaims[key] = true;
     return { questId: id, gained: reward(ctx, q.reward, 'repeat-quest') };
   },
   'battlePass.claim'(ctx, p) {
-    const level = int(p.level, 'level', 1, 50), track = p.track ?? 'free', pass = ctx.actor.growth.battlePass;
+    const level = int(p.level, 'level', 1, 50), track = p.track ?? 'free', pass = p.season?ctx.actor.growth.battlePassArchive?.[p.season]:ctx.legacyRewards&&track!=='free'?ctx.actor.stageScope.pass:ctx.actor.growth.battlePass;
+    if(!pass)fail('该季战令记录不存在');
     if (!['free', 'premium', 'ultimate'].includes(track)) fail('battle pass track invalid');
     if (track === 'premium' && !pass.premium) fail('premium battle pass locked');
     if (track === 'ultimate' && !pass.ultimate) fail('ultimate battle pass locked');
     const claimKey = `${track}:${level}`;
     if (pass.claimed.includes(claimKey) || (track === 'free' && pass.claimed.includes(level))) fail('battle pass reward already claimed');
-    const earnedLevel = earnedBattlePassLevel(ctx.actor.growth);
+    const earnedLevel = pass.earnedLevel??(ctx.legacyRewards&&track!=='free'?ctx.actor.stageScope.passEarnedLevel:earnedBattlePassLevel(ctx.actor.growth));
     if (earnedLevel < level) fail('battle pass level locked');
     const levelRow = dataRows(ctx.tables, 'embeddata/scp/battlepasslevelconfig.xml').find(r => numericField(r, ['level'], -1) === level);
     const rewardGroup = track === 'free' ? numericField(levelRow, ['regular_Id'], 0) : numericField(levelRow, ['advanced_Id'], 0);
@@ -944,6 +953,7 @@ const handlers = {
         gained.push(type === 0 ? reward(ctx, { gold: count }, 'battle-pass') : reward(ctx, { item: id, count }, 'battle-pass'));
       }
     } else gained = [reward(ctx, level % 5 === 0 ? { gold: 3 } : { silver: 200 }, 'battle-pass')];
+    if(!gained.some(x=>Object.keys(x).length))throw stageError('本档奖励属于暂缓资源，领取资格保留，未标记已领取。');
     pass.claimed.push(claimKey);
     return { level, track, earnedLevel, gained };
   },
@@ -1064,6 +1074,7 @@ export function growthView(ctx) {
       && !(track.id === 'free' && g.battlePass.claimed.includes(level)))
       .map(track => uiItem(`领取${level}级${track.label}战令`, `已达到 ${earnedPassLevel} 级`, 'battlePass.claim',
         { level, track: track.id }, !track.unlocked)));
+  battlePassItems.push(...Object.entries(g.battlePassArchive??{}).flatMap(([season,pass])=>Array.from({length:pass.earnedLevel??0},(_,i)=>i+1).flatMap(level=>passTracks.filter(track=>(track.id==='free'||pass[track.id]&&level<=(pass.premiumMax??0))&&!pass.claimed?.includes(`${track.id}:${level}`)).map(track=>uiItem(`领取${season}第${level}级${track.label}战令`,'原有奖励','battlePass.claim',{season,level,track:track.id})))));
   const reputationShopItems = reputationShopOffers(ctx.tables).map(offer => {
     const card = cardDef(ctx.tables, offer.cardId), unlocked = reputationLevel(ctx, offer.reputationType) >= offer.requiredLevel;
     return uiItem(String(field(card, ['Name'], offer.cardId)), `${offer.price} 银币`, 'shop.reputation.buy',
@@ -1083,7 +1094,7 @@ export function growthView(ctx) {
       uiItem(`取出 ${id}`, `仓库持有 ${count}`, 'warehouse.move', { itemId: id, count: 1, to: 'inventory' }, Boolean(g.warehouseLocks[id])),
       uiItem(`${g.warehouseLocks[id] ? '解锁' : '锁定'}仓库 ${id}`, '切换资产锁', 'warehouse.lock', { itemId: id, locked: !g.warehouseLocks[id] })
     ])) },
-    { id: 'equipment', title: '装备与铁匠', items: equipment.map(r => {
+    { id: 'equipment', title: '装备', items: equipment.filter(r=>{const id=itemKey(numericField(r,['物品ID\n','物品ID','ID']));return stageItemAllowed(ctx.tables,id)&&(own(actor.inventory,id)>0||Object.values(actor.equipment).includes(id));}).map(r => {
       const id = numericField(r, ['物品ID\n', '物品ID', 'ID']);
       return uiItem(`装备 ${field(r, ['名字'], id)}`, `需求等级 ${numericField(r, ['使用等级'], 0) + 1}`, 'equipment.equip', { itemId: itemKey(id) }, !own(actor.inventory, itemKey(id)));
     }).concat(equipped.flatMap(([slot, id]) => [

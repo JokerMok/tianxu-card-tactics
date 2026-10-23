@@ -1,3 +1,4 @@
+import {stageRewardAllowed} from './stage-policy.mjs';
 import {randomUUID} from 'node:crypto';
 import {digest,stable,requireText,requireCount,conflict} from './store.mjs';
 import {grantManagedResource} from './growth-systems.mjs';
@@ -88,8 +89,9 @@ export class GmService {
     if(this.catalog)return this.catalog;
     const names=presentationNames(this.content),items=[];
     for(const [resourceId,name]of Object.entries({silver:'银币',gold:'金币',crystal:'晶石'}))items.push({type:'currency',resourceId,name});
-    for(const c of Object.values(this.content.catalog.scopes.main.cards))if(activeCard(this.content.catalog,c))items.push({type:'card',resourceId:c.id,name:names[c.id]??String(c.raw.Name),source:this.content.catalog.localization?.cards[c.id]?.status??'source'});
+    for(const c of Object.values(this.content.catalog.scopes.main.cards))if(activeCard(this.content.catalog,c)&&stageRewardAllowed(this.content.tables,'card',c.id))items.push({type:'card',resourceId:c.id,name:names[c.id]??String(c.raw.Name),source:this.content.catalog.localization?.cards[c.id]?.status??'source'});
     for(const [id,table,name,originalName]of ITEMS){
+      if(!stageRewardAllowed(this.content.tables,'item',id))continue;
       const row=this.content.table(table).find(r=>(r['物品ID']??r['物品ID\n']??r.ID)===id);
       if(!row||row['名字']!==originalName||/废弃|Abandoned/i.test(row['名字']))continue;
       const stack=Number(Object.entries(row).find(([k])=>k.startsWith('叠放数量'))?.[1]);

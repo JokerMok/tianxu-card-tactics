@@ -84,12 +84,15 @@ interface RuntimeCatalog {
   models: Record<string, Model>;
   timelines: Record<string, Timeline>;
 }
+interface CachedFrameTree { node: Node; ready: boolean; generation: number }
 type DisplayState = RecoveredDisplayState;
 const IDENTITY: Matrix2D = { a: 1, b: 0, c: 0, d: 1, tx_px: 0, ty_px: 0 };
 const STATUS_ALIASES: Record<RecoveredAnimationStatus, string[]> = {
   stand: ['stand', 'std', 'idle'], walk: ['walk', 'move'], atk: ['atk', 'attack'],
   hit: ['hit', 'behit', 'hurt'], die: ['die', 'dead', 'death'],
 };
+const MAX_CACHED_FRAMES = 48;
+const FRAME_ASSET_TIMEOUT_MS = 8000;
 
 function finite(value: unknown, fallback = 0): number {
   const parsed = Number(value);
@@ -113,13 +116,14 @@ function urlJoin(base: string, path: string): string {
  * missing timeline or bitmap leaves the host empty instead of presenting a
  * still portrait as animation.
  */
+const timelineIndices = new WeakMap<RuntimeCatalog, Map<string, Timeline>>();
 export class RecoveredAnimation {
   readonly node: Node;
   readonly mountNode: Node;
 
   private readonly catalog: RuntimeCatalog;
   private readonly assetBaseUrl: string;
-  private readonly timelineByCharacter = new Map<string, Timeline>();
+  private readonly timelineByCharacter: Map<string, Timeline>;
   private readonly textures = new Map<string, Promise<Texture2D>>();
   private model: Model | null = null;
   private models: Model[] = [];
@@ -138,6 +142,11 @@ export class RecoveredAnimation {
   private completionResolve?: () => void;
   private playbackGeneration = 0;
   private generation = 0;
+  private renderCacheKey = '';
+  private renderedFrameKey = '';
+  private activeRenderer?: Node;
+  private readonly frameCache = new Map<string, CachedFrameTree>();
+  private readonly performance = { frameTreesBuilt: 0, frameTreesReused: 0, frameTreesEvicted: 0 };
   private disposed = false;
 
   constructor(parent: Node, catalog: RecoveredCatalog, assetBaseUrl: string) {
@@ -150,9 +159,9 @@ export class RecoveredAnimation {
     this.mountNode = new Node('RecoveredMount');
     this.mountNode.layer = Layers.Enum.UI_2D;
     this.mountNode.setParent(this.node);
-    for (const timeline of Object.values(this.catalog.timelines)) {
-      this.timelineByCharacter.set(`${timeline.container_path}:${timeline.character_id}`, timeline);
-    }
+    let index=timelineIndices.get(this.catalog);
+    if(!index){index=new Map();for(const timeline of Object.values(this.catalog.timelines))index.set(`${timeline.container_path}:${timeline.character_id}`,timeline);timelineIndices.set(this.catalog,index);}
+    this.timelineByCharacter=index;
   }
 
   async setMonster(monsterId: number, scope: DataScope = 'main'): Promise<void> {
@@ -210,6 +219,12 @@ export class RecoveredAnimation {
       .filter((layer): layer is { model: Model; status: ModelStatus } => Boolean(layer.status));
     this.current = selected;
     this.currentDirection = direction;
+    const renderCacheKey = `${this.models.map(model => model.id).join(',')}|${this.currentLayers
+      .map(layer => layer.status.timeline_id ?? '').join(',')}|${direction}`;
+    if (renderCacheKey !== this.renderCacheKey) {
+      this.renderCacheKey = renderCacheKey;
+      this.prepareRenderHandoff();
+    }
     this.applyModelOrigin(this.model, direction);
     this.frameAccumulator = 0;
     this.absoluteFrame = 0;
@@ -261,6 +276,12 @@ export class RecoveredAnimation {
     }).filter((layer): layer is { model: Model; status: ModelStatus } => Boolean(layer));
     this.current = chosen;
     this.currentDirection = direction;
+    const renderCacheKey = `${this.models.map(model => model.id).join(',')}|${this.currentLayers
+      .map(layer => layer.status.timeline_id ?? '').join(',')}|${direction}`;
+    if (renderCacheKey !== this.renderCacheKey) {
+      this.renderCacheKey = renderCacheKey;
+      this.prepareRenderHandoff();
+    }
     this.applyModelOrigin(this.model, direction);
     this.frameAccumulator = 0;
     this.absoluteFrame = 0;
@@ -302,7 +323,9 @@ export class RecoveredAnimation {
       this.fireAttack(playbackGeneration);
       if (playbackGeneration !== this.playbackGeneration) return;
     }
-    if (nextFrame !== this.frame) this.renderCurrentFrame(false);
+    // Layer timelines may use a different frame rate/count from the root.
+    // Let the composite frame key decide whether the retained tree changes.
+    this.renderCurrentFrame(false);
     if (!this.loop && this.absoluteFrame >= count && !this.completionFired) {
       // CreatureAttackState calls the attack on exit when the configured cue
       // was never reached (for example, a malformed cue beyond the clip).
@@ -336,6 +359,15 @@ export class RecoveredAnimation {
     this.completionResolve = undefined;
   }
 
+  /** Bounded, identity-free counters used by local performance comparison. */
+  getPerformanceStats() {
+    const entries = Array.from(this.frameCache.values()).filter(entry => entry.node.isValid);
+    const retained = this.node.children.filter(child => child !== this.mountNode && child.isValid);
+    return { ...this.performance, frameCacheSize: entries.length, retainedFrameTrees: retained.length,
+      activeFrameTrees: retained.filter(node => node.active !== false).length,
+      pendingFrameTrees: entries.filter(entry => !entry.ready).length };
+  }
+
   /** AutoupdateAssertBackground sizes the actual displayed clip to its UI box.
    * This is only for window previews; board entities retain source anchors. */
   fitPreviewBox(width: number, height: number): boolean {
@@ -343,6 +375,7 @@ export class RecoveredAnimation {
     if (!parent || this.disposed) return false;
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     const visit = (node: Node) => {
+      if (node !== this.node && node.active === false) return;
       if (node.getComponent(Sprite)) {
         const box = node.getComponent(UITransform)?.getBoundingBoxToWorld();
         if (box) for (const [x, y] of [[box.xMin, box.yMin], [box.xMax, box.yMax]]) {
@@ -450,34 +483,98 @@ export class RecoveredAnimation {
     }
     const count = Math.max(1, timeline.show_frame_count || timeline.declared_frames);
     const nextFrame = this.loop ? this.absoluteFrame % count : Math.min(count - 1, this.absoluteFrame);
-    if (!force && nextFrame === this.frame) return;
     this.frame = nextFrame;
-    const generation = ++this.generation;
-    this.clearDisplay();
+    const currentFps = Math.max(1, finite(this.current?.particle_framerate,
+      finite(this.current?.raw.framerate, timeline.fps || 24)));
+    const layerFrames = this.currentLayers.map(layer => {
+      const layerTimeline = layer.status.timeline_id ? this.catalog.timelines[layer.status.timeline_id] : undefined;
+      if (!layerTimeline) return -1;
+      const layerCount = Math.max(1, layerTimeline.show_frame_count || layerTimeline.declared_frames);
+      const layerFps = Math.max(1, finite(layer.status.particle_framerate,
+        finite(layer.status.raw.framerate, layerTimeline.fps || currentFps)));
+      const layerAbsoluteFrame = Math.floor(this.absoluteFrame / currentFps * layerFps + 1e-9);
+      return this.loop ? layerAbsoluteFrame % layerCount : Math.min(layerCount - 1, layerAbsoluteFrame);
+    });
+    const cacheKey = `${this.renderCacheKey}:${nextFrame}:${layerFrames.join(',')}`;
+    if (!force && cacheKey === this.renderedFrameKey) return;
+    this.renderedFrameKey = cacheKey;
+    const cached = this.frameCache.get(cacheKey);
+    if (cached?.node.isValid) {
+      this.frameCache.delete(cacheKey);
+      this.frameCache.set(cacheKey, cached);
+      if (cached.ready) this.activateFrame(cacheKey, cached, true);
+      return;
+    }
+    const generation = this.generation;
     const rendererNode = new Node('RecoveredRenderer');
     rendererNode.layer = Layers.Enum.UI_2D;
     rendererNode.setParent(this.node);
+    rendererNode.active = false;
+    const entry: CachedFrameTree = { node: rendererNode, ready: false, generation };
+    this.frameCache.set(cacheKey, entry);
+    this.performance.frameTreesBuilt++;
     this.applyRendererGeometry(rendererNode, this.model!, this.current!, this.currentDirection);
+    const pendingAssets: Promise<void>[] = [];
     for (const [index, layer] of this.currentLayers.entries()) {
       const layerTimeline = layer.status.timeline_id ? this.catalog.timelines[layer.status.timeline_id] : undefined;
       if (!layerTimeline) continue;
       const layerNode = new Node(`RecoveredLayer-${index}-${layer.model.name}`);
       layerNode.layer = Layers.Enum.UI_2D;
       layerNode.setParent(rendererNode);
-      const layerCount = Math.max(1, layerTimeline.show_frame_count || layerTimeline.declared_frames);
-      const currentTimeline = this.current?.timeline_id ? this.catalog.timelines[this.current.timeline_id] : undefined;
-      const currentFps = Math.max(1, finite(this.current?.particle_framerate,
-        finite(this.current?.raw.framerate, currentTimeline?.fps || 24)));
-      const layerFps = Math.max(1, finite(layer.status.particle_framerate,
-        finite(layer.status.raw.framerate, layerTimeline.fps || currentFps)));
-      const layerAbsoluteFrame = Math.floor(this.absoluteFrame / currentFps * layerFps + 1e-9);
-      const layerFrame = this.loop ? layerAbsoluteFrame % layerCount : Math.min(layerCount - 1, layerAbsoluteFrame);
-      this.renderTimeline(layerTimeline, layerFrame + 1, layerNode, generation, new Set());
+      this.renderTimeline(layerTimeline, layerFrames[index] + 1, layerNode, generation, new Set(), pendingAssets);
+    }
+    while (this.frameCache.size > MAX_CACHED_FRAMES) {
+      const oldest = Array.from(this.frameCache.entries()).find(([, candidate]) => candidate.node !== this.activeRenderer);
+      if (!oldest) break;
+      this.frameCache.delete(oldest[0]);
+      if (oldest[1].node.isValid) oldest[1].node.destroy();
+      this.performance.frameTreesEvicted++;
+    }
+    this.mountNode.setSiblingIndex(this.node.children.length - 1);
+    if (!pendingAssets.length) {
+      entry.ready = true;
+      this.activateFrame(cacheKey, entry, false);
+    } else {
+      void Promise.all(pendingAssets).then(() => {
+        entry.ready = true;
+        this.activateFrame(cacheKey, entry, false);
+      });
     }
   }
 
+  private activateFrame(cacheKey: string, entry: CachedFrameTree, reused: boolean): void {
+    if (this.disposed || entry.generation !== this.generation || !entry.ready || !entry.node.isValid
+        || this.renderedFrameKey !== cacheKey || this.frameCache.get(cacheKey) !== entry) return;
+    // Make the complete tree visible before retiring the previous tree. Both
+    // writes occur in one JS turn, so Cocos never renders the prepared gap.
+    entry.node.active = true;
+    const previous = this.activeRenderer;
+    if (previous?.isValid && previous !== entry.node) previous.active = false;
+    entry.node.setSiblingIndex(this.node.children.length - 1);
+    this.mountNode.setSiblingIndex(this.node.children.length - 1);
+    this.activeRenderer = entry.node;
+    if (previous?.isValid && previous !== entry.node
+        && !Array.from(this.frameCache.values()).some(candidate => candidate.node === previous)) previous.destroy();
+    if (reused) this.performance.frameTreesReused++;
+  }
+
+  /** Invalidate pending work while keeping the last complete tree visible for handoff. */
+  private prepareRenderHandoff(): void {
+    this.generation++;
+    for (const child of Array.from(this.node.children)) {
+      if (child !== this.mountNode && child !== this.activeRenderer) child.destroy();
+    }
+    this.frameCache.clear();
+    this.renderedFrameKey = '';
+    this.mountNode.setSiblingIndex(this.node.children.length - 1);
+  }
+
   private clearDisplay(): void {
+    this.generation++;
     for (const child of Array.from(this.node.children)) if (child !== this.mountNode) child.destroy();
+    this.frameCache.clear();
+    this.activeRenderer = undefined;
+    this.renderedFrameKey = '';
     this.mountNode.setSiblingIndex(this.node.children.length - 1);
   }
 
@@ -486,7 +583,7 @@ export class RecoveredAnimation {
   }
 
   private renderTimeline(timeline: Timeline, frame: number, parent: Node, generation: number,
-                         ancestors: Set<string>, offsetX = 0, offsetY = 0): void {
+                         ancestors: Set<string>, pendingAssets: Promise<void>[], offsetX = 0, offsetY = 0): void {
     if (ancestors.has(timeline.id)) return;
     const branch = new Set(ancestors).add(timeline.id);
     for (const [depth, state] of Array.from(this.evaluate(timeline, frame)).sort((a, b) => a[0] - b[0])) {
@@ -495,9 +592,9 @@ export class RecoveredAnimation {
         : this.timelineByCharacter.get(`${timeline.container_path}:${state.characterId}`);
       if (child) {
         const childFrame = recoveredChildFrame(frame, timeline.fps, state, child);
-        this.renderTimeline(child, childFrame, transformed, generation, branch);
+        this.renderTimeline(child, childFrame, transformed, generation, branch, pendingAssets);
       } else if (state.assetId) {
-        this.renderAsset(state.assetId, transformed, generation);
+        this.renderAsset(state.assetId, transformed, generation, pendingAssets);
       }
     }
   }
@@ -525,18 +622,18 @@ export class RecoveredAnimation {
     return inner;
   }
 
-  private renderAsset(assetId: string, parent: Node, generation: number): void {
+  private renderAsset(assetId: string, parent: Node, generation: number, pendingAssets: Promise<void>[]): void {
     const asset = this.catalog.assets[assetId];
     if (!asset) return;
     if (asset.path) {
-      this.attachSprite(asset, parent, generation);
+      pendingAssets.push(this.attachSprite(asset, parent, generation));
       return;
     }
     const fill = (asset.fillStyles ?? []).find(candidate => candidate.bitmap_asset_id);
     if (!fill?.bitmap_asset_id) return;
     const fillHost = this.affine(parent, this.fillMatrix(fill.matrix), 'bitmap-fill');
     const bitmap = this.catalog.assets[fill.bitmap_asset_id];
-    if (bitmap?.path) this.attachSprite(bitmap, fillHost, generation);
+    if (bitmap?.path) pendingAssets.push(this.attachSprite(bitmap, fillHost, generation));
   }
 
   private fillMatrix(matrix?: Matrix2D): Matrix2D {
@@ -548,8 +645,8 @@ export class RecoveredAnimation {
   }
 
   private attachSprite(asset: RuntimeAsset, parent: Node, generation: number,
-                       bounds?: [number, number, number, number]): void {
-    this.loadTexture(asset.id).then(texture => {
+                       bounds?: [number, number, number, number]): Promise<void> {
+    return this.loadTextureWithin(asset.id).then(texture => {
       if (this.disposed || generation !== this.generation || !parent.isValid) return;
       const node = new Node(`asset-${asset.id.slice(-8)}`);
       node.layer = Layers.Enum.UI_2D;
@@ -570,6 +667,25 @@ export class RecoveredAnimation {
       const y = bounds ? -(bounds[2] + height / 2) : -height / 2;
       node.setPosition(x, y);
     }).catch(error => console.warn(`[RecoveredAnimation] Unable to load ${asset.id}`, error));
+  }
+
+  private loadTextureWithin(assetId: string): Promise<Texture2D> {
+    const load = this.loadTexture(assetId);
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(new Error(`Recovered bitmap ${assetId} timed out after ${FRAME_ASSET_TIMEOUT_MS}ms`));
+      }, FRAME_ASSET_TIMEOUT_MS);
+      load.then(texture => {
+        if (settled) return;
+        settled = true; clearTimeout(timer); resolve(texture);
+      }, error => {
+        if (settled) return;
+        settled = true; clearTimeout(timer); reject(error);
+      });
+    });
   }
 
   private loadTexture(assetId: string): Promise<Texture2D> {

@@ -5,6 +5,7 @@ import type { OriginalUi } from './OriginalUi.ts';
 import type { RecoveredCatalog } from './RecoveredContent.ts';
 import { RecoveredAnimation } from './RecoveredAnimation.ts';
 import { AdvancedGrowthWindows } from './AdvancedGrowthWindows.ts';
+import { stageActionReason, stageSectionAllowed } from './StageScope.ts';
 
 type Row = Record<string, unknown>;
 interface Field { key: string; label: string; type?: string; value?: unknown; min?: number; max?: number; options?: {label: string; value: string}[] }
@@ -75,7 +76,7 @@ export class GrowthWindows {
   private readonly pages = new Map<string, number>();
   private selectedItem = '';
   private inventoryStore: 'inventory' | 'warehouse' = 'inventory';
-  private equipmentMode: 'wear' | 'smithy' = 'wear';
+  /** Retained for save-compatible dormant smithy rendering; no stage entry routes here. */
   private smithyMode: SmithyMode = 'enhance';
   private categoryPage = 0;
   private categoriesOpen = false;
@@ -92,7 +93,7 @@ export class GrowthWindows {
     this.parent = parent;
     this.state = state as GrowthState;
     const requested = this.routeSection(section || this.state.growth.sections[0]?.id || 'inventory');
-    this.section = requested === 'smithy' ? 'equipment' : requested;
+    this.section = stageSectionAllowed(requested) ? requested : 'inventory';
     this.categoriesOpen = false;
     if (this.advanced.supports(requested)) {
       this.actorPreview?.destroy(); this.actorPreview = undefined;
@@ -102,9 +103,6 @@ export class GrowthWindows {
       return;
     }
     this.advanced.destroy();
-    // The home-screen smithy shortcut currently routes to `equipment`.  Make
-    // that public entry open the smithy; the bqzl tab switches to wear/profile.
-    if (requested === 'equipment' || requested === 'smithy') this.equipmentMode = 'smithy';
     this.draw();
   }
 
@@ -123,9 +121,7 @@ export class GrowthWindows {
     this.root = this.ui.node(this.parent!, 'GrowthWindows', WINDOW_W, WINDOW_H, WINDOW_X, WINDOW_Y);
     this.root.addComponent(BlockInputEvents);
     this.skin(this.root, 'WindowFrame', 'ckxiao', WINDOW_W, WINDOW_H);
-    this.skin(this.root, 'WindowTitle', this.section === 'equipment' && this.equipmentMode === 'smithy' ? 'tiejiangpu' : 'btrenwu',
-      this.section === 'equipment' && this.equipmentMode === 'smithy' ? 92 : 53,
-      this.section === 'equipment' && this.equipmentMode === 'smithy' ? 25 : 24, 0, 196);
+    this.skin(this.root, 'WindowTitle', 'btrenwu', 53, 24, 0, 196);
     this.skin(this.root, 'CloseArt', 'guanbi', 34, 33, 326, 193);
     this.ui.button(this.root, 'Growth:Close', '', 326, 193, 34, 33, () => this.callbacks.close(), false, true);
     this.renderRail();
@@ -140,40 +136,15 @@ export class GrowthWindows {
 
   private renderRail(): void {
     const root = this.root!;
-    if (this.section === 'equipment' && this.equipmentMode === 'smithy' && !this.categoriesOpen) {
-      const smithyTabs: Array<{ id: SmithyMode; normal: string; selected: string }> = [
-        { id: 'enhance', normal: 'bqqh', selected: 'bqqh_l' },
-        { id: 'craft', normal: 'bqhc', selected: 'bqhc_l' },
-        { id: 'runeCraft', normal: 'bqdz', selected: 'bqdz_l' },
-      ];
-      smithyTabs.forEach((tab, index) => {
-        const y = 125 - index * 88;
-        this.skin(root, `SmithyRailArt:${tab.id}`, this.smithyMode === tab.id ? tab.selected : tab.normal, 32, 79, -332, y);
-        this.ui.button(root, `SmithyRail:${tab.id}`, '', -332, y, 36, 80, () => {
-          this.smithyMode = tab.id; this.selectedItem = ''; this.renderCurrent();
-        }, false, true);
-      });
-      this.ui.button(root, 'SmithyRail:Refine', '精炼', -332, -135, 38, 66, () => {
-        this.smithyMode = 'refine'; this.selectedItem = ''; this.renderCurrent();
-      }, this.smithyMode === 'refine', true);
-      this.ui.button(root, 'SmithyRail:Actor', '角色', -332, -167, 38, 28, () => {
-        this.openSection('equipment', 'wear');
-      }, false, true);
-      this.ui.button(root, 'SmithyRail:All', '全部', -332, -199, 38, 28, () => {
-        this.categoriesOpen = true; this.renderCurrent();
-      }, false, true);
-      return;
-    }
     const tabs: Array<{ id: string; title: string; normal: string; selected: string }> = [
       { id: 'inventory', title: '背包', normal: 'bqbb', selected: 'bqbb_l' },
       { id: 'equipment', title: '角色资料', normal: 'bqzl', selected: 'bqzl_l' },
-      { id: 'pets', title: '宠物与坐骑', normal: 'bqzq', selected: 'bqzq_l' },
     ];
     tabs.forEach((tab, index) => {
       const y = 125 - index * 88;
       this.skin(root, `RailArt:${tab.id}`, this.section === tab.id && !this.categoriesOpen ? tab.selected : tab.normal, 32, 79, -332, y);
       this.ui.button(root, `GrowthTab:${tab.id}`, '', -332, y, 36, 80, () => {
-        this.openSection(tab.id, tab.id === 'equipment' ? 'wear' : undefined);
+        this.openSection(tab.id);
       }, false, true);
     });
     this.ui.button(root, 'GrowthTab:All', '更多', -332, -145, 38, 76, () => {
@@ -183,8 +154,7 @@ export class GrowthWindows {
 
   private contentSkin(): { name: string; variant?: string } {
     if (this.section === 'inventory') return { name: 'zbbj_1' };
-    if (this.section === 'equipment' && this.equipmentMode === 'wear') return { name: 'renwuziliao' };
-    if (this.section === 'pets') return { name: 'zbbj_2_zq' };
+    if (this.section === 'equipment') return { name: 'renwuziliao' };
     return { name: 'xiaochuangkoubj', variant: 'game/data/img/ui/gonggongchuangkou.swf#144' };
   }
 
@@ -235,14 +205,8 @@ export class GrowthWindows {
   }
 
   private renderEquipment(content: Node): void {
-    this.ui.button(content, 'Equipment:Wear', '角色装备', -85, 165, 150, 28, () => {
-      this.equipmentMode = 'wear'; this.renderCurrent();
-    }, this.equipmentMode === 'wear');
-    this.ui.button(content, 'Equipment:Smithy', '铁匠铺', 85, 165, 150, 28, () => {
-      this.equipmentMode = 'smithy'; this.renderCurrent();
-    }, this.equipmentMode === 'smithy');
-    if (this.equipmentMode === 'wear') this.renderWear(content);
-    else this.renderSmithy(content);
+    this.ui.label(content, 'Equipment:Heading', '角色装备', 0, 165, 300, 28, 17, Theme.gold);
+    this.renderWear(content);
   }
 
   private renderWear(content: Node): void {
@@ -416,11 +380,23 @@ export class GrowthWindows {
   }
 
   private renderModule(content: Node): void {
-    if (this.section === 'energy-supply') this.renderEnergySupply(content);
-    else if (this.section === 'clan-war') this.renderClanWar(content);
-    else if (this.section === 'tasks') this.renderTaskJournal(content);
-    else if (this.section === 'collection') this.renderCollection(content);
+    if (this.section === 'tasks') this.renderTaskJournal(content);
+    else if (this.section === 'legacy') this.renderLegacy(content);
     else this.renderDebugModule(content);
+  }
+
+  private renderLegacy(content: Node): void {
+    const items = this.sectionItems('legacy'); const key = 'legacy:rights'; const pageSize = 6; const page = this.page(key, items.length, pageSize);
+    this.ui.label(content, 'LegacyTitle', '旧权益处理', 0, 142, 420, 28, 19, Theme.gold);
+    this.ui.label(content, 'LegacyNote', '这里只显示已有领取、退还或退出操作，不会创建新玩法。', 0, 112, 560, 28, 12, Theme.dim);
+    items.slice(page * pageSize, page * pageSize + pageSize).forEach((item, index) => {
+      const col = index % 2; const row = Math.floor(index / 2); const x = col ? 160 : -160; const y = 61 - row * 82;
+      const tile = this.ui.button(content, `LegacyAction:${index}`, item.label, x, y, 292, 64,
+        () => this.execute(item), Boolean(item.disabled));
+      if (item.detail) this.ui.label(tile, 'Detail', item.detail, 0, -19, 270, 22, 10, Theme.dim, true);
+    });
+    if (!items.length) this.ui.label(content, 'LegacyEmpty', '当前没有需要处理的旧权益', 0, 0, 380, 48, 14, Theme.dim);
+    this.pager(content, key, items.length, pageSize, 0, -168);
   }
 
   private renderCategories(content: Node): void {
@@ -448,21 +424,13 @@ export class GrowthWindows {
     const available = new Map(this.state!.growth.sections.map(section => [section.id, section.title]));
     const result: GrowthDestination[] = [];
     const add = (id: string, title?: string) => { if (available.has(id)) result.push({ id, title: title ?? available.get(id)! }); };
-    add('cards'); add('progression'); add('city'); add('activities'); add('summon'); add('shop');
-    add('reputation-shop'); add('profession-skill-shop'); add('tower'); add('forbidden'); add('world-boss');
-    const operations = this.sectionItems('quest-operations');
-    if (operations.some(item => item.action.startsWith('quest.explore.'))) result.push({ id: 'dock', title: '出征港口' });
-    if (operations.some(item => !item.action.startsWith('quest.explore.'))) result.push({ id: 'energy-supply', title: '精力与冒险补给' });
-    if (available.has('city')) result.push({ id: 'defense', title: '护城要塞' });
-    add('ranked-season'); add('tournament'); add('clan-war'); add('tasks'); add('collection');
+    add('shop', '基础商店'); add('profession-skill-shop'); add('city'); add('activities'); add('progression', '免费战令与日常'); add('tasks'); add('legacy');
     return result;
   }
 
   private debugSections(): Section[] {
-    const known = new Set(['inventory', 'equipment', 'pets', 'cards', 'progression', 'city', 'activities', 'summon', 'shop',
-      'reputation-shop', 'profession-skill-shop', 'tower', 'forbidden', 'world-boss', 'quest-operations', 'ranked-season',
-      'tournament', 'clan-war', 'tasks', 'collection']);
-    return this.state!.growth.sections.filter(section => section.id === 'local-tools' || !known.has(section.id));
+    const known = new Set(['inventory', 'equipment', 'progression', 'city', 'activities', 'shop', 'profession-skill-shop', 'tasks', 'legacy']);
+    return this.state!.growth.sections.filter(section => stageSectionAllowed(section.id) && !known.has(section.id));
   }
 
   private renderEnergySupply(content: Node): void {
@@ -563,7 +531,8 @@ export class GrowthWindows {
   }
 
   private sectionItems(id: string): ActionItem[] {
-    return this.state!.growth.sections.find(section => section.id === id)?.items ?? [];
+    return (this.state!.growth.sections.find(section => section.id === id)?.items ?? [])
+      .filter(item => !stageActionReason(item.action, item.payload ?? {}));
   }
 
   private itemActions(id: string): ActionItem[] {
@@ -572,6 +541,8 @@ export class GrowthWindows {
 
   private execute(item: ActionItem): void {
     if (item.disabled || !item.action) return;
+    const reason = stageActionReason(item.action, item.payload ?? {});
+    if (reason) { this.callbacks.detail('本阶段范围', reason); return; }
     if (item.fields?.length) this.callbacks.action(item);
     else this.callbacks.run(item.action, item.payload ?? {});
   }
@@ -629,17 +600,12 @@ export class GrowthWindows {
     if (this.parent && this.state) this.draw();
   }
 
-  private routeSection(section: string): string {
-    if (section === 'quest-operations') return 'energy-supply';
-    if (section === 'mounts' || section === 'mount') return 'pets';
-    if (section === 'expedition') return 'dock';
-    return section;
-  }
+  private routeSection(section: string): string { return section === 'smithy' ? 'equipment' : section; }
 
-  private openSection(section: string, equipmentMode?: 'wear' | 'smithy'): void {
+  private openSection(section: string): void {
     const destination = this.routeSection(section);
+    if (!stageSectionAllowed(destination)) { this.callbacks.detail('本阶段范围', '本阶段未开放此入口。'); return; }
     this.section = destination;
-    if (equipmentMode) this.equipmentMode = equipmentMode;
     this.categoriesOpen = false;
     this.selectedItem = '';
     if (this.advanced.supports(destination)) {

@@ -24,7 +24,7 @@ export class BattleSceneView {
   private clocks: { remaining: number; done(): void }[] = [];
   private flights: Node[] = []; private selectedHandPositions = new Map<string, Vec3>();
   private pendingFlight?: { cardId: string; origin: Vec3 }; private impacted = new Set<string>();
-  speed = 1; autoplay = false;
+  private readonly speed = 1; autoplay = false;
 
   constructor(private parent: Node, private ui: CocosUi, private original: OriginalUi,
       private catalog: RecoveredCatalog, private base: string, private hooks: Hooks) {
@@ -344,7 +344,7 @@ export class BattleSceneView {
   }
   private renderHud(force = false) {
     const state = this.presentation.visibleState; if (!state || this.disposed) return;
-    const key = `${state.revision}:${this.locked}:${this.selected}:${this.speed}:${this.autoplay}:${this.settledReady}`;
+    const key = `${state.revision}:${this.locked}:${this.selected}:${this.autoplay}:${this.settledReady}`;
     if (!force && this.uiKey === key) return; this.uiKey = key;
     this.hud?.destroy(); this.hud = this.ui.node(this.parent, 'BattleWnd:original-layout', 1200, 600);
     const hud = this.hud; const active = state.players[state.activePlayer];
@@ -383,7 +383,6 @@ export class BattleSceneView {
     this.skinButton(hud, 'Battle:End', 'hhjs_1', '', '结束回合', 528.5, -136, 139, 35, () => this.hooks.command({ type: 'end' }), !mine);
     this.skinButton(hud, 'Battle:Auto', 'ajbangzhu', '', this.autoplay ? '自动' : '手动', 432, -136, 50, 35, () => { this.autoplay = !this.autoplay; this.renderHud(true); }, this.latest.settled);
     this.skinButton(hud, 'Battle:Surrender', 'tx_1', '', '', 382, -136, 50, 35, () => this.hooks.command({ type: 'surrender' }), this.locked || this.latest.settled);
-    this.skinButton(hud, 'Battle:Speed', 'ajbangzhu', '', `${this.speed}倍速`, 312, -136, 75, 27, () => { this.speed = this.speed === 1 ? 2 : 1; this.renderHud(true); });
     if (mine) for (const [index, play] of this.latest.legalPlays.filter(play => play.instanceId === this.selected).entries()) {
       const p = this.position(play.row, play.col);
       const hand = me.hand.find(card => card.instanceId === play.instanceId);

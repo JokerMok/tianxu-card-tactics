@@ -232,12 +232,13 @@ function closeSeason(world, tables, now) {
     key: season.key, startAt: season.startAt, endAt: season.endAt, ranked: ranking, clan,
     registrations: structuredClone(season.clan.registrations), closedAt: now,
   });
-  league.current = newSeason(now);
+  league.current.closed=true; // Stage pause: settle the existing cycle, never create the next one.
 }
 
 function rotate(world, tables, now) {
   const league = ensureWorld(world, now);
-  if (now < league.current.endAt) return false;
+  if (league.current.closed||now < league.current.endAt) return false;
+  if(Object.values(world.battles??{}).some(b=>!b.settled&&['ranked','clan-war'].includes(b.mode)))return false;
   closeSeason(world, tables, now);
   return true;
 }

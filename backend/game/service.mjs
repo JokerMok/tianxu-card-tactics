@@ -1,3 +1,4 @@
+import { STAGE_SCOPE, stageError, initializeStage, stageActionGuard, stageFilterSections, stageDeckIssues, stageDungeonAllowed, stageSceneAllowed, stageCardAllowed, stageItemAllowed, legacyClaimKey } from './stage-policy.mjs';
 import { randomInt, randomUUID } from 'node:crypto';
 import { createBattle, applyBattleAction, legalPlays, advanceAI, publicBattle } from '../../cocos-client/assets/scripts/game/BattleKernel.ts';
 import { numeric } from '../../cocos-client/assets/scripts/game/RecoveredContent.ts';
@@ -37,6 +38,8 @@ export class GameService {
       if(expectedActorRevision!==undefined&&(!Number.isSafeInteger(expectedActorRevision)||expectedActorRevision!==(actor.commandRevision??0)))throw conflict('角色已被另一页面更新，请同步后重新操作','ACTOR_CONFLICT',{actorRevision:actor.commandRevision??0});
       const ctx = { world, actor, content: this.content, tables: this.content.tables, now, randomInt,
         makePlayer: (candidate, team) => this.playerSpec(world, candidate, team) };
+      this.ensureStage(ctx);
+      stageActionGuard(ctx,action,payload);
       touchActorActivity(ctx);
       const before = pveActionSnapshot(ctx);
       const result = (() => {
@@ -44,7 +47,7 @@ export class GameService {
       const active = this.activeBattle(world, actor.id);
       const locked = ['deck.save', 'pve.start', 'room.create', 'room.join', ...growthActions, ...competitionActions, ...leagueActions, 'guild.leave', 'guild.transfer', ...pveActions.filter(name => name !== 'task.claim'), ...socialActions.filter(name => ['trade.', 'auction.', 'mail.send'].some(prefix => name.startsWith(prefix)))];
       if (active && locked.includes(action)) throw new Error('请先结束当前战斗');
-      if (pveActions.includes(action) && (action !== 'task.claim' || !this.tasks(actor).some(task => task.id === payload.taskId))) {
+      if (pveActions.includes(action) && (action !== 'task.claim' || !this.tasks(actor,true).some(task => task.id === payload.taskId))) {
         const result = operatePve(ctx, action, payload);
         if (result.start) {
           const record = this.startSpecialPve(world, actor, result.start, now);
@@ -78,9 +81,10 @@ export class GameService {
         if (step >= requirements.length || !requirements[step]) throw new Error('请先完成本步引导目标');
         actor.tutorialStep++; grantSilver(actor, 20, '新手引导', now); return { message: '引导完成，获得20银币' };
       }
-      if (action === 'task.claim') return this.claimTask(actor, payload, now);
+      if (action === 'task.claim'&&this.tasks(actor,true).some(task=>task.id===payload.taskId)) return this.claimTask(actor, payload, now);
       if (action === 'pve.enterScene') {
         const sceneId = Number(payload.sceneId);
+        if(!stageSceneAllowed(this.content.tables,sceneId))throw stageError('该扩展场景本阶段暂缓，主线章节继续保留。');
         if (!actor.progress.unlockedScenes.includes(sceneId)) throw new Error('场景尚未解锁');
         this.content.graph(sceneId); actor.progress.sceneId = sceneId; return { message: '已进入场景' };
       }
@@ -90,7 +94,7 @@ export class GameService {
         if (!node || !this.content.nodeAccessible(actor, graph, node)) throw new Error('请先通关前置关卡');
         const next = node.triggers.find(trigger => numeric(trigger.raw, 'type') === 3);
         if (!next) throw new Error('此处没有场景通道');
-        const sceneId = numeric(next.raw, 'nextsenceid'); this.content.graph(sceneId);
+        const sceneId = numeric(next.raw, 'nextsenceid');if(!stageSceneAllowed(this.content.tables,sceneId))throw stageError(); this.content.graph(sceneId);
         const minLevel = this.content.sceneLevels.get(String(sceneId)) ?? 1;
         if (actor.level < minLevel) throw new Error(`需要等级${minLevel}`);
         if (!actor.progress.unlockedScenes.includes(sceneId)) actor.progress.unlockedScenes.push(sceneId);
@@ -100,6 +104,7 @@ export class GameService {
         const id = Number(payload.sceneId);
         const entry = this.content.table('scene/fubens').find(row => ['简单', '普通', '困难'].some(key => Number(row[key]) === id));
         if (!entry) throw new Error('副本不存在');
+        if (!stageDungeonAllowed(this.content.tables,id)) throw stageError('本阶段仅开放普通副本；已有进度与在途战斗保留。');
         const minLevel = this.content.sceneLevels.get(String(id)) ?? 1;
         if (actor.level < minLevel) throw new Error(`需要等级${minLevel}`);
         const gold = Number(entry['进入消耗金币'] ?? 0);
@@ -124,6 +129,8 @@ export class GameService {
         actor.progress.sceneId = id; return { message: '副本挑战已开启' };
       }
       if (action === 'pve.start') {
+        const issues=stageDeckIssues(actor,this.content.tables);if(issues.length)throw new Error(issues.join('\n'));
+        if(!stageSceneAllowed(this.content.tables,String(payload.nodeId).split(':node:')[0]))throw stageError();
         const level = this.content.level(actor, payload.nodeId, payload.triggerId);
         const battle = this.startPve(world, [actor], level, now, 'pve');
         return { message: '战斗开始', battleId: battle.id };
@@ -156,6 +163,8 @@ export class GameService {
       })();
       actor.name = requireText(actor.name, '角色名称', 14);
       onPveAction(ctx, action, payload, result, before);
+      delete actor.stageScope?.claims?.[legacyClaimKey(action,payload)];
+      if(action==='inventory.use'&&ctx.legacyRewards){const key=String(payload.itemId).includes(':')?payload.itemId:`main:item:${payload.itemId}`;actor.stageScope.inventory[key]=Math.max(0,(actor.stageScope.inventory[key]??0)-Number(payload.count??1));}
       actor.commandRevision=(actor.commandRevision??0)+1;
       return {...result,commandRevision:actor.commandRevision};
     }, now);
@@ -175,22 +184,25 @@ export class GameService {
       quests: {}, claimed: [], tutorialStep: 0, rating: 1000, wins: 0, losses: 0,
       stats: { battles: 0, pveWins: 0, coopWins: 0, pvpMatches: 0, deckEdits: 0 },
       settings: { music: true, sound: true }, createdAt: now, lastLogin: now, economicLog: [] };
-    this.content.validateDeck(actor, deck); world.characters[id] = actor;
+    this.content.validateDeck(actor, deck);
+    actor.stageScope={id:STAGE_SCOPE.id,startedAt:now,claims:{},inventory:{},battles:[],rooms:[],unresolved:[]};
+    world.characters[id] = actor;
     world.mail[`welcome:${id}`] = { id: `welcome:${id}`, from: 'system', to: id, title: '欢迎来到天墟',
       text: '初始卡组已准备。先保存编队，再从世界地图出征。卡牌准备值归零后可部署。', attachment: null, claimed: true, read: false, at: now };
     return { message: '角色已创建', characterId: id };
   }
-  tasks(actor) {
+  tasks(actor, includePaused=false) {
     return [
       { id: 'first-deck', name: '整备卡组', detail: '保存一次合法卡组', ready: actor.stats.deckEdits > 0, reward: 30 },
       { id: 'first-battle', name: '踏上征途', detail: '完成一场战斗', ready: actor.stats.battles > 0, reward: 30 },
       { id: 'three-wins', name: '主线先锋', detail: '取得三场PVE胜利', ready: actor.stats.pveWins >= 3, reward: 100 },
       { id: 'cooperation', name: '并肩作战', detail: '与真实玩家合作取胜', ready: actor.stats.coopWins > 0, reward: 100 },
       { id: 'arena', name: '竞技新秀', detail: '完成一场真实PVP', ready: actor.stats.pvpMatches > 0, reward: 100 },
-    ].map(task => ({ ...task, claimed: actor.claimed.includes('task:' + task.id) }));
+    ].filter(task=>includePaused||!['cooperation','arena'].includes(task.id)).map(task => ({ ...task, claimed: actor.claimed.includes('task:' + task.id) }));
   }
   claimTask(actor, payload, now) {
-    const task = this.tasks(actor).find(task => task.id === payload.taskId);
+    const task = this.tasks(actor,true).find(task => task.id === payload.taskId);
+    if(['cooperation','arena'].includes(payload.taskId)&&!actor.stageScope?.claims?.[legacyClaimKey('task.claim',payload)])throw stageError();
     if (!task || !task.ready || task.claimed) throw new Error('任务未完成或已领取');
     actor.claimed.push('task:' + task.id); grantSilver(actor, task.reward, '任务奖励', now);
     this.content.grantExperience(actor, 10); return { message: `领取${task.reward}银币与10经验` };
@@ -209,7 +221,7 @@ export class GameService {
   startPve(world, actors, level, now, mode, roomId) {
     const id = randomUUID(); const seed = randomInt(1, 0x7fffffff);
     const players = actors.map(actor => this.playerSpec(world, actor, 0));
-    const elite = level.trigger.children.some(row => row._tag === 'elite') && randomInt(10000) < numeric(level.trigger.raw, 'eliteprob');
+    const elite = false; // New elite branches are deferred; persisted battles keep their original encounter.
     const encounterParams = elite ? this.content.encounter(level.trigger, true) : level.params;
     for (const [index, param] of encounterParams.entries()) {
       const monsterId = numeric(param, 'id'); const hero = this.content.data.monsters[String(monsterId)];
@@ -312,10 +324,10 @@ export class GameService {
         silver = numeric(rewardRaw, 'silverprize'); xp = numeric(rewardRaw, 'expprize');
         const cardId = numeric(rewardRaw, 'cardidprize'); const count = numeric(rewardRaw, 'cardnumprize');
         if (cardId > 0 && count > 0) {
-          const card = this.content.card(cardId); actor.cards[card.id] = (actor.cards[card.id] ?? 0) + count;
-          cards.push({ id: card.id, count });
+          const card = this.content.card(cardId); if(stageCardAllowed(this.content.tables,card.id)||actor.stageScope?.battles?.includes(record.id)){actor.cards[card.id] = (actor.cards[card.id] ?? 0) + count;
+          cards.push({ id: card.id, count });}
         }
-        const extras = grantCampaignExtras({ world, actor, content: this.content, tables: this.content.tables, now, randomInt }, record,
+        const extras = grantCampaignExtras({ world, actor, content: this.content, tables: this.content.tables, now, randomInt, legacyRewards:actor.stageScope?.battles?.includes(record.id) }, record,
           { trigger: repeatReward, node, scene, eligible: Boolean(repeatReward) });
         cards.push(...extras.cards.map(card => ({ id: card.cardId, count: card.count })));
         record.campaignExtras ??= {}; record.campaignExtras[id] = extras;
@@ -329,7 +341,7 @@ export class GameService {
             const item = Number(prize['（道具ID 其他填0)']); const amount = Number(prize['数量']);
             if (type === 1) silver += amount;
             else if (type === 2) actor.currencies.gold += amount;
-            else if (type === 4) actor.inventory[`main:item:${item}`] = (actor.inventory[`main:item:${item}`] ?? 0) + amount;
+            else if (type === 4 && (stageItemAllowed(this.content.tables,item)||actor.stageScope?.battles?.includes(record.id))) actor.inventory[`main:item:${item}`] = (actor.inventory[`main:item:${item}`] ?? 0) + amount;
             actor.claimed.push(key);
           }
         }
@@ -347,9 +359,9 @@ export class GameService {
       grantSilver(actor, silver, `战斗结算:${record.id}`, now); this.content.grantExperience(actor, xp);
       record.rewards[id] = { won, silver: silver + Number(record.campaignExtras?.[id]?.currencies?.silver ?? 0), xp: xp + Number(record.campaignExtras?.[id]?.xp ?? 0), cards, extras: record.campaignExtras?.[id] };
       const balanceBefore = actor.currencies.silver; const xpBefore = actor.xp;
-      onPveBattleSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt }, record, won);
-      onCompetitionSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt }, record, won);
-      onLeagueSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt }, record, won);
+      onPveBattleSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt, legacyRewards:actor.stageScope?.battles?.includes(record.id) }, record, won);
+      onCompetitionSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt, legacyRewards:actor.stageScope?.battles?.includes(record.id) }, record, won);
+      onLeagueSettled({ world, actor, content: this.content, tables: this.content.tables, now, randomInt, legacyRewards:actor.stageScope?.battles?.includes(record.id) }, record, won);
       if (record.pve) {
         if (won) actor.stats.pveWins++;
         record.rewards[id] = { won, silver: actor.currencies.silver - balanceBefore,
@@ -418,9 +430,17 @@ export class GameService {
     room.status = 'battle'; room.battleId = record.id;
     return { message: '联机战斗开始', battleId: record.id };
   }
+  ensureStage(ctx) {
+    if(ctx.actor.stageScope?.id===STAGE_SCOPE.id)return false;
+    touchActorActivity(ctx,0);
+    const sections=[...growthView(ctx).sections,...pveView(ctx).sections,...competitionView(ctx).sections,...leagueView(ctx).sections];
+    sections.push({id:'old-milestones',items:this.tasks(ctx.actor,true).filter(t=>['cooperation','arena'].includes(t.id)&&t.ready&&!t.claimed).map(t=>({label:t.name,action:'task.claim',payload:{taskId:t.id}}))});
+    return initializeStage(ctx,sections);
+  }
   view(accountId, characterId) {
     let world = this.store.read(); let actor = this.actor(world, accountId, characterId);
     const now = this.clock();
+    if(actor.stageScope?.id!==STAGE_SCOPE.id){this.store.scheduled(current=>this.ensureStage({world:current,actor:this.actor(current,accountId,characterId),content:this.content,tables:this.content.tables,now,randomInt}));world=this.store.read();actor=this.actor(world,accountId,characterId);}
     if (!Number.isFinite(actor.growth?.lastActiveAt) || now - actor.growth.lastActiveAt >= 60000) {
       const changed = this.store.scheduled(current => touchActorActivity({ world: current, actor: this.actor(current, accountId, characterId), content: this.content, tables: this.content.tables, now, randomInt }));
       if (changed) { world = this.store.read(); actor = this.actor(world, accountId, characterId); }
@@ -446,20 +466,21 @@ export class GameService {
         detail: `当前领主：${world.guilds[territory.controllerGuildId]?.name ?? '尚无'}`, action: 'room.create', payload: { mode: 'clan-war', territoryId: territory.id } });
     }
     growth.sections.find(section => section.id === 'tournament')?.items.push({ label: '创建竞技赛房间', action: 'room.create', payload: { mode: 'tournament' }, disabled: competition.tournament?.status !== 'active' });
-    growth.sections = presentSections(this.content, growth.sections);
-    const social = socialView(world, actor); const names = presentationNames(this.content);
+    const social = socialView(world, actor);
+    growth.sections=presentSections(this.content,stageFilterSections({...ctx,social},growth.sections));
+    const names = presentationNames(this.content);
     const assets = new Set([...Object.keys(actor.inventory), ...Object.keys(actor.cards), ...Object.keys(actor.warehouse ?? {}), ...Object.values(actor.equipment ?? {}),
       ...social.trades.map(row => row.goods?.id), ...social.auctions.map(row => row.goods?.id), ...social.mail.map(row => row.attachment?.id)].filter(Boolean));
     const assetNames = Object.fromEntries(Array.from(assets, id => [id, names[id] ?? (id.includes(':item:') ? `物品 #${id.split(':').at(-1)}` : `卡牌 #${id.split(':').at(-1)}`)]));
-    return { serverInstance:this.instanceId,revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
+    return { stageScope:STAGE_SCOPE,serverInstance:this.instanceId,revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, tutorialReady:[true,actor.stats.deckEdits>0,actor.stats.battles>0,actor.stats.pveWins>0][actor.tutorialStep]===true,deckIssues:stageDeckIssues(actor,this.content.tables), deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
       story: String(this.content.table('stringres').find(row => row.ID === 10100)?.des ?? ''),
-      scenes: this.content.sceneSummary(actor), tasks: this.tasks(actor), growth, pve, social,
+      scenes: this.content.sceneSummary(actor).filter(scene=>stageSceneAllowed(this.content.tables,scene.id)), tasks: this.tasks(actor), growth, pve, social,
       roomInvites: Object.values(world.roomInvites ?? {}).filter(invite => invite.to === actor.id && invite.expires > this.clock() && world.rooms[invite.roomId]?.status === 'waiting'),
       rooms: Object.values(world.rooms).filter(room => room.status === 'waiting' || (room.members.includes(actor.id) && !world.battles[room.battleId]?.dismissed.includes(actor.id))),
       rankings: Object.values(world.characters).map(char => ({ id: char.id, name: char.name, level: char.level, rating: char.rating, wins: char.wins, losses: char.losses }))
         .sort((a, b) => b.rating - a.rating),
-      dungeons: this.content.table('scene/fubens').filter(row => typeof row['副本ID'] === 'number').map(row => ({
-        id: row['副本ID'], name: row['名称'], easy: row['简单'], normal: row['普通'], hard: row['困难'] })) };
+      dungeons: this.content.table('scene/fubens').filter(row => typeof row['副本ID'] === 'number'&&(stageDungeonAllowed(this.content.tables,row['简单'])||stageDungeonAllowed(this.content.tables,row['普通']))).map(row => ({
+        id: row['副本ID'], name: row['名称'], easy: row['简单'], normal: row['普通'], hard: null })) };
   }
   tick() {
     const now = this.clock();

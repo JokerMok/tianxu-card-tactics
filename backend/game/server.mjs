@@ -1,4 +1,6 @@
 import http from 'node:http';
+import {gzipSync} from 'node:zlib';
+import {createHash} from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createReadStream, statSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -46,6 +48,9 @@ export async function createGameServer(options = {}) {
   const content = new ServerContent(folder,{localizationFolder});
   const store = new GameStore(options.database ?? process.env.TIANXU_DATABASE ?? path.join(ROOT, 'backend/data/tianxu.sqlite'));
   const service = new GameService(store, content, { clock: options.clock });
+  const catalogBytes=Buffer.from(JSON.stringify(content.catalog));
+  const catalogGzip=gzipSync(catalogBytes);
+  const catalogEtag='"'+createHash('sha256').update(catalogBytes).digest('hex')+'"';
   const gm=new GmService(store,content),limit=rateLimiter(),address=req=>clientAddress(req,trustedProxies);
   const gmHttp=createGmHttp({store,gm,publicOrigin,body,limit,address});
   const gmWeb=options.gmWebFolder??path.join(ROOT,'backend/gm-web');
@@ -81,8 +86,18 @@ export async function createGameServer(options = {}) {
         const accountId = store.authenticate(token);
         const characterId = String(request.headers['x-character-id'] ?? '');
         if (request.method === 'GET' && url.pathname === '/api/characters') return json(200, { characters: service.characters(accountId) });
-        if (request.method === 'GET' && url.pathname === '/api/catalog') return json(200, content.catalog);
+        if (request.method === 'GET' && url.pathname === '/api/catalog') {
+          const headers={'Content-Type':'application/json; charset=utf-8','Cache-Control':'private, max-age=3600','ETag':catalogEtag,'Vary':'Accept-Encoding'};
+          if(request.headers['if-none-match']===catalogEtag){response.writeHead(304,headers);response.end();return;}
+          const compressed=/\bgzip\b/.test(String(request.headers['accept-encoding']??''));
+          const bytes=compressed?catalogGzip:catalogBytes;
+          response.writeHead(200,{...headers,'Content-Length':bytes.length,...(compressed?{'Content-Encoding':'gzip'}:{})});response.end(bytes);return;
+        }
         if (request.method === 'GET' && url.pathname === '/api/state') {
+          if(url.searchParams.get('instance')===service.instanceId){
+            const world=store.read(),actor=service.actor(world,accountId,characterId);
+            if(url.searchParams.get('since')===String(world.revision)&&actor.stageScope&&Number.isFinite(actor.growth?.lastActiveAt)&&service.clock()-actor.growth.lastActiveAt<60000)return json(200,{unchanged:true,revision:world.revision,serverInstance:service.instanceId,now:service.clock()});
+          }
           const view = service.view(accountId, characterId);
           if (!allowTestActions && view.growth?.sections) view.growth.sections = view.growth.sections
             .filter(section => section.id !== 'local-tools')

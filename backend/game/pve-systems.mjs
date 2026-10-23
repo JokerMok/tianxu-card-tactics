@@ -1,3 +1,4 @@
+import { stageError, stageTaskAllowed, stageRewardAllowed, legacyClaimKey } from './stage-policy.mjs';
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
 const CST = 8 * 3_600_000;
@@ -243,6 +244,7 @@ function activeWorldBoss(ctx) {
   const latest = events.at(-1);
   if (!latest || latest.status === 0) return { config, day, open: false, status: 0, performance: latest?.performance ?? 0 };
   const key = `${day}:${latest.performance}`;
+  if(!ctx.world.pve.worldBoss[key])return {config,day,open:false,status:0,performance:latest.performance};
   const season = ctx.world.pve.worldBoss[key] ??= { key, day, performance: latest.performance, maxHp: config.hp,
     hp: config.hp, status: latest.status, contributions: {}, defeated: false, closed: false };
   season.status = season.defeated ? 0 : latest.status;
@@ -336,6 +338,7 @@ function activeForbidden(ctx) {
   const config = forbiddenConfig(ctx), time = localSeconds(ctx.now), day = dayKey(ctx.now);
   const elapsed = config.schedule.filter(event => event.at <= time), latest = elapsed.at(-1);
   const status = latest?.status ?? 0;
+  if(!ctx.world.pve.forbidden[day])return {config,day,open:false,status:0,season:{key:day,day,rankings:{},closed:true}};
   const season = ctx.world.pve.forbidden[day] ??= { key: day, day, status, rankings: {}, closed: false };
   season.status = status;
   if (status === 0 && elapsed.some(event => event.status === 2)) season.closed = true;
@@ -805,6 +808,13 @@ function targetProgress(ctx, target, task) {
   }
 }
 
+function enabledStageTasks(ctx) {
+  const tasks=taskCatalog(ctx.tables).tasks;
+  const enabled=new Set([...tasks.values()].filter(t=>stageTaskAllowed(t,ctx.tables)).map(t=>t.id));
+  let changed=true;while(changed){changed=false;for(const id of enabled){const task=tasks.get(id);if(task.conditions.some(c=>c.type===4&&!ctx.actor.pve.tasks.claimed.includes(number(c.params.taskid))&&!enabled.has(number(c.params.taskid)))){enabled.delete(id);changed=true;}}}
+  return enabled;
+}
+
 function taskView(ctx, task) {
   const progress = task.targets.map(target => ({ detail: target.detail, type: target.type, ...targetProgress(ctx, target, task) }));
   const eligible = task.conditions.every(condition => conditionMet(ctx, condition));
@@ -817,6 +827,7 @@ function claimTask(ctx, payload) {
   ensure(ctx);
   const task = taskCatalog(ctx.tables).tasks.get(number(payload.taskId));
   if (!task) fail('任务不存在');
+  if(!enabledStageTasks(ctx).has(task.id)&&!ctx.actor.stageScope?.claims?.[legacyClaimKey('task.claim',payload)])throw stageError('该任务依赖暂缓玩法，本阶段不再产生新目标。');
   const view = taskView(ctx, task);
   if (!view.eligible || !view.ready || view.claimed) fail('任务未完成或已领取');
   const reward = task.reward ?? {};
@@ -824,16 +835,17 @@ function claimTask(ctx, payload) {
   credit(ctx.actor, 'gold', number(reward.gold), 'source-task', ctx.now);
   credit(ctx.actor, 'crystal', number(reward.crystal), 'source-task', ctx.now);
   grantXp(ctx, reward.xp);
-  if (number(reward.cardId) > 0 && number(reward.cardCount) > 0) {
+  if ((ctx.legacyRewards||stageRewardAllowed(ctx.tables,'card',reward.cardId))&&number(reward.cardId) > 0 && number(reward.cardCount) > 0) {
     const key = `main:card:${reward.cardId}`;
     ctx.actor.cards[key] = number(ctx.actor.cards[key]) + number(reward.cardCount);
   }
   for (const item of reward.items ?? []) {
+    if(!ctx.legacyRewards&&!stageRewardAllowed(ctx.tables,'item',item.id))continue;
     const key = `main:item:${item.id}`;
     ctx.actor.inventory[key] = number(ctx.actor.inventory[key]) + item.count;
   }
-  ctx.actor.pve.tasks.contribution = number(ctx.actor.pve.tasks.contribution) + number(reward.contribution);
-  ctx.actor.pve.tasks.activity = number(ctx.actor.pve.tasks.activity) + number(reward.activity);
+  if(ctx.legacyRewards){ctx.actor.pve.tasks.contribution = number(ctx.actor.pve.tasks.contribution) + number(reward.contribution);
+  ctx.actor.pve.tasks.activity = number(ctx.actor.pve.tasks.activity) + number(reward.activity);}
   ctx.actor.pve.tasks.claimed.push(task.id);
   ctx.actor.claimed.push(`source-task:${task.id}`);
   return { message: '任务奖励已领取', taskId: task.id, reward };
@@ -1013,8 +1025,9 @@ export function pveView(ctx) {
     && season.rewardEligibility?.[ctx.actor.id]?.length && !pve.worldBoss.rewardClaims.includes(`${season.key}:${ctx.actor.id}`));
   const forbiddenClaims = Object.values(ctx.world.pve.forbidden).filter(season => season.rewardsFinalized
     && season.rewardEligibility?.[ctx.actor.id] && !pve.forbidden.rewardClaims.includes(`${season.key}:${ctx.actor.id}`));
+  const stageTasks=enabledStageTasks(ctx);
   const groups = tasks.groups.map(group => ({ id: group.id, type: group.type, classType: group.classType, dailyActivity: group.dailyActivity,
-    tasks: group.tasks.map(task => taskView(ctx, task)) }));
+    tasks: group.tasks.filter(task=>!ctx.actor.stageScope||stageTasks.has(task.id)||ctx.actor.stageScope?.claims?.[legacyClaimKey('task.claim',{taskId:task.id})]).map(task => taskView(ctx, task)) }));
   const layouts = towerRows(ctx), normalMax = Math.max(...layouts.filter(row => number(row.MaxLayout) < 501).map(row => number(row.MaxLayout))),
     infernalMax = Math.max(...layouts.filter(row => number(row.MinLayout) >= 501).map(row => number(row.MaxLayout))),
     normalComplete = pve.tower.nextNormal > normalMax, infernalComplete = pve.tower.nextInfernal > infernalMax,

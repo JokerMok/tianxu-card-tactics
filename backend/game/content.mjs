@@ -1,3 +1,4 @@
+import {stageCardAllowed,stageDeckIssues} from './stage-policy.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { MISSING_MONSTERS, BOARD_SCENES, FALLBACK_MAP } from './compatibility.mjs';
@@ -42,6 +43,7 @@ export class ServerContent extends RecoveredContent {
     const counts = {};
     for (const id of deck) {
       const card = this.card(id);
+      if(!stageCardAllowed(this.tables,id))throw new Error('该卡关联的集结点技能本阶段暂缓，请换牌；持有资产保留。');
       const monster = this.monsterForCard(id);
       const type = numeric(card.raw, 'Type');
       if (type === 1 && !monster) throw new Error('特殊英雄卡不能加入卡组');
@@ -52,7 +54,7 @@ export class ServerContent extends RecoveredContent {
         if (required > 0 && required !== actor.profession) throw new Error('卡牌职业不符');
       }
       counts[id] = (counts[id] ?? 0) + 1;
-      if (counts[id] > (actor.cards[id] ?? 0)) throw new Error('卡牌持有数量不足');
+      if (counts[id] > (actor.cards[id] ?? 0)) throw new Error(stageDeckIssues({...actor,deck},this.tables).join('\n')||'卡牌持有数量不足');
       if (counts[id] > (monster && numeric(monster, 'Unique') ? 1 : 3)) throw new Error('同名卡牌超出允许数量');
     }
     return [...deck];

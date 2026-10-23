@@ -1,3 +1,4 @@
+import {stageRewardAllowed,stageCardAllowed,stageItemAllowed} from './stage-policy.mjs';
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;
 const table = (tables, name) => tables?.[`embeddata/scp/${name.toLowerCase()}.xml`] ?? [];
 const localId = value => {
@@ -50,6 +51,8 @@ function addLog(ctx, asset, amount, reason) {
 
 function addReward(ctx, reward, result, reason) {
   const { type, id, count } = reward;
+  const kind=type===1?'silver':type===2?'gold':type===3?'card':type===4?'item':'paused';
+  if(!ctx.legacyRewards&&!stageRewardAllowed(ctx.tables,kind,id)){(result.withheld??=[]).push({...reward,reason:'stage-paused'});return false;}
   if (!Number.isSafeInteger(count) || count < 1) return false;
   if (type === 1 || type === 2) {
     const asset = type === 1 ? 'silver' : 'gold';
@@ -143,15 +146,15 @@ function dungeonPreview(ctx, record, node) {
 
 function reconstructedPool(ctx, groupId) {
   const tickets = new Set(table(ctx.tables, 'scene/fubens').map(row => number(row['进入消耗道具ID'])).filter(id => id > 0 && itemDefinition(ctx.tables, id)));
-  const items = [...tickets].sort((a, b) => a - b).map(id => ({ type: 4, id, count: 1 }));
+  const items = [...tickets].filter(id=>ctx.legacyRewards||stageItemAllowed(ctx.tables,id)).sort((a, b) => a - b).map(id => ({ type: 4, id, count: 1 }));
   for (const name of ['medicament', 'warrant']) {
     for (const row of table(ctx.tables, name)) {
       const id = number(row['物品ID'] ?? row.ID);
-      if (id > 0 && itemDefinition(ctx.tables, id) && !items.some(value => value.id === id)) items.push({ type: 4, id, count: 1 });
+      if ((ctx.legacyRewards||stageItemAllowed(ctx.tables,id)) && id > 0 && itemDefinition(ctx.tables, id) && !items.some(value => value.id === id)) items.push({ type: 4, id, count: 1 });
     }
   }
   const qualityCap = Math.max(0, Math.min(6, Math.floor(number(groupId) / 50)));
-  const cards = table(ctx.tables, 'card').filter(row => number(row.Quality) <= qualityCap && cardDefinition(ctx.tables, number(row.ID)))
+  const cards = table(ctx.tables, 'card').filter(row => (ctx.legacyRewards||stageCardAllowed(ctx.tables,row.ID)) && number(row.Quality) <= qualityCap && cardDefinition(ctx.tables, number(row.ID)))
     .map(row => ({ type: 3, id: number(row.ID), count: 1 }));
   return [...items, ...cards];
 }

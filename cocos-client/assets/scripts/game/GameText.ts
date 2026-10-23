@@ -147,6 +147,14 @@ export function presentationError(raw: string): string {
   if (/Failed to fetch|NetworkError|Load failed|fetch failed/i.test(text)) return '网络连接中断，请稍后重试。';
   if (/Unauthorized|Invalid token|token expired/i.test(text)) return '登录状态已失效，请重新登录。';
   if (/AbortError|timed?\s*out/i.test(text)) return '请求超时，结果尚未确认，请重试确认。';
+  if (/insufficient silver/i.test(text)) return '银币不足。';
+  if (/insufficient gold/i.test(text)) return '金币不足。';
+  if (/insufficient crystal/i.test(text)) return '晶石不足。';
+  if (/warehouse full/i.test(text)) return '仓库已满，请先取出或整理物品。';
+  if (/item locked/i.test(text)) return '该物品已锁定，请先解锁。';
+  if (/profession skill holding limit reached/i.test(text)) return '该职业技能卡已达到持有上限。';
+  if (/profession skill unavailable/i.test(text)) return '当前职业无法购买这张技能卡。';
+  if (/item has no directly usable effect|item is not a configured consumable/i.test(text)) return '该道具本阶段不可使用，未消耗任何道具。';
   if (/Unable to load original UI skin|Original UI .* missing|Unknown original (?:skin|component)/i.test(text)) return '界面资源加载失败，请重启游戏后重试。';
   return text;
 }

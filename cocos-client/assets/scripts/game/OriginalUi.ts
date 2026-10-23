@@ -154,6 +154,8 @@ function parseColor(value?: string, fallback = Color.WHITE): Color {
  */
 export class OriginalUi {
   private readonly frames = new Map<string, SpriteFrame>();
+  private readonly framePromises = new Map<string, Promise<SpriteFrame>>();
+  private readonly performance = { frameLoads: 0, frameCacheHits: 0, sharedInflightLoads: 0 };
   private readonly sourceByNode = new WeakMap<Node, NodeSource>();
   private readonly buttonFrames = new WeakMap<Node, Record<string, SpriteFrame>>();
   private readonly mountByNode = new WeakMap<Node, MountContext>();
@@ -164,6 +166,11 @@ export class OriginalUi {
     if (catalog.version !== 1 || catalog.sourceManifest !== '5254333315581813739') {
       throw new Error('Original UI catalog schema/source is invalid; rerun scripts/import-original-ui.py');
     }
+  }
+
+  /** Bounded, identity-free counters used by the local runtime diagnostics. */
+  getPerformanceStats(): Readonly<typeof this.performance> {
+    return { ...this.performance };
   }
 
   async mount(componentIdOrAlias: string, parent: Node): Promise<OriginalUiMount> {
@@ -622,9 +629,12 @@ export class OriginalUi {
     const remote = this.baseUrl && file ? `${this.baseUrl.replace(/\/$/, '')}/${file.replace(/^\//, '')}` : '';
     const key = remote || path;
     const cached = this.frames.get(key);
-    if (cached) return Promise.resolve(cached);
-    if (remote) {
-      return new Promise((resolve, reject) => assetManager.loadRemote<ImageAsset>(remote,
+    if (cached) { this.performance.frameCacheHits++; return Promise.resolve(cached); }
+    const inflight = this.framePromises.get(key);
+    if (inflight) { this.performance.sharedInflightLoads++; return inflight; }
+    this.performance.frameLoads++;
+    const load = remote
+      ? new Promise<SpriteFrame>((resolve, reject) => assetManager.loadRemote<ImageAsset>(remote,
         { ext: /\.jpe?g$/i.test(file || '') ? '.jpg' : '.png' }, (error, image) => {
           if (error) return reject(new Error(`Unable to load original UI skin ${remote}: ${error.message}`));
           const texture = new Texture2D();
@@ -633,13 +643,15 @@ export class OriginalUi {
           frame.texture = texture;
           this.frames.set(key, frame);
           resolve(frame);
-        }));
-    }
-    return new Promise((resolve, reject) => resources.load(`${path}/spriteFrame`, SpriteFrame, (error, frame) => {
-      if (error) return reject(new Error(`Unable to load original UI skin ${path}: ${error.message}`));
-      this.frames.set(key, frame);
-      resolve(frame);
-    }));
+        }))
+      : new Promise<SpriteFrame>((resolve, reject) => resources.load(`${path}/spriteFrame`, SpriteFrame, (error, frame) => {
+        if (error) return reject(new Error(`Unable to load original UI skin ${path}: ${error.message}`));
+        this.frames.set(key, frame);
+        resolve(frame);
+      }));
+    this.framePromises.set(key, load);
+    void load.finally(() => this.framePromises.delete(key)).catch(() => undefined);
+    return load;
   }
 
   private buttonAncestor(node: Node): Node | null {

@@ -2,6 +2,7 @@ import { BlockInputEvents, Button, Color, Node, UIOpacity } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import type { OriginalUi, OriginalUiMount } from './OriginalUi.ts';
 import type { RecoveredCatalog } from './RecoveredContent.ts';
+import { stageActionReason, stageSectionAllowed } from './StageScope.ts';
 
 type Row = Record<string, unknown>;
 interface Field { key: string; label: string; type?: string; value?: unknown; min?: number; max?: number; options?: {label: string; value: string}[] }
@@ -90,9 +91,8 @@ export class AdvancedGrowthWindows {
   ) {}
 
   supports(section: string): section is AdvancedSection {
-    return ['pets', 'cards', 'progression', 'city', 'shop', 'reputation-shop', 'profession-skill-shop',
-      'activities', 'summon', 'tower', 'forbidden', 'world-boss', 'dock', 'expedition', 'defense',
-      'ranked-season', 'tournament'].includes(section);
+    return ['progression', 'city', 'shop', 'profession-skill-shop', 'activities'].includes(section)
+      && stageSectionAllowed(section);
   }
 
   render(parent: Node, state: unknown, section: AdvancedSection): void {
@@ -325,7 +325,7 @@ export class AdvancedGrowthWindows {
     try { mount.setProgress('progress', progress, 100); } catch { /* Optional progress component. */ }
     this.transparent(root, 'PassPort:Close', 1162, 0, 38, 40, () => this.callbacks.close());
     this.transparent(root, 'PassPort:RewardsTab', 10, 145, 161, 52, () => { this.passTab = 'rewards'; this.redraw(); }, false, '战令奖励');
-    this.transparent(root, 'PassPort:TasksTab', 10, 202, 161, 52, () => { this.passTab = 'tasks'; this.redraw(); }, false, '任务与声望');
+    this.transparent(root, 'PassPort:TasksTab', 10, 202, 161, 52, () => { this.passTab = 'tasks'; this.redraw(); }, false, '保留日常');
     const all = this.sectionItems('progression');
     const claims = all.filter(item => item.action === 'battlePass.claim');
     const items = this.passTab === 'rewards' ? claims : all.filter(item => item.action !== 'battlePass.claim');
@@ -338,25 +338,20 @@ export class AdvancedGrowthWindows {
     } else {
       this.renderPassTasks(root, items);
     }
-    const unlocks = this.sectionItems('local-tools').filter(item => item.action === 'test.unlockBattlePass');
-    if (unlocks.length) this.transparent(root, 'PassPort:Upgrade', 888, 69, 250, 70,
-      () => this.callbacks.detail('战令轨道', '选择要解锁的进阶轨道。', unlocks), false, '解锁进阶轨道');
+    this.ui.label(root, 'PassPort:StageNote', '本阶段保留免费战令', ...center(888, 69, 250, 70), 250, 70, 13, Theme.dim);
   }
 
   private bindTown(root: Node, mount: OriginalUiMount): void {
     this.safeText(mount, 'txtNorTitle', '城池经营');
-    this.safeText(mount, 'txtDiffTitle', '建筑升级');
+    this.safeText(mount, 'txtDiffTitle', '本阶段范围');
     this.safeText(mount, 'txtReward', '征收税金');
-    this.safeText(mount, 'txtReward1', '提升城池');
+    this.safeText(mount, 'txtReward1', '仅保留税收');
     const items = this.sectionItems('city');
     const tax = items.find(item => item.action === 'city.tax');
-    const upgrades = items.filter(item => item.action === 'city.upgrade');
     this.transparent(root, 'Town:Close', 881, 96, 36, 36, () => this.callbacks.close());
     this.transparent(root, 'Town:Tax', 384, 401, 126, 47, () => this.executeMaybe(tax, '征收税金'), Boolean(tax?.disabled), '进入经营');
-    this.transparent(root, 'Town:Buildings', 693, 402, 126, 47, () => {
-      if (upgrades.length) this.callbacks.detail('建筑升级', '选择要升级的建筑。', upgrades);
-      else this.callbacks.detail('建筑升级', '该功能暂未开放');
-    }, !upgrades.length, '选择建筑');
+    this.transparent(root, 'Town:Buildings', 693, 402, 126, 47,
+      () => this.callbacks.detail('本阶段范围', '本阶段仅保留每日税收。'), true, '暂缓升级');
     const city = record(record(this.state?.actor.growth).city);
     const buildings = record(city.buildings);
     const status = Object.entries(buildings).map(([id, value]) => `${id} Lv.${Number(record(value).level ?? 0)}`).join('  ');
@@ -473,7 +468,7 @@ export class AdvancedGrowthWindows {
     entries.slice(page * pageSize, page * pageSize + pageSize).forEach(([level, rewards], column) => {
       const left = 326 + column * 101;
       this.ui.label(parent, `${key}:Level:${level}`, `等级 ${level}`, ...center(left, 157, 96, 30), 96, 30, 13, Theme.gold);
-      const tracks = ['free', 'premium', 'ultimate'];
+      const tracks = ['free'];
       tracks.forEach((track, index) => {
         const item = rewards.find(candidate => String(candidate.payload?.track ?? 'free') === track);
         const top = 192 + index * 92;
@@ -935,8 +930,7 @@ export class AdvancedGrowthWindows {
     this.ui.label(parent, `${key}:Balances`,
       `余额  银币 ${balance(currencies.silver)}   金币 ${balance(currencies.gold)}   晶石 ${balance(currencies.crystal)}`,
       ...center(305, 420, 430, 28), 430, 28, 13, Theme.gold, true);
-    this.ui.button(parent, `${key}:RefreshUnavailable`, '刷新尚未开放', ...center(856, 419, 135, 30), 135, 30,
-      () => undefined, true);
+
   }
 
   private shopIcon(parent: Node, group: ActionGroup, x: number, y: number): void {
@@ -1058,11 +1052,23 @@ export class AdvancedGrowthWindows {
   }
 
   private sectionItems(id: string): ActionItem[] {
-    return this.state?.growth.sections.find(section => section.id === id)?.items ?? [];
+    const items = this.state?.growth.sections.find(section => section.id === id)?.items ?? [];
+    if (!stageSectionAllowed(id)) return [];
+    return items.filter(item => {
+      if (stageActionReason(item.action, item.payload ?? {})) return false;
+      if (id === 'city') return item.action === 'city.tax';
+      if (id === 'activities') return item.action === 'activity.loginClaim' || item.action === 'activity.checkin';
+      if (id === 'progression') return item.action === 'quest.repeatClaim'
+        || (item.action === 'battlePass.claim' && String(item.payload?.track ?? 'free') === 'free');
+      if (id === 'profession-skill-shop') return item.action === 'shop.skill.buy';
+      return true;
+    });
   }
 
   private execute(item: ActionItem): void {
     if (item.disabled || !item.action) return;
+    const reason = stageActionReason(item.action, item.payload ?? {});
+    if (reason) { this.callbacks.detail('本阶段范围', reason); return; }
     if (item.fields?.length) this.callbacks.action(item);
     else this.callbacks.run(item.action, item.payload ?? {});
   }

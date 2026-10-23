@@ -15,7 +15,8 @@
     "backend/gm-web/index.html",
     "backend/gm-web/app.js",
     "backend/gm-web/style.css",
-    "deploy/game/compose.yaml"
+    "deploy/game/compose.yaml",
+    "cocos-client/assets/scripts/game/StageScope.ts"
   ],
   "backend": {
     "directory": "backend/game",
