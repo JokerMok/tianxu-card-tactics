@@ -8,7 +8,8 @@
     "cocos-client/assets/scripts/game/BattleKernel.ts",
     "cocos-client/assets/scripts/game/RecoveredContent.ts",
     "cocos-client/assets/scripts/game/RecoveredEffects.ts",
-    "cocos-client/assets/scripts/game/GameContracts.ts"
+    "cocos-client/assets/scripts/game/GameContracts.ts",
+    "cocos-client/assets/scripts/game/TerrainRules.ts"
   ],
   "backend": {
     "directory": "backend/game",

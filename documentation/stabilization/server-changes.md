@@ -47,3 +47,9 @@ node scripts/game-data.mjs maintain --database /data/tianxu.sqlite
 ## 实际开销
 
 测量见 storage-measurement.json。两账号、各77种持有卡的隔离夹具下，世界JSON约8.4KB，22次读取累计约2.5ms，1次写入约0.05ms；状态视图组装平均约367ms、响应约1.37MB。当前主要成本在视图组装和输出，缺乏拆分世界JSON的收益依据，本轮保持存储结构。该小样本不代表大规模并发或长期数据库性能；状态视图体积仍是后续优化项。
+
+## 2026-10-23：地形状态接入（新增）
+
+`BattleState.version`仍为1，新增可选`terrains`；旧状态缺字段时由内核按空数组处理，不更换数据库，也不要求清档。原有世界JSON事务天然保存地形格、拥有者、剩余回合、占用者及RNG，无需schema3。新技能解析统一在`TerrainRules.ts`与`BattleKernel.ts`，服务、AI仍复用同一内核。
+
+地形动作沿既有出牌及requestId回执路径；重试不新增格、不额外移牌、不重跑随机。结算统一移除地形，原唯一奖励账本继续保护发奖。此次没有新增第二套服务或重写经济/存档；账号、事务、备份与防重属于已有能力，本轮只确认新状态可经过这些路径恢复。定向结果见`terrain-service-validation.md`与本轮`validation.md`。

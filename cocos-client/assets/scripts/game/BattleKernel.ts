@@ -1,8 +1,9 @@
 import type {
-  BattleAction, BattleEvent, BattleEventUnitView, BattlePlayer, BattleSpec, BattleState, BattleUnit,
+  BattleAction, BattleEvent, BattleEventUnitView, BattlePlayer, BattleSpec, BattleState, BattleTerrain, BattleUnit,
   HandCard, LegalPlay, Team, UnitStatus,
 } from './GameContracts.ts';
 import { numeric, type RawRow, type RecoveredSkill, RecoveredContent } from './RecoveredContent.ts';
+import { getTerrainRule, type TerrainRule } from './TerrainRules.ts';
 
 const COLUMNS = 12;
 const OPENING_HAND = 5;
@@ -187,6 +188,165 @@ function emit(state: MutableState, event: Omit<BattleEvent, 'seq'>): void {
     ...(actorView ? { actorView } : {}),
     ...(targetView ? { targetView } : {}),
   });
+}
+
+function terrainState(state: MutableState): BattleTerrain[] {
+  return state.terrains ?? (state.terrains = []);
+}
+
+function terrainContains(terrain: BattleTerrain, row: number, col: number): boolean {
+  return terrain.cells.some(cell => cell.row === row && cell.col === col);
+}
+
+function emitTerrain(state: MutableState, type: 'terrain-add' | 'terrain-update' | 'terrain-remove', terrain: BattleTerrain): void {
+  emit(state, { type, terrainId: terrain.id, terrain: clone(terrain), actor: terrain.ownerId, skillId: terrain.skillId });
+}
+
+function terrainRuleFor(content: RecoveredContent, terrain: BattleTerrain): TerrainRule {
+  const rule = getTerrainRule(content, terrain.skillId);
+  if (!rule) throw new Error(`Unknown terrain skill ${terrain.skillId}`);
+  return rule;
+}
+
+function unitOnBlockingTerrain(content: RecoveredContent, state: BattleState, unit: BattleUnit): boolean {
+  return (state.terrains ?? []).some(terrain => terrainContains(terrain, unit.row, unit.col)
+    && terrainRuleFor(content, terrain).blocksPositiveStatuses);
+}
+
+function removePositiveStatuses(content: RecoveredContent, state: MutableState, unit: BattleUnit, terrain: BattleTerrain): void {
+  const positive = unit.statuses.filter(status => numeric(content.data.statuses[String(status.id)] ?? {}, 'Harm', 0) === 0);
+  for (const status of positive) applyStatusModifiers(content, unit, status.id, -1);
+  const removed = new Set(positive);
+  unit.statuses = unit.statuses.filter(status => !removed.has(status));
+  for (const status of positive) emit(state, {
+    type: 'status', actor: terrain.ownerId, target: unit.id, effectId: status.id, message: 'terrain-dispel',
+  });
+}
+
+function applyTerrainEntry(content: RecoveredContent, state: MutableState, terrain: BattleTerrain, unit: BattleUnit): void {
+  if (unit.hp <= 0 || unit.flags.hero === 1) return;
+  const rule = terrainRuleFor(content, terrain);
+  if (rule.blocksPositiveStatuses) removePositiveStatuses(content, state, unit, terrain);
+  if (rule.entryDamage > 0 && unit.hp > 0) {
+    damage(content, state, undefined, unit, rule.entryDamage, false, 'terrain-entry', terrain.skillId, rule.damageType);
+  }
+}
+
+/** Updates durable occupancy and resolves entry exactly once for this cell entry. */
+function enterTerrainCell(
+  content: RecoveredContent,
+  state: MutableState,
+  unit: BattleUnit,
+  row: number,
+  col: number,
+  forceCellEntry = false,
+): void {
+  if (unit.flags.hero === 1) return;
+  for (const terrain of terrainState(state)) {
+    const inside = terrainContains(terrain, row, col);
+    const index = terrain.occupants.indexOf(unit.id);
+    if (!inside && index >= 0) {
+      terrain.occupants.splice(index, 1);
+      emitTerrain(state, 'terrain-update', terrain);
+    } else if (inside && index < 0) {
+      terrain.occupants.push(unit.id);
+      terrain.occupants.sort();
+      emitTerrain(state, 'terrain-update', terrain);
+      applyTerrainEntry(content, state, terrain, unit);
+    } else if (inside && forceCellEntry) {
+      applyTerrainEntry(content, state, terrain, unit);
+    }
+  }
+}
+
+function reconcileTerrainOccupants(state: MutableState): void {
+  const live = new Map(state.units.filter(unit => unit.hp > 0 && unit.flags.hero !== 1).map(unit => [unit.id, unit]));
+  for (const terrain of terrainState(state)) {
+    const next = terrain.occupants.filter(id => {
+      const unit = live.get(id);
+      return !!unit && terrainContains(terrain, unit.row, unit.col);
+    }).sort();
+    if (next.length !== terrain.occupants.length || next.some((id, index) => id !== terrain.occupants[index])) {
+      terrain.occupants = next;
+      emitTerrain(state, 'terrain-update', terrain);
+    }
+  }
+}
+
+function configuredTerrainColumns(state: BattleState, team: Team, start: number, end: number): number[] {
+  const values: number[] = [];
+  for (let col = Math.min(start, end); col <= Math.max(start, end); col += 1) {
+    const mirrored = team === 0 ? col : state.columns - 1 - col;
+    if (mirrored > 0 && mirrored < state.columns - 1) values.push(mirrored);
+  }
+  return values.sort((a, b) => a - b);
+}
+
+function terrainLegalColumns(content: RecoveredContent, state: BattleState, team: Team, skillId: number): number[] {
+  const rule = getTerrainRule(content, skillId);
+  if (!rule) return [];
+  if (rule.placement === 'ward') return [team === 0 ? 5 : 6];
+  return configuredTerrainColumns(state, team, rule.startCol, rule.endCol);
+}
+
+function terrainPlacementCells(state: MutableState, owner: BattlePlayer, rule: TerrainRule, anchorRow: number, anchorCol: number): Array<{ row: number; col: number }> {
+  if (rule.placement === 'ward') {
+    const columns = owner.team === 0 ? [5, 6, 7, 8, 9] : [2, 3, 4, 5, 6];
+    return columns.flatMap(col => Array.from({ length: state.rows }, (_, row) => ({ row, col })));
+  }
+  const allowed = configuredTerrainColumns(state, owner.team, rule.startCol, rule.endCol);
+  const cells = allowed.flatMap(col => Array.from({ length: state.rows }, (_, row) => ({ row, col })));
+  const anchorIndex = cells.findIndex(cell => cell.row === anchorRow && cell.col === anchorCol);
+  if (anchorIndex < 0) throw new Error('Terrain anchor is outside its configured range');
+  const selected = [cells.splice(anchorIndex, 1)[0]!];
+  while (cells.length && selected.length < rule.count) {
+    selected.push(cells.splice(Math.floor(nextRandom(state) * cells.length), 1)[0]!);
+  }
+  return selected.sort((a, b) => a.row - b.row || a.col - b.col);
+}
+
+function placeTerrain(content: RecoveredContent, state: MutableState, owner: BattlePlayer, skillId: number, row: number, col: number): void {
+  const rule = getTerrainRule(content, skillId);
+  if (!rule) throw new Error(`Unknown terrain skill ${skillId}`);
+  const cells = terrainPlacementCells(state, owner, rule, row, col);
+  const replacing = new Set(cells.map(cell => `${cell.row}:${cell.col}`));
+  for (const previous of [...terrainState(state)]) {
+    const beforeReplacement = clone(previous);
+    const survivors = previous.cells.filter(cell => !replacing.has(`${cell.row}:${cell.col}`));
+    if (survivors.length === previous.cells.length) continue;
+    previous.cells = survivors;
+    previous.occupants = previous.occupants.filter(id => {
+      const unit = state.units.find(candidate => candidate.id === id && candidate.hp > 0);
+      return !!unit && terrainContains(previous, unit.row, unit.col);
+    }).sort();
+    if (previous.cells.length) emitTerrain(state, 'terrain-update', previous);
+    else {
+      state.terrains = terrainState(state).filter(candidate => candidate.id !== previous.id);
+      emitTerrain(state, 'terrain-remove', beforeReplacement);
+    }
+  }
+  const terrain: BattleTerrain = {
+    id: `terrain:${state.nextId++}`,
+    skillId,
+    topographyId: rule.topographyId,
+    ownerId: owner.id,
+    team: owner.team,
+    cells,
+    remainingTurns: rule.remainingTurns,
+    createdTurn: state.turn,
+    occupants: [],
+  };
+  terrainState(state).push(terrain);
+  emitTerrain(state, 'terrain-add', terrain);
+  for (const unit of [...state.units]) if (unit.hp > 0 && unit.flags.hero !== 1 && terrainContains(terrain, unit.row, unit.col)) {
+    enterTerrainCell(content, state, unit, unit.row, unit.col);
+  }
+  removeDead(content, state);
+}
+
+function clearTerrains(state: MutableState): void {
+  for (const terrain of [...terrainState(state)]) emitTerrain(state, 'terrain-remove', terrain);
+  state.terrains = [];
 }
 
 function player(state: BattleState, id: string): BattlePlayer {
@@ -703,6 +863,7 @@ function applyStatus(content: RecoveredContent, state: MutableState, source: Bat
   const raw = content.data.statuses[String(statusId)];
   if (!raw || target.hp <= 0) return;
   const harmful = numeric(raw, 'Harm', 0) === 1;
+  if (!harmful && unitOnBlockingTerrain(content, state, target)) return;
   const immunity = target.flags.statusImmunity ?? 0;
   if (immunity === 3 || (immunity === 1 && !harmful) || (immunity === 2 && harmful)) return;
   const turns = Math.max(1, numeric(raw, 'Turns', 1));
@@ -867,6 +1028,7 @@ function refreshAuras(content: RecoveredContent, state: MutableState): void {
       if (!content.data.statuses[String(statusId)]) continue;
       for (const target of state.units) {
         if (!auraTargetMatches(content, state, source, target, effect)) continue;
+        if (numeric(content.data.statuses[String(statusId)]!, 'Harm', 0) === 0 && unitOnBlockingTerrain(content, state, target)) continue;
         const key = `${target.id}:${statusId}`;
         if (!desired.has(key)) desired.set(key, { target, source, effect, statusId });
       }
@@ -1038,6 +1200,7 @@ function resolveDamageDealtEffects(
             target.row = source.row;
             target.col = col;
             emitEffect(state, source, effect, 'pull', target, 1);
+            enterTerrainCell(content, state, target, target.row, target.col, true);
           }
         }
         break;
@@ -1144,6 +1307,8 @@ function damage(
     if (col > 0 && col < state.columns - 1 && !occupied(state, source.row, col, target.id)) {
       target.row = source.row; target.col = col;
       emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, moveFrom, moveTo: { row: target.row, col: target.col }, message: 'burrow' });
+      enterTerrainCell(content, state, target, target.row, target.col, true);
+      if (target.hp <= 0) return 0;
       if (distance(source, target) > effectiveRange(content, source)) return 0;
     }
   }
@@ -1153,8 +1318,12 @@ function damage(
       const col = target.col + (target.col >= source.col ? 1 : -1);
       if (col <= 0 || col >= state.columns - 1 || occupied(state, target.row, col, target.id)) break;
       target.col = col;
+      enterTerrainCell(content, state, target, target.row, target.col, true);
+      if (target.hp <= 0) break;
     }
     emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, moveFrom, moveTo: { row: target.row, col: target.col }, message: 'withdraw' });
+    enterTerrainCell(content, state, target, target.row, target.col);
+    if (target.hp <= 0) return 0;
     if (distance(source, target) > effectiveRange(content, source)) return 0;
   }
   if ((target.flags.damageImmuneTurns ?? 0) > 0 || target.flags.invincible === 1 || hasEffectType(content, target, 111)) return 0;
@@ -1463,6 +1632,7 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
     }
     if (!processed) break;
     state.units = state.units.filter(unit => unit.hp > 0);
+    reconcileTerrainOccupants(state);
     refreshAuras(content, state);
     removeInvalidTribalThresholds(content, state);
   }
@@ -1480,6 +1650,7 @@ function settleIfNeeded(state: MutableState): void {
   if (teams.length <= 1) {
     state.status = 'settled';
     state.winner = teams[0] ?? null;
+    clearTerrains(state);
     emit(state, { type: 'settled', amount: state.winner ?? -1 });
     return;
   }
@@ -1489,12 +1660,14 @@ function settleIfNeeded(state: MutableState): void {
       state.status = 'settled';
       state.winner = state.units.some(unit => unit.team === state.boardClearTeam && unit.flags.hero !== 1 && unit.hp > 0)
         ? state.boardClearTeam : (state.boardClearTeam === 0 ? 1 : 0);
+      clearTerrains(state);
       emit(state, { type: 'settled', amount: state.winner, message: 'turn-limit' });
       return;
     }
     const scores = ([0, 1] as Team[]).map(team => ({ team, hp: state.players.filter(p => p.team === team).reduce((sum, p) => sum + Math.max(0, p.hp), 0) }));
     state.status = 'settled';
     state.winner = scores[0]!.hp === scores[1]!.hp ? null : (scores[0]!.hp > scores[1]!.hp ? 0 : 1);
+    clearTerrains(state);
     emit(state, { type: 'settled', amount: state.winner ?? -1, message: 'turn-limit' });
   }
 }
@@ -1545,15 +1718,16 @@ function skillTargets(content: RecoveredContent, state: BattleState, owner: Batt
 function isResolvableSkill(raw: RawRow): boolean {
   const serverClass = numeric(raw, 'ServerClassID', 0);
   const skillId = numeric(raw, 'ID', 0);
-  // ServerClass 19 links persistent battlefield cards. The recovered rows do
-  // not contain the enter/stay/leave algorithm, so exposing them as playable
-  // would consume a card without resolving its rule. Warded Ground (50903)
-  // is a ServerClass 18 terrain with the same missing lifecycle contract.
-  if (serverClass === 19 || skillId === 50903) return false;
+  if (getTerrainRuleFromRaw(skillId)) return true;
   return serverClass > 0
     || (numeric(raw, 'HaveDam', 0) > 0 && numeric(raw, 'DamValue', 0) > 0)
     || (numeric(raw, 'HaveCure', 0) > 0 && numeric(raw, 'CureValue', 0) > 0)
     || numeric(raw, 'StatusID', 0) > 0;
+}
+
+function getTerrainRuleFromRaw(skillId: number): boolean {
+  return skillId === 50903 || (skillId >= 50731 && skillId <= 50734)
+    || (skillId >= 50741 && skillId <= 50744) || (skillId >= 50806 && skillId <= 50809);
 }
 
 export function legalPlays(content: RecoveredContent, state: BattleState, actorId: string): LegalPlay[] {
@@ -1580,6 +1754,13 @@ export function legalPlays(content: RecoveredContent, state: BattleState, actorI
       let skill: RecoveredSkill;
       try { skill = content.skill(skillId); } catch { continue; }
       if (!isResolvableSkill(skill.raw!)) continue;
+      const terrainRule = getTerrainRule(content, skillId);
+      if (terrainRule) {
+        for (let row = 0; row < state.rows; row += 1) {
+          for (const col of terrainLegalColumns(content, state, owner.team, skillId)) result.push({ instanceId: hand.instanceId, row, col });
+        }
+        continue;
+      }
       const selectType = numeric(skill.raw!, 'SelectType', 0);
       if (selectType === 0) {
         const anchor = heroFor(state, owner.id)!;
@@ -1677,6 +1858,8 @@ function summonCardAt(content: RecoveredContent, state: MutableState, owner: Bat
   const unit = makeUnit(content, state, owner, monsterId, cardId, row, col, false);
   state.units.push(unit);
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, cardId, row, col, message: 'skill' });
+  enterTerrainCell(content, state, unit, row, col);
+  if (unit.hp <= 0) { removeDead(content, state); return true; }
   resolveSummonEffects(content, state, unit);
   return true;
 }
@@ -1692,7 +1875,10 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
   const description = asString(raw, 'Des');
   const skillName = asString(raw, 'SkillName');
   let handled = false;
-  if (serverClass === 3) {
+  if (getTerrainRule(content, skillId)) {
+    placeTerrain(content, state, owner, skillId, primary.row, primary.col);
+    handled = true;
+  } else if (serverClass === 3) {
     for (const target of targets) {
       const removed = removeStatuses(content, target, target.team === owner.team, /all/i.test(description));
       if (target.team !== owner.team && damageValue > 0 && removed > 0) damage(content, state, undefined, target, damageValue * removed, false, undefined, skillId);
@@ -1753,13 +1939,25 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
     handled = true;
   } else if (serverClass === 10) {
     const units = state.units.filter(unit => unit.flags.hero !== 1 && unit.hp > 0 && distance(unit, primary) <= 2).sort((a, b) => distance(a, primary) - distance(b, primary) || a.id.localeCompare(b.id)).slice(0, 2);
-    if (units.length === 2) [units[0]!.row, units[0]!.col, units[1]!.row, units[1]!.col] = [units[1]!.row, units[1]!.col, units[0]!.row, units[0]!.col];
+    if (units.length === 2) {
+      const origins = units.map(unit => ({ row: unit.row, col: unit.col }));
+      [units[0]!.row, units[0]!.col, units[1]!.row, units[1]!.col] = [units[1]!.row, units[1]!.col, units[0]!.row, units[0]!.col];
+      if (units.some((unit, index) => terrainState(state).some(terrain => terrainContains(terrain, origins[index]!.row, origins[index]!.col)
+          || terrainContains(terrain, unit.row, unit.col)))) {
+        units.forEach((unit, index) => emit(state, {
+          type: 'move', actor: unit.id, row: unit.row, col: unit.col,
+          moveFrom: origins[index], moveTo: { row: unit.row, col: unit.col }, message: 'terrain-swap',
+        }));
+      }
+      enterTerrainCell(content, state, units[0]!, units[0]!.row, units[0]!.col, true);
+      enterTerrainCell(content, state, units[1]!, units[1]!.row, units[1]!.col, true);
+    }
     handled = true;
   } else if (serverClass === 11) {
     for (const target of targets) {
       damage(content, state, undefined, target, damageValue, false, undefined, skillId);
       if (target.hp > 0) {
-        knockback(state, target, 2);
+        knockback(content, state, target, 2);
         refreshAuras(content, state);
       }
     }
@@ -1785,7 +1983,6 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
     if (ownHero) heal(state, undefined, ownHero, total, skillId);
     handled = true;
   } else if (serverClass === 18) {
-    if (skillId === 50903) throw new Error(`Unsupported persistent battlefield skill ${skillId}`);
     const terrainTargets = state.units.filter(unit => unit.hp > 0 && distance(unit, primary) <= 3);
     const attackMatch = description.match(/\+(\d+) Attack/i);
     const rangeMatch = description.match(/\+(\d+) Range/i);
@@ -1798,7 +1995,7 @@ function playSkill(content: RecoveredContent, state: MutableState, owner: Battle
     emit(state, { type: 'terrain', actor: owner.id, skillId, row: primary.row, col: primary.col, amount: numeric(raw, 'DamValue', 0) });
     handled = true;
   } else if (serverClass === 19) {
-    throw new Error(`Unsupported persistent battlefield skill ${skillId}`);
+    throw new Error(`Unknown persistent battlefield skill ${skillId}`);
   } else if (serverClass === 20 || serverClass === 34 || serverClass === 43) {
     for (const target of targets) damage(content, state, undefined, target, Math.max(1, damageValue || owner.attack || 1), false, undefined, skillId, numeric(raw, 'DamType', 0));
     handled = true;
@@ -2162,6 +2359,8 @@ function summon(content: RecoveredContent, state: MutableState, owner: BattlePla
   state.units.push(unit);
   emit(state, { type: 'play', actor: owner.id, target: unit.id, cardId: hand.cardId, row, col });
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, cardId: hand.cardId, row, col });
+  enterTerrainCell(content, state, unit, row, col);
+  if (unit.hp <= 0) { removeDead(content, state); return; }
   resolveSummonEffects(content, state, unit);
   if ((unit.flags.summonHeroDamage ?? 0) > 0) {
     const hero = heroFor(state, owner.id);
@@ -2210,6 +2409,7 @@ function moveUnit(content: RecoveredContent, state: MutableState, unit: BattleUn
   let landedRow = unit.row;
   let landedCol = unit.col;
   const crossed: BattleUnit[] = [];
+  const path: Array<{ row: number; col: number }> = [];
   while (remaining-- > 0 && Math.abs(probeCol - target.col) + Math.abs(probeRow - target.row) > effectiveRange(content, unit)) {
     const direction = unit.team === 0 ? 1 : -1;
     const candidates: Array<[number, number]> = [];
@@ -2227,15 +2427,51 @@ function moveUnit(content: RecoveredContent, state: MutableState, unit: BattleUn
     [probeRow, probeCol] = cell;
     const crossedUnit = state.units.find(candidate => candidate.id !== unit.id && candidate.hp > 0 && candidate.row === probeRow && candidate.col === probeCol);
     if (crossedUnit && crossedUnit.team !== unit.team && !crossed.includes(crossedUnit)) crossed.push(crossedUnit);
-    if (!occupied(state, probeRow, probeCol, unit.id)) [landedRow, landedCol] = [probeRow, probeCol];
+    const landable = !occupied(state, probeRow, probeCol, unit.id);
+    if (landable) [landedRow, landedCol] = [probeRow, probeCol];
+    path.push({ row: probeRow, col: probeCol });
   }
-  [unit.row, unit.col] = [landedRow, landedCol];
+  const terrainAware = path.some(step => terrainState(state).some(terrain => terrainContains(terrain, step.row, step.col)))
+    || terrainState(state).some(terrain => terrainContains(terrain, fromRow, fromCol));
+  if (terrainAware) {
+    let previous = { row: fromRow, col: fromCol };
+    for (const step of path) {
+      unit.row = step.row;
+      unit.col = step.col;
+      emit(state, {
+        type: 'move', actor: unit.id, row: unit.row, col: unit.col,
+        moveFrom: previous, moveTo: { row: unit.row, col: unit.col }, message: 'terrain-step',
+      });
+      enterTerrainCell(content, state, unit, unit.row, unit.col, true);
+      previous = { row: unit.row, col: unit.col };
+      if (unit.hp <= 0) {
+        landedRow = unit.row;
+        landedCol = unit.col;
+        break;
+      }
+    }
+    if (unit.hp > 0 && (unit.row !== landedRow || unit.col !== landedCol)) {
+      const moveFrom = { row: unit.row, col: unit.col };
+      unit.row = landedRow;
+      unit.col = landedCol;
+      emit(state, {
+        type: 'move', actor: unit.id, row: unit.row, col: unit.col,
+        moveFrom, moveTo: { row: unit.row, col: unit.col }, message: 'terrain-land',
+      });
+      enterTerrainCell(content, state, unit, unit.row, unit.col);
+    }
+  } else {
+    [unit.row, unit.col] = [landedRow, landedCol];
+  }
   unit.flags.movedThisTurn = Math.abs(fromRow - unit.row) + Math.abs(fromCol - unit.col);
-  if (unit.row !== fromRow || unit.col !== fromCol) {
+  if (!terrainAware && (unit.row !== fromRow || unit.col !== fromCol)) {
     emit(state, {
       type: 'move', actor: unit.id, row: unit.row, col: unit.col,
       moveFrom: { row: fromRow, col: fromCol }, moveTo: { row: unit.row, col: unit.col },
     });
+  }
+  if (unit.row !== fromRow || unit.col !== fromCol) {
+    if (unit.hp <= 0) return;
     for (const effect of activeEffectRows(content, unit)) {
       if (effect.type === 230) {
         const statusId = optionalNumber(effect.raw, 'param1', 0);
@@ -2259,12 +2495,22 @@ function moveUnit(content: RecoveredContent, state: MutableState, unit: BattleUn
   }
 }
 
-function knockback(state: MutableState, target: BattleUnit, squares: number): void {
+function knockback(content: RecoveredContent, state: MutableState, target: BattleUnit, squares: number): void {
   const direction = target.team === 0 ? -1 : 1;
   for (let count = 0; count < squares; count += 1) {
     const col = target.col + direction;
     if (col <= 0 || col >= COLUMNS - 1 || occupied(state, target.row, col, target.id)) break;
+    const moveFrom = { row: target.row, col: target.col };
     target.col = col;
+    if (terrainState(state).some(terrain => terrainContains(terrain, moveFrom.row, moveFrom.col)
+        || terrainContains(terrain, target.row, target.col))) {
+      emit(state, {
+        type: 'move', actor: target.id, row: target.row, col: target.col,
+        moveFrom, moveTo: { row: target.row, col: target.col }, message: 'terrain-knockback',
+      });
+    }
+    enterTerrainCell(content, state, target, target.row, target.col, true);
+    if (target.hp <= 0) break;
   }
 }
 
@@ -2387,7 +2633,7 @@ function attack(content: RecoveredContent, state: MutableState, attacker: Battle
         if (numeric(skill, 'HaveCure', 0) > 0 && cure > 0) heal(state, attacker, attacker, cure, skillId);
       }
       if ((attacker.flags.knockback ?? 0) > 0 && victim.hp > 0) {
-        knockback(state, victim, attacker.flags.knockback!);
+        knockback(content, state, victim, attacker.flags.knockback!);
         refreshAuras(content, state);
       }
       if (victim.flags.hero === 1) {
@@ -2413,6 +2659,7 @@ function attack(content: RecoveredContent, state: MutableState, attacker: Battle
       const moveFrom = { row: attacker.row, col: attacker.col };
       attacker.col = col;
       emit(state, { type: 'move', actor: attacker.id, row: attacker.row, col, moveFrom, moveTo: { row: attacker.row, col } });
+      enterTerrainCell(content, state, attacker, attacker.row, attacker.col, true);
     }
   }
   removeDead(content, state);
@@ -2425,6 +2672,8 @@ function summonToken(content: RecoveredContent, state: MutableState, owner: Batt
   const unit = makeUnit(content, state, owner, monsterId, `token:${monsterId}`, cell[0], cell[1], false);
   state.units.push(unit);
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, row: unit.row, col: unit.col, message: 'effect' });
+  enterTerrainCell(content, state, unit, unit.row, unit.col);
+  if (unit.hp <= 0) { removeDead(content, state); return; }
   resolveSummonEffects(content, state, unit);
 }
 
@@ -2433,6 +2682,8 @@ function summonTokenAt(content: RecoveredContent, state: MutableState, owner: Ba
   const unit = makeUnit(content, state, owner, monsterId, `token:${monsterId}`, row, col, false);
   state.units.push(unit);
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, row, col, message: 'effect' });
+  enterTerrainCell(content, state, unit, row, col);
+  if (unit.hp <= 0) { removeDead(content, state); return unit; }
   resolveSummonEffects(content, state, unit);
   return unit;
 }
@@ -2490,6 +2741,7 @@ function reconcileTribalThreshold(content: RecoveredContent, state: MutableState
   }
   if (allowApply && statusId > 0 && content.data.statuses[String(statusId)]) for (const target of otherAllies) {
     if (!desired.has(target.id) || target.flags[key] === 1) continue;
+    if (numeric(content.data.statuses[String(statusId)]!, 'Harm', 0) === 0 && unitOnBlockingTerrain(content, state, target)) continue;
     target.flags[key] = 1;
     target.statuses.push({ id: statusId, turns: Number.MAX_SAFE_INTEGER, sourceId: source.id });
     applyStatusModifiers(content, target, statusId, 1);
@@ -2758,7 +3010,18 @@ function resolveTurnEffects(content: RecoveredContent, state: MutableState, unit
         if (onRequestedHalf(state, unit, p1)) {
           const direction = unit.team === 0 ? (p2 ? 1 : -1) : (p2 ? -1 : 1);
           const target = state.units.find(candidate => candidate.id !== unit.id && candidate.hp > 0 && candidate.row === unit.row && candidate.col === unit.col + direction && (p4 === 4 ? candidate.team === unit.team : candidate.team !== unit.team));
-          if (target) [unit.row, unit.col, target.row, target.col] = [target.row, target.col, unit.row, unit.col];
+          if (target) {
+            const unitFrom = { row: unit.row, col: unit.col };
+            const targetFrom = { row: target.row, col: target.col };
+            [unit.row, unit.col, target.row, target.col] = [target.row, target.col, unit.row, unit.col];
+            if (terrainState(state).some(terrain => terrainContains(terrain, unitFrom.row, unitFrom.col)
+                || terrainContains(terrain, targetFrom.row, targetFrom.col))) {
+              emit(state, { type: 'move', actor: unit.id, row: unit.row, col: unit.col, moveFrom: unitFrom, moveTo: { row: unit.row, col: unit.col }, message: 'terrain-swap' });
+              emit(state, { type: 'move', actor: target.id, row: target.row, col: target.col, moveFrom: targetFrom, moveTo: { row: target.row, col: target.col }, message: 'terrain-swap' });
+            }
+            enterTerrainCell(content, state, unit, unit.row, unit.col, true);
+            enterTerrainCell(content, state, target, target.row, target.col, true);
+          }
           emitEffect(state, unit, effect, 'position-swap', target, target ? 1 : 0);
         }
         break;
@@ -2934,6 +3197,7 @@ function processUnitTurn(content: RecoveredContent, state: MutableState, unit: B
         const reverse = unit.flags.reverseMove === 1 || hasEffectType(content, unit, 167);
         moveUnit(content, state, unit, reverse ? (heroFor(state, unit.playerId) ?? destination) : destination);
       }
+      if (unit.hp <= 0) return;
       target = chooseTarget(content, state, unit, enemies.filter(candidate => candidate.hp > 0 && distance(unit, candidate) <= effectiveRange(content, unit)));
     }
     if (target && !(unit.flags.noAttackAfterMove === 1 && (unit.flags.movedThisTurn ?? 0) > 0)) attack(content, state, unit, target);
@@ -2959,6 +3223,44 @@ function effectIdsFromStatus(raw: RawRow): number[] {
   return ids;
 }
 
+function resolveTerrainTurnEnd(content: RecoveredContent, state: MutableState, owner: BattlePlayer): void {
+  // Stay effects run for every currently living creature owned by the player,
+  // including creatures summoned during this same player turn.
+  for (const unit of [...state.units].filter(candidate => candidate.playerId === owner.id && candidate.hp > 0 && candidate.flags.hero !== 1)) {
+    const terrain = terrainState(state).find(candidate => terrainContains(candidate, unit.row, unit.col));
+    if (!terrain) continue;
+    const rule = terrainRuleFor(content, terrain);
+    if (rule.blocksPositiveStatuses) removePositiveStatuses(content, state, unit, terrain);
+    if (rule.stayDamage > 0 && unit.hp > 0) {
+      damage(content, state, undefined, unit, rule.stayDamage, false, 'terrain-stay', terrain.skillId, rule.damageType);
+      removeDead(content, state);
+    }
+  }
+
+  // Each hatch cell makes one attempt on its owner's player-turn end. Occupied
+  // cells are skipped with no backlog; the cumulative thresholds share one roll.
+  for (const terrain of [...terrainState(state)].filter(candidate => candidate.ownerId === owner.id)) {
+    const rule = terrainRuleFor(content, terrain);
+    if (!rule.summonChoices.length) continue;
+    for (const cell of terrain.cells) {
+      if (occupied(state, cell.row, cell.col)) continue;
+      const roll = nextRandom(state) * 100;
+      const choice = rule.summonChoices.find(candidate => roll < candidate.threshold);
+      if (choice) summonTokenAt(content, state, owner, choice.monsterId, cell.row, cell.col);
+    }
+  }
+
+  for (const terrain of [...terrainState(state)]) {
+    if (terrain.remainingTurns === null) continue;
+    terrain.remainingTurns -= 1;
+    if (terrain.remainingTurns > 0) emitTerrain(state, 'terrain-update', terrain);
+    else {
+      state.terrains = terrainState(state).filter(candidate => candidate.id !== terrain.id);
+      emitTerrain(state, 'terrain-remove', terrain);
+    }
+  }
+}
+
 function endTurn(content: RecoveredContent, state: MutableState, owner: BattlePlayer): void {
   const units = state.units.filter(unit => unit.playerId === owner.id && unit.hp > 0 && unit.summonedTurn < state.turn).sort((a, b) => a.row - b.row || (owner.team === 0 ? b.col - a.col : a.col - b.col) || a.id.localeCompare(b.id));
   for (const unit of units) {
@@ -2967,6 +3269,10 @@ function endTurn(content: RecoveredContent, state: MutableState, owner: BattlePl
     settleIfNeeded(state);
     if (state.status === 'settled') return;
   }
+  resolveTerrainTurnEnd(content, state, owner);
+  removeDead(content, state);
+  settleIfNeeded(state);
+  if (state.status === 'settled') return;
   emit(state, { type: 'turn-end', actor: owner.id, amount: state.turn });
   let next = state.activePlayer;
   for (let attempts = 0; attempts < state.players.length; attempts += 1) {
@@ -3026,6 +3332,7 @@ export function createBattle(content: RecoveredContent, spec: BattleSpec): Battl
     rows,
     players: [],
     units: [],
+    terrains: [],
     events: [],
     status: 'playing',
     winner: null,

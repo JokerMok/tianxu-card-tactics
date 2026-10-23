@@ -1,7 +1,7 @@
 {
   "sourceManifest": "5254333315581813739",
   "scope": "main",
-  "descriptions": "runtime-derived; no official description recovered",
+  "descriptions": "10 effects remain runtime-derived; terrain13 now link recovered Topography/Effect rows with explicit current-version policy; not official server verification",
   "effects": [
     {
       "effectId": 3967,
@@ -289,7 +289,7 @@
     {
       "cardId": 50731,
       "skillId": 50731,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50731,
@@ -343,21 +343,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第8至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:5d023c40e0f428593612",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50704,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40052,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:5f129829c5d9d7a6e18b",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50732,
       "skillId": 50732,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50732,
@@ -411,21 +441,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第7至10列选择一格，包含落点在内随机生成至多8格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:d921b650afd51c094d01",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50704,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40052,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:5f129829c5d9d7a6e18b",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50733,
       "skillId": 50733,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50733,
@@ -479,21 +539,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第6至10列选择一格，包含落点在内随机生成至多10格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:c48a603f69753fb34115",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50704,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40052,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:5f129829c5d9d7a6e18b",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50734,
       "skillId": 50734,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50734,
@@ -547,21 +637,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第5至10列选择一格，包含落点在内随机生成至多12格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到5点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:9c9235b0249b9e29c842",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50704,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40052,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:5f129829c5d9d7a6e18b",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50741,
       "skillId": 50741,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50741,
@@ -615,21 +735,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第9至10列选择一格，包含落点在内随机生成至多4格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:9eaf24c4a882d8df5f1d",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50705,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40053,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 7 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:8f695ede4791054000e0",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50742,
       "skillId": 50742,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50742,
@@ -683,21 +833,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第8至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:7b2f5dd767ad6bb1793b",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50705,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40053,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 7 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:8f695ede4791054000e0",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50743,
       "skillId": 50743,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50743,
@@ -751,21 +931,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第7至10列选择一格，包含落点在内随机生成至多8格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:27153f600dc8dc65a69d",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50705,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40053,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 7 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:8f695ede4791054000e0",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50744,
       "skillId": 50744,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma Injection",
         "ID": 50744,
@@ -819,21 +1029,51 @@
       },
       "localization": {
         "name": "岩浆注入",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第6至10列选择一格，包含落点在内随机生成至多10格互不重复的岩浆。生物所属玩家结束回合时，仍在其中的双方生物受到7点火焰伤害；进入时不造成伤害。持续8个玩家回合。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma Injection",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:8495a7098180c41983af",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50705,
+        "animateitem": "yanjiang",
+        "turns": 8,
+        "ability1": 40053,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 7 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:8f695ede4791054000e0",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50806,
       "skillId": 50806,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Hatch",
         "ID": 50806,
@@ -887,21 +1127,51 @@
       },
       "localization": {
         "name": "孵化",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的孵化地形。施放者结束回合时，每个空格有90%概率召唤幼龙，10%概率召唤焰龙卫士；被占据则跳过。结算后地形消失，不补发召唤。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Hatch",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:85efdc17f84ad0ebd7e3",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Hatch",
+        "ID": 50806,
+        "animateitem": "zhaohuanzhimeng",
+        "turns": 1,
+        "ability1": 40503,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Summons 1 Fire Whelp (1/1/5/Flying/Ember/Fire Curse 2) in this square each turn, may summon 1 Flame Dragon Guard.",
+        "_row": "config_row:04020ffb9851ac81a401",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50807,
       "skillId": 50807,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Hatch",
         "ID": 50807,
@@ -955,15 +1225,45 @@
       },
       "localization": {
         "name": "孵化",
-        "text": "本版本限制：该牌依赖尚未实现的持续地形规则，当前不能施放。",
-        "status": "unsupported",
-        "source": "census.raw.Des (non-text value; effect unavailable)",
+        "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的孵化地形。施放者结束回合时，每个空格有90%概率召唤幼龙，10%概率召唤焰龙卫士；被占据则跳过。结算后地形消失，不补发召唤。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Hatch",
-        "originalText": "0"
+        "originalText": "0",
+        "ruleEvidence": {
+          "skillRow": "config_row:0e8e0171581ac499fe80",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "ServerClassID 19 persistent battlefield algorithm is absent; legalPlays rejects it before card consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Hatch",
+        "ID": 50807,
+        "animateitem": "zhaohuanzhimeng",
+        "turns": 1,
+        "ability1": 40504,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Summons 1 Fire Whelp (1/1/6/Flying/Ember/Fire Curse 3) in this square each turn, may summon 1 Flame Dragon Guard.",
+        "_row": "config_row:5048d1508b71f6060974",
+        "_tag": null,
+        "_path": null
       }
     },
     {
@@ -1038,7 +1338,7 @@
     {
       "cardId": 50808,
       "skillId": 50808,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma",
         "ID": 50808,
@@ -1093,21 +1393,51 @@
       },
       "localization": {
         "name": "岩浆",
-        "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到3点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
-        "status": "unsupported",
-        "source": "linked skill Des + BattleKernel runtime boundary",
+        "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多3格互不重复的岩浆。进入或在所属玩家回合结束时仍处其中的双方生物受到3点火焰伤害。持续至被覆盖或战斗结束。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma",
-        "originalText": "0"
+        "originalText": "Deals 3 Fire Damage to creatures who enter and 3 Fire damage to creatures who end their turn in this tile.",
+        "ruleEvidence": {
+          "skillRow": "config_row:f257decce9e282bbe59d",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "Persistent enter/stay/leave terrain lifecycle is not represented; legalPlays rejects the card before consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50808,
+        "animateitem": "yanjiang",
+        "turns": 0,
+        "ability1": 40056,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 3 Fire Damage to creatures who enter and 3 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:2bc0ad2f6be1580a869d",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50809,
       "skillId": 50809,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Magma",
         "ID": 50809,
@@ -1162,21 +1492,51 @@
       },
       "localization": {
         "name": "岩浆",
-        "text": "原规则说明：进入此地格的生物受到3点火焰伤害；在此地格结束回合的生物再受到5点火焰伤害。本版本限制：持续地形规则尚未实现，当前不能施放。",
-        "status": "unsupported",
-        "source": "linked skill Des + BattleKernel runtime boundary",
+        "text": "在己方视角第1至10列选择一格，包含落点在内随机生成至多6格互不重复的岩浆。进入或在所属玩家回合结束时仍处其中的双方生物受到5点火焰伤害。持续至被覆盖或战斗结束。不占据士兵位置；新地形覆盖重叠格，不叠加；英雄不受影响。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Magma",
-        "originalText": "0"
+        "originalText": "Deals 3 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "ruleEvidence": {
+          "skillRow": "config_row:a0151a5053879d21bcdf",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "Persistent enter/stay/leave terrain lifecycle is not represented; legalPlays rejects the card before consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Magma",
+        "ID": 50809,
+        "animateitem": "yanjiang",
+        "turns": 0,
+        "ability1": 40057,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Deals 5 Fire Damage to creatures who enter and 5 Fire damage to creatures who end their turn in this tile.",
+        "_row": "config_row:0b60d0254b6caa03eb60",
+        "_tag": null,
+        "_path": null
       }
     },
     {
       "cardId": 50903,
       "skillId": 50903,
-      "support": "unsupported",
+      "support": "supported-current-version",
       "cardConfig": {
         "Name": "Warded Ground",
         "ID": 50903,
@@ -1231,15 +1591,45 @@
       },
       "localization": {
         "name": "结界之地",
-        "text": "原规则说明：任一玩家的生物进入结界之地时移除全部增益，且处于其中时无法获得增益。本版本限制：持续地形规则尚未实现，当前不能施放。",
-        "status": "unsupported",
-        "source": "linked skill Des + BattleKernel runtime boundary",
+        "text": "在己方视角第5列施放，覆盖第5至9列全部行。任意阵营的生物进入时移除全部增益状态；停留其中时不能获得增益状态。英雄不受影响。离开后可重新获得增益，已移除的增益不恢复。持续至被覆盖或战斗结束。",
+        "status": "runtime-description",
+        "source": "Recovered main Topography.xml + Effect.xml parameters; current-version scatter, anchor, clock and replacement policy; documentation/stabilization/terrain-rules.md",
         "originalName": "Warded Ground",
-        "originalText": "0"
+        "originalText": "Any player creature entering Warded Ground has all buffs removed and cannot gain buffs whilst inside.",
+        "ruleEvidence": {
+          "skillRow": "config_row:eabccd98e6fd8ecd9b6c",
+          "topographyTable": "main:embeddata/scp/topography.xml",
+          "implementation": "BattleKernel terrain lifecycle; TerrainRules.ts"
+        }
       },
       "runtimeEvidence": {
-        "file": "cocos-client/assets/scripts/game/BattleKernel.ts",
-        "reason": "Persistent enter/stay/leave terrain lifecycle is not represented; legalPlays rejects the card before consumption"
+        "files": [
+          "cocos-client/assets/scripts/game/TerrainRules.ts",
+          "cocos-client/assets/scripts/game/BattleKernel.ts"
+        ],
+        "tests": [
+          "TerrainRules.test.mjs",
+          "BattleKernel.test.mjs",
+          "backend/game/terrain-integration.test.mjs"
+        ],
+        "classification": "recovered parameters plus current-version placement/clock/replacement policy"
+      },
+      "previousSupport": "unsupported",
+      "topographyConfig": {
+        "Name": "Warded Ground",
+        "ID": 50903,
+        "animateitem": "jinghuazhidi",
+        "turns": 0,
+        "ability1": 40801,
+        "ability2": 0,
+        "ability3": 0,
+        "ability4": 0,
+        "ability5": 0,
+        "layout": 0,
+        "des": "Any player creature entering Warded Ground has all buffs removed and cannot gain buffs whilst inside.",
+        "_row": "config_row:0ff9bec1323a2d8c5cee",
+        "_tag": null,
+        "_path": null
       }
     }
   ],

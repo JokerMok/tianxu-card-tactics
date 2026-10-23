@@ -707,23 +707,247 @@ test('TypeID 172 applies configured turns and nested Petrified status restrictio
   assert.equal(legalPlays(content, state, 'p0').some(play => play.targetId === petrified.id), false);
 });
 
-test('unsupported persistent battlefield cards cannot be played or consumed', () => {
-  for (const cardId of ['50731', '50808', '50809', '50903']) {
-    const state = createBattle(content, spec({
+test('all terrain cards expose configured legal anchors and persist serializable terrain state', () => {
+  for (const cardId of ['50731', '50732', '50733', '50734', '50741', '50742', '50743', '50744', '50806', '50807', '50808', '50809', '50903']) {
+    let state = createBattle(content, spec({
       players: [
         { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill(cardId) },
         { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1'), ai: true },
       ],
     }));
     state.players[0].hand.forEach(card => { card.wait = 0; });
-    assert.equal(legalPlays(content, state, 'p0').length, 0, `${cardId} has no legal placement`);
-    const snapshot = JSON.stringify(state);
-    const hand = state.players[0].hand[0];
-    assert.throws(() => applyBattleAction(content, state, 'p0', {
-      type: 'play', instanceId: hand.instanceId, row: 0, col: 8,
-    }), /Illegal card play/);
-    assert.equal(JSON.stringify(state), snapshot, `${cardId} rejection preserves the authoritative state and hand`);
+    const plays = legalPlays(content, state, 'p0');
+    assert.ok(plays.length > 0, `${cardId} has legal placement`);
+    assert.ok(plays.every(play => play.targetId === undefined), `${cardId} uses cell anchors`);
+    if (cardId === '50903') assert.deepEqual(new Set(plays.map(play => play.col)), new Set([5]));
+    state = applyBattleAction(content, state, 'p0', { type: 'play', ...plays[0] });
+    assert.equal(state.terrains.length, 1);
+    assert.doesNotThrow(() => JSON.parse(JSON.stringify(state)));
+    assert.equal(state.events.find(event => event.type === 'terrain-add')?.terrain?.id, state.terrains[0].id);
   }
+  const rejected = createBattle(content, spec({ players: [
+    { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50731') },
+    { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+  ] }));
+  const before = JSON.stringify(rejected);
+  assert.throws(() => applyBattleAction(content, rejected, 'p0', {
+    type: 'play', instanceId: rejected.players[0].hand[0].instanceId, row: 0, col: 1,
+  }), /Illegal card play/);
+  assert.equal(JSON.stringify(rejected), before, 'invalid terrain input does not consume its card or mutate state');
+
+  const mirrored = createBattle(content, spec({ firstPlayer: 1, players: [
+    { id: 'p0', name: 'Other', team: 0, hp: 30, deck: Array(5).fill('1') },
+    { id: 'p1', name: 'Caster', team: 1, hp: 30, deck: Array(5).fill('50731') },
+  ] }));
+  assert.deepEqual(new Set(legalPlays(content, mirrored, 'p1').map(play => play.col)), new Set([1, 2, 3]));
+});
+
+test('each recovered magma terrain resolves its configured runtime damage', () => {
+  const stays = new Map([
+    ['50731', 5], ['50732', 5], ['50733', 5], ['50734', 5],
+    ['50741', 7], ['50742', 7], ['50743', 7], ['50744', 7],
+  ]);
+  for (const [cardId, expected] of stays) {
+    let state = createBattle(content, spec({
+      players: [
+        { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill(cardId) },
+        { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+      ],
+      initialUnits: [{ playerId: 'p0', monsterId: 9093, row: 0, col: Number(content.skill(cardId).raw.StartX) }],
+    }));
+    const unit = state.units.find(candidate => candidate.monsterId === 9093);
+    const play = legalPlays(content, state, 'p0').find(candidate => candidate.row === unit.row && candidate.col === unit.col);
+    state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
+    assert.equal(state.units.find(candidate => candidate.id === unit.id).hp, 10, `${cardId} has no entry damage`);
+    state.units.find(candidate => candidate.id === unit.id).movement = 0;
+    state.units.find(candidate => candidate.id === unit.id).flags.noAct = 1;
+    state = applyBattleAction(content, state, 'p0', { type: 'end' });
+    assert.equal(state.units.find(candidate => candidate.id === unit.id)?.hp, 10 - expected, `${cardId} stay damage`);
+  }
+  for (const [cardId, expected] of [['50808', 3], ['50809', 5]]) {
+    let state = createBattle(content, spec({
+      players: [
+        { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill(cardId) },
+        { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+      ],
+      initialUnits: [{ playerId: 'p0', monsterId: 9093, row: 0, col: 1 }],
+    }));
+    const unit = state.units.find(candidate => candidate.monsterId === 9093);
+    const play = legalPlays(content, state, 'p0').find(candidate => candidate.row === 0 && candidate.col === 1);
+    state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
+    assert.equal(state.units.find(candidate => candidate.id === unit.id).hp, 10 - expected, `${cardId} entry damage`);
+  }
+});
+
+test('magma placement and player-turn end resolve entry/stay damage before terrain expiry', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50809') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+    initialUnits: [{ playerId: 'p0', monsterId: 9093, row: 0, col: 1 }],
+  }));
+  const play = legalPlays(content, state, 'p0').find(candidate => candidate.row === 0 && candidate.col === 1);
+  assert.ok(play);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
+  const unit = state.units.find(candidate => candidate.monsterId === 9093);
+  assert.equal(unit.hp, 5, 'placement under a creature counts as entry');
+  const terrainEvent = state.events.findIndex(event => event.type === 'terrain-update' && event.terrain?.occupants.includes(unit.id));
+  const entryDamage = state.events.findIndex(event => event.type === 'damage' && event.message === 'terrain-entry');
+  assert.ok(terrainEvent >= 0 && terrainEvent < entryDamage, 'occupancy snapshot precedes entry damage');
+  state = applyBattleAction(content, state, 'p0', { type: 'end' });
+  assert.equal(state.units.some(candidate => candidate.id === unit.id), false, 'stay damage kills before a later action');
+  assert.ok(state.terrains.some(terrain => terrain.skillId === 50809 && terrain.remainingTurns === null));
+});
+
+test('hatch summons once in every empty cell before its one-player-turn expiry', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50806') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+  }));
+  const play = legalPlays(content, state, 'p0')[0];
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
+  const cells = state.terrains[0].cells.map(cell => `${cell.row}:${cell.col}`);
+  state = applyBattleAction(content, state, 'p0', { type: 'end' });
+  const hatchlings = state.units.filter(unit => [9091, 9093].includes(unit.monsterId));
+  assert.equal(hatchlings.length, 3);
+  assert.deepEqual(new Set(hatchlings.map(unit => `${unit.row}:${unit.col}`)), new Set(cells));
+  assert.equal(state.terrains.some(terrain => terrain.skillId === 50806), false);
+  assert.ok(state.events.some(event => event.type === 'terrain-remove' && event.terrain?.remainingTurns === 0));
+});
+
+test('both hatch skills use their own cumulative recovered summon alternatives', () => {
+  for (const [cardId, monsters] of [['50806', [9091, 9093]], ['50807', [9092, 9094]]]) {
+    let state = createBattle(content, spec({
+      players: [
+        { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill(cardId) },
+        { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+      ],
+    }));
+    state = applyBattleAction(content, state, 'p0', { type: 'play', ...legalPlays(content, state, 'p0')[0] });
+    state = applyBattleAction(content, state, 'p0', { type: 'end' });
+    const summoned = state.units.filter(unit => monsters.includes(unit.monsterId));
+    assert.equal(summoned.length, 3, cardId);
+    assert.ok(summoned.every(unit => monsters.includes(unit.monsterId)), cardId);
+  }
+});
+
+test('an eight-turn terrain expires after eight player ends rather than eight rounds', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50731') },
+      { id: 'p1', name: 'Other', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+  }));
+  const play = legalPlays(content, state, 'p0')[0];
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...play });
+  for (let ended = 1; ended <= 8; ended += 1) {
+    const actor = state.players[state.activePlayer].id;
+    state = applyBattleAction(content, state, actor, { type: 'end' });
+    if (ended < 8) assert.equal(state.terrains[0].remainingTurns, 8 - ended);
+  }
+  assert.equal(state.terrains.length, 0);
+});
+
+test('warded ground purges and blocks positive statuses for both teams, then permits them after leaving', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50903') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+    initialUnits: [
+      { playerId: 'p0', monsterId: 10, row: 0, col: 5 },
+      { playerId: 'p1', monsterId: 10, row: 1, col: 6 },
+    ],
+  }));
+  const friendly = state.units.find(unit => unit.playerId === 'p0' && unit.monsterId === 10);
+  const enemy = state.units.find(unit => unit.playerId === 'p1' && unit.monsterId === 10);
+  friendly.statuses.push({ id: 41007, turns: 5 });
+  enemy.statuses.push({ id: 41007, turns: 5 });
+  const ward = legalPlays(content, state, 'p0').find(play => play.row === 0 && play.col === 5);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...ward });
+  assert.equal(state.units.find(unit => unit.id === friendly.id).statuses.some(status => status.id === 41007), false);
+  assert.equal(state.units.find(unit => unit.id === enemy.id).statuses.some(status => status.id === 41007), false);
+  state.players[0].hand.push({ instanceId: 'ward-buff', cardId: '41007', wait: 0 });
+  const blocked = legalPlays(content, state, 'p0').find(play => play.instanceId === 'ward-buff' && play.targetId === friendly.id);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...blocked });
+  assert.equal(state.units.find(unit => unit.id === friendly.id).statuses.some(status => status.id === 41007), false);
+  state.units.find(unit => unit.id === friendly.id).col = 4;
+  state.players[0].hand.push({ instanceId: 'outside-buff', cardId: '41007', wait: 0 });
+  const allowed = legalPlays(content, state, 'p0').find(play => play.instanceId === 'outside-buff' && play.targetId === friendly.id);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...allowed });
+  assert.ok(state.units.find(unit => unit.id === friendly.id).statuses.some(status => status.id === 41007));
+});
+
+test('warded ground suppresses positive aura refresh', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Aura', team: 0, hp: 30, deck: Array(5).fill('1'), effects: [547] },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+    initialUnits: [{ playerId: 'p0', monsterId: 315, row: 0, col: 1 }],
+  }));
+  const unit = state.units.find(candidate => candidate.monsterId === 315);
+  assert.ok(unit.statuses.some(status => status.auraEffectId !== undefined));
+  state.terrains = [{
+    id: 'terrain:ward-test', skillId: 50903, topographyId: 50903, ownerId: 'p1', team: 1,
+    cells: [{ row: 0, col: 1 }], remainingTurns: null, createdTurn: 0, occupants: [unit.id],
+  }];
+  state = applyBattleAction(content, state, 'p0', { type: 'end' });
+  assert.equal(state.units.find(candidate => candidate.id === unit.id).statuses.some(status => status.auraEffectId !== undefined), false);
+});
+
+test('terrain overlap replaces only shared cells and version-1 states without terrains still reduce', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Caster', team: 0, hp: 30, deck: Array(5).fill('50808') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+  }));
+  const first = legalPlays(content, state, 'p0').find(play => play.row === 0 && play.col === 1);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...first });
+  const oldId = state.terrains[0].id;
+  const second = legalPlays(content, state, 'p0').find(play => play.row === 0 && play.col === 1);
+  state = applyBattleAction(content, state, 'p0', { type: 'play', ...second });
+  const keys = state.terrains.flatMap(terrain => terrain.cells.map(cell => `${cell.row}:${cell.col}`));
+  assert.equal(keys.length, new Set(keys).size, 'one ground owns each cell');
+  assert.ok(state.events.some(event => event.terrainId === oldId && ['terrain-update', 'terrain-remove'].includes(event.type)));
+
+  const restored = JSON.parse(JSON.stringify(createBattle(content, spec())));
+  delete restored.terrains;
+  assert.doesNotThrow(() => { state = applyBattleAction(content, restored, 'p0', { type: 'end' }); });
+  assert.deepEqual(state.terrains, []);
+});
+
+test('movement resolves every terrain cell and a terrain entry death prevents the attack', () => {
+  let state = createBattle(content, spec({
+    players: [
+      { id: 'p0', name: 'Mover', team: 0, hp: 30, deck: Array(5).fill('1') },
+      { id: 'p1', name: 'Enemy', team: 1, hp: 30, deck: Array(5).fill('1') },
+    ],
+    initialUnits: [
+      { playerId: 'p0', monsterId: 9093, row: 0, col: 1 },
+      { playerId: 'p1', monsterId: 1, row: 0, col: 6 },
+    ],
+  }));
+  const mover = state.units.find(unit => unit.monsterId === 9093);
+  mover.movement = 4;
+  state.terrains = [{
+    id: 'terrain:test', skillId: 50809, topographyId: 50809, ownerId: 'p1', team: 1,
+    cells: [{ row: 0, col: 2 }, { row: 0, col: 3 }], remainingTurns: null, createdTurn: 0, occupants: [],
+  }];
+  state = applyBattleAction(content, state, 'p0', { type: 'end' });
+  assert.equal(state.units.some(unit => unit.id === mover.id), false);
+  const damageEvents = state.events.filter(event => event.type === 'damage' && event.message === 'terrain-entry' && event.target === mover.id);
+  assert.equal(damageEvents.length, 2);
+  for (const damageEvent of damageEvents) {
+    const index = state.events.indexOf(damageEvent);
+    const moveEvent = state.events.slice(0, index).findLast(event => event.type === 'move' && event.actor === mover.id);
+    assert.deepEqual(moveEvent.moveTo, { row: damageEvent.targetView.row, col: damageEvent.targetView.col });
+  }
+  assert.equal(state.events.some(event => event.type === 'attack' && event.actor === mover.id), false);
 });
 
 test('all supported recovered nonzero ServerClass skill cards are legal and execute in a populated battle', () => {
@@ -735,7 +959,6 @@ test('all supported recovered nonzero ServerClass skill cards are legal and exec
     const raw = content.data.skills[skillId]?.raw;
     const serverClass = Number(raw?.ServerClassID ?? 0);
     if (!raw || serverClass <= 0) continue;
-    if (serverClass === 19 || Number(raw.ID) === 50903) continue;
     let state = createBattle(content, spec({
       players: [
         { id: 'p0', name: 'Caster', team: 0, hp: 300, attack: 5, deck: Array(5).fill(cardId) },
@@ -754,8 +977,8 @@ test('all supported recovered nonzero ServerClass skill cards are legal and exec
     executedClasses.add(serverClass);
     executedCards += 1;
   }
-  assert.equal(executedCards, 279);
-  assert.deepEqual([...executedClasses].sort((a, b) => a - b), [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 35, 36, 37, 38, 39, 44]);
+  assert.equal(executedCards, 292);
+  assert.deepEqual([...executedClasses].sort((a, b) => a - b), [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 35, 36, 37, 38, 39, 44]);
 });
 
 test('every supported recovered nonzero ServerClassID has an executable authoritative path', () => {
@@ -768,7 +991,6 @@ test('every supported recovered nonzero ServerClassID has an executable authorit
   const template = content.data.cards['40000'];
   try {
     for (const [serverClass, skillId] of firstSkillByClass) {
-      if (serverClass === 19) continue;
       content.data.cards[cardId] = {
         ...template,
         id: `main:card:${cardId}`,

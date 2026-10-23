@@ -66,6 +66,18 @@ export interface BattleUnit {
  */
 export type BattleEventUnitView = BattleUnit;
 export interface BattleEventPoint { row: number; col: number }
+export interface BattleTerrain {
+  id: string;
+  skillId: number;
+  topographyId: number;
+  ownerId: string;
+  team: Team;
+  cells: BattleEventPoint[];
+  /** null means that the terrain lasts until the battle ends. */
+  remainingTurns: number | null;
+  createdTurn: number;
+  occupants: string[];
+}
 export interface BattleEvent {
   seq: number;
   type: string;
@@ -85,6 +97,8 @@ export interface BattleEvent {
   moveTo?: BattleEventPoint;
   hpBefore?: number;
   hpAfter?: number;
+  terrain?: BattleTerrain;
+  terrainId?: string;
 }
 export interface BattleState {
   version: 1;
@@ -99,6 +113,8 @@ export interface BattleState {
   rows: number;
   players: BattlePlayer[];
   units: BattleUnit[];
+  /** Optional so version-1 battles written before terrain support still load. */
+  terrains?: BattleTerrain[];
   events: BattleEvent[];
   status: 'playing' | 'settled';
   winner: Team | null;
