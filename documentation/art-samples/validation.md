@@ -1,3 +1,5 @@
+> 历史首批v1记录：用户已要求定向返工，不能作为视觉通过结论。当前试玩与交付见 [R2修订](revision-2/README.md)；v1资源保留，可用 `?skin=sample-v1` 对照。
+
 # 本地定向验证
 
 日期2026-10-24；Apple M5 Pro、48GiB内存、Node25.9.0、Cocos Creator3.8.8原生web-desktop构建、内置Chromium浏览器、本机127.0.0.1:7440。渲染线程2。隔离DB始终为 `.local/art-samples/game.sqlite`，无生产连接。

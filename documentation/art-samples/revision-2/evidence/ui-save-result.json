@@ -1,0 +1,30 @@
+{
+  "source": "server GameStore read after actual Cocos drag/save/close/reopen",
+  "isolatedDatabase": ".local/art-samples/game.sqlite",
+  "deck": [
+    "main:card:3",
+    "main:card:4",
+    "main:card:23001",
+    "main:card:1"
+  ],
+  "held": [
+    {
+      "id": "main:card:3",
+      "count": 1
+    },
+    {
+      "id": "main:card:4",
+      "count": 1
+    },
+    {
+      "id": "main:card:23001",
+      "count": 1
+    },
+    {
+      "id": "main:card:1",
+      "count": 1
+    }
+  ],
+  "statsDeckEdits": 2,
+  "personalDatabaseAccessed": false
+}

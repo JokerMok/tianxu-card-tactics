@@ -1,12 +1,14 @@
+> 历史首批v1记录：用户已要求定向返工，不能作为视觉通过结论。当前试玩与交付见 [R2修订](revision-2/README.md)；v1资源保留，可用 `?skin=sample-v1` 对照。
+
 # 精简PVE范围版 · 首批美术样板
 
 2026-10-24。本地分支 `codex/art-samples-pve`，从实际HEAD `dbd5434` 继续，包含 `554f265`；原检查点 `b60fe6c` 保留。实施 `784ff78`，名称定位补修 `57e50b0`。不是全量换美术或全游戏验收。没有连接服务器、写个人数据库、推送或合并main；原未跟踪UI评审目录与zip保留。
 
 ## 试玩
 
-- [新样板](http://127.0.0.1:7440/?skin=sample)
+- [新样板](http://127.0.0.1:7440/?skin=sample-v1)
 - [原素材](http://127.0.0.1:7440/?skin=original)
-- [只替换背景](http://127.0.0.1:7440/?skin=sample&art=background)、[只替换UI](http://127.0.0.1:7440/?skin=sample&art=ui)、[只替换卫兵](http://127.0.0.1:7440/?skin=sample&art=unit)
+- [只替换背景](http://127.0.0.1:7440/?skin=sample-v1&art=background)、[只替换UI](http://127.0.0.1:7440/?skin=sample-v1&art=ui)、[只替换卫兵](http://127.0.0.1:7440/?skin=sample-v1&art=unit)
 
 切换URL会重载客户端，不回退数据库或进度；**先保存卡组草稿**。这些开关只作用于表现，不改ID、规则和资产。未选中的对象继续使用旧资源。
 

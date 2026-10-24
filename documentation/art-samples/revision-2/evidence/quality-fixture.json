@@ -1,0 +1,21 @@
+{
+  "scope": "isolated QA only; persisted through existing deck.save validator",
+  "cards": [
+    {
+      "id": "main:card:1",
+      "quality": 0
+    },
+    {
+      "id": "main:card:3",
+      "quality": 2
+    },
+    {
+      "id": "main:card:4",
+      "quality": 3
+    },
+    {
+      "id": "main:card:23001",
+      "quality": 6
+    }
+  ]
+}

@@ -1,0 +1,434 @@
+{
+  "elapsedMs": 392566.8000003815,
+  "page": "home",
+  "ready": true,
+  "busy": false,
+  "nodes": 285,
+  "sprites": 38,
+  "missing": 0,
+  "emptyNames": [],
+  "sampleGeometry": [
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 465,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 645,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 825,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 375,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 645,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 555,
+        "y": 190.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    }
+  ],
+  "units": 13,
+  "maxUnits": 13,
+  "animations": 13,
+  "blankSamples": 168,
+  "warmBlankSamples": 0,
+  "animationSamples": 608426,
+  "spriteChanges": 18789,
+  "homeBuilds": 0,
+  "p95": 10,
+  "clicks": [],
+  "startup": [
+    {
+      "path": "/api/bootstrap",
+      "ms": 2,
+      "encoded": 89,
+      "decoded": 89,
+      "transfer": 389
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "ms": 6.400000095367432,
+      "encoded": 6653356,
+      "decoded": 6653356,
+      "transfer": 6653656
+    },
+    {
+      "path": "/api/catalog",
+      "ms": 58.69999980926514,
+      "encoded": 9100299,
+      "decoded": 67036807,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "ms": 1.3000001907348633,
+      "encoded": 5623,
+      "decoded": 5623,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "ms": 1.9000000953674316,
+      "encoded": 795,
+      "decoded": 795,
+      "transfer": 0
+    }
+  ],
+  "lastResources": [
+    {
+      "path": "/api/state",
+      "ms": 3,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.800000190734863,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.700000286102295,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 4.199999809265137,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.599999904632568,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.800000190734863,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.599999904632568,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.599999904632568,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    }
+  ],
+  "art": {
+    "skin": {
+      "pack": "steelwood-revision-2-20261024",
+      "uiTextures": 8,
+      "loads": 8,
+      "failures": 0,
+      "maxPrepareMs": 65
+    },
+    "battle": {
+      "liveDisplays": 13,
+      "animations": [
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 2918,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 2918,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 2919,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 2919,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 2919,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 2919,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 2919,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 1,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 6,
+          "atlasPoolSpriteFrames": 35,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 2,
+          "frameChanges": 3120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        }
+      ]
+    }
+  }
+}
