@@ -1,0 +1,10 @@
+{
+  "id": "e6c9a3ed-1682-49c4-9c0e-a04477e6ac1a",
+  "mapId": 1,
+  "seed": 1024,
+  "initialUnits": 8,
+  "initialHeroUnits": 2,
+  "source": "createBattle using original monster 1/12/19/43 configuration. Only starting positions/decks are QA fixtures; no stat/rule override.",
+  "account": "dedicated local QA account; credentials excluded",
+  "liveDatabase": "isolated .local/art-samples/game.sqlite"
+}

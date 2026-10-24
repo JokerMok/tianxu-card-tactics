@@ -1,0 +1,24 @@
+{
+  "deck": [
+    "main:card:19",
+    "main:card:43",
+    "main:card:61",
+    "main:card:1"
+  ],
+  "serverReceipt": {
+    "result": {
+      "message": "卡组已保存",
+      "cards": [
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:1"
+      ],
+      "commandRevision": 6
+    },
+    "revision": 63,
+    "replayed": false
+  },
+  "reopenedScreenshot": "saved-reopened.png",
+  "source": "isolated database via existing GameStore, no personal database"
+}

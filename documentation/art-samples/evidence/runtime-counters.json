@@ -1,0 +1,193 @@
+[
+  {
+    "scenario": "normal-pve-observation",
+    "maximumUnits": 7,
+    "rAFp95": 10,
+    "art": {
+      "skin": {
+        "pack": "first-batch-steelwood-20261024",
+        "uiTextures": 4,
+        "loads": 4,
+        "failures": 0,
+        "maxPrepareMs": 48
+      },
+      "battle": {
+        "liveDisplays": 6,
+        "animations": [
+          {
+            "frameTreesBuilt": 6,
+            "frameTreesReused": 569,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 1,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 7,
+            "plays": 4,
+            "frameChanges": 922,
+            "cues": 0,
+            "completions": 0,
+            "cancellations": 3
+          },
+          {
+            "frameTreesBuilt": 15,
+            "frameTreesReused": 343,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "frameTreesBuilt": 15,
+            "frameTreesReused": 337,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "frameTreesBuilt": 7,
+            "frameTreesReused": 339,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "frameTreesBuilt": 7,
+            "frameTreesReused": 336,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "fixture-observation",
+    "maximumUnits": 10,
+    "rAFp95": 10.19999999999709,
+    "art": {
+      "skin": {
+        "pack": "first-batch-steelwood-20261024",
+        "uiTextures": 3,
+        "loads": 3,
+        "failures": 0,
+        "maxPrepareMs": 73
+      },
+      "battle": {
+        "liveDisplays": 7,
+        "animations": [
+          {
+            "frameTreesBuilt": 6,
+            "frameTreesReused": 689,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 5,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 3,
+            "plays": 16,
+            "frameChanges": 1126,
+            "cues": 3,
+            "completions": 4,
+            "cancellations": 11
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 5,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 4,
+            "plays": 14,
+            "frameChanges": 1125,
+            "cues": 3,
+            "completions": 6,
+            "cancellations": 7
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 5,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 3,
+            "plays": 14,
+            "frameChanges": 1121,
+            "cues": 2,
+            "completions": 4,
+            "cancellations": 9
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 5,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 4,
+            "plays": 14,
+            "frameChanges": 1123,
+            "cues": 2,
+            "completions": 4,
+            "cancellations": 9
+          },
+          {
+            "frameTreesBuilt": 50,
+            "frameTreesReused": 648,
+            "frameTreesEvicted": 0,
+            "frameCacheSize": 6,
+            "retainedFrameTrees": 6,
+            "activeFrameTrees": 1,
+            "pendingFrameTrees": 0
+          },
+          {
+            "kind": "sample",
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 5,
+            "atlasPoolSpriteFrames": 54,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 5,
+            "plays": 14,
+            "frameChanges": 1122,
+            "cues": 2,
+            "completions": 5,
+            "cancellations": 8
+          }
+        ]
+      }
+    }
+  }
+]

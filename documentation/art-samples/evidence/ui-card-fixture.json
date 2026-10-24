@@ -1,0 +1,125 @@
+{
+  "source": "isolated QA cards only; no ordinary acquisition claim",
+  "cards": [
+    {
+      "id": "main:card:1",
+      "name": "卫兵",
+      "abilities": 1,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:8",
+      "name": "哨卫",
+      "abilities": 1,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:15",
+      "name": "重甲队长",
+      "abilities": 1,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:19",
+      "name": "侍从",
+      "abilities": 1,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:26",
+      "name": "圣骑士",
+      "abilities": 2,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:33",
+      "name": "圣殿骑士",
+      "abilities": 3,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:40",
+      "name": "圣战军指挥官·卢卡努斯",
+      "abilities": 3,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:43",
+      "name": "枪骑兵",
+      "abilities": 1,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:50",
+      "name": "枪骑士",
+      "abilities": 2,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:57",
+      "name": "精锐枪骑士",
+      "abilities": 2,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:61",
+      "name": "骑兵",
+      "abilities": 1,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:68",
+      "name": "骑士",
+      "abilities": 2,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:75",
+      "name": "骑士队长",
+      "abilities": 2,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:82",
+      "name": "冲锋者·伊坎",
+      "abilities": 2,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:85",
+      "name": "剑士",
+      "abilities": 0,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:92",
+      "name": "大剑士",
+      "abilities": 1,
+      "nameStatus": "recovered-context"
+    },
+    {
+      "id": "main:card:99",
+      "name": "剑术大师",
+      "abilities": 1,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:40",
+      "name": "圣战军指挥官·卢卡努斯",
+      "abilities": 3,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:4044",
+      "name": "巨型食人魔·赫拉克勒斯",
+      "abilities": 1,
+      "nameStatus": "candidate"
+    },
+    {
+      "id": "main:card:9447",
+      "name": "逆位永恒丘比特（亚当）",
+      "abilities": 5,
+      "nameStatus": "candidate"
+    }
+  ]
+}

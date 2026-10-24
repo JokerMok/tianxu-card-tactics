@@ -1,0 +1,34 @@
+[
+  {
+    "file": "manifest.json",
+    "status": 200,
+    "type": "application/json",
+    "bytes": 2335,
+    "sha256": "32c213150d2b2fe4961e0bfb68d68e7c980940406107434cf59530e7e205b3da"
+  },
+  {
+    "file": "guard-atlas.png",
+    "status": 200,
+    "type": "image/png",
+    "bytes": 979280,
+    "sha256": "9746239cbb3e8db0cc6257a4c7a3f20ecd482e45059eeaf1992a5bd9df51fd10"
+  },
+  {
+    "file": "forest-map-1.jpg",
+    "status": 200,
+    "type": "image/jpeg",
+    "bytes": 573733,
+    "sha256": "b6b98bbefe110dfeead009ee7754e87c8b386fb1932c055fb409ee60e640205a"
+  },
+  {
+    "file": "button-disabled.png",
+    "status": 200,
+    "type": "image/png",
+    "bytes": 25289,
+    "sha256": "e91647b19c1f441a6f9fc09e0a046281fbba2ddd0fe972d46ecbabd6e5d274f8"
+  },
+  {
+    "case": "path escape",
+    "status": 404
+  }
+]
