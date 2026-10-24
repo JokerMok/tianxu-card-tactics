@@ -53,7 +53,7 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   ]);
   const spec = {
     atlas: 'guard.png', frameSize: [256, 256], columns: 9, frameCount: 54,
-    displaySize: [170, 170], foot: [128, 220], mount: [170, 100],
+    displaySize: [170, 170], foot: [128, 220], mount: [170, 100], nameOffsetY: 74,
     clips: {
       stand: { start: 0, count: 8, fps: 12, loop: true },
       walk: { start: 8, count: 12, fps: 16, loop: true },
@@ -83,6 +83,7 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   const attack = first.play('atk', 'west', () => cues++, () => completions++);
   assert.equal(attack.cueSeconds, 0.25);
   assert.equal(attack.durationSeconds, 0.6);
+  assert.equal(first.getSourceLayoutMetrics().nameOffsetY, 74, 'name height must not use transparent atlas padding');
   assert.equal(first.spriteNode.scale.x, -1, 'west mirrors the sprite around its foot pivot');
   assert.equal(first.mountNode.position.x, -((170 - 128) * 170 / 256));
   first.update(0.24);

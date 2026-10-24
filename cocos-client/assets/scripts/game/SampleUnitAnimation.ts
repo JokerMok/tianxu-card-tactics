@@ -26,6 +26,8 @@ export interface SampleUnitSpec {
   mount: [number, number];
   /** Offset from the unchanged board logical point, in design coordinates. */
   origin?: [number, number];
+  /** Head label position above the board point, independent of transparent atlas padding. */
+  nameOffsetY?: number;
   clips: Record<RecoveredAnimationStatus, {
     start: number;
     count: number;
@@ -103,6 +105,7 @@ function validateSpec(spec: SampleUnitSpec): AtlasLayout {
   }
   if (!finitePair(spec.displaySize) || spec.displaySize.some(value => value <= 0)
       || !finitePair(spec.foot) || !finitePair(spec.mount) || (spec.origin !== undefined && !finitePair(spec.origin))
+      || (spec.nameOffsetY !== undefined && (!Number.isFinite(spec.nameOffsetY) || spec.nameOffsetY < 0))
       || spec.foot[0] < 0 || spec.foot[0] > frameWidth
       || spec.foot[1] < 0 || spec.foot[1] > frameHeight) {
     throw new Error('Sample unit display layout is invalid');
@@ -382,6 +385,7 @@ export class SampleUnitAnimation {
       nominalHeight: this.spec.displaySize[1],
       anchorX: direction === 'west' ? this.spec.displaySize[0] - anchorX : anchorX,
       anchorY: this.spec.foot[1] * scaleY,
+      nameOffsetY: this.spec.nameOffsetY,
     };
   }
 

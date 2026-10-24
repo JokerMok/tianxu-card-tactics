@@ -98,10 +98,12 @@ export class BattleSceneView {
         void ready.then(() => {
           if (!this.disposed && instance.node.isValid && !instance.dying && instance.generation === 0) {
             instance.generation++; animation.play('stand', this.direction(instance));
-            const anchorY = animation.getSourceLayoutMetrics(this.direction(instance))?.anchorY ?? 70;
+            const metrics = animation.getSourceLayoutMetrics(this.direction(instance));
+            const nameOffsetY = metrics && 'nameOffsetY' in metrics && typeof metrics.nameOffsetY === 'number'
+              ? metrics.nameOffsetY : (metrics?.anchorY ?? 70) + 1;
             // CreatureItem.updateNamePos uses raw anchor + 10. Keep the first
             // row text inside the viewport when the local battle places a hero there.
-            instance.name.node.setPosition(0, Math.min(anchorY + 1, 279 - instance.node.position.y), 0);
+            instance.name.node.setPosition(0, Math.min(nameOffsetY, 279 - instance.node.position.y), 0);
           }
         }).catch(error => this.hooks.notice(String(error)));
       }
