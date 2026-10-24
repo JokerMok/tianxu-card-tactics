@@ -1,8 +1,9 @@
 import {assetManager,ImageAsset,Texture2D,SpriteFrame,Sprite,Node} from 'cc';
 import type {SampleUnitSpec} from './SampleUnitAnimation.ts';
 interface ImageSpec {file:string;size:[number,number];insets?:[number,number,number,number]}
-interface Manifest {version:1;id:string;images:Record<string,ImageSpec>;maps:Record<string,string>;units:Record<string,SampleUnitSpec>}
+interface Manifest {version:1|2;id:string;images:Record<string,ImageSpec>;maps:Record<string,string>;units:Record<string,SampleUnitSpec>}
 type State='normal'|'selected'|'pressed'|'disabled';
+export type ButtonKind='primary'|'secondary'|'compact';
 const images=new Map<string,Promise<{image:ImageAsset;texture:Texture2D;frame:SpriteFrame}>>();
 const requests=new WeakMap<Node,string>();
 let manifest:Manifest|undefined,base='',disposed=false;
@@ -16,9 +17,10 @@ export class ArtSkin {
  }
  static async load(origin:string){
   if(!['ui','unit','background'].some(k=>this.enabled(k as 'ui'|'unit'|'background')))return;
-  if(manifest)return;base=origin.replace(/\/$/,'')+'/art/v1/';disposed=false;
+  if(manifest)return;const requested=typeof location==='undefined'?'sample':new URLSearchParams(location.search).get('skin')??'sample';
+  const version=requested==='sample-v1'?'v1':'v2';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
   const res=await fetch(base+'manifest.json');if(!res.ok)throw new Error('美术样板清单载入失败，请检查本机资源目录。');
-  const value=await res.json();if(value.version!==1||!value.images||!value.units||!value.maps)throw new Error('美术样板清单格式错误。');manifest=value;
+  const value=await res.json();if(![1,2].includes(value.version)||!value.images||!value.units||!value.maps)throw new Error('美术样板清单格式错误。');manifest=value;
   // Prepare all four states before the first real press, rather than loading a pressed image after release.
   try { if(this.enabled('ui'))await Promise.all(['normal','selected','pressed','disabled'].map(state=>this.acquire('button-'+state,value.images['button-'+state]))); } catch(error) { manifest=undefined;throw error; }
  }
@@ -34,9 +36,9 @@ export class ArtSkin {
   const asset=await this.acquire(key,item);if(!node.isValid||disposed||requests.get(node)!==key)return;
   sprite.spriteFrame=asset.frame;sprite.type=item.insets?Sprite.Type.SLICED:Sprite.Type.SIMPLE;
  }
- static button(node:Node,disabled:boolean,selected=false){
+ static button(node:Node,disabled:boolean,selected=false,kind:ButtonKind='secondary'){
   let state:State=disabled?'disabled':selected?'selected':'normal';
-  const paint=()=>{void this.paint(node,'button-'+state).catch(e=>console.warn('Art skin button',String(e)));};paint();
+  const paint=()=>{const preferred=`button-${kind}-${state}`,key=manifest?.images[preferred]?preferred:'button-'+state;void this.paint(node,key).catch(e=>console.warn('Art skin button',String(e)));};paint();
   if(disabled)return;
   node.on(Node.EventType.MOUSE_ENTER,()=>{state='selected';paint();});
   const reset=()=>{state=selected?'selected':'normal';paint();};
@@ -49,10 +51,15 @@ export class ArtSkin {
   if(['kpglk_1','zdjm_1'].includes(skin))return 'panel';
   return undefined;
  }
+ static qualityFrame(quality:number){
+  if(!this.enabled('ui')||!manifest)return undefined;
+  const key='quality-frame-'+Math.max(0,Math.min(6,Math.round(quality)));
+  return manifest.images[key]?key:(manifest.images['card-frame']?'card-frame':undefined);
+ }
  private static acquire(key:string,item:ImageSpec){
   let pending=images.get(key);if(pending)return pending;
-  // This pack has a fixed manifest: at most 7 UI images + one background. No per-unit atlas here.
-  if(images.size>=8)throw new Error('美术样板图像缓存已达到上限。');const at=Date.now();stats.loads++;
+  // Both packs have finite manifests. V2 adds quality frames, button tiers and HUD icons.
+  if(images.size>=40)throw new Error('美术样板图像缓存已达到上限。');const at=Date.now();stats.loads++;
   pending=new Promise<{image:ImageAsset;texture:Texture2D;frame:SpriteFrame}>((resolve,reject)=>assetManager.loadRemote<ImageAsset>(base+item.file,{ext:item.file.endsWith('.jpg')?'.jpg':'.png'},(error,image)=>{
    if(error){stats.failures++;images.delete(key);reject(error);return;}
    if(disposed){assetManager.releaseAsset(image);reject(new Error('样板皮肤已释放。'));return;}

@@ -181,12 +181,12 @@ export class BattleSceneView {
       const display = this.displays.get(change.unitId); if (!display) continue;
       const delta = change.after - change.before;
       const hit = this.ui.label(display.node, 'Damage:' + change.eventSeq,
-        delta > 0 ? `+${delta}` : `−${Math.abs(delta)}`, 0, 38, 110, 30, 24, delta > 0 ? Theme.green : Theme.red);
+        delta > 0 ? `+${delta}` : delta<0?`−${Math.abs(delta)}`:change.message==='blocked'?'格挡':'未受伤', 0, 38, 110, 30, 24, delta > 0 ? Theme.green : delta<0?Theme.red:Theme.gold);
       tween(hit.node).by(.5 / this.speed, { position: new Vec3(0, 40, 0) }).call(() => { if (hit.node.isValid) hit.node.destroy(); }).start();
-      if (!display.dying && change.unitId !== step.actorId && change.after > 0) {
-        const generation = ++display.generation;
-        const handle = display.animation.play('hit', this.direction(display));
-        if (handle.hasNativeState) void handle.completion.then(() => {
+      if (!display.dying && change.unitId !== step.actorId && change.after > 0 && delta<=0) {
+        const handle = delta<0?display.animation.play('hit', this.direction(display)):change.message==='blocked'?display.animation.playBlock(this.direction(display)):null;
+        const generation = handle?++display.generation:display.generation;
+        if (handle?.hasNativeState) void handle.completion.then(() => {
           // RecoveredAnimation resolves a canceled handle. Only the handle
           // that still owns this display may restore stand; an old hit must
           // never cancel a newer attack animation.
@@ -301,7 +301,7 @@ export class BattleSceneView {
   }
   private cardBadge(card: RecoveredCatalog['scopes']['main']['cards'][string]): string {
     const skillId = String(card.raw.SkillID ?? '');
-    if (skillId) {
+    if (Number(skillId)>0) {
       const profession = Number(this.catalog.scopes.main.skills[skillId]?.raw?.['使用职业'] ?? 0);
       return ['ZSxiao', 'ZSxiao', 'LRxiao', 'FSxiao', 'MSxiao', 'MSxiao'][profession] ?? 'ZSxiao';
     }
@@ -325,27 +325,29 @@ export class BattleSceneView {
   private async drawSmallCard(parent: Node, card: RecoveredCatalog['scopes']['main']['cards'][string], wait: number,
       selected: boolean, showStats = true): Promise<void> {
     const art = this.catalog.assets[card.art[0]];
-    if (art?.path) await this.ui.image(parent, 'Portrait', this.base + '/recovered/' + art.path, 85, 116);
+    if (art?.path) {const portrait=await this.ui.image(parent, 'Portrait', this.base + '/recovered/' + art.path, 85, 116);if(wait>0&&showStats)portrait.addComponent(UIOpacity).opacity=150;}
     if (!parent.isValid) return;
     // CardBackgroundPane places the original race/skill frame over raw art.
-    const frame = this.sourceCardSkin(parent, 'SourceFrame:' + this.cardFrame(card), this.cardFrame(card), 0, 0, 85, 116);
+    const quality = Math.max(0, Math.min(6, Number(card.raw.Quality ?? 0)));
+    const qualityKey=ArtSkin.qualityFrame(quality);let frame:Node|undefined;
+    if(qualityKey){frame=this.ui.node(parent,'QualityFrame:'+quality,85,116);void ArtSkin.paint(frame,qualityKey);}else frame=this.sourceCardSkin(parent, 'SourceFrame:' + this.cardFrame(card), this.cardFrame(card), 0, 0, 85, 116);
     if (!frame) {
       const outline = parent.addComponent(Graphics); outline.strokeColor = selected ? Theme.gold : new Color(125, 91, 39);
       outline.lineWidth = selected ? 3 : 1; outline.rect(-42.5, -58, 85, 116); outline.stroke();
     }
-    this.sourceCardSkin(parent, 'ReadyPlate', 'feiyongxiao', -30, 43);
-    this.ui.label(parent, 'Wait', String(wait), -29, 43, 25, 25, 19, Theme.text);
-    const quality = Math.max(0, Math.min(6, Number(card.raw.Quality ?? 0)));
-    this.sourceCardSkin(parent, 'QualityStar', ['baixingxiao', 'lvxingxiao', 'lanxingxiao', 'zixingxiao',
-      'chengxingxiao', 'hongxingxiao', 'jinxingxiao'][quality], 0, 50);
+    const qualityColor=[new Color(151,163,158),new Color(89,193,124),new Color(73,151,224),new Color(163,99,225),new Color(230,151,62),new Color(229,76,67),new Color(244,211,101)][quality];
+    const safeBadge=(name:string,x:number,y:number)=>{const n=this.ui.node(parent,name,25,25,x,y),g=n.addComponent(Graphics);g.fillColor=new Color(7,24,23,235);g.circle(0,0,11);g.fill();g.strokeColor=qualityColor;g.lineWidth=1.5;g.circle(0,0,11);g.stroke();};
+    if(qualityKey)safeBadge('ReadySafe',-30,43);else this.sourceCardSkin(parent,'ReadyPlate','feiyongxiao',-30,43);this.ui.label(parent, 'Wait', String(wait), -30, 43, 23, 23, 17, wait>0?Theme.gold:Theme.text);
+    if(!qualityKey)this.sourceCardSkin(parent, 'QualityStar', ['baixingxiao', 'lvxingxiao', 'lanxingxiao', 'zixingxiao','chengxingxiao', 'hongxingxiao'][quality], 0, 50);
     this.sourceCardSkin(parent, 'RaceOrProfession', this.cardBadge(card), 31, 44);
-    if (selected) this.sourceCardSkin(parent, 'PlayableRing', 'raoquan', 0, 0, 85, 116);
+    if (selected){const ring=this.ui.node(parent,'SelectedRing',91,122),g=ring.addComponent(Graphics);g.strokeColor=Theme.gold;g.lineWidth=3;g.roundRect(-44,-59,88,118,6);g.stroke();}
     const cardLabel=this.ui.label(parent, 'CardName', cardName(this.catalog,card.id), 0, -47, 80, 24, 11);cardLabel.overflow=Label.Overflow.CLAMP;cardLabel.lineHeight=12;
     if (!showStats) return;
     const monster = this.catalog.scopes.main.monsters[String(card.raw.MonsterID)];
     if (monster) {
-      this.ui.label(parent, 'Attack', String(monster.Attack), -28, -24, 25, 22, 16);
-      this.ui.label(parent, 'HP', String(monster.HP), 28, -24, 25, 22, 16);
+      if(qualityKey){safeBadge('AttackSafe',-28,-24);safeBadge('HpSafe',28,-24);}
+      this.ui.label(parent, 'Attack', String(monster.Attack), -28, -24, 23, 22, 15);
+      this.ui.label(parent, 'HP', String(monster.HP), 28, -24, 23, 22, 15);
     }
   }
   private renderHud(force = false) {
@@ -366,15 +368,18 @@ export class BattleSceneView {
     const mine = !this.locked && !this.latest.settled && active?.id === this.me;
     const terrainCount = (state.terrains ?? []).reduce((sum, t) => sum + t.cells.length, 0);
     if (terrainCount) this.ui.label(hud, 'Terrain:legend', `地形 ${terrainCount}格 · 点击格子查看效果 · 数字为玩家回合`, -302, -136, 510, 25, 13, Theme.gold);
-    this.ui.label(hud, 'DrawPile', `${me.drawPile.length}`, -191, -228, 44, 30, 22, Theme.gold);
-    this.ui.label(hud, 'Graveyard', `${me.graveyard.length}`, 555, -228, 44, 30, 22, Theme.gold);
+    const counter=(name:string,key:string,label:string,count:number,x:number)=>{const url=ArtSkin.url(key);if(url)void this.ui.image(hud,name+':icon',url,34,34,x,-228);else this.ui.label(hud,name+':fallback',label.slice(0,1),x,-228,30,30,17,Theme.gold);this.ui.label(hud,name+':label',label,x,-202,58,18,11,Theme.text);this.ui.label(hud,name+':count',String(count),x,-265,38,24,18,Theme.gold);};
+    counter('DrawPile','hud-draw','牌库',me.drawPile.length,-216);counter('Graveyard','hud-graveyard','墓地',me.graveyard.length,555);
+    const handIcon=ArtSkin.url('hud-hand');if(handIcon)void this.ui.image(hud,'HandSummary:icon',handIcon,25,25,-170,-145);this.ui.label(hud,'HandSummary',`手牌 ${me.hand.length}`,-125,-145,76,22,13,Theme.gold);
     this.selectedHandPositions.clear();
     me.hand.forEach((hand, index) => {
       const card = this.catalog.scopes.main.cards[hand.cardId.split(':').at(-1)!]; if (!card) return;
       const x = -143 + index * 89; const y = -228 + (this.selected === hand.instanceId ? 15 : 0);
       const box = this.ui.node(hud, 'Hand:' + index, 85, 116, x, y);
       void this.drawSmallCard(box, card, hand.wait, this.selected === hand.instanceId);
-      box.on(Node.EventType.TOUCH_START, () => { if (mine && hand.wait === 0) {const unsupported=cardDisplay(this.catalog,card,this.base).abilities.find(a=>a.status==='unsupported');if(unsupported){this.hooks.notice(unsupported.text);return;} this.selected = hand.instanceId; box.setPosition(x, y + 15); } });
+      const enabled=mine&&hand.wait===0;if(!enabled)box.addComponent(UIOpacity).opacity=165;
+      box.on(Node.EventType.MOUSE_ENTER,()=>{if(enabled&&this.selected!==hand.instanceId){box.setPosition(x,y+5);box.setScale(1.03,1.03,1);}});box.on(Node.EventType.MOUSE_LEAVE,()=>{if(this.selected!==hand.instanceId&&box.isValid){box.setPosition(x,y);box.setScale(1,1,1);}});
+      box.on(Node.EventType.TOUCH_START, () => { if (enabled) {const unsupported=cardDisplay(this.catalog,card,this.base).abilities.find(a=>a.status==='unsupported');if(unsupported){this.hooks.notice(unsupported.text);return;} box.setScale(.97,.97,1);this.selected = hand.instanceId; box.setPosition(x, y + 15); } });
       box.on(Node.EventType.TOUCH_MOVE, (event: EventTouch) => { if (this.selected !== hand.instanceId || !mine) return;
         const p = event.getUILocation(); const local = hud.getComponent(UITransform)!.convertToNodeSpaceAR(new Vec3(p.x, p.y)); box.setPosition(local); });
       box.on(Node.EventType.TOUCH_END, (event: EventTouch) => {
@@ -384,11 +389,12 @@ export class BattleSceneView {
         if (legal && local.y > -150) this.playFromHand(hand.cardId, legal);
         else { this.selected = hand.instanceId; this.renderHud(true); }
       });
+      box.on(Node.EventType.TOUCH_CANCEL,()=>{if(box.isValid){box.setScale(1,1,1);box.setPosition(x,y);}if(this.selected===hand.instanceId)this.renderHud(true);});
       this.selectedHandPositions.set(hand.instanceId, new Vec3(x, y));
     });
-    this.skinButton(hud, 'Battle:End', 'hhjs_1', '', '结束回合', 528.5, -136, 139, 35, () => this.hooks.command({ type: 'end' }), !mine);
-    this.skinButton(hud, 'Battle:Auto', 'ajbangzhu', '', this.autoplay ? '自动' : '手动', 432, -136, 50, 35, () => { this.autoplay = !this.autoplay; this.renderHud(true); }, this.latest.settled);
-    this.skinButton(hud, 'Battle:Surrender', 'tx_1', '', '', 382, -136, 50, 35, () => this.hooks.command({ type: 'surrender' }), this.locked || this.latest.settled);
+    if(ArtSkin.image('button-primary-normal'))this.ui.sourceButton(hud,'Battle:End','hhjs_1','','结束回合',528.5,-136,139,35,()=>this.hooks.command({type:'end'}),!mine,undefined,'primary');else this.skinButton(hud, 'Battle:End', 'hhjs_1', '', '结束回合', 528.5, -136, 139, 35, () => this.hooks.command({ type: 'end' }), !mine);
+    if(ArtSkin.image('button-secondary-normal'))this.ui.sourceButton(hud,'Battle:Auto','ajbangzhu','',this.autoplay?'自动':'手动',423,-136,60,35,()=>{this.autoplay=!this.autoplay;this.renderHud(true);},this.latest.settled,undefined,'secondary',this.autoplay);else this.skinButton(hud, 'Battle:Auto', 'ajbangzhu', '', this.autoplay ? '自动' : '手动', 432, -136, 50, 35, () => { this.autoplay = !this.autoplay; this.renderHud(true); }, this.latest.settled);
+    this.skinButton(hud, 'Battle:Surrender', 'tx_1', '', '', 360, -136, 50, 35, () => this.hooks.command({ type: 'surrender' }), this.locked || this.latest.settled);
     if (mine) for (const [index, play] of this.latest.legalPlays.filter(play => play.instanceId === this.selected).entries()) {
       const p = this.position(play.row, play.col);
       const hand = me.hand.find(card => card.instanceId === play.instanceId);

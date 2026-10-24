@@ -1,0 +1,308 @@
+{
+  "card-frame": {
+    "file": "quality-frame-0.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-0": {
+    "file": "quality-frame-0.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-1": {
+    "file": "quality-frame-1.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-2": {
+    "file": "quality-frame-2.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-3": {
+    "file": "quality-frame-3.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-4": {
+    "file": "quality-frame-4.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "quality-frame-5": {
+    "file": "quality-frame-5.png",
+    "size": [
+      256,
+      352
+    ]
+  },
+  "button-normal": {
+    "file": "button-secondary-normal.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-selected": {
+    "file": "button-secondary-selected.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-pressed": {
+    "file": "button-secondary-pressed.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-disabled": {
+    "file": "button-secondary-disabled.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-primary-normal": {
+    "file": "button-primary-normal.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-primary-selected": {
+    "file": "button-primary-selected.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-primary-pressed": {
+    "file": "button-primary-pressed.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-primary-disabled": {
+    "file": "button-primary-disabled.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-secondary-normal": {
+    "file": "button-secondary-normal.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-secondary-selected": {
+    "file": "button-secondary-selected.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-secondary-pressed": {
+    "file": "button-secondary-pressed.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-secondary-disabled": {
+    "file": "button-secondary-disabled.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-compact-normal": {
+    "file": "button-compact-normal.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-compact-selected": {
+    "file": "button-compact-selected.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-compact-pressed": {
+    "file": "button-compact-pressed.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "button-compact-disabled": {
+    "file": "button-compact-disabled.png",
+    "size": [
+      256,
+      56
+    ],
+    "insets": [
+      24,
+      24,
+      12,
+      12
+    ]
+  },
+  "hud-draw": {
+    "file": "hud-draw.png",
+    "size": [
+      48,
+      48
+    ]
+  },
+  "hud-hand": {
+    "file": "hud-hand.png",
+    "size": [
+      48,
+      48
+    ]
+  },
+  "hud-graveyard": {
+    "file": "hud-graveyard.png",
+    "size": [
+      48,
+      48
+    ]
+  },
+  "control-plus": {
+    "file": "control-plus.png",
+    "size": [
+      24,
+      24
+    ]
+  },
+  "control-minus": {
+    "file": "control-minus.png",
+    "size": [
+      24,
+      24
+    ]
+  },
+  "control-locked": {
+    "file": "control-locked.png",
+    "size": [
+      24,
+      24
+    ]
+  },
+  "quality-frame-6": {
+    "file": "quality-frame-6.png",
+    "size": [
+      256,
+      352
+    ]
+  }
+}

@@ -111,6 +111,12 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   stand.cancel();
   await stand.completion;
 
+  assert.equal(first.playBlock('east'),null,'legacy packs without a block pose do not fake an injury');
+  spec.reactions={block:{start:32,count:3,fps:15,loop:false}};
+  const block=first.playBlock('west');
+  assert.equal(block.statusName,'block');assert.equal(block.cueSeconds,null);
+  assert.equal(block.durationSeconds,.2);first.update(.21);await block.completion;
+  assert.equal(cues,1,'shield brace cannot repeat an attack cue');
   first.destroy();
   assert.equal(second.getPerformanceStats().atlasPoolLiveReferences, 1);
   assert.equal(cc.metrics.framesDestroyed, 0);

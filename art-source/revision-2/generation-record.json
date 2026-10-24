@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-24/25",
+  "tool": "built-in image_gen (no API key, CLI or purchased assets)",
+  "outputs": [
+    {
+      "file": "guard-painted-sheet.png",
+      "generatedFile": "exec-1d696b39-0753-4f4c-94fe-d2fad316e8e8.png",
+      "reference": [
+        "recovered/images/c679e00e31b86cb3d681.png (existing Guard card)",
+        "documentation/art-samples/evidence/battle-original.png (style/scale guide)"
+      ],
+      "brief": "Blue-armored sword/shield Guard; stocky shoulders and legs; painted 6-column / five-action pose sheet, fixed right-facing camera; guard stance, stepping, anticipated attack/contact/recovery, wound recoil, kneel/fall. No rendered text. Transparent background.",
+      "sha256": "8e35f78a2d2c9475482dcb578ea84ee46aae42436999a35d5d60e466fb01e43e"
+    },
+    {
+      "file": "forest-map-1.png",
+      "generatedFile": "exec-34698044-e164-489b-a480-6bc71a89352e.png",
+      "reference": [
+        "documentation/art-samples/evidence/battle-original.png (four row and hand-zone guide)"
+      ],
+      "brief": "2:1 illustrated forest/ruins; central x5-95%, y8-76% uninterrupted level ground; feet at21/37/53/69%; peripheral ruins/trees; no horizon inside board, no UI/grid/units.",
+      "sha256": "3712efe6f91799ea107217ab0336475d02c17e31565ad2170923bd71ac9de0fb"
+    },
+    {
+      "file": "guard-walk-sheet.png",
+      "generatedFile": "exec-e5687b47-8d78-48e3-9889-fa123d340c7c.png",
+      "reference": [
+        "guard-painted-sheet.png"
+      ],
+      "brief": "Eight alternate lift/heel-plant walking poses in 4x2 strip; same Guard identity and fixed facing camera. Dedicated second pass replaces first conservative shuffle.",
+      "sha256": "a1380d1b44ea0290d2f0ac974f6d7caa1838ed56f44b20e1975424a0bdd4bbf8"
+    }
+  ],
+  "processing": "prepare-revision-2.py: transparent-pose extraction and constant ground/column registration. Base common scale0.60; larger walk source common scale0.31 matches body height. No frame bounds recentering. Runtime35 frames:6 idle+8 revised walk+6 attack+6 hit+6 death+3 forward-shield block reuse. Original6 walk source retained but not used. Runtime filenames have content hashes to avoid stale texture/layout pairing.",
+  "approval": "Candidate revision only; no batch production approved. Generated output is local review material; no public originality or rights-clearance claim."
+}

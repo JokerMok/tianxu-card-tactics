@@ -28,6 +28,8 @@ export interface SampleUnitSpec {
   origin?: [number, number];
   /** Head label position above the board point, independent of transparent atlas padding. */
   nameOffsetY?: number;
+  /** Optional presentation of an authoritative blocked impact; not a new battle action. */
+  reactions?: {block?: {start:number;count:number;fps:number;loop:boolean}};
   clips: Record<RecoveredAnimationStatus, {
     start: number;
     count: number;
@@ -120,6 +122,8 @@ function validateSpec(spec: SampleUnitSpec): AtlasLayout {
       throw new Error(`Sample unit ${status} clip is invalid`);
     }
   }
+  const block=spec.reactions?.block;
+  if(block&&(!Number.isInteger(block.start)||block.start<0||!positiveInteger(block.count)||!Number.isFinite(block.fps)||block.fps<=0||block.loop!==false||block.start+block.count>spec.frameCount))throw new Error('Sample block clip is invalid');
   return {
     frameWidth,
     frameHeight,
@@ -302,11 +306,11 @@ export class SampleUnitAnimation {
   }
 
   play(status: RecoveredAnimationStatus, direction: RecoveredAnimationDirection,
-       onAttack?: () => void, onComplete?: () => void): RecoveredPlaybackHandle {
+       onAttack?: () => void, onComplete?: () => void, reaction?: 'block'): RecoveredPlaybackHandle {
     this.cancelActive();
     const generation = ++this.playbackGeneration;
     const entry = this.entry;
-    const clip = this.spec.clips[status];
+    const clip = reaction ? this.spec.reactions?.[reaction] as SampleUnitSpec['clips']['hit'] : this.spec.clips[status];
     if (this.disposed || !entry?.frames || !clip) {
       return { generation, status, statusName: null, durationSeconds: 0, cueSeconds: null,
         hasNativeState: false, completion: Promise.resolve(), cancel: () => undefined };
@@ -339,13 +343,17 @@ export class SampleUnitAnimation {
     return {
       generation,
       status,
-      statusName: status,
+      statusName: reaction??status,
       durationSeconds: clip.count / clip.fps,
       cueSeconds: clip.cueFrame === undefined ? null : clip.cueFrame / clip.fps,
       hasNativeState: true,
       completion,
       cancel: () => this.cancelPlayback(generation),
     };
+  }
+
+  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {
+    return this.spec.reactions?.block?this.play('hit',direction,undefined,undefined,'block'):null;
   }
 
   update(dt: number): void {

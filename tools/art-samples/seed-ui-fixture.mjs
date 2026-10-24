@@ -7,6 +7,8 @@ try{const content=new ServerContent(path.join(root,'cocos-client/assets/resource
 const available=Object.values(content.data.cards).filter(c=>stageCardAllowed(content.tables,c.id)&&!/(abandon|废弃)/i.test(c.raw.Name));
 const names=new Set(),selected=[];for(const c of available){if(names.has(c.raw.Name))continue;names.add(c.raw.Name);selected.push(c);if(selected.length===17)break;}
 for(const id of ['main:card:40','main:card:4044','main:card:9447']){const c=available.find(c=>c.id===id);if(c)selected.push(c);}
+// Include actual enabled quality variants of Guard for a same-deck quality comparison.
+for(const c of available.filter(c=>c.raw.Name==='Guard')){if(!selected.some(x=>x.id===c.id))selected.push(c);}
 const a=s.read().characters[login.characterId];if(!a||!a.name.startsWith('动作验收'))throw new Error('Requires isolated art fixture character');
 s.transaction(a.accountId,'art-ui-seed-v1','local.ui-fixture',selected.map(c=>c.id),world=>{const actor=world.characters[a.id];for(const c of selected)actor.cards[c.id]=Math.max(1,actor.cards[c.id]??0);return {message:'UI fixture only'};});
 writeFileSync(path.join(folder,'evidence/ui-card-fixture.json'),JSON.stringify({source:'isolated QA cards only; no ordinary acquisition claim',cards:selected.map(c=>{const d=cardDisplay(content.catalog,c,'');return{id:c.id,name:d.name,abilities:d.abilities.length,nameStatus:d.nameStatus};})},null,2));console.log('Seeded isolated UI card fixture:',selected.length);

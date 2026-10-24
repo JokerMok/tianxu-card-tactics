@@ -1,4 +1,4 @@
-import { ArtSkin } from './ArtSkin.ts';
+import { ArtSkin,type ButtonKind } from './ArtSkin.ts';
 import { Node, UITransform, Layers, Graphics, Color, Label, Button, EditBox,
   HorizontalTextAlignment, VerticalTextAlignment, Sprite, SpriteFrame, assetManager, ImageAsset, Texture2D, UIOpacity } from 'cc';
 import type { OriginalUi } from './OriginalUi.ts';
@@ -44,9 +44,9 @@ export class CocosUi {
     return node;
   }
   sourceButton(parent: Node, name: string, skin: string, pressed: string, text: string, x: number, y: number,
-      width: number, height: number, callback: () => void, disabled = false, variant?: string): Node {
+      width: number, height: number, callback: () => void, disabled = false, variant?: string, kind:ButtonKind='secondary', selected=false): Node {
     if(ArtSkin.image('button-normal') && text && width>=60){
-      const node=this.node(parent,name,width,height,x,y);ArtSkin.button(node,disabled,text.startsWith('✓'));
+      const node=this.node(parent,name,width,height,x,y);ArtSkin.button(node,disabled,selected||text.startsWith('✓'),kind);
       const button=node.addComponent(Button);button.interactable=!disabled;
       this.label(node,name+':text',text,0,0,width-10,height-2,13,disabled?Theme.dim:Theme.text);
       node.on(Button.EventType.CLICK,callback);return node;
@@ -66,9 +66,9 @@ export class CocosUi {
     return node;
   }
   button(parent: Node, name: string, text: string, x: number, y: number, width: number, height: number,
-      callback: () => void, disabled = false, transparent = false): Node {
+      callback: () => void, disabled = false, transparent = false, kind:ButtonKind='secondary', selected=false): Node {
     if (this.original?.catalog.skins.ajda_1?.path && text && !transparent) {
-      return this.sourceButton(parent, name, 'ajda_1', '', text, x, y, width, height, callback, disabled);
+      return this.sourceButton(parent, name, 'ajda_1', '', text, x, y, width, height, callback, disabled, undefined, kind, selected);
     }
     const node = transparent && this.original ? this.node(parent, name, width, height, x, y) : this.panel(parent, name, width, height, x, y,
       transparent ? new Color(220, 193, 132, 35) : disabled ? new Color(34, 42, 43) : Theme.raised,

@@ -205,6 +205,9 @@ export class RecoveredAnimation {
     await Promise.all(models.map(model => this.preloadModel(model, standOnly)));
   }
 
+  /** No fallback to injury for an absorbed hit on legacy models. */
+  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {return this.sample?.playBlock(direction)??null;}
+
   play(status: RecoveredAnimationStatus, direction: RecoveredAnimationDirection,
        onAttack?: () => void, onComplete?: () => void): RecoveredPlaybackHandle {
     if(this.sample){

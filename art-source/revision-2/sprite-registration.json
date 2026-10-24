@@ -1,0 +1,855 @@
+{
+  "sourceSheet": [
+    1374,
+    1145
+  ],
+  "method": "alpha-connected pose extraction, fixed source column/row ground anchors; common scale 0.60 for all poses, including death. No bbox recentering.",
+  "records": [
+    {
+      "status": "stand",
+      "frame": 0,
+      "sourceBounds": [
+        49,
+        26,
+        210,
+        229
+      ],
+      "sheetAnchor": [
+        129,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        80,
+        99,
+        177,
+        221
+      ]
+    },
+    {
+      "status": "stand",
+      "frame": 1,
+      "sourceBounds": [
+        272,
+        26,
+        429,
+        229
+      ],
+      "sheetAnchor": [
+        351,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        81,
+        99,
+        175,
+        221
+      ]
+    },
+    {
+      "status": "stand",
+      "frame": 2,
+      "sourceBounds": [
+        496,
+        27,
+        656,
+        229
+      ],
+      "sheetAnchor": [
+        576,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        80,
+        100,
+        176,
+        221
+      ]
+    },
+    {
+      "status": "stand",
+      "frame": 3,
+      "sourceBounds": [
+        720,
+        26,
+        878,
+        229
+      ],
+      "sheetAnchor": [
+        799,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        81,
+        99,
+        176,
+        221
+      ]
+    },
+    {
+      "status": "stand",
+      "frame": 4,
+      "sourceBounds": [
+        951,
+        26,
+        1108,
+        229
+      ],
+      "sheetAnchor": [
+        1029,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        81,
+        99,
+        175,
+        221
+      ]
+    },
+    {
+      "status": "stand",
+      "frame": 5,
+      "sourceBounds": [
+        1181,
+        27,
+        1336,
+        229
+      ],
+      "sheetAnchor": [
+        1258,
+        227
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        82,
+        100,
+        175,
+        221
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 0,
+      "sourceBounds": [
+        44,
+        254,
+        211,
+        454
+      ],
+      "sheetAnchor": [
+        129,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        77,
+        101,
+        177,
+        221
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 1,
+      "sourceBounds": [
+        287,
+        256,
+        446,
+        459
+      ],
+      "sheetAnchor": [
+        351,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        90,
+        102,
+        185,
+        224
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 2,
+      "sourceBounds": [
+        487,
+        260,
+        658,
+        455
+      ],
+      "sheetAnchor": [
+        576,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        75,
+        104,
+        178,
+        221
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 3,
+      "sourceBounds": [
+        717,
+        258,
+        886,
+        455
+      ],
+      "sheetAnchor": [
+        799,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        79,
+        103,
+        180,
+        221
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 4,
+      "sourceBounds": [
+        965,
+        259,
+        1121,
+        462
+      ],
+      "sheetAnchor": [
+        1029,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        90,
+        104,
+        184,
+        226
+      ]
+    },
+    {
+      "status": "walk",
+      "frame": 5,
+      "sourceBounds": [
+        1184,
+        260,
+        1340,
+        454
+      ],
+      "sheetAnchor": [
+        1258,
+        453
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        84,
+        104,
+        178,
+        220
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 0,
+      "sourceBounds": [
+        34,
+        519,
+        224,
+        701
+      ],
+      "sheetAnchor": [
+        129,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        71,
+        111,
+        185,
+        220
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 1,
+      "sourceBounds": [
+        267,
+        479,
+        451,
+        700
+      ],
+      "sheetAnchor": [
+        351,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        78,
+        87,
+        188,
+        220
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 2,
+      "sourceBounds": [
+        483,
+        456,
+        679,
+        701
+      ],
+      "sheetAnchor": [
+        576,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        72,
+        74,
+        190,
+        221
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 3,
+      "sourceBounds": [
+        693,
+        523,
+        990,
+        702
+      ],
+      "sheetAnchor": [
+        799,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        64,
+        114,
+        242,
+        221
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 4,
+      "sourceBounds": [
+        935,
+        524,
+        1151,
+        701
+      ],
+      "sheetAnchor": [
+        1029,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        72,
+        114,
+        202,
+        220
+      ]
+    },
+    {
+      "status": "atk",
+      "frame": 5,
+      "sourceBounds": [
+        1178,
+        508,
+        1344,
+        704
+      ],
+      "sheetAnchor": [
+        1258,
+        700
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        80,
+        105,
+        180,
+        223
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 0,
+      "sourceBounds": [
+        44,
+        734,
+        206,
+        933
+      ],
+      "sheetAnchor": [
+        129,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        77,
+        102,
+        174,
+        221
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 1,
+      "sourceBounds": [
+        278,
+        750,
+        432,
+        931
+      ],
+      "sheetAnchor": [
+        351,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        84,
+        111,
+        176,
+        220
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 2,
+      "sourceBounds": [
+        490,
+        756,
+        648,
+        933
+      ],
+      "sheetAnchor": [
+        576,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        76,
+        115,
+        171,
+        221
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 3,
+      "sourceBounds": [
+        721,
+        751,
+        880,
+        930
+      ],
+      "sheetAnchor": [
+        799,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        81,
+        112,
+        176,
+        219
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 4,
+      "sourceBounds": [
+        955,
+        748,
+        1113,
+        934
+      ],
+      "sheetAnchor": [
+        1029,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        84,
+        110,
+        179,
+        222
+      ]
+    },
+    {
+      "status": "hit",
+      "frame": 5,
+      "sourceBounds": [
+        1173,
+        737,
+        1335,
+        934
+      ],
+      "sheetAnchor": [
+        1258,
+        931
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        77,
+        104,
+        174,
+        222
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 0,
+      "sourceBounds": [
+        43,
+        958,
+        193,
+        1117
+      ],
+      "sheetAnchor": [
+        129,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        76,
+        126,
+        166,
+        221
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 1,
+      "sourceBounds": [
+        269,
+        975,
+        429,
+        1117
+      ],
+      "sheetAnchor": [
+        351,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        79,
+        136,
+        175,
+        221
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 2,
+      "sourceBounds": [
+        501,
+        993,
+        682,
+        1126
+      ],
+      "sheetAnchor": [
+        576,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        83,
+        147,
+        192,
+        227
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 3,
+      "sourceBounds": [
+        720,
+        973,
+        925,
+        1116
+      ],
+      "sheetAnchor": [
+        799,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        81,
+        135,
+        204,
+        221
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 4,
+      "sourceBounds": [
+        946,
+        1002,
+        1132,
+        1116
+      ],
+      "sheetAnchor": [
+        1029,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        78,
+        152,
+        190,
+        220
+      ]
+    },
+    {
+      "status": "die",
+      "frame": 5,
+      "sourceBounds": [
+        1142,
+        1037,
+        1366,
+        1123
+      ],
+      "sheetAnchor": [
+        1258,
+        1115
+      ],
+      "scale": 0.6,
+      "runtimeBounds": [
+        58,
+        173,
+        192,
+        225
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 0,
+      "sourceCell": [
+        0,
+        0,
+        444,
+        444
+      ],
+      "sourceBounds": [
+        59,
+        48,
+        379,
+        433
+      ],
+      "sheetAnchor": [
+        225,
+        433
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        77,
+        101,
+        176,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 1,
+      "sourceCell": [
+        444,
+        0,
+        887,
+        444
+      ],
+      "sourceBounds": [
+        76,
+        44,
+        392,
+        434
+      ],
+      "sheetAnchor": [
+        670,
+        433
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        82,
+        99,
+        180,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 2,
+      "sourceCell": [
+        887,
+        0,
+        1330,
+        444
+      ],
+      "sourceBounds": [
+        68,
+        37,
+        378,
+        435
+      ],
+      "sheetAnchor": [
+        1114,
+        433
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        79,
+        97,
+        175,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 3,
+      "sourceCell": [
+        1330,
+        0,
+        1774,
+        444
+      ],
+      "sourceBounds": [
+        59,
+        46,
+        390,
+        433
+      ],
+      "sheetAnchor": [
+        1557,
+        433
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        76,
+        100,
+        179,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 4,
+      "sourceCell": [
+        0,
+        444,
+        444,
+        887
+      ],
+      "sourceBounds": [
+        69,
+        39,
+        421,
+        416
+      ],
+      "sheetAnchor": [
+        225,
+        860
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        80,
+        103,
+        189,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 5,
+      "sourceCell": [
+        444,
+        444,
+        887,
+        887
+      ],
+      "sourceBounds": [
+        70,
+        38,
+        400,
+        415
+      ],
+      "sheetAnchor": [
+        670,
+        860
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        80,
+        103,
+        182,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 6,
+      "sourceCell": [
+        887,
+        444,
+        1330,
+        887
+      ],
+      "sourceBounds": [
+        81,
+        34,
+        378,
+        416
+      ],
+      "sheetAnchor": [
+        1114,
+        860
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        83,
+        102,
+        175,
+        220
+      ]
+    },
+    {
+      "status": "revised-walk",
+      "frame": 7,
+      "sourceCell": [
+        1330,
+        444,
+        1774,
+        887
+      ],
+      "sourceBounds": [
+        70,
+        37,
+        402,
+        416
+      ],
+      "sheetAnchor": [
+        1557,
+        860
+      ],
+      "scale": 0.31,
+      "runtimeBounds": [
+        79,
+        103,
+        182,
+        220
+      ]
+    }
+  ]
+}
