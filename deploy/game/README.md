@@ -25,7 +25,7 @@ TIANXU_DATABASE=/absolute/persistent-data/tianxu.sqlite \
 node scripts/start-game.mjs
 ```
 
-如果需要另行挂载资源，可设置 `TIANXU_CONTENT_DIR`、`TIANXU_WEB_DIR`、`TIANXU_UI_DIR` 和 `TIANXU_LOCALIZATION_DIR`。`TIANXU_LOG_DIR` 用于指向可写日志目录。这些值在 Linux 上应使用实际绝对路径，不依赖本机 macOS 用户目录。
+如果需要另行挂载资源，可设置 `TIANXU_CONTENT_DIR`、`TIANXU_WEB_DIR`、`TIANXU_UI_DIR`、`TIANXU_ART_DIR` 和 `TIANXU_LOCALIZATION_DIR`。`TIANXU_LOG_DIR` 用于指向可写日志目录。这些值在 Linux 上应使用实际绝对路径，不依赖本机 macOS 用户目录。
 
 ## Docker Compose
 
@@ -47,3 +47,5 @@ docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml ps
 更换运行包时先备份数据库，再在新目录生成新包和新镜像。回滚前先确认数据库兼容性；本轮 GM 为附加表迁移，切回上一版本不需要覆盖数据库。禁止用旧备份覆盖上线后玩家进度。不要把数据库、日志或备份复制进 `.local/game-runtime`。
 
 当前为无需邀请码的玩家注册版本，账号 Bearer 鉴权继续生效。GM 后台和首次管理员初始化见 [gm.md](gm.md)。生产必须设置准确的 `TIANXU_PUBLIC_ORIGIN` 与可信反代 socket 地址 `TIANXU_TRUSTED_PROXY`；Caddy 覆盖 X-Real-IP。旧 [tencent.md](tencent.md) 的邀请码要求仅保留为历史记录，已被本轮替代。
+
+本地首批美术样板的运行白名单仅包含 `art-samples/v1` 的9个显式文件；生成母图、Blender源、截图与录像不进入运行包。本轮只维护打包兼容，不执行部署。

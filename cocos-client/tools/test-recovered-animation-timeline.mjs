@@ -72,7 +72,7 @@ export class Node {
 }
 export class UITransform { setContentSize(){} } export class Sprite { static SizeMode={CUSTOM:1}; }
 export class Vec3 { constructor(x,y,z){Object.assign(this,{x,y,z});} }
-export class SpriteFrame {} export class Rect {} export class Texture2D {
+export class SpriteFrame {} export class Rect {} export class Size {constructor(width,height){this.width=width;this.height=height;}} export class Texture2D {
   constructor(){ this.width=16; this.height=16; } set image(value){ this.width=value.width; this.height=value.height; } destroy(){}
 }
 export class ImageAsset {} export const Layers={Enum:{UI_2D:1}}; export const Color={WHITE:{}};

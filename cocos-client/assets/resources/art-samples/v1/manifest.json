@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "id": "first-batch-steelwood-20261024",
+  "images": {
+    "card-frame": {
+      "file": "card-frame.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "panel": {
+      "file": "panel.png",
+      "size": [
+        384,
+        288
+      ],
+      "insets": [
+        26,
+        26,
+        24,
+        24
+      ]
+    },
+    "forest-map-1": {
+      "file": "forest-map-1.jpg",
+      "size": [
+        1600,
+        800
+      ]
+    },
+    "button-normal": {
+      "file": "button-normal.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-selected": {
+      "file": "button-selected.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-pressed": {
+      "file": "button-pressed.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-disabled": {
+      "file": "button-disabled.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    }
+  },
+  "maps": {
+    "main:map:1": "forest-map-1"
+  },
+  "units": {
+    "main:monster:1": {
+      "atlas": "guard-atlas.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "columns": 8,
+      "frameCount": 54,
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "mount": [
+        122,
+        173
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 8,
+          "fps": 12,
+          "loop": true
+        },
+        "walk": {
+          "start": 8,
+          "count": 12,
+          "fps": 16,
+          "loop": true
+        },
+        "atk": {
+          "start": 20,
+          "count": 12,
+          "fps": 20,
+          "loop": false,
+          "cueFrame": 5
+        },
+        "hit": {
+          "start": 32,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 38,
+          "count": 16,
+          "fps": 20,
+          "loop": false
+        }
+      },
+      "origin": [
+        0,
+        -32
+      ]
+    }
+  }
+}

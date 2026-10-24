@@ -1,3 +1,4 @@
+import { ArtSkin } from './ArtSkin.ts';
 import { ActionOutbox, type PendingAction } from './ActionOutbox.ts';
 import { Component, Node, Label, EditBox, Color, UITransform, view, screen, Size, ResolutionPolicy, profiler, Button, BlockInputEvents } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
@@ -77,6 +78,7 @@ export class TianxuGame extends Component {
     (globalThis as unknown as { __TIANXU_UI__: unknown }).__TIANXU_UI__ = {
       snapshot: () => ({ page: this.page, ready: Boolean(this.state), characterId: this.characterId, busy: this.busy,
         battleId: this.state?.battle?.id, revision: this.state?.revision, buttons: this.ui.targets.map(target => ({ ...target })) }),
+      art: () => ({ skin: ArtSkin.metrics(), battle: this.battleView?.getArtMetrics() }),
       performance: () => ({ ...this.performance, originalUi: this.original?.getPerformanceStats() }),
     };
     void this.boot();
@@ -85,7 +87,7 @@ export class TianxuGame extends Component {
   onDestroy() {
     globalThis.removeEventListener('online',this.online);this.viewportObserver?.disconnect();globalThis.removeEventListener('resize',this.syncViewport);
     if (this.pollTimer) clearInterval(this.pollTimer);
-    this.deckWindow?.destroy(); this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
+    ArtSkin.dispose(); this.deckWindow?.destroy(); this.audio?.destroy(); this.battleView?.destroy(); this.growthWindows?.destroy(); this.secondaryWindows?.destroy();
   }
   update(dt: number) {
     this.battleView?.update(dt);
@@ -126,6 +128,7 @@ export class TianxuGame extends Component {
   private async boot() {
     this.entryReplayBattleId = '';
     if (!this.backdrop) { try { this.backdrop = (await this.api<{backdrop?: string}>('/api/bootstrap')).backdrop ?? ''; } catch { /* Login still provides the server error on submission. */ } }
+    try { await ArtSkin.load(this.apiBase); } catch(error) { this.renderLogin(); this.toast(String(error)); return; }
     if (!this.original) {
       const response = await fetch(this.apiBase + '/recovered/original-ui.json', { cache: 'no-store' });
       if (!response.ok) { this.renderLogin(); this.toast('原版界面资源未导入，请导入界面资源后重启'); return; }

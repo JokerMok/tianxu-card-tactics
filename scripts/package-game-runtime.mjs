@@ -142,6 +142,8 @@ export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative 
   }
   for (const relative of await walkFiles(sourceRoot, policy.ui.directory)) paths.add(relative);
 
+  if(policy.art)for(const file of policy.art.files)paths.add(path.posix.join(safeRelative(policy.art.directory),safeRelative(file)));
+
   const files = [];
   let bytes = 0;
   for (const relative of [...paths].sort()) {

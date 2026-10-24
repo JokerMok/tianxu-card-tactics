@@ -46,5 +46,19 @@
   },
   "ui": {
     "directory": "cocos-client/assets/resources/ui-revision-a"
+  },
+  "art": {
+    "directory": "cocos-client/assets/resources/art-samples",
+    "files": [
+      "v1/manifest.json",
+      "v1/forest-map-1.jpg",
+      "v1/card-frame.png",
+      "v1/panel.png",
+      "v1/button-normal.png",
+      "v1/button-selected.png",
+      "v1/button-pressed.png",
+      "v1/button-disabled.png",
+      "v1/guard-atlas.png"
+    ]
   }
 }

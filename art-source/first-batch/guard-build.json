@@ -1,0 +1,67 @@
+{
+  "config": {
+    "height": 1.82,
+    "shoulder_width": 0.64,
+    "head_height": 0.24,
+    "camera": [
+      4.6,
+      -7.8,
+      4.1
+    ],
+    "target": [
+      0,
+      0,
+      0.93
+    ],
+    "ortho": 3.15,
+    "frame_size": 256,
+    "runtime_size": [
+      170,
+      170
+    ],
+    "frames": 54,
+    "threads": 2
+  },
+  "clips": {
+    "stand": {
+      "start": 0,
+      "count": 8,
+      "fps": 12,
+      "loop": true
+    },
+    "walk": {
+      "start": 8,
+      "count": 12,
+      "fps": 16,
+      "loop": true
+    },
+    "atk": {
+      "start": 20,
+      "count": 12,
+      "fps": 20,
+      "loop": false,
+      "cueFrame": 5
+    },
+    "hit": {
+      "start": 32,
+      "count": 6,
+      "fps": 20,
+      "loop": false
+    },
+    "die": {
+      "start": 38,
+      "count": 16,
+      "fps": 20,
+      "loop": false
+    }
+  },
+  "objects": 53,
+  "materials": 9,
+  "bones": 16,
+  "vertices": 3400,
+  "source": "Original Python-authored geometry, materials and skeletal animation; no downloaded model or texture",
+  "foot": [
+    128,
+    220
+  ]
+}

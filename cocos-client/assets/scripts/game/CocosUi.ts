@@ -1,3 +1,4 @@
+import { ArtSkin } from './ArtSkin.ts';
 import { Node, UITransform, Layers, Graphics, Color, Label, Button, EditBox,
   HorizontalTextAlignment, VerticalTextAlignment, Sprite, SpriteFrame, assetManager, ImageAsset, Texture2D, UIOpacity } from 'cc';
 import type { OriginalUi } from './OriginalUi.ts';
@@ -17,7 +18,9 @@ export class CocosUi {
     node.addComponent(UITransform).setContentSize(width, height); node.setPosition(x, y); return node;
   }
   panel(parent: Node, name: string, width: number, height: number, x = 0, y = 0, fill = Theme.panel, border?: Color): Node {
-    const node = this.node(parent, name, width, height, x, y); const g = node.addComponent(Graphics);
+    const node = this.node(parent, name, width, height, x, y);
+    if(ArtSkin.image('panel') && (border || /Modal|Dialog|Panel|Frame/.test(name)) && !/Shade|Backdrop|Base|Legal/.test(name)){void ArtSkin.paint(node,'panel');return node;}
+    const g = node.addComponent(Graphics);
     g.fillColor = fill; g.roundRect(-width / 2, -height / 2, width, height, 5); g.fill();
     if (border) { g.strokeColor = border; g.lineWidth = 1; g.stroke(); } return node;
   }
@@ -34,12 +37,20 @@ export class CocosUi {
     if (!this.original) throw new Error('Original UI has not been loaded');
     const source = this.original.skin(skin, variant);
     const node = this.node(parent, name, width ?? source.width ?? 1, height ?? source.height ?? 1, x, y);
+    const replacement=ArtSkin.sourceKey(skin);
+    if(replacement){void ArtSkin.paint(node,replacement);return node;}
     void this.image(node, name + ':asset', this.resourceBase + (source.file ?? source.path + '.png'),
       width ?? source.width ?? 1, height ?? source.height ?? 1);
     return node;
   }
   sourceButton(parent: Node, name: string, skin: string, pressed: string, text: string, x: number, y: number,
       width: number, height: number, callback: () => void, disabled = false, variant?: string): Node {
+    if(ArtSkin.image('button-normal') && text && width>=60){
+      const node=this.node(parent,name,width,height,x,y);ArtSkin.button(node,disabled,text.startsWith('✓'));
+      const button=node.addComponent(Button);button.interactable=!disabled;
+      this.label(node,name+':text',text,0,0,width-10,height-2,13,disabled?Theme.dim:Theme.text);
+      node.on(Button.EventType.CLICK,callback);return node;
+    }
     const node = this.skin(parent, name, skin, x, y, width, height, variant);
     const button = node.addComponent(Button); button.interactable = !disabled;
     if (text) this.label(node, name + ':text', text, 0, 0, width - 8, height - 2, 13, new Color(255, 245, 210));

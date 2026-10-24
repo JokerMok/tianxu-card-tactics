@@ -40,6 +40,7 @@ export async function createGameServer(options = {}) {
   const folder = options.contentFolder ?? process.env.TIANXU_CONTENT_DIR ?? path.join(ROOT, 'cocos-client/assets/resources/recovered');
   const web = options.webFolder ?? process.env.TIANXU_WEB_DIR ?? path.join(ROOT, '.local/web');
   const uiFolder=options.uiFolder??process.env.TIANXU_UI_DIR??path.join(folder,'../ui-revision-a');
+  const artFolder=options.artFolder??process.env.TIANXU_ART_DIR??path.join(ROOT,'cocos-client/assets/resources/art-samples');
   const localizationFolder=options.localizationFolder??process.env.TIANXU_LOCALIZATION_DIR??path.join(folder,'../localization');
   const log=runtimeLogger(options.logDir??process.env.TIANXU_LOG_DIR);
   const publicOrigin=options.publicOrigin??process.env.TIANXU_PUBLIC_ORIGIN;
@@ -121,15 +122,16 @@ export async function createGameServer(options = {}) {
       const isGm=url.pathname.startsWith('/gm/');
       const isResource = url.pathname.startsWith('/recovered/');
       const isUi=url.pathname.startsWith('/ui-assets/');
-      const base = isGm?gmWeb:isUi ? uiFolder : isResource ? folder : web;
-      const relative = decodeURIComponent(isGm?url.pathname.slice('/gm/'.length):isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
+      const isArt=url.pathname.startsWith('/art/');
+      const base = isArt?artFolder:isGm?gmWeb:isUi ? uiFolder : isResource ? folder : web;
+      const relative = decodeURIComponent(isArt?url.pathname.slice('/art/'.length):isGm?url.pathname.slice('/gm/'.length):isUi ? url.pathname.slice('/ui-assets/'.length) : isResource ? url.pathname.slice('/recovered/'.length) : url.pathname.slice(1)) || 'index.html';
       if(isGm&&!['index.html','app.js','style.css'].includes(relative))return json(404,{error:'资源不存在'});
       if(isGm){response.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");response.setHeader('X-Frame-Options','DENY');}
       const filename = path.resolve(base, relative);
       if (!filename.startsWith(path.resolve(base) + path.sep) || !existsSync(filename) || !statSync(filename).isFile()) return json(404, { error: '资源不存在' });
       const stat = statSync(filename);
       response.writeHead(200, { 'Content-Type': MIME[path.extname(filename).toLowerCase()] ?? 'application/octet-stream',
-        'Content-Length': stat.size, 'Cache-Control': isGm?'no-store':isResource && path.extname(filename) !== '.json' ? 'private, max-age=3600' : 'no-cache' });
+        'Content-Length': stat.size, 'Cache-Control': isGm?'no-store':(isResource||isArt) && path.extname(filename) !== '.json' ? 'private, max-age=3600' : 'no-cache' });
       if (request.method === 'HEAD') return response.end();
       createReadStream(filename).pipe(response);
     } catch (error) {

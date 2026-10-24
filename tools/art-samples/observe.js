@@ -1,0 +1,18 @@
+if(new URLSearchParams(location.search).get('profile')==='1') (async()=>{
+ const cc=await System.import('cc'),out=document.createElement('output');out.id='art-observation';out.hidden=true;document.body.append(out);
+ let started=performance.now(),last=started,frameTimes=[],clicks=[],pending=null,seq=0,seen=new WeakSet(),homes=new WeakSet(),homeBuilds=0,maxUnits=0,unitFrames=0,blankUnits=0,warmBlankUnits=0,signature='',steady=0;
+ const spriteSignatures=new WeakMap();let changes=0;
+ document.addEventListener('mousedown',e=>{pending={seq:++seq,x:Math.round(e.clientX),y:Math.round(e.clientY),at:performance.now(),previous:signature,firstMs:null,usableMs:null};clicks.push(pending);if(clicks.length>48)clicks.shift();},{passive:true,capture:true});
+ function frame(now){let n=0,sprites=0,missing=0,units=0,anims=0,names=[],emptyNames=[],sampleGeometry=[];function walk(node,active=true){active=active&&node.active!==false;if(!active)return;n++;const name=node.name??'';if(name==='HomeWnd:original'&&!homes.has(node)){homes.add(node);homeBuilds++;}if(name==='CardDeckWindow'||name==='GrowthWindows'||name==='OriginalWorldMapWindow'||name==='HomeWnd:original'||name==='BattleScene:source-layers')names.push(name);
+ if(name==='SampleUnitSprite'){const u=node.getComponent(cc.UITransform),sp=node.getComponent(cc.Sprite);sampleGeometry.push({size:u?.contentSize,anchor:u?.anchorPoint,pos:node.worldPosition,frame:sp?.spriteFrame?.rect,original:sp?.spriteFrame?.originalSize});}
+ const s=node.getComponent(cc.Sprite);if(s){sprites++;if(!s.spriteFrame){if(!name.startsWith('LiveInput:')){missing++;emptyNames.push(name);}}else{const r=s.spriteFrame.rect;const key=[r?.x,r?.y,r?.width,r?.height,node.position.x,node.position.y,node.scale.x].join(',');const before=spriteSignatures.get(node);if(before&&before!==key)changes++;spriteSignatures.set(node,key);}}
+ if(name.startsWith('Unit:'))units++;if(name==='RecoveredAnimation'){anims++;let has=false;const inspect=x=>{if(x.active===false)return;const sp=x.getComponent(cc.Sprite);if(sp?.spriteFrame)has=true;for(const c of x.children)inspect(c);};inspect(node);unitFrames++;if(!has){blankUnits++;if(seen.has(node))warmBlankUnits++;}else seen.add(node);}
+ for(const c of node.children)walk(c,active);}
+ const scene=cc.director.getScene();if(scene)walk(scene);const snap=window.__TIANXU_UI__?.snapshot?.(),next=[snap?.page,names.sort().join('|')].join(':');if(next===signature)steady++;else steady=0;signature=next;maxUnits=Math.max(maxUnits,units);
+ if(pending){if(pending.firstMs===null&&pending.previous!==signature&&names.length)pending.firstMs=now-pending.at;
+ if(pending.firstMs!==null&&pending.usableMs===null&&!snap?.busy&&missing===0&&steady>=2)pending.usableMs=now-pending.at;}
+ frameTimes.push(now-last);if(frameTimes.length>1200)frameTimes.shift();last=now;const sorted=[...frameTimes].sort((a,b)=>a-b);
+ const resource=r=>({path:new URL(r.name).pathname,ms:r.duration,encoded:r.encodedBodySize,decoded:r.decodedBodySize,transfer:r.transferSize});
+ out.setAttribute('data-json',JSON.stringify({elapsedMs:now-started,page:snap?.page,ready:snap?.ready,busy:snap?.busy,nodes:n,sprites,missing,emptyNames,sampleGeometry,units,maxUnits,animations:anims,blankSamples:blankUnits,warmBlankSamples:warmBlankUnits,animationSamples:unitFrames,spriteChanges:changes,homeBuilds,p95:sorted[Math.floor(sorted.length*.95)],clicks:clicks.map(({at,previous,...r})=>r),startup:performance.getEntriesByType('resource').filter(r=>/catalog|bootstrap|original-ui/.test(r.name)).map(resource),lastResources:performance.getEntriesByType('resource').filter(r=>r.name.includes('/api/')).slice(-8).map(resource),art:window.__TIANXU_UI__?.art?.()}));requestAnimationFrame(frame);}
+ requestAnimationFrame(frame);
+})();

@@ -1,3 +1,4 @@
+import { ArtSkin } from './ArtSkin.ts';
 import { Node, UITransform, Label, Color, EventTouch, Vec3, input, Input, EventKeyboard, KeyCode, BlockInputEvents } from 'cc';
 import { CardManagementUi,palette } from './CardManagementUi.ts';
 import { ScrollRegion,type Point } from './CardScrollRegion.ts';
@@ -18,7 +19,7 @@ export class CardDeckWindow {
  private dragLayer!:Node;private drag?:{side:'deck'|'library';id:string;start:Point;last:Point;at:number;mode:'pending'|'scroll'|'drag';pane:Pane};private ghost?:Node;private target?:Node;
  private nativeReleaseAt=0;private released=()=>{this.nativeReleaseAt=Date.now();};private message='点击卡牌固定详情；横向拖动可加入或移除。';private closeDialog?:Node;private closeAfterSave?:()=>void;private blur=()=>this.cancelDrag('窗口失去焦点，拖放已取消。');
  constructor(_ui:CocosUi,original:OriginalUi,private catalog:RecoveredCatalog,private base:string,private callbacks:{close():void;save(cards:string[],requestId:string,actorId:string,expectedDeck:string[]):Promise<string[]>;detail(card:any):void;growth():void}){
- this.ui=new CardManagementUi(base+'/ui-assets/');const skins:Record<string,string>={};for(const [name,skin]of Object.entries(original.catalog.skins)){const v=skin.path||skin.file?skin:Object.entries(skin.variants).find(([key])=>key.includes('newplayer.swf'))?.[1]??Object.values(skin.variants)[0];const path=v?.file||('path'in v&&v.path?v.path+'.png':undefined);if(path)skins[name]=base+'/recovered/'+path;}
+ this.ui=new CardManagementUi(base+'/ui-assets/');const skins:Record<string,string>={};for(const [name,skin]of Object.entries(original.catalog.skins)){const v=skin.path||skin.file?skin:Object.entries(skin.variants).find(([key])=>key.includes('newplayer.swf'))?.[1]??Object.values(skin.variants)[0];const path=v?.file||('path'in v&&v.path?v.path+'.png':undefined);if(path)skins[name]=ArtSkin.sourceKey(name)?ArtSkin.url(ArtSkin.sourceKey(name)!)!:base+'/recovered/'+path;}
  this.data={cards:[],skins}; // The independent atlas is paused; hydrate only owned/current-deck records.
  input.on(Input.EventType.KEY_DOWN,this.key,this);globalThis.addEventListener('mouseup',this.released,true);globalThis.addEventListener('touchend',this.released,true);globalThis.addEventListener('blur',this.blur);globalThis.addEventListener('touchcancel',this.blur,true);globalThis.addEventListener('pointercancel',this.blur,true);
  }

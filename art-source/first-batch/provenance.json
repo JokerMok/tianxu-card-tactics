@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "images": [
+    {
+      "file": "forest-map-1.png",
+      "generationId": "exec-c27b96aa-be5b-47e2-89f2-13e66b713aea",
+      "sha256": "0249e6bbdb29c215c89f7bd2d067e52da86b6282f8b4bc0b3e813f18bb181b8b",
+      "tool": "built-in image_gen",
+      "date": "2026-10-24",
+      "sourceStatus": "generated sample; not recovered original art; no downloaded third-party asset"
+    },
+    {
+      "file": "card-frame.png",
+      "generationId": "exec-974d650d-70e8-41ab-ac58-27cc2606febd",
+      "sha256": "458a6aea4a164b8eef7cfa34e22ae80bde8bc6dea4a951c223bf2ab90e0e1d0d",
+      "tool": "built-in image_gen",
+      "date": "2026-10-24",
+      "sourceStatus": "generated sample; not recovered original art; no downloaded third-party asset"
+    },
+    {
+      "file": "panel.png",
+      "generationId": "exec-739f1031-67e4-4984-a823-59a235c09350",
+      "sha256": "bf1e3bc39db75bffe9472655f895ab02f4648e1adb4bb5cb60d5fda0c84b2d00",
+      "tool": "built-in image_gen",
+      "date": "2026-10-24",
+      "sourceStatus": "generated sample; not recovered original art; no downloaded third-party asset"
+    },
+    {
+      "file": "buttons.png",
+      "generationId": "exec-6b681803-8613-4239-9c67-1c2711e5f585",
+      "sha256": "c4912aed44dcb21f69a32bd9803dc7f11f8c90c150e272b8ac84859cd37bfa64",
+      "tool": "built-in image_gen",
+      "date": "2026-10-24",
+      "sourceStatus": "generated sample; not recovered original art; no downloaded third-party asset"
+    }
+  ],
+  "unit": {
+    "source": "tools/art-samples/build-guard.py",
+    "editable": "guard-rig.blend",
+    "tool": "Blender 5.2.1 LTS",
+    "geometry": "original procedural mesh and rigid-weight skeletal poses",
+    "externalModelsOrTextures": false,
+    "rendering": "Cycles 12 samples denoise, transparent RGBA, 2 threads"
+  },
+  "processing": "tools/art-samples/prepare-assets.py",
+  "licenseNote": "No external image/model download or third-party asset license claimed. Generated outputs and authored geometry are samples; this does not establish the originality of the rest of the game."
+}

@@ -1,3 +1,4 @@
+import { ArtSkin } from './ArtSkin.ts';
 import { cardName,cardDisplay,sourceDisplayName } from './GameText.ts';
 import { Color, Graphics, instantiate, Label, Node, tween, UIOpacity, UITransform, Vec3, EventTouch } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
@@ -33,6 +34,7 @@ export class BattleSceneView {
     this.actors = ui.node(this.scene, 'Actors:feet-sorted', 1200, 600);
     this.effects = new RecoveredEffects(this.scene, catalog, base + '/recovered/');
   }
+  getArtMetrics() { return { liveDisplays:this.displays.size, animations:Array.from(this.displays.values()).map(d=>d.animation.getPerformanceStats()) }; }
   get locked() { return this.presentation.locked || this.processing; }
   get settledReady() { return this.presentation.settledReady && !this.processing; }
   sync(battle: BattleView, character: string, replayEntry = false) {
@@ -44,7 +46,7 @@ export class BattleSceneView {
     if (first) {
       const map = this.catalog.scopes.main.maps[String(battle.state.mapId)];
       const art = this.catalog.assets[map?.background_asset_ids[0]];
-      if (art?.path) { void this.ui.image(this.scene, 'OriginalBattleMap', this.base + '/recovered/' + art.path, 1200, 600); this.scene.children.at(-1)?.setSiblingIndex(0); }
+      if (art?.path) { void this.ui.image(this.scene, 'OriginalBattleMap', ArtSkin.background('main',battle.state.mapId) ?? this.base + '/recovered/' + art.path, 1200, 600); this.scene.children.at(-1)?.setSiblingIndex(0); }
     }
     this.syncDisplays(); this.renderHud(); this.advance();
   }
@@ -232,7 +234,9 @@ export class BattleSceneView {
       const handle = display.animation.play('die', this.direction(display));
       if (handle.hasNativeState) pose.destroy();
       const opacity = (handle.hasNativeState ? display.animation.node : pose).addComponent(UIOpacity);
-      const fade = new Promise<void>(resolve => tween(opacity).to(.6 / this.speed, { opacity: 0 }).call(() => resolve()).start());
+      // A native death clip remains visible through its final pose; the legacy alpha fallback starts immediately.
+      const fade = (handle.hasNativeState ? handle.completion : Promise.resolve()).then(() =>
+        new Promise<void>(resolve => tween(opacity).to(.6 / this.speed, { opacity: 0 }).call(() => resolve()).start()));
       // CreatureDieState runs its recovered AlphaEffect and keeps the dying
       // creature registered for its full two-second lifetime before destroy.
       await Promise.all([fade, handle.completion, this.wait(2)]);
