@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-25",
+  "tool": "built-in image_gen only; no API key/CLI, paid assets, web downloads or private repository upload",
+  "commonPromptSpecification": "6 columns x5 action rows,30 complete separate painted poses; fixed3/4 right-facing camera, constant scale/light/ground per row. Alert idle; genuine alternating walk/trot; windup-contact-fourth-pose-recovery attack; wound recoil/recovery; stagger/knees/side fall/prone death. No text/UI/grid/background. Reference card fixes identity; R2 source fixes texture density only. Genuine transparent alpha, small contact shadow. Every full weapon and limb remains in its own extracted silhouette. Two directions use existing foot mirror.",
+  "outputs": [
+    {
+      "key": "horseman",
+      "generatedFiles": [
+        "exec-dd55da43-3224-486c-b9f6-7a9fac1c502c.png"
+      ],
+      "finalSource": "horseman-poses.png",
+      "sha256": "e84ab7d05e24f0b17179f6a6b4b305ac9733aa093a718f15e66befb96af10c08",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/e00eb1cfdeacecc02b42.png",
+        "art-source/batch-2/lancer-poses.png"
+      ],
+      "identity": "青发蓝银肩甲、白衬衣、红马衣、剑和蓝金圆盾、栗马；区别于长枪骑兵。",
+      "layoutRepair": null
+    },
+    {
+      "key": "elven-hunter",
+      "generatedFiles": [
+        "exec-7ee40462-47ce-44a8-900b-850e835f566d.png"
+      ],
+      "finalSource": "elven-hunter-poses.png",
+      "sha256": "d08c4ce2f4ca63287ed64adacb45d20077e0799b7b72c5da68d245069d62a1fa",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/49dddb1ba7629253b7f1.png",
+        "art-source/revision-2/guard-painted-sheet.png"
+      ],
+      "identity": "长绿发精灵、棕白绿轻甲、木反曲弓和背箭袋；拉弓/释放而非近战挥砍。",
+      "layoutRepair": null
+    },
+    {
+      "key": "goblin-bandit",
+      "generatedFiles": [
+        "exec-ae461787-3c2d-454c-a6e4-3994bd40db51.png"
+      ],
+      "finalSource": "goblin-bandit-poses.png",
+      "sha256": "7de229b9dfd246996a5a1e364815326969338dc383db6e2a1ec1449c891f95d8",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/7633ecd013d262024524.png",
+        "art-source/revision-2/guard-painted-sheet.png"
+      ],
+      "identity": "黄绿皮长耳尖鼻、棕刺发、破皮衣/白腕布、小木棍；低矮敏捷。",
+      "layoutRepair": null
+    },
+    {
+      "key": "goblin-marauder",
+      "generatedFiles": [
+        "exec-8a41091c-d152-47c2-add4-9fc1946c14f1.png"
+      ],
+      "finalSource": "goblin-marauder-poses.png",
+      "sha256": "fd6ee41cec485e765ba237c1493917e88dee7fbb1eda4f4b4587797d31beff32",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/ecc63dda8b6b1fd866dd.png",
+        "art-source/revision-2/guard-painted-sheet.png"
+      ],
+      "identity": "黄绿皮、单髻、铜肩甲深衣、双曲刃；独立双刀步态/交叉斩。",
+      "layoutRepair": null
+    },
+    {
+      "key": "ogre-destroyer",
+      "generatedFiles": [
+        "exec-c26d27f4-b335-4440-b1dc-3172dbba15e0.png",
+        "exec-61e712d7-992c-47dc-92b0-8a36eb54c9ac.png"
+      ],
+      "finalSource": "ogre-destroyer-poses.png",
+      "sha256": "54c13af7e011299dfea2bcf808af9a99ec0f83cc6e53d22d4b4bf6a5f7c83855",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/0b5ff0540403864aa2bf.png",
+        "art-source/revision-2/guard-painted-sheet.png"
+      ],
+      "identity": "蓝紫皮肌肉巨魔、骷髅饰物/交叉皮带、刺木棒；区别于肥胖普通巨魔。",
+      "layoutRepair": "仅两张巨魔追加透明间距修订；原输出另存*-unspaced.png。最终30姿态均独立，无格界强切。"
+    },
+    {
+      "key": "ogre-marauder",
+      "generatedFiles": [
+        "exec-b31d7656-e65c-45f9-b646-0f4a27439d07.png",
+        "exec-88c98dfb-f4e2-43b5-8e7e-9749ed35079c.png"
+      ],
+      "finalSource": "ogre-marauder-poses.png",
+      "sha256": "4c5cb15b5e8e1ac3657269da17e0a162e8c4fe73b78b6eca161011fa201370da",
+      "references": [
+        "cocos-client/assets/resources/recovered/images/622e103a4ef3fd2d97ee.png",
+        "art-source/revision-2/guard-painted-sheet.png"
+      ],
+      "identity": "肉色大腹秃头巨魔、简易棕肩甲、骷髅腰扣、粗木棒；重步和横扫。",
+      "layoutRepair": "仅两张巨魔追加透明间距修订；原输出另存*-unspaced.png。最终30姿态均独立，无格界强切。"
+    }
+  ],
+  "processing": "prepare-chapter1-batch3.py: alpha silhouette extraction; disconnected blade reattached to nearest body. One scale per unit and common source-column/row-ground anchors; no per-frame bbox recenter. Source layout repair scale compensated uniformly so battlefield bodies not shrunk. Asymmetric ogre atlas padding accommodates club tips; logical origin unchanged. SHA256 runtime names.",
+  "scope": "Only six exact source models, explicit base-monster aliases3001/3019/4001 after same-model check; no blanket quality variants. Existing map/UI/Guard/Squire/Lancer referenced unchanged.",
+  "rightsBoundary": "Reference original card materials remain read-only; generated derivatives do not establish all-game originality or independent rights clearance. Local art implementation only; user final visual approval remains separate."
+}

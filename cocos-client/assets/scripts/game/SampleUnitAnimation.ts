@@ -44,6 +44,7 @@ interface AtlasLayout {
   frameHeight: number;
   columns: number;
   frameCount: number;
+  estimatedBytes: number;
   key: string;
 }
 
@@ -51,6 +52,7 @@ interface AtlasEntry {
   readonly url: string;
   readonly layout: AtlasLayout;
   refs: number;
+  estimatedBytes: number;
   state: 'pending' | 'ready' | 'failed';
   image?: ImageAsset;
   texture?: Texture2D;
@@ -83,7 +85,11 @@ interface ActivePlayback {
 }
 
 const REQUIRED_STATUSES: RecoveredAnimationStatus[] = ['stand', 'walk', 'atk', 'hit', 'die'];
-const MAX_ATLAS_ENTRIES = 4;
+// Admission is based on the decoded RGBA texture footprint, not compressed PNG
+// bytes. Nine distinct live atlases cover the current three models plus the
+// approved six-model chapter batch; 80 MiB covers its expected 77.44 MiB peak.
+const MAX_ACTIVE_ATLAS_ENTRIES = 9;
+const MAX_ACTIVE_ATLAS_BYTES = 80 * 1024 * 1024;
 
 function atlasUrl(base: string, atlas: string): string {
   if (/^(?:[a-z]+:)?\/\//i.test(atlas) || atlas.startsWith('/') || atlas.startsWith('data:')) return atlas;
@@ -129,6 +135,7 @@ function validateSpec(spec: SampleUnitSpec): AtlasLayout {
     frameHeight,
     columns: spec.columns,
     frameCount: spec.frameCount,
+    estimatedBytes: spec.columns * frameWidth * Math.ceil(spec.frameCount / spec.columns) * frameHeight * 4,
     key: `${frameWidth}x${frameHeight}:${spec.columns}:${spec.frameCount}`,
   };
 }
@@ -143,11 +150,18 @@ class SharedAtlasBank {
     }
     if (!entry) {
       this.makeRoom();
-      if (this.entries.size >= MAX_ATLAS_ENTRIES) throw new Error('Sample atlas pool is full');
+      const admittedBytes = Array.from(this.entries.values())
+        .reduce((sum, current) => sum + current.estimatedBytes, 0);
+      if (this.entries.size >= MAX_ACTIVE_ATLAS_ENTRIES) {
+        throw new Error(`Sample atlas active-count budget exceeded (${MAX_ACTIVE_ATLAS_ENTRIES})`);
+      }
+      if (admittedBytes + layout.estimatedBytes > MAX_ACTIVE_ATLAS_BYTES) {
+        throw new Error(`Sample atlas active-byte budget exceeded (${MAX_ACTIVE_ATLAS_BYTES})`);
+      }
       let resolve!: (entry: AtlasEntry) => void;
       let reject!: (error: Error) => void;
       const ready = new Promise<AtlasEntry>((accept, decline) => { resolve = accept; reject = decline; });
-      entry = { url, layout, refs: 1, state: 'pending', ready, resolve, reject };
+      entry = { url, layout, refs: 1, estimatedBytes: layout.estimatedBytes, state: 'pending', ready, resolve, reject };
       this.entries.set(url, entry);
       this.load(entry);
     } else {
@@ -161,7 +175,10 @@ class SharedAtlasBank {
         if (released) return;
         released = true;
         retained.refs = Math.max(0, retained.refs - 1);
-        if (retained.refs === 0 && retained.state === 'ready') this.dispose(retained);
+        // A zero-reference entry is never a preload. Pending loads reject their
+        // waiters and release a late image in the load callback; ready entries
+        // release frames, texture and image immediately.
+        if (retained.refs === 0) this.dispose(retained, new Error('Sample atlas load was abandoned'));
       },
     };
   }
@@ -173,11 +190,14 @@ class SharedAtlasBank {
       atlasPoolPendingEntries: entries.filter(entry => entry.state === 'pending').length,
       atlasPoolLiveReferences: entries.reduce((sum, entry) => sum + entry.refs, 0),
       atlasPoolSpriteFrames: entries.reduce((sum, entry) => sum + (entry.frames?.length ?? 0), 0),
+      atlasPoolEstimatedBytes: entries.reduce((sum, entry) => sum + entry.estimatedBytes, 0),
+      atlasPoolMaxEntries: MAX_ACTIVE_ATLAS_ENTRIES,
+      atlasPoolMaxEstimatedBytes: MAX_ACTIVE_ATLAS_BYTES,
     };
   }
 
   private static makeRoom(): void {
-    if (this.entries.size < MAX_ATLAS_ENTRIES) return;
+    if (this.entries.size < MAX_ACTIVE_ATLAS_ENTRIES) return;
     const unused = Array.from(this.entries.values()).find(entry => entry.refs === 0);
     if (unused) this.dispose(unused, new Error('Sample atlas load was abandoned'));
   }
@@ -204,6 +224,17 @@ class SharedAtlasBank {
         entry.reject(new Error('Sample atlas image is smaller than its frame layout'));
         return;
       }
+      const decodedBytes = image.width * image.height * 4;
+      const otherBytes = Array.from(this.entries.values())
+        .reduce((sum, current) => sum + (current === entry ? 0 : current.estimatedBytes), 0);
+      if (otherBytes + decodedBytes > MAX_ACTIVE_ATLAS_BYTES) {
+        assetManager.releaseAsset(image);
+        entry.state = 'failed';
+        if (this.entries.get(entry.url) === entry) this.entries.delete(entry.url);
+        entry.reject(new Error(`Sample atlas active-byte budget exceeded (${MAX_ACTIVE_ATLAS_BYTES})`));
+        return;
+      }
+      entry.estimatedBytes = decodedBytes;
       const texture = new Texture2D('SampleUnitAtlas');
       texture.image = image;
       const frames: SpriteFrame[] = [];
@@ -251,6 +282,8 @@ class SharedAtlasBank {
 
 /** Runtime player for a bounded, pre-rendered unit sprite atlas. */
 export class SampleUnitAnimation {
+  /** Read-only global ownership counters remain available after the last unit is gone. */
+  static atlasMetrics() { return SharedAtlasBank.stats(); }
   readonly node: Node;
   readonly spriteNode: Node;
   readonly mountNode: Node;

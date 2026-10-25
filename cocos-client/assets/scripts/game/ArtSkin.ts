@@ -1,5 +1,5 @@
 import {assetManager,ImageAsset,Texture2D,SpriteFrame,Sprite,Node} from 'cc';
-import type {SampleUnitSpec} from './SampleUnitAnimation.ts';
+import {SampleUnitAnimation,type SampleUnitSpec} from './SampleUnitAnimation.ts';
 interface ImageSpec {file:string;size:[number,number];insets?:[number,number,number,number]}
 interface Manifest {version:1|2;id:string;images:Record<string,ImageSpec>;maps:Record<string,string>;units:Record<string,SampleUnitSpec>}
 type State='normal'|'selected'|'pressed'|'disabled';
@@ -18,7 +18,7 @@ export class ArtSkin {
  static async load(origin:string){
   if(!['ui','unit','background'].some(k=>this.enabled(k as 'ui'|'unit'|'background')))return;
   if(manifest)return;const requested=typeof location==='undefined'?'sample':new URLSearchParams(location.search).get('skin')??'sample';
-  const version=requested==='sample-v1'?'v1':requested==='sample-r2'?'v2':'v3';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
+  const version=requested==='sample-v1'?'v1':requested==='sample-r2'?'v2':requested==='sample-batch2'?'v3':'v4';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
   const res=await fetch(base+'manifest.json');if(!res.ok)throw new Error('美术样板清单载入失败，请检查本机资源目录。');
   const value=await res.json();if(![1,2].includes(value.version)||!value.images||!value.units||!value.maps)throw new Error('美术样板清单格式错误。');manifest=value;
   // Prepare all four states before the first real press, rather than loading a pressed image after release.
@@ -67,6 +67,6 @@ export class ArtSkin {
    if(item.insets)[frame.insetLeft,frame.insetRight,frame.insetTop,frame.insetBottom]=item.insets;
    stats.maxPrepareMs=Math.max(stats.maxPrepareMs,Date.now()-at);resolve({image,texture,frame});}));images.set(key,pending);return pending;
  }
- static metrics(){return {pack:manifest?.id??'original',uiTextures:images.size,...stats};}
+ static metrics(){return {pack:manifest?.id??'original',uiTextures:images.size,...stats,unitAtlases:SampleUnitAnimation.atlasMetrics()};}
  static dispose(){disposed=true;for(const p of images.values())void p.then(a=>{a.frame.destroy();a.texture.destroy();assetManager.releaseAsset(a.image);}).catch(()=>{});images.clear();manifest=undefined;}
 }

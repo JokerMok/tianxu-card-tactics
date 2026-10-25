@@ -11,13 +11,33 @@ import type { BattleAction, BattleState, BattleUnit, BattleTerrain, LegalPlay } 
 
 interface BattleView { id: string; settled: boolean; state: BattleState; entryState?: BattleState; legalPlays: LegalPlay[];
   rewards?: { won: boolean; silver: number; xp: number; cards?: { id: string; count: number }[] } }
-interface Display { node: Node; animation: RecoveredAnimation; ready: Promise<void>; hp: Label; attack: Label; name: Label; team: number; dying: boolean; generation: number }
+interface Display { node: Node; animation: RecoveredAnimation; ready: Promise<void>; hp: Label; attack: Label; name: Label; team: number; dying: boolean; generation: number;
+  preferredNameOffsetY: number; nameSuppressed: boolean; nameHovered: boolean; namePinned: boolean }
 interface Hooks { command(action: BattleAction): void; hide(): void; dismiss(): void; sound(skill: number): void;
   log(text: string): void; notice(text: string): void }
 
 const BATTLE_TOP_HUD_Y = 292;
 const BATTLE_TOP_HUD_HEIGHT = 16;
 const BATTLE_TOP_HUD_FONT_SIZE = 12;
+const UNIT_NAME_WIDTH = 140;
+const UNIT_NAME_HEIGHT = 18;
+const UNIT_STATS_WIDTH = 70;
+const UNIT_STATS_HEIGHT = 22;
+const UNIT_STATS_OFFSET_Y = -34;
+const ADJACENT_NAME_SAFE_OFFSET_Y = 38;
+
+function unitNameLane(point: Vec3, preferredOffsetY: number, upperRowPoints: Vec3[]) {
+  const preferredCenterY = point.y + preferredOffsetY;
+  // Keep top-row unit labels clear of the unchanged settings/log buttons too.
+  const controlsOverlap = point.x + UNIT_NAME_WIDTH / 2 > 424
+    && point.x - UNIT_NAME_WIDTH / 2 < 590 && preferredCenterY + UNIT_NAME_HEIGHT / 2 > 260
+    && preferredCenterY - UNIT_NAME_HEIGHT / 2 < 288;
+  const blocked = controlsOverlap || upperRowPoints.some(upper =>
+    Math.abs(point.x - upper.x) < (UNIT_NAME_WIDTH + UNIT_STATS_WIDTH) / 2 + 4
+      && Math.abs(preferredCenterY - (upper.y + UNIT_STATS_OFFSET_Y))
+        < (UNIT_NAME_HEIGHT + UNIT_STATS_HEIGHT) / 2 + 3);
+  return { suppressed: blocked, offsetY: blocked ? ADJACENT_NAME_SAFE_OFFSET_Y : preferredOffsetY };
+}
 
 function fixedHudText(value: string, maxCharacters: number): string {
   const characters = Array.from(value.trim());
@@ -97,22 +117,39 @@ export class BattleSceneView {
         const owner = state.players.find(player => player.id === unit.playerId);
         const ready = (unit.flags.hero === 1 && !unit.monsterId ? animation.setActor(owner?.profession ?? 1, owner?.sex ?? 1) : animation.setMonster(unit.monsterId));
         display = { node, animation, ready, team: unit.team, dying: false, generation: 0,
+          preferredNameOffsetY: ADJACENT_NAME_SAFE_OFFSET_Y, nameSuppressed: false, nameHovered: false, namePinned: false,
           hp: this.ui.label(node, 'Health', `${unit.hp}`, 16, -34, 35, 22, 16, Theme.red),
           attack: this.ui.label(node, 'Attack', `${unit.attack}`, -16, -34, 35, 22, 16, Theme.text),
-          name: this.ui.label(node, 'Name', unit.flags.hero ? (owner?.ai?sourceDisplayName(this.catalog,owner.name):owner?.name??'') : cardName(this.catalog,unit.cardId), 0, 119, 140, 18, 12,
+          name: this.ui.label(node, 'Name', unit.flags.hero ? (owner?.ai?sourceDisplayName(this.catalog,owner.name):owner?.name??'') : cardName(this.catalog,unit.cardId), 0, ADJACENT_NAME_SAFE_OFFSET_Y, UNIT_NAME_WIDTH, UNIT_NAME_HEIGHT, 12,
           unit.team === 0 ? Theme.green : Theme.red) };
         this.ui.label(node, 'StatsSeparator', '/', 0, -34, 12, 20, 14);
         this.displays.set(unit.id, display);
         const instance = display;
+        // Keep annotation interaction inside one board cell. The 170x170 visual
+        // roots overlap at the 95px row pitch and must not become hit targets.
+        // This child remains below the HUD/legal-target layer with its actor.
+        const nameHit = this.ui.node(node, 'NameHitRegion', 84, 90, 0, 10);
+        nameHit.on(Node.EventType.MOUSE_ENTER, () => {
+          instance.nameHovered = true; this.applyNameVisibility(instance);
+        });
+        nameHit.on(Node.EventType.MOUSE_LEAVE, () => {
+          instance.nameHovered = false; this.applyNameVisibility(instance);
+        });
+        nameHit.on(Node.EventType.TOUCH_END, () => {
+          instance.namePinned = !instance.namePinned; this.applyNameVisibility(instance);
+        });
         void ready.then(() => {
-          if (!this.disposed && instance.node.isValid && !instance.dying && instance.generation === 0) {
+          if (!this.disposed && this.displays.get(unit.id) === instance
+              && instance.node.isValid && !instance.dying && instance.generation === 0) {
             instance.generation++; animation.play('stand', this.direction(instance));
             const metrics = animation.getSourceLayoutMetrics(this.direction(instance));
             const nameOffsetY = metrics && 'nameOffsetY' in metrics && typeof metrics.nameOffsetY === 'number'
               ? metrics.nameOffsetY : (metrics?.anchorY ?? 70) + 1;
             // CreatureItem.updateNamePos uses raw anchor + 10. Keep the first
             // row text inside the viewport when the local battle places a hero there.
-            instance.name.node.setPosition(0, Math.min(nameOffsetY, 273 - instance.node.position.y), 0);
+            instance.preferredNameOffsetY = Math.min(nameOffsetY, 273 - instance.node.position.y);
+            const current = this.presentation.visibleState?.units.find(candidate => candidate.id === unit.id);
+            if (current && this.presentation.visibleState) this.syncNameLane(instance, current, this.presentation.visibleState);
           }
         }).catch(error => this.hooks.notice(String(error)));
       }
@@ -121,10 +158,41 @@ export class BattleSceneView {
         if (!this.presentation.locked) display.node.setPosition(this.position(unit.row, unit.col));
       }
     }
+    // Presentation snapshots may already contain a move destination while its
+    // tween is still in flight. Re-lane only at a stable board snapshot; the
+    // move completion below performs the corresponding stable update.
+    if (!this.presentation.locked) this.syncNameLanes(state);
     // HP-zero entities remain registered and are updated until the death step completes.
     for (const [id, display] of this.displays) if (!state.units.some(unit => unit.id === id) && !display.dying) this.release(id);
     const ordered = Array.from(this.displays.values()).sort((a, b) => b.node.position.y - a.node.position.y);
     ordered.forEach((display, index) => display.node.setSiblingIndex(index));
+  }
+  private applyNameVisibility(display: Display): void {
+    display.name.node.active = !display.nameSuppressed || display.nameHovered || display.namePinned;
+  }
+  private isNameBlocker(display: Display | undefined): display is Display {
+    return Boolean(display && !display.dying && display.node.isValid && display.node.active
+      && (display.node.getComponent(UIOpacity)?.opacity ?? 255) > 0);
+  }
+  private syncNameLane(display: Display, unit: BattleUnit, state: BattleState): void {
+    // Use rendered board positions. During a move, authoritative row/col already
+    // points at the destination while the actor is still tweening from its old
+    // cell; unrelated snapshots must not make its local label jump lanes.
+    const point = display.node.position;
+    const upperRowPoints = state.units.filter(candidate => candidate.hp > 0 && candidate.row === unit.row - 1)
+      .map(candidate => this.displays.get(candidate.id))
+      .filter((candidate): candidate is Display => this.isNameBlocker(candidate))
+      .map(candidate => candidate.node.position);
+    const lane = unitNameLane(point, display.preferredNameOffsetY, upperRowPoints);
+    display.nameSuppressed = lane.suppressed;
+    display.name.node.setPosition(0, lane.offsetY, 0);
+    this.applyNameVisibility(display);
+  }
+  private syncNameLanes(state: BattleState): void {
+    for (const unit of state.units) {
+      const display = this.displays.get(unit.id);
+      if (display && !display.dying) this.syncNameLane(display, unit, state);
+    }
   }
   private terrainText(terrain: BattleTerrain): string {
     const name = cardName(this.catalog, String(terrain.skillId));
@@ -224,6 +292,7 @@ export class BattleSceneView {
       const generation = ++display.generation;
       display.animation.play('walk', end.x < start.x ? 'west' : 'east');
       await new Promise<void>(resolve => tween(display.node).to(seconds / this.speed, { position: end }).call(() => resolve()).start());
+      if (this.presentation.visibleState) this.syncNameLanes(this.presentation.visibleState);
       if (!this.disposed && !display.dying && display.generation === generation) {
         display.generation++; display.animation.play('stand', this.direction(display));
       }

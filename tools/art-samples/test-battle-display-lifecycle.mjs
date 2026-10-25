@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {readFile}from'node:fs/promises';
 import {stripTypeScriptTypes}from'node:module';
 const source=await readFile(new URL('../../cocos-client/assets/scripts/game/BattleSceneView.ts',import.meta.url),'utf8');
+const observerSource=await readFile(new URL('./observe.js',import.meta.url),'utf8');
 class UIOpacity{opacity=255}
 class FakeNode{
  constructor(parent){this.parent=parent;this.isValid=true;this.components=new Map();this.children=[];if(parent)parent.children.push(this)}
@@ -16,9 +17,9 @@ class FakeNode{
 const tweens=[];
 function tween(target){let seconds=0,values;return{to(n,v){seconds=n;values=v;return this},start(){tweens.push({target,seconds,values})}}}
 const Label={Overflow:{CLAMP:1}};
-const transpiled=stripTypeScriptTypes(source.replace(/^import .*;\s*$/gm,''),{mode:'transform'}).replace('export class BattleSceneView','class BattleSceneView')+'\nreturn {BattleSceneView};';
+const transpiled=stripTypeScriptTypes(source.replace(/^import .*;\s*$/gm,''),{mode:'transform'}).replace('export class BattleSceneView','class BattleSceneView')+'\nreturn {BattleSceneView,unitNameLane};';
 const exports=new Function('instantiate','tween','UIOpacity','Label','ArtSkin','Theme','Color',transpiled)(()=>new FakeNode(),tween,UIOpacity,Label,{image:()=>undefined,url:()=>undefined},{gold:'gold',text:'white'},class Color{});
-const {BattleSceneView}=exports;
+const {BattleSceneView,unitNameLane}=exports;
 const flush=async()=>{for(let i=0;i<5;i++)await Promise.resolve()};
 function actor(){const node=new FakeNode();const art=new FakeNode(node),name=new FakeNode(node),hpNode=new FakeNode(node);let finish;let destroyed=false;const completion=new Promise(r=>finish=r);return{node,generation:0,dying:false,ready:Promise.resolve(),hp:{node:hpNode,string:'3'},name:{node:name},animation:{node:art,play(){return{hasNativeState:true,completion}},destroy(){destroyed=true}},finish,get destroyed(){return destroyed}}}
 function presenter(display){const view=Object.create(BattleSceneView.prototype);Object.assign(view,{disposed:false,speed:1,clocks:[],displays:new Map([['unit:7',display]]),syncDisplays(){}});return view}
@@ -32,6 +33,30 @@ test('actual death presenter finishes pose then fades art and labels together be
 });
 test('actual delayed death completion cannot fade or release a replacement with the same unitId',async()=>{
  tweens.length=0;const old=actor(),v=presenter(old),done=v.perform({kind:'death',actorId:'unit:7'});await flush();const fresh=actor();v.displays.set('unit:7',fresh);old.finish();await flush();assert.equal(tweens.length,0);await advance(v,2);await done;assert.equal(v.displays.get('unit:7'),fresh);assert.equal(fresh.node.visibleAlpha,1);assert.equal(fresh.destroyed,false);
+});
+test('adjacent lower-row names use a safe reveal lane while non-colliding names stay visible',()=>{
+ const upper={x:0,y:100,z:0};
+ assert.deepEqual(unitNameLane({x:495,y:207.5,z:0},65.5,[]),{suppressed:true,offsetY:38},'upper-right unit name must not sit below battle toolbar');
+ assert.deepEqual(unitNameLane({x:0,y:5,z:0},68,[upper]),{suppressed:true,offsetY:38},
+  'mounted lower-row name must not cover upper-row attack/health');
+ assert.deepEqual(unitNameLane({x:180,y:5,z:0},68,[upper]),{suppressed:false,offsetY:68},
+  'a separate column keeps its source-derived head label');
+ assert.deepEqual(unitNameLane({x:0,y:5,z:0},38,[upper]),{suppressed:false,offsetY:38},
+  'the hover/touch reveal lane is outside the adjacent stats bounds');
+});
+test('annotation input stays within one board cell and observer keeps ambiguous zero-hp blanks separate',()=>{
+ assert.match(source,/ui\.node\(node, 'NameHitRegion', 84, 90, 0, 10\)/);
+ const annotationBlock=source.slice(source.indexOf("const nameHit ="),source.indexOf('void ready.then'));
+ assert.doesNotMatch(annotationBlock,/(?:^|\s)node\.on\(Node\.EventType\.(?:MOUSE_ENTER|MOUSE_LEAVE|TOUCH_END)/,
+  'the overlapping 170x170 visual root must not own annotation input');
+ assert.equal((annotationBlock.match(/nameHit\.on\(Node\.EventType\.(?:MOUSE_ENTER|MOUSE_LEAVE|TOUCH_END)/g)??[]).length,3);
+ const classifierSource=observerSource.slice(0,observerSource.indexOf('\nif('));
+ const classify=new Function(`${classifierSource};return classifyAnimationBlank;`)();
+ assert.equal(classify(false,0,'5'),'expectedOpacityZero');
+ assert.equal(classify(false,1,'0'),'zeroHpSourceEmpty');
+ assert.equal(classify(false,1,'5'),'unexpectedEmpty');
+ assert.equal(classify(false,1,'5',false),'initialUnrendered');
+ assert.equal(classify(true,0,'0'),'rendered');
 });
 test('actual HUD render places bounded fixed-font global information above upper unit names',()=>{
  const labels=[];const v=Object.create(BattleSceneView.prototype);const state={revision:1,turn:123,players:[{id:'me',name:'这是一个需要明确截断的超长角色名称ABC',ai:false,hand:[],drawPile:[],graveyard:[]}],activePlayer:0,terrains:[],events:[]};

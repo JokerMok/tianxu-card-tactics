@@ -8,6 +8,9 @@ import {writeFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 const death=process.argv.includes('--death');
 const batchTwo=process.argv.includes('--batch-two');
+const chapterThree=process.argv.includes('--chapter-three');
+const reverseSides=process.argv.includes('--reverse-sides');
+if(reverseSides&&!chapterThree)throw new Error('--reverse-sides requires the chapter-three fixture');
 const emptyHand=process.argv.includes('--empty-hand');
 const root=path.resolve(import.meta.dirname,'../..');
 const folder=path.join(root,'.local/art-samples');mkdirSync(folder,{recursive:true});
@@ -24,7 +27,11 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  const playerSpec=service.playerSpec(world,actor,0);
  const deck=emptyHand?[]:playerSpec.deck;
  const players=[{...playerSpec,deck},{id:enemy,name:'隔离动作对照',team:1,hp:8,attack:1,ai:true,profession:1,deck:[...deck]}];
- const initialUnits=batchTwo?[
+ const initialUnits=chapterThree?[
+ {monsterId:19,playerId:actorId,row:0,col:3},{monsterId:60001,playerId:enemy,row:0,col:5},
+ {monsterId:61,playerId:actorId,row:1,col:4},{monsterId:60003,playerId:enemy,row:1,col:6},{monsterId:5019,playerId:actorId,row:1,col:2},
+ {monsterId:1,playerId:actorId,row:2,col:3},{monsterId:60005,playerId:enemy,row:2,col:5},{monsterId:43,playerId:actorId,row:2,col:1},
+ {monsterId:12,playerId:actorId,row:3,col:4},{monsterId:60002,playerId:enemy,row:3,col:5}]:batchTwo?[
  {monsterId:19,playerId:actorId,row:0,col:3},{monsterId:43,playerId:enemy,row:0,col:5},
  {monsterId:43,playerId:actorId,row:1,col:4},{monsterId:61,playerId:enemy,row:1,col:6},
  {monsterId:1,playerId:actorId,row:2,col:3},{monsterId:12,playerId:enemy,row:2,col:5},
@@ -37,11 +44,12 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  {monsterId:43,playerId:actorId,row:1,col:4},{monsterId:1,playerId:enemy,row:1,col:6},
  {monsterId:1,playerId:actorId,row:2,col:2},{monsterId:1,playerId:enemy,row:2,col:7},
  {monsterId:19,playerId:actorId,row:3,col:3},{monsterId:1,playerId:enemy,row:3,col:6}];
- const entryState=createBattle(content,{id,seed:1024,mapId:1,players,rows:4,firstPlayer:0,initialUnits});
+ const positioned=reverseSides?initialUnits.map(unit=>({...unit,col:11-unit.col,playerId:unit.playerId===actorId?enemy:actorId})):initialUnits;
+ const entryState=createBattle(content,{id,seed:1024,mapId:1,players,rows:4,firstPlayer:0,initialUnits:positioned});
  world.battles[id]={id,entryState,state:structuredClone(entryState),mode:'pve',pve:{mode:'art-fixture'},participants:[actorId],createdAt:Date.now(),settled:false,rewards:{},dismissed:[]};
  return {message:'Local animation fixture only'};
 });
 writeFileSync(path.join(folder,'fixture-login.json'),JSON.stringify({username,password,characterId:actorId}),{mode:0o600});
-writeFileSync(path.join(folder,batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:8,initialHeroUnits:2,source:'createBattle using original monster 1/12/19/43/61 configuration. Only starting positions are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
-console.log('Created isolated 10-unit authoritative animation fixture. Private login stored locally.');
+writeFileSync(path.join(folder,chapterThree?`evidence/chapter-1-batch3${reverseSides?'-reverse':''}-fixture-contract.json`:batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:chapterThree?10:8,initialHeroUnits:2,reverseSides,source:'createBattle using original monster configuration, including chapter-1 IDs for --chapter-three. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
+console.log('Created isolated authoritative animation fixture; private login stored locally.');
 } finally{store.close();}

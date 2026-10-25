@@ -1,0 +1,454 @@
+{
+  "base": "815caf0",
+  "scope": "six new different source models; original three unchanged",
+  "units": [
+    {
+      "key": "horseman",
+      "monsterIds": [
+        61
+      ],
+      "sourceName": "Horseman",
+      "modelId": "model:084ab6a537029e5baa0a",
+      "animateitem": "nanqibing01",
+      "referenceCard": "main:card:61",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/e00eb1cfdeacecc02b42.png",
+      "position": "初始卡组第四张；首章各节点可部署",
+      "originalCueSeconds": 0.25,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "runtimeAtlas": "horseman-e085efcf9726.png",
+      "frameSize": [
+        320,
+        320
+      ],
+      "displaySize": [
+        200,
+        200
+      ],
+      "foot": [
+        160,
+        280
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "当前构建：普通账号保存初始四卡，103手动部署61，105正常托管再部署。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    },
+    {
+      "key": "elven-hunter",
+      "monsterIds": [
+        5019
+      ],
+      "sourceName": "Elven Hunter",
+      "modelId": "model:00fc2a2e0efd186fb8fa",
+      "animateitem": "lieren01",
+      "referenceCard": "main:card:5019",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/49dddb1ba7629253b7f1.png",
+      "position": "首章101首通奖励；后续节点可部署",
+      "originalCueSeconds": 0.375,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "runtimeAtlas": "elven-hunter-86861df505a3.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "101首通奖励来源沿用上批账号记录；当前构建查看中文详情、升级容量后加进5卡并真实保存，105实际部署。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    },
+    {
+      "key": "goblin-bandit",
+      "monsterIds": [
+        60001,
+        3001
+      ],
+      "sourceName": "Goblin Bandit",
+      "modelId": "model:8b1c69f6618c1d1f3f5f",
+      "animateitem": "dijingbubing01",
+      "referenceCard": "main:card:3001",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/7633ecd013d262024524.png",
+      "position": "首章101敌方英雄",
+      "originalCueSeconds": 0.25,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "aliasEvidence": "Exact same animateitem and resolved model, quality0 Goblin Rogue card3001 image used as identity reference; other variants untouched.",
+      "runtimeAtlas": "goblin-bandit-2d9929f96c2d.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "101原有普通通关记录保留；当前构建九图集动作夹具含60001，未重新普通首战。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    },
+    {
+      "key": "goblin-marauder",
+      "monsterIds": [
+        60002,
+        3019
+      ],
+      "sourceName": "Goblin Maurader",
+      "modelId": "model:8d96ae7e7cc6096e8d46",
+      "animateitem": "dijingdaozei01",
+      "referenceCard": "main:card:3019",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/ecc63dda8b6b1fd866dd.png",
+      "position": "首章102敌方英雄",
+      "originalCueSeconds": 0.25,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "aliasEvidence": "Exact same animateitem and resolved model; only base quality0 card3019 alias included.",
+      "runtimeAtlas": "goblin-marauder-7aa44029e47a.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "当前构建普通102实际出场并结算，另有同场动作夹具。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    },
+    {
+      "key": "ogre-destroyer",
+      "monsterIds": [
+        60003
+      ],
+      "sourceName": "Ogre Destroyer",
+      "modelId": "model:e20d7e5947f126a1af02",
+      "animateitem": "jumomugun02",
+      "referenceCard": "main:card:4008",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/0b5ff0540403864aa2bf.png",
+      "position": "首章103敌方英雄",
+      "originalCueSeconds": 0.25,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "runtimeAtlas": "ogre-destroyer-a341df145f8b.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "displaySize": [
+        190,
+        190
+      ],
+      "foot": [
+        124,
+        220
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "当前构建普通103实际出场并结算，另有同场动作夹具。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    },
+    {
+      "key": "ogre-marauder",
+      "monsterIds": [
+        60005,
+        4001
+      ],
+      "sourceName": "Ogre Marauder",
+      "modelId": "model:d9297fe5cbede4982581",
+      "animateitem": "jumomugun01",
+      "referenceCard": "main:card:4001",
+      "referenceImage": "cocos-client/assets/resources/recovered/images/622e103a4ef3fd2d97ee.png",
+      "position": "首章105敌方英雄",
+      "originalCueSeconds": 0.25,
+      "actions": [
+        "stand",
+        "walk",
+        "atk",
+        "hit",
+        "die"
+      ],
+      "implementation": "已接入本机正式Cocos；待机/移动/攻击/受伤/死亡，左右脚底镜像；用户最终视觉确认单独记录",
+      "sourceModelUnchanged": true,
+      "aliasEvidence": "Exact same animateitem and resolved model; only base quality0 card4001 alias included.",
+      "runtimeAtlas": "ogre-marauder-18789be5d8f8.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "displaySize": [
+        190,
+        190
+      ],
+      "foot": [
+        108,
+        220
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "normalPathValidation": "当前构建普通105实际出场并结算，另有同场动作夹具。",
+      "mixedValidation": "真实Cocos九图集混合战斗，固定初始布局+真实权威规则/事件队列，非正常成长证明；见README录像"
+    }
+  ],
+  "remaining": [
+    {
+      "monsterId": 60007,
+      "model": "model:30945d8c76c9d4a31508",
+      "reason": "首章市政厅首领，超过本批6模型预算，保留原资源"
+    },
+    {
+      "scope": "compatible enemy deck and actual summons",
+      "reason": "当前实现从跨种族有效普通池抽卡，抽样100种子覆盖124个模型；无固定首章召唤物保证。本批不修改池或规则，不声称已统一所有随机出场。"
+    }
+  ],
+  "completedAt": "2026-10-26",
+  "runtimePack": "steelwood-chapter1-batch3-20261025",
+  "resourceBudget": {
+    "activeAtlases": 9,
+    "maxEstimatedRgbaBytes": 83886080,
+    "actualNineAtlasEstimatedRgbaBytes": 81199104,
+    "newSixEstimatedRgbaBytes": 51609600,
+    "newSixPngBytes": 5431582,
+    "notMeasuredGpuMemory": true
+  },
+  "evidence": "documentation/art-samples/chapter1-batch3/README.md"
+}
