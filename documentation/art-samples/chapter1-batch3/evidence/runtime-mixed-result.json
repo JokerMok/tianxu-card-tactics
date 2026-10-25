@@ -1,0 +1,790 @@
+{
+  "elapsedMs": 6226276.8,
+  "page": "home",
+  "ready": true,
+  "busy": false,
+  "nodes": 222,
+  "sprites": 28,
+  "missing": 0,
+  "emptyNames": [],
+  "sampleGeometry": [
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 465,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 200,
+        "height": 200
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.125
+      },
+      "pos": {
+        "x": 285,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 640,
+        "y": 0,
+        "width": 320,
+        "height": 320
+      },
+      "original": {
+        "width": 320,
+        "height": 320
+      }
+    },
+    {
+      "size": {
+        "width": 200,
+        "height": 200
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.125
+      },
+      "pos": {
+        "x": 375,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1600,
+        "y": 0,
+        "width": 320,
+        "height": 320
+      },
+      "original": {
+        "width": 320,
+        "height": 320
+      }
+    },
+    {
+      "size": {
+        "width": 200,
+        "height": 200
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.125
+      },
+      "pos": {
+        "x": 555,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 320
+      },
+      "original": {
+        "width": 320,
+        "height": 320
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 1005,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 200,
+        "height": 200
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.125
+      },
+      "pos": {
+        "x": 555,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 640,
+        "y": 0,
+        "width": 320,
+        "height": 320
+      },
+      "original": {
+        "width": 320,
+        "height": 320
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 285,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 200,
+        "height": 200
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.125
+      },
+      "pos": {
+        "x": 465,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1600,
+        "y": 0,
+        "width": 320,
+        "height": 320
+      },
+      "original": {
+        "width": 320,
+        "height": 320
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 195,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 375,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 645,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    },
+    {
+      "size": {
+        "width": 170,
+        "height": 170
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 0.140625
+      },
+      "pos": {
+        "x": 645,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "width": 256,
+        "height": 256
+      },
+      "original": {
+        "width": 256,
+        "height": 256
+      }
+    }
+  ],
+  "units": 14,
+  "maxUnits": 17,
+  "animations": 14,
+  "blankSamples": 379,
+  "warmBlankSamples": 240,
+  "animationSamples": 7203274,
+  "blankClassification": {
+    "initialUnrendered": 139,
+    "currentInitialUnrendered": 0,
+    "expectedOpacityZero": 166,
+    "zeroHpSourceEmpty": 74,
+    "unexpected": 0,
+    "currentExpectedOpacityZero": 0,
+    "currentZeroHpSourceEmpty": 0,
+    "currentUnexpected": 0,
+    "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+  },
+  "opacityDiagnostics": {
+    "transparentAnimations": 514,
+    "fadingAnimations": 420,
+    "currentTransparent": 0,
+    "currentFading": 0
+  },
+  "spriteChanges": 403772,
+  "homeBuilds": 0,
+  "p95": 9.799999999813735,
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 466,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 3,
+      "x": 641,
+      "y": 572,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 4,
+      "x": 640,
+      "y": 226,
+      "firstMs": 809.3999999046791,
+      "usableMs": 884.3999999046791
+    },
+    {
+      "seq": 5,
+      "x": 56,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 6,
+      "x": 1091,
+      "y": 505,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 7,
+      "x": 139,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 8,
+      "x": 221,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    }
+  ],
+  "startup": [
+    {
+      "path": "/api/bootstrap",
+      "ms": 0.8000001907348633,
+      "encoded": 89,
+      "decoded": 89,
+      "transfer": 389
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "ms": 7.200000286102295,
+      "encoded": 6653356,
+      "decoded": 6653356,
+      "transfer": 6653656
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "ms": 2.5999999046325684,
+      "encoded": 224590,
+      "decoded": 224590,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "ms": 1.299999713897705,
+      "encoded": 93602,
+      "decoded": 93602,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "ms": 1.9000000953674316,
+      "encoded": 11375,
+      "decoded": 11375,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "ms": 1,
+      "encoded": 3016,
+      "decoded": 3016,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "ms": 0.8999996185302734,
+      "encoded": 1761,
+      "decoded": 1761,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "ms": 1.8000001907348633,
+      "encoded": 154025,
+      "decoded": 154025,
+      "transfer": 0
+    },
+    {
+      "path": "/api/catalog",
+      "ms": 77.5,
+      "encoded": 9100299,
+      "decoded": 67036807,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "ms": 2.799999713897705,
+      "encoded": 5623,
+      "decoded": 5623,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "ms": 1.3000001907348633,
+      "encoded": 795,
+      "decoded": 795,
+      "transfer": 0
+    }
+  ],
+  "lastResources": [
+    {
+      "path": "/api/state",
+      "ms": 6.699999809265137,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 698.8999996185303,
+      "encoded": 472550,
+      "decoded": 472550,
+      "transfer": 472850
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.099999904632568,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.400000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 6.900000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.699999809265137,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.400000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    }
+  ],
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-batch3-20261025",
+      "uiTextures": 12,
+      "loads": 12,
+      "failures": 0,
+      "maxPrepareMs": 41,
+      "unitAtlases": {
+        "atlasPoolEntries": 5,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 12,
+        "atlasPoolSpriteFrames": 155,
+        "atlasPoolEstimatedBytes": 49741824,
+        "atlasPoolMaxEntries": 9,
+        "atlasPoolMaxEstimatedBytes": 83886080
+      }
+    },
+    "battle": {
+      "liveDisplays": 14,
+      "animations": [
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 32920,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 0,
+          "plays": 14,
+          "frameChanges": 35145,
+          "cues": 3,
+          "completions": 5,
+          "cancellations": 8
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 12,
+          "frameChanges": 35143,
+          "cues": 4,
+          "completions": 4,
+          "cancellations": 7
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 6,
+          "frameChanges": 35134,
+          "cues": 2,
+          "completions": 2,
+          "cancellations": 3
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 4,
+          "plays": 14,
+          "frameChanges": 35143,
+          "cues": 2,
+          "completions": 3,
+          "cancellations": 10
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 6,
+          "frameChanges": 35146,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 5
+        },
+        {
+          "frameTreesBuilt": 48,
+          "frameTreesReused": 32884,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 4,
+          "frameChanges": 29120,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 3
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 5,
+          "plays": 4,
+          "frameChanges": 29110,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 3
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 29101,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 29095,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 0,
+          "plays": 10,
+          "frameChanges": 29011,
+          "cues": 1,
+          "completions": 2,
+          "cancellations": 7
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 28993,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 5,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 12,
+          "atlasPoolSpriteFrames": 155,
+          "atlasPoolEstimatedBytes": 49741824,
+          "atlasPoolMaxEntries": 9,
+          "atlasPoolMaxEstimatedBytes": 83886080,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 4,
+          "plays": 14,
+          "frameChanges": 28996,
+          "cues": 1,
+          "completions": 4,
+          "cancellations": 9
+        }
+      ]
+    }
+  }
+}

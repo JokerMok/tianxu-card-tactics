@@ -1,0 +1,219 @@
+{
+  "checkedAt": "2026-10-25T16:13:58.382Z",
+  "environment": "local isolated art-samples database, read-only inspection",
+  "accountType": "ordinary UI registration and normal rewards; no GM/seeding for this account",
+  "level": 2,
+  "currencies": {
+    "silver": 420,
+    "gold": 20,
+    "crystal": 0
+  },
+  "deck": [
+    "main:card:19",
+    "main:card:43",
+    "main:card:1",
+    "main:card:61",
+    "main:card:5019"
+  ],
+  "ownedRelevant": {
+    "main:card:1": 1,
+    "main:card:19": 2,
+    "main:card:43": 1,
+    "main:card:61": 1,
+    "main:card:5019": 1,
+    "main:card:8": 1
+  },
+  "progress": {
+    "sceneId": 1,
+    "clearedNodes": [
+      "main:scene:1:node:101",
+      "main:scene:1:node:102",
+      "main:scene:1:node:103",
+      "main:scene:1:node:105"
+    ],
+    "clearedTriggers": [
+      "main:scene:1:node:101:trigger:101001",
+      "main:scene:1:node:102:trigger:102001",
+      "main:scene:1:node:103:trigger:103001",
+      "main:scene:1:node:105:trigger:105001"
+    ],
+    "unlockedScenes": [
+      1
+    ],
+    "positionByScene": {}
+  },
+  "battles": [
+    {
+      "level": {
+        "sceneId": "main:scene:1",
+        "nodeId": "main:scene:1:node:101",
+        "triggerId": "main:scene:1:node:101:trigger:101001",
+        "elite": false
+      },
+      "mode": "pve",
+      "turn": 4,
+      "settled": true,
+      "dismissed": true,
+      "reward": {
+        "won": true,
+        "silver": 30,
+        "xp": 6,
+        "cards": [
+          {
+            "id": "main:card:5019",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "survivingOwnMonsterIds": [
+        0,
+        19,
+        43,
+        1
+      ],
+      "initialEnemyMonsterIds": [
+        60001
+      ],
+      "settlementRows": 1
+    },
+    {
+      "level": {
+        "sceneId": "main:scene:1",
+        "nodeId": "main:scene:1:node:102",
+        "triggerId": "main:scene:1:node:102:trigger:102001",
+        "elite": false
+      },
+      "mode": "pve",
+      "turn": 4,
+      "settled": true,
+      "dismissed": true,
+      "reward": {
+        "won": true,
+        "silver": 30,
+        "xp": 6,
+        "cards": [
+          {
+            "id": "main:card:2",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "survivingOwnMonsterIds": [
+        0,
+        1,
+        19,
+        43
+      ],
+      "initialEnemyMonsterIds": [
+        60002
+      ],
+      "settlementRows": 1
+    },
+    {
+      "level": {
+        "sceneId": "main:scene:1",
+        "nodeId": "main:scene:1:node:103",
+        "triggerId": "main:scene:1:node:103:trigger:103001",
+        "elite": false
+      },
+      "mode": "pve",
+      "turn": 4,
+      "settled": true,
+      "dismissed": true,
+      "reward": {
+        "won": true,
+        "silver": 30,
+        "xp": 6,
+        "cards": [
+          {
+            "id": "main:card:19",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "survivingOwnMonsterIds": [
+        0,
+        61
+      ],
+      "initialEnemyMonsterIds": [
+        60003
+      ],
+      "settlementRows": 1
+    },
+    {
+      "level": {
+        "sceneId": "main:scene:1",
+        "nodeId": "main:scene:1:node:105",
+        "triggerId": "main:scene:1:node:105:trigger:105001",
+        "elite": false
+      },
+      "mode": "pve",
+      "turn": 6,
+      "settled": true,
+      "dismissed": true,
+      "reward": {
+        "won": true,
+        "silver": 30,
+        "xp": 6,
+        "cards": [
+          {
+            "id": "main:card:8",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "survivingOwnMonsterIds": [
+        0,
+        61,
+        1,
+        19,
+        43,
+        5019
+      ],
+      "initialEnemyMonsterIds": [
+        60005
+      ],
+      "settlementRows": 1
+    }
+  ]
+}

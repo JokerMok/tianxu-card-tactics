@@ -1,0 +1,257 @@
+{
+  "elapsedMs": 6238310,
+  "page": "world",
+  "ready": true,
+  "busy": false,
+  "nodes": 152,
+  "sprites": 35,
+  "missing": 0,
+  "emptyNames": [],
+  "sampleGeometry": [],
+  "units": 0,
+  "maxUnits": 17,
+  "animations": 0,
+  "blankSamples": 379,
+  "warmBlankSamples": 240,
+  "animationSamples": 7204058,
+  "blankClassification": {
+    "initialUnrendered": 139,
+    "currentInitialUnrendered": 0,
+    "expectedOpacityZero": 166,
+    "zeroHpSourceEmpty": 74,
+    "unexpected": 0,
+    "currentExpectedOpacityZero": 0,
+    "currentZeroHpSourceEmpty": 0,
+    "currentUnexpected": 0,
+    "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+  },
+  "opacityDiagnostics": {
+    "transparentAnimations": 514,
+    "fadingAnimations": 420,
+    "currentTransparent": 0,
+    "currentFading": 0
+  },
+  "spriteChanges": 403850,
+  "homeBuilds": 1,
+  "p95": 9.700000000186265,
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 466,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 3,
+      "x": 641,
+      "y": 572,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 4,
+      "x": 640,
+      "y": 226,
+      "firstMs": 809.3999999046791,
+      "usableMs": 884.3999999046791
+    },
+    {
+      "seq": 5,
+      "x": 56,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 6,
+      "x": 1091,
+      "y": 505,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 7,
+      "x": 139,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 8,
+      "x": 221,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 9,
+      "x": 640,
+      "y": 531,
+      "firstMs": 4.500000094994903,
+      "usableMs": 446.0000000949949
+    }
+  ],
+  "startup": [
+    {
+      "path": "/api/bootstrap",
+      "ms": 0.8000001907348633,
+      "encoded": 89,
+      "decoded": 89,
+      "transfer": 389
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "ms": 7.200000286102295,
+      "encoded": 6653356,
+      "decoded": 6653356,
+      "transfer": 6653656
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "ms": 2.5999999046325684,
+      "encoded": 224590,
+      "decoded": 224590,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "ms": 1.299999713897705,
+      "encoded": 93602,
+      "decoded": 93602,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "ms": 1.9000000953674316,
+      "encoded": 11375,
+      "decoded": 11375,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "ms": 1,
+      "encoded": 3016,
+      "decoded": 3016,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "ms": 0.8999996185302734,
+      "encoded": 1761,
+      "decoded": 1761,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "ms": 1.8000001907348633,
+      "encoded": 154025,
+      "decoded": 154025,
+      "transfer": 0
+    },
+    {
+      "path": "/api/catalog",
+      "ms": 77.5,
+      "encoded": 9100299,
+      "decoded": 67036807,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "ms": 2.799999713897705,
+      "encoded": 5623,
+      "decoded": 5623,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "ms": 1.3000001907348633,
+      "encoded": 795,
+      "decoded": 795,
+      "transfer": 0
+    }
+  ],
+  "lastResources": [
+    {
+      "path": "/api/state",
+      "ms": 6.699999809265137,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 698.8999996185303,
+      "encoded": 472550,
+      "decoded": 472550,
+      "transfer": 472850
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.099999904632568,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.400000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 6.900000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.699999809265137,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.400000095367432,
+      "encoded": 109,
+      "decoded": 109,
+      "transfer": 409
+    }
+  ],
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-batch3-20261025",
+      "uiTextures": 12,
+      "loads": 12,
+      "failures": 0,
+      "maxPrepareMs": 41,
+      "unitAtlases": {
+        "atlasPoolEntries": 0,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 0,
+        "atlasPoolSpriteFrames": 0,
+        "atlasPoolEstimatedBytes": 0,
+        "atlasPoolMaxEntries": 9,
+        "atlasPoolMaxEstimatedBytes": 83886080
+      }
+    }
+  }
+}
