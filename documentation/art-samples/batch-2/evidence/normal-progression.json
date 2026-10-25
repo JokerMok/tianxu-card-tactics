@@ -1,0 +1,80 @@
+{
+  "source": "normal registration and character creation through actual Cocos UI; no seed/GM; isolated DB read-only verification",
+  "characterLevel": 1,
+  "deck": [
+    "main:card:19",
+    "main:card:43",
+    "main:card:61",
+    "main:card:1"
+  ],
+  "cards": {
+    "main:card:1": 1,
+    "main:card:19": 1,
+    "main:card:43": 1,
+    "main:card:61": 1,
+    "main:card:5019": 1
+  },
+  "currencies": {
+    "silver": 330,
+    "gold": 20,
+    "crystal": 0
+  },
+  "progress": {
+    "sceneId": 1,
+    "clearedNodes": [
+      "main:scene:1:node:101"
+    ],
+    "clearedTriggers": [
+      "main:scene:1:node:101:trigger:101001"
+    ],
+    "unlockedScenes": [
+      1
+    ],
+    "positionByScene": {}
+  },
+  "battle": {
+    "mode": "pve",
+    "status": "settled",
+    "winner": 0,
+    "turn": 4,
+    "settled": true,
+    "dismissed": true,
+    "deployedCards": [
+      {
+        "cardId": "main:card:19",
+        "monsterId": 19
+      },
+      {
+        "cardId": "main:card:43",
+        "monsterId": 43
+      },
+      {
+        "cardId": "main:card:1",
+        "monsterId": 1
+      }
+    ]
+  },
+  "settlements": [
+    {
+      "won": true,
+      "silver": 30,
+      "xp": 6,
+      "cards": [
+        {
+          "id": "main:card:5019",
+          "count": 1
+        }
+      ],
+      "extras": {
+        "items": [],
+        "cards": [],
+        "currencies": {},
+        "reputation": [],
+        "growth": {},
+        "xp": 0,
+        "randomGroups": [],
+        "preview": null
+      }
+    }
+  ]
+}

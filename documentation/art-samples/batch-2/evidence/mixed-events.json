@@ -1,0 +1,565 @@
+{
+  "source": "isolated authoritative QA fixture; no ordinary progression claim",
+  "events": [
+    {
+      "seq": 19,
+      "type": "move",
+      "actor": "unit:1",
+      "monsterId": 19,
+      "row": 0,
+      "col": 4
+    },
+    {
+      "seq": 20,
+      "type": "attack",
+      "actor": "unit:1",
+      "target": "unit:2",
+      "monsterId": 19,
+      "targetMonsterId": 43,
+      "amount": 1
+    },
+    {
+      "seq": 21,
+      "type": "damage",
+      "actor": "unit:1",
+      "target": "unit:2",
+      "monsterId": 19,
+      "targetMonsterId": 43,
+      "amount": 1,
+      "hpAfter": 1
+    },
+    {
+      "seq": 22,
+      "type": "move",
+      "actor": "unit:3",
+      "monsterId": 43,
+      "row": 1,
+      "col": 5
+    },
+    {
+      "seq": 23,
+      "type": "attack",
+      "actor": "unit:3",
+      "target": "unit:2",
+      "monsterId": 43,
+      "targetMonsterId": 43,
+      "amount": 2
+    },
+    {
+      "seq": 24,
+      "type": "damage",
+      "actor": "unit:3",
+      "target": "unit:2",
+      "monsterId": 43,
+      "targetMonsterId": 43,
+      "amount": 1,
+      "hpAfter": 0
+    },
+    {
+      "seq": 25,
+      "type": "death",
+      "actor": "unit:2",
+      "monsterId": 43,
+      "row": 0,
+      "col": 5
+    },
+    {
+      "seq": 26,
+      "type": "move",
+      "actor": "unit:5",
+      "monsterId": 1,
+      "row": 2,
+      "col": 4
+    },
+    {
+      "seq": 27,
+      "type": "attack",
+      "actor": "unit:5",
+      "target": "unit:6",
+      "monsterId": 1,
+      "targetMonsterId": 12,
+      "amount": 1
+    },
+    {
+      "seq": 28,
+      "type": "damage",
+      "actor": "unit:5",
+      "target": "unit:6",
+      "monsterId": 1,
+      "targetMonsterId": 12,
+      "amount": 0,
+      "message": "blocked"
+    },
+    {
+      "seq": 29,
+      "type": "attack",
+      "actor": "unit:7",
+      "target": "unit:8",
+      "monsterId": 12,
+      "targetMonsterId": 19,
+      "amount": 4
+    },
+    {
+      "seq": 30,
+      "type": "damage",
+      "actor": "unit:7",
+      "target": "unit:8",
+      "monsterId": 12,
+      "targetMonsterId": 19,
+      "amount": 4,
+      "hpAfter": 0
+    },
+    {
+      "seq": 31,
+      "type": "death",
+      "actor": "unit:8",
+      "monsterId": 19,
+      "row": 3,
+      "col": 5
+    },
+    {
+      "seq": 33,
+      "type": "damage",
+      "target": "hero:ai:1b28708e-a159-4ee1-afa0-06ef7757a600",
+      "targetMonsterId": 0,
+      "amount": 1,
+      "hpAfter": 7,
+      "message": "fatigue"
+    },
+    {
+      "seq": 44,
+      "type": "attack",
+      "actor": "unit:4",
+      "target": "unit:3",
+      "monsterId": 61,
+      "targetMonsterId": 43,
+      "amount": 1
+    },
+    {
+      "seq": 45,
+      "type": "damage",
+      "actor": "unit:4",
+      "target": "unit:3",
+      "monsterId": 61,
+      "targetMonsterId": 43,
+      "amount": 1,
+      "hpAfter": 1
+    },
+    {
+      "seq": 46,
+      "type": "attack",
+      "actor": "unit:6",
+      "target": "unit:3",
+      "monsterId": 12,
+      "targetMonsterId": 43,
+      "amount": 4
+    },
+    {
+      "seq": 47,
+      "type": "damage",
+      "actor": "unit:6",
+      "target": "unit:3",
+      "monsterId": 12,
+      "targetMonsterId": 43,
+      "amount": 1,
+      "hpAfter": 0
+    },
+    {
+      "seq": 48,
+      "type": "death",
+      "actor": "unit:3",
+      "monsterId": 43,
+      "row": 1,
+      "col": 5
+    },
+    {
+      "seq": 50,
+      "type": "damage",
+      "target": "hero:0ecdf10e-6e1c-431b-a6e6-7d59711b5fe7",
+      "targetMonsterId": 0,
+      "amount": 1,
+      "hpAfter": 7,
+      "message": "fatigue"
+    },
+    {
+      "seq": 53,
+      "type": "move",
+      "actor": "unit:18",
+      "monsterId": 61,
+      "row": 1,
+      "col": 4
+    },
+    {
+      "seq": 54,
+      "type": "move",
+      "actor": "unit:17",
+      "monsterId": 43,
+      "row": 1,
+      "col": 3
+    },
+    {
+      "seq": 55,
+      "type": "attack",
+      "actor": "unit:5",
+      "target": "unit:6",
+      "monsterId": 1,
+      "targetMonsterId": 12,
+      "amount": 1
+    },
+    {
+      "seq": 56,
+      "type": "damage",
+      "actor": "unit:5",
+      "target": "unit:6",
+      "monsterId": 1,
+      "targetMonsterId": 12,
+      "amount": 0,
+      "message": "blocked"
+    },
+    {
+      "seq": 57,
+      "type": "move",
+      "actor": "unit:7",
+      "monsterId": 12,
+      "row": 3,
+      "col": 5
+    },
+    {
+      "seq": 58,
+      "type": "attack",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 4
+    },
+    {
+      "seq": 59,
+      "type": "damage",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 2,
+      "hpAfter": 12
+    },
+    {
+      "seq": 61,
+      "type": "damage",
+      "target": "hero:ai:1b28708e-a159-4ee1-afa0-06ef7757a600",
+      "targetMonsterId": 0,
+      "amount": 2,
+      "hpAfter": 5,
+      "message": "fatigue"
+    },
+    {
+      "seq": 64,
+      "type": "move",
+      "actor": "unit:21",
+      "monsterId": 43,
+      "row": 0,
+      "col": 5
+    },
+    {
+      "seq": 65,
+      "type": "attack",
+      "actor": "unit:21",
+      "target": "unit:1",
+      "monsterId": 43,
+      "targetMonsterId": 19,
+      "amount": 2
+    },
+    {
+      "seq": 66,
+      "type": "damage",
+      "actor": "unit:21",
+      "target": "unit:1",
+      "monsterId": 43,
+      "targetMonsterId": 19,
+      "amount": 2,
+      "hpAfter": 2
+    },
+    {
+      "seq": 67,
+      "type": "move",
+      "actor": "unit:22",
+      "monsterId": 61,
+      "row": 0,
+      "col": 6
+    },
+    {
+      "seq": 68,
+      "type": "move",
+      "actor": "unit:4",
+      "monsterId": 61,
+      "row": 1,
+      "col": 5
+    },
+    {
+      "seq": 69,
+      "type": "attack",
+      "actor": "unit:4",
+      "target": "unit:18",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1
+    },
+    {
+      "seq": 70,
+      "type": "damage",
+      "actor": "unit:4",
+      "target": "unit:18",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1,
+      "hpAfter": 5
+    },
+    {
+      "seq": 71,
+      "type": "move",
+      "actor": "unit:24",
+      "monsterId": 1,
+      "row": 1,
+      "col": 7
+    },
+    {
+      "seq": 72,
+      "type": "attack",
+      "actor": "unit:6",
+      "target": "unit:5",
+      "monsterId": 12,
+      "targetMonsterId": 1,
+      "amount": 4
+    },
+    {
+      "seq": 73,
+      "type": "damage",
+      "actor": "unit:6",
+      "target": "unit:5",
+      "monsterId": 12,
+      "targetMonsterId": 1,
+      "amount": 3,
+      "hpAfter": 0
+    },
+    {
+      "seq": 74,
+      "type": "death",
+      "actor": "unit:5",
+      "monsterId": 1,
+      "row": 2,
+      "col": 4
+    },
+    {
+      "seq": 76,
+      "type": "damage",
+      "target": "hero:0ecdf10e-6e1c-431b-a6e6-7d59711b5fe7",
+      "targetMonsterId": 0,
+      "amount": 2,
+      "hpAfter": 5,
+      "message": "fatigue"
+    },
+    {
+      "seq": 79,
+      "type": "attack",
+      "actor": "unit:1",
+      "target": "unit:21",
+      "monsterId": 19,
+      "targetMonsterId": 43,
+      "amount": 1
+    },
+    {
+      "seq": 80,
+      "type": "damage",
+      "actor": "unit:1",
+      "target": "unit:21",
+      "monsterId": 19,
+      "targetMonsterId": 43,
+      "amount": 1,
+      "hpAfter": 1
+    },
+    {
+      "seq": 81,
+      "type": "attack",
+      "actor": "unit:18",
+      "target": "unit:4",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1
+    },
+    {
+      "seq": 82,
+      "type": "damage",
+      "actor": "unit:18",
+      "target": "unit:4",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1,
+      "hpAfter": 5
+    },
+    {
+      "seq": 83,
+      "type": "attack",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 4
+    },
+    {
+      "seq": 84,
+      "type": "damage",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 2,
+      "hpAfter": 10
+    },
+    {
+      "seq": 86,
+      "type": "damage",
+      "target": "hero:ai:1b28708e-a159-4ee1-afa0-06ef7757a600",
+      "targetMonsterId": 0,
+      "amount": 3,
+      "hpAfter": 2,
+      "message": "fatigue"
+    },
+    {
+      "seq": 89,
+      "type": "attack",
+      "actor": "unit:21",
+      "target": "unit:1",
+      "monsterId": 43,
+      "targetMonsterId": 19,
+      "amount": 2
+    },
+    {
+      "seq": 90,
+      "type": "damage",
+      "actor": "unit:21",
+      "target": "unit:1",
+      "monsterId": 43,
+      "targetMonsterId": 19,
+      "amount": 2,
+      "hpAfter": 0
+    },
+    {
+      "seq": 91,
+      "type": "death",
+      "actor": "unit:1",
+      "monsterId": 19,
+      "row": 0,
+      "col": 4
+    },
+    {
+      "seq": 92,
+      "type": "move",
+      "actor": "unit:22",
+      "monsterId": 61,
+      "row": 1,
+      "col": 6
+    },
+    {
+      "seq": 93,
+      "type": "attack",
+      "actor": "unit:4",
+      "target": "unit:18",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1
+    },
+    {
+      "seq": 94,
+      "type": "damage",
+      "actor": "unit:4",
+      "target": "unit:18",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1,
+      "hpAfter": 4
+    },
+    {
+      "seq": 95,
+      "type": "attack",
+      "actor": "unit:6",
+      "target": "unit:7",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 4
+    },
+    {
+      "seq": 96,
+      "type": "damage",
+      "actor": "unit:6",
+      "target": "unit:7",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 2,
+      "hpAfter": 12
+    },
+    {
+      "seq": 98,
+      "type": "damage",
+      "target": "hero:0ecdf10e-6e1c-431b-a6e6-7d59711b5fe7",
+      "targetMonsterId": 0,
+      "amount": 3,
+      "hpAfter": 2,
+      "message": "fatigue"
+    },
+    {
+      "seq": 101,
+      "type": "attack",
+      "actor": "unit:18",
+      "target": "unit:4",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1
+    },
+    {
+      "seq": 102,
+      "type": "damage",
+      "actor": "unit:18",
+      "target": "unit:4",
+      "monsterId": 61,
+      "targetMonsterId": 61,
+      "amount": 1,
+      "hpAfter": 4
+    },
+    {
+      "seq": 103,
+      "type": "attack",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 4
+    },
+    {
+      "seq": 104,
+      "type": "damage",
+      "actor": "unit:7",
+      "target": "unit:6",
+      "monsterId": 12,
+      "targetMonsterId": 12,
+      "amount": 2,
+      "hpAfter": 8
+    },
+    {
+      "seq": 106,
+      "type": "damage",
+      "target": "hero:ai:1b28708e-a159-4ee1-afa0-06ef7757a600",
+      "targetMonsterId": 0,
+      "amount": 2,
+      "hpAfter": 0,
+      "message": "fatigue"
+    },
+    {
+      "seq": 109,
+      "type": "death",
+      "actor": "hero:ai:1b28708e-a159-4ee1-afa0-06ef7757a600",
+      "monsterId": 0,
+      "row": 0,
+      "col": 11
+    }
+  ]
+}

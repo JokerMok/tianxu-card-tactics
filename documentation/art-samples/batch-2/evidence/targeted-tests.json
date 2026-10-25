@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-25",
+  "boundary": "Node adapters/mock Cocos for lifecycle and resource ownership, separate from actual Creator screenshots/video",
+  "results": {
+    "presentationQueue": "✔ bootstrap and explicit refresh establish a baseline without replaying event history (0.756083ms)\n✔ a newly discovered PVE battle queues AI opening events after its entry baseline (0.861ms)\n✔ move, real attack impact, death completion, and settlement advance visible state in order (0.946333ms)\n✔ duplicate polls are ignored and a newer snapshot appends while the prior queue is active (0.257833ms)\n✔ multi-attack, counterattack, reflection damage, multiple deaths, and summon stay distinct and ordered (0.693834ms)\n✔ events from another connection are queued solely by authoritative sequence (0.129166ms)\n✔ terrain appears before its hit, expiry follows its last hit, and refresh never replays triggers (0.2955ms)\nℹ tests 7\nℹ suites 0\nℹ pass 7\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 103.085666\n",
+    "displayLifecycleHud": "(node:66279) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time\n(Use `node --trace-warnings ...` to show where the warning was created)\n✔ actual death presenter finishes pose then fades art and labels together before release (0.87225ms)\n✔ actual delayed death completion cannot fade or release a replacement with the same unitId (0.28725ms)\n✔ actual HUD render places bounded fixed-font global information above upper unit names (0.413667ms)\nℹ tests 3\nℹ suites 0\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 110.194875\n",
+    "sharedAtlasActualV3Specs": "Sample unit atlas clock/cue/cancel/refcount PASS (mock Cocos runtime; not visual acceptance)\n"
+  }
+}
