@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import { execFile as execFileCallback } from 'node:child_process';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -44,9 +46,16 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
 
   const compiler = resolve(root, 'web-prototype/node_modules/typescript/bin/tsc');
   const outputDir = resolve(scratch, 'compiled');
-  await execFile(process.execPath, [compiler, '--ignoreConfig', '--noCheck', '--target', 'es2022', '--module', 'esnext',
-    '--moduleResolution', 'bundler', '--rewriteRelativeImportExtensions', '--outDir', outputDir,
-    resolve(root, 'cocos-client/assets/scripts/game/SampleUnitAnimation.ts')]);
+  if (existsSync(compiler)) {
+    await execFile(process.execPath, [compiler, '--ignoreConfig', '--noCheck', '--target', 'es2022', '--module', 'esnext',
+      '--moduleResolution', 'bundler', '--rewriteRelativeImportExtensions', '--outDir', outputDir,
+      resolve(root, 'cocos-client/assets/scripts/game/SampleUnitAnimation.ts')]);
+  } else {
+    // Current local Node supports TS transformation; a mock-only test need not install a compiler.
+    await mkdir(outputDir, {recursive:true});
+    await writeFile(resolve(outputDir, 'SampleUnitAnimation.js'), stripTypeScriptTypes(
+      await readFile(resolve(root, 'cocos-client/assets/scripts/game/SampleUnitAnimation.ts'), 'utf8'), {mode:'transform'}));
+  }
   const [{ SampleUnitAnimation }, cc] = await Promise.all([
     import(pathToFileURL(resolve(outputDir, 'SampleUnitAnimation.js')).href),
     import(pathToFileURL(resolve(packageDir, 'index.js')).href),
@@ -152,6 +161,29 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   const settled = await Promise.allSettled(liveLoads);
   assert.ok(settled.every(result => result.status === 'rejected'));
   assert.equal(live[0].getPerformanceStats().atlasPoolEntries, 0);
+  // Exercise the actual three-unit pack, including original cue times and shared pool cleanup.
+  const pack=JSON.parse(await readFile(resolve(root,'cocos-client/assets/resources/art-samples/v3/manifest.json'),'utf8'));
+  assert.deepEqual(Object.keys(pack.units).sort(),['main:monster:1','main:monster:19','main:monster:43']);
+  const instances=[];const frameBase=cc.metrics.framesDestroyed;
+  for(const id of [1,19,43]) {
+    const actual=pack.units['main:monster:'+id];
+    const pair=[new SampleUnitAnimation(host,'mock://batch2',actual),new SampleUnitAnimation(host,'mock://batch2',actual)];
+    const loads=pair.map(x=>x.load());
+    cc.resolveNext(actual.columns*actual.frameSize[0],Math.ceil(actual.frameCount/actual.columns)*actual.frameSize[1]);
+    await Promise.all(loads);instances.push(...pair);
+    let impacts=0;const attack=pair[0].play('atk','west',()=>impacts++);
+    const expected=id===43?.375:.25;assert.equal(attack.cueSeconds,expected);
+    pair[0].update(expected-.001);assert.equal(impacts,0);
+    pair[0].update(.002);assert.equal(impacts,1);
+    pair[0].update(2);await attack.completion;assert.equal(impacts,1);
+    if(id!==1)assert.equal(pair[0].playBlock('west'),null,'do not invent shield blocking');
+  }
+  assert.equal(instances[0].getPerformanceStats().atlasPoolEntries,3);
+  assert.equal(instances[0].getPerformanceStats().atlasPoolLiveReferences,6);
+  assert.equal(instances[0].getPerformanceStats().atlasPoolSpriteFrames,95);
+  for(const animation of instances)animation.destroy();
+  assert.equal(instances[0].getPerformanceStats().atlasPoolEntries,0);
+  assert.equal(cc.metrics.framesDestroyed-frameBase,95);
 } finally {
   await rm(scratch, { recursive: true, force: true });
 }

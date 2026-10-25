@@ -18,7 +18,7 @@ export class ArtSkin {
  static async load(origin:string){
   if(!['ui','unit','background'].some(k=>this.enabled(k as 'ui'|'unit'|'background')))return;
   if(manifest)return;const requested=typeof location==='undefined'?'sample':new URLSearchParams(location.search).get('skin')??'sample';
-  const version=requested==='sample-v1'?'v1':'v2';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
+  const version=requested==='sample-v1'?'v1':requested==='sample-r2'?'v2':'v3';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
   const res=await fetch(base+'manifest.json');if(!res.ok)throw new Error('美术样板清单载入失败，请检查本机资源目录。');
   const value=await res.json();if(![1,2].includes(value.version)||!value.images||!value.units||!value.maps)throw new Error('美术样板清单格式错误。');manifest=value;
   // Prepare all four states before the first real press, rather than loading a pressed image after release.

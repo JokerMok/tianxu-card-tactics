@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-25",
+  "tool": "built-in image_gen; no CLI/API key, asset purchase, web download or private-project upload",
+  "outputs": [
+    {
+      "file": "squire-poses.png",
+      "generatedFile": "exec-dae87e5d-3f39-4e2e-bf51-a97da591d54f.png",
+      "reference": [
+        "recovered/images/df552e565b0be398eee4.png",
+        "art-source/revision-2/guard-painted-sheet.png (paint density/material reference only)"
+      ],
+      "briefSummary": "Magenta-haired young Squire; red/gold cuirass, silver shoulders, red/white skirt, brown boots; dark radial gold-rimmed round shield and sword. Painted proportions/textures guided by R2 Guard without copying Guard silhouette. Six-column five-action sheet: alert idle, alternating steps, anticipated diagonal sword cut/contact/recovery with body and shield participation, wound recoil, knees/side collapse. Fixed right-facing camera; transparent, no text.",
+      "sha256": "02ff31fb9e656d1ce539b57566bc2d2c7e972411c0a42b6f9218330dc8c982b7"
+    },
+    {
+      "file": "lancer-poses.png",
+      "generatedFile": "exec-5a0a040c-718e-4b46-b5ff-30e9584b47b9.png",
+      "reference": [
+        "recovered/images/1beaffff5775c94cc431.png",
+        "art-source/revision-2/guard-painted-sheet.png (paint density/material reference only)"
+      ],
+      "briefSummary": "Blue-armored teal-haired mounted Lancer, chestnut horse, black mane/tail, blue harness/barding, red saddle cloth, long brown/gold lance and silver tip; no shield. Coordinated horse/rider rather than enlarged infantry. Six-column five-action sheet: guarded idle, articulated diagonal trot, lower/contact/recover lance with stable saddle, wound recoil, horse knees/side fall with rider. Painted R2 material density; fixed right-facing camera, transparent, no text.",
+      "sha256": "69c420339101e436fb22718f182c8c6b52192d13828e0c9eb20cacd38e4e4373"
+    }
+  ],
+  "processing": "prepare-batch-2.py extracts actual painted poses using alpha and fixed sheet cell/ground registration, one scale per unit; compiles atlas and SHA256 runtime names. Squire final two prone cells touch: split original connected pixels at source x1147, no synthetic pose. Originals retained. No card image replacement.",
+  "scope": "Only main:monster:19 and main:monster:43. v3 references unchanged v2 map/UI/Guard images; other quality variants remain original.",
+  "directionBoundary": "Right-facing painted view, entire actor mirrored around constant foot pivot for west; mirrored mount offset. No independently painted rear view or dynamic body-part attachment. Lance/attack remains enemy-facing; anatomical shield/sword screen side swaps for Squire as for R2 Guard.",
+  "approval": "R2 direction accepted as production basis for these two candidates only. New Squire/Lancer visual quality still awaits user review; not whole-game originality or all-device acceptance."
+}

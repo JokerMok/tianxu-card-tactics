@@ -7,6 +7,7 @@ import {randomUUID,randomBytes} from 'node:crypto';
 import {writeFileSync,mkdirSync} from 'node:fs';
 import path from 'node:path';
 const death=process.argv.includes('--death');
+const batchTwo=process.argv.includes('--batch-two');
 const emptyHand=process.argv.includes('--empty-hand');
 const root=path.resolve(import.meta.dirname,'../..');
 const folder=path.join(root,'.local/art-samples');mkdirSync(folder,{recursive:true});
@@ -23,7 +24,11 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  const playerSpec=service.playerSpec(world,actor,0);
  const deck=emptyHand?[]:playerSpec.deck;
  const players=[{...playerSpec,deck},{id:enemy,name:'隔离动作对照',team:1,hp:8,attack:1,ai:true,profession:1,deck:[...deck]}];
- const initialUnits=death?[
+ const initialUnits=batchTwo?[
+ {monsterId:19,playerId:actorId,row:0,col:3},{monsterId:43,playerId:enemy,row:0,col:5},
+ {monsterId:43,playerId:actorId,row:1,col:4},{monsterId:61,playerId:enemy,row:1,col:6},
+ {monsterId:1,playerId:actorId,row:2,col:3},{monsterId:12,playerId:enemy,row:2,col:5},
+ {monsterId:12,playerId:actorId,row:3,col:4},{monsterId:19,playerId:enemy,row:3,col:5}]:death?[
  {monsterId:1,playerId:actorId,row:0,col:5},{monsterId:12,playerId:enemy,row:0,col:6},
  {monsterId:12,playerId:actorId,row:1,col:4},{monsterId:1,playerId:enemy,row:1,col:5},
  {monsterId:1,playerId:actorId,row:2,col:2},{monsterId:12,playerId:enemy,row:2,col:6},
@@ -37,6 +42,6 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  return {message:'Local animation fixture only'};
 });
 writeFileSync(path.join(folder,'fixture-login.json'),JSON.stringify({username,password,characterId:actorId}),{mode:0o600});
-writeFileSync(path.join(folder,death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:8,initialHeroUnits:2,source:'createBattle using original monster 1/12/19/43 configuration. Only starting positions are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
+writeFileSync(path.join(folder,batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:8,initialHeroUnits:2,source:'createBattle using original monster 1/12/19/43/61 configuration. Only starting positions are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
 console.log('Created isolated 10-unit authoritative animation fixture. Private login stored locally.');
 } finally{store.close();}

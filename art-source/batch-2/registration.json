@@ -1,0 +1,1340 @@
+{
+  "squire": {
+    "sha256": "10c34cd8249acc5bcbfc34e03548e040b7e3a7e0660e12c38be8b40cb5e89f00",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "method": "Connected pose extraction with fixed source-column and ground registration; common scale per unit, never bbox recentering. Squire final two source poses split at x1147 after alpha contact.",
+    "spec": {
+      "atlas": "squire-10c34cd8249a.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "mount": [
+        128,
+        178
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "frames": [
+      {
+        "status": "stand",
+        "index": 0,
+        "sourceBounds": [
+          36,
+          27,
+          200,
+          231
+        ],
+        "sourceAnchor": [
+          120,
+          230
+        ],
+        "runtimeBounds": [
+          78,
+          98,
+          176,
+          220
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 1,
+        "sourceBounds": [
+          267,
+          28,
+          429,
+          231
+        ],
+        "sourceAnchor": [
+          350,
+          230
+        ],
+        "runtimeBounds": [
+          78,
+          99,
+          175,
+          221
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 2,
+        "sourceBounds": [
+          498,
+          24,
+          660,
+          232
+        ],
+        "sourceAnchor": [
+          579,
+          230
+        ],
+        "runtimeBounds": [
+          79,
+          96,
+          176,
+          221
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 3,
+        "sourceBounds": [
+          726,
+          26,
+          887,
+          231
+        ],
+        "sourceAnchor": [
+          807,
+          230
+        ],
+        "runtimeBounds": [
+          79,
+          98,
+          176,
+          221
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 4,
+        "sourceBounds": [
+          955,
+          24,
+          1127,
+          232
+        ],
+        "sourceAnchor": [
+          1037,
+          230
+        ],
+        "runtimeBounds": [
+          79,
+          96,
+          182,
+          221
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 5,
+        "sourceBounds": [
+          1182,
+          29,
+          1347,
+          232
+        ],
+        "sourceAnchor": [
+          1267,
+          230
+        ],
+        "runtimeBounds": [
+          77,
+          99,
+          176,
+          221
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 6,
+        "sourceBounds": [
+          36,
+          257,
+          214,
+          467
+        ],
+        "sourceAnchor": [
+          120,
+          468
+        ],
+        "runtimeBounds": [
+          78,
+          93,
+          185,
+          219
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 7,
+        "sourceBounds": [
+          280,
+          260,
+          449,
+          468
+        ],
+        "sourceAnchor": [
+          350,
+          468
+        ],
+        "runtimeBounds": [
+          86,
+          95,
+          187,
+          220
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 8,
+        "sourceBounds": [
+          499,
+          262,
+          673,
+          469
+        ],
+        "sourceAnchor": [
+          579,
+          468
+        ],
+        "runtimeBounds": [
+          80,
+          96,
+          184,
+          220
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 9,
+        "sourceBounds": [
+          740,
+          259,
+          907,
+          467
+        ],
+        "sourceAnchor": [
+          807,
+          468
+        ],
+        "runtimeBounds": [
+          88,
+          95,
+          188,
+          220
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 10,
+        "sourceBounds": [
+          962,
+          263,
+          1142,
+          468
+        ],
+        "sourceAnchor": [
+          1037,
+          468
+        ],
+        "runtimeBounds": [
+          83,
+          97,
+          191,
+          220
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 11,
+        "sourceBounds": [
+          1188,
+          264,
+          1360,
+          470
+        ],
+        "sourceAnchor": [
+          1267,
+          468
+        ],
+        "runtimeBounds": [
+          81,
+          98,
+          184,
+          222
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 12,
+        "sourceBounds": [
+          29,
+          503,
+          226,
+          709
+        ],
+        "sourceAnchor": [
+          120,
+          708
+        ],
+        "runtimeBounds": [
+          73,
+          97,
+          191,
+          221
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 13,
+        "sourceBounds": [
+          262,
+          479,
+          460,
+          708
+        ],
+        "sourceAnchor": [
+          350,
+          708
+        ],
+        "runtimeBounds": [
+          75,
+          83,
+          194,
+          220
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 14,
+        "sourceBounds": [
+          476,
+          471,
+          671,
+          707
+        ],
+        "sourceAnchor": [
+          579,
+          708
+        ],
+        "runtimeBounds": [
+          66,
+          78,
+          183,
+          220
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 15,
+        "sourceBounds": [
+          690,
+          525,
+          1001,
+          710
+        ],
+        "sourceAnchor": [
+          807,
+          708
+        ],
+        "runtimeBounds": [
+          58,
+          110,
+          245,
+          221
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 16,
+        "sourceBounds": [
+          936,
+          521,
+          1152,
+          710
+        ],
+        "sourceAnchor": [
+          1037,
+          708
+        ],
+        "runtimeBounds": [
+          67,
+          108,
+          197,
+          221
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 17,
+        "sourceBounds": [
+          1186,
+          502,
+          1353,
+          711
+        ],
+        "sourceAnchor": [
+          1267,
+          708
+        ],
+        "runtimeBounds": [
+          79,
+          96,
+          179,
+          221
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 18,
+        "sourceBounds": [
+          43,
+          733,
+          201,
+          946
+        ],
+        "sourceAnchor": [
+          120,
+          944
+        ],
+        "runtimeBounds": [
+          82,
+          93,
+          177,
+          221
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 19,
+        "sourceBounds": [
+          290,
+          742,
+          442,
+          944
+        ],
+        "sourceAnchor": [
+          350,
+          944
+        ],
+        "runtimeBounds": [
+          92,
+          99,
+          183,
+          220
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 20,
+        "sourceBounds": [
+          532,
+          739,
+          681,
+          944
+        ],
+        "sourceAnchor": [
+          579,
+          944
+        ],
+        "runtimeBounds": [
+          100,
+          97,
+          189,
+          220
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 21,
+        "sourceBounds": [
+          756,
+          745,
+          905,
+          944
+        ],
+        "sourceAnchor": [
+          807,
+          944
+        ],
+        "runtimeBounds": [
+          97,
+          101,
+          186,
+          220
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 22,
+        "sourceBounds": [
+          962,
+          743,
+          1124,
+          948
+        ],
+        "sourceAnchor": [
+          1037,
+          944
+        ],
+        "runtimeBounds": [
+          83,
+          99,
+          180,
+          222
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 23,
+        "sourceBounds": [
+          1192,
+          733,
+          1345,
+          948
+        ],
+        "sourceAnchor": [
+          1267,
+          944
+        ],
+        "runtimeBounds": [
+          83,
+          93,
+          175,
+          222
+        ]
+      },
+      {
+        "status": "die",
+        "index": 24,
+        "sourceBounds": [
+          30,
+          959,
+          207,
+          1122
+        ],
+        "sourceAnchor": [
+          120,
+          1124
+        ],
+        "runtimeBounds": [
+          74,
+          121,
+          180,
+          219
+        ]
+      },
+      {
+        "status": "die",
+        "index": 25,
+        "sourceBounds": [
+          269,
+          966,
+          471,
+          1121
+        ],
+        "sourceAnchor": [
+          350,
+          1124
+        ],
+        "runtimeBounds": [
+          79,
+          125,
+          200,
+          218
+        ]
+      },
+      {
+        "status": "die",
+        "index": 26,
+        "sourceBounds": [
+          496,
+          982,
+          700,
+          1130
+        ],
+        "sourceAnchor": [
+          579,
+          1124
+        ],
+        "runtimeBounds": [
+          78,
+          135,
+          200,
+          224
+        ]
+      },
+      {
+        "status": "die",
+        "index": 27,
+        "sourceBounds": [
+          710,
+          1010,
+          915,
+          1120
+        ],
+        "sourceAnchor": [
+          807,
+          1124
+        ],
+        "runtimeBounds": [
+          70,
+          152,
+          193,
+          218
+        ]
+      },
+      {
+        "status": "die",
+        "index": 28,
+        "sourceBounds": [
+          929,
+          1031,
+          1149,
+          1126
+        ],
+        "sourceAnchor": [
+          1037,
+          1124
+        ],
+        "runtimeBounds": [
+          63,
+          164,
+          195,
+          221
+        ]
+      },
+      {
+        "status": "die",
+        "index": 29,
+        "sourceBounds": [
+          1145,
+          1044,
+          1361,
+          1122
+        ],
+        "sourceAnchor": [
+          1267,
+          1124
+        ],
+        "runtimeBounds": [
+          55,
+          172,
+          185,
+          219
+        ]
+      }
+    ]
+  },
+  "lancer": {
+    "sha256": "535e44dd3d9a8179eb6f941eb1f7f15d83f7a0ec2f833230595091cf81b3ced5",
+    "sourceSize": [
+      1374,
+      1145
+    ],
+    "method": "Connected pose extraction with fixed source-column and ground registration; common scale per unit, never bbox recentering. Squire final two source poses split at x1147 after alpha contact.",
+    "spec": {
+      "atlas": "lancer-535e44dd3d9a.png",
+      "frameSize": [
+        320,
+        320
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        200,
+        200
+      ],
+      "foot": [
+        160,
+        280
+      ],
+      "mount": [
+        165,
+        196
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 68,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "frames": [
+      {
+        "status": "stand",
+        "index": 0,
+        "sourceBounds": [
+          27,
+          2,
+          217,
+          253
+        ],
+        "sourceAnchor": [
+          113,
+          252
+        ],
+        "runtimeBounds": [
+          98,
+          100,
+          235,
+          281
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 1,
+        "sourceBounds": [
+          243,
+          7,
+          444,
+          254
+        ],
+        "sourceAnchor": [
+          338,
+          252
+        ],
+        "runtimeBounds": [
+          92,
+          104,
+          237,
+          282
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 2,
+        "sourceBounds": [
+          470,
+          2,
+          668,
+          254
+        ],
+        "sourceAnchor": [
+          565,
+          252
+        ],
+        "runtimeBounds": [
+          92,
+          100,
+          235,
+          281
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 3,
+        "sourceBounds": [
+          690,
+          20,
+          893,
+          254
+        ],
+        "sourceAnchor": [
+          786,
+          252
+        ],
+        "runtimeBounds": [
+          91,
+          113,
+          237,
+          281
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 4,
+        "sourceBounds": [
+          923,
+          5,
+          1118,
+          254
+        ],
+        "sourceAnchor": [
+          1015,
+          252
+        ],
+        "runtimeBounds": [
+          94,
+          102,
+          234,
+          281
+        ]
+      },
+      {
+        "status": "stand",
+        "index": 5,
+        "sourceBounds": [
+          1147,
+          4,
+          1355,
+          253
+        ],
+        "sourceAnchor": [
+          1248,
+          252
+        ],
+        "runtimeBounds": [
+          87,
+          101,
+          237,
+          280
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 6,
+        "sourceBounds": [
+          10,
+          253,
+          222,
+          480
+        ],
+        "sourceAnchor": [
+          113,
+          478
+        ],
+        "runtimeBounds": [
+          86,
+          118,
+          239,
+          281
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 7,
+        "sourceBounds": [
+          228,
+          257,
+          457,
+          477
+        ],
+        "sourceAnchor": [
+          338,
+          478
+        ],
+        "runtimeBounds": [
+          81,
+          121,
+          246,
+          279
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 8,
+        "sourceBounds": [
+          465,
+          264,
+          690,
+          476
+        ],
+        "sourceAnchor": [
+          565,
+          478
+        ],
+        "runtimeBounds": [
+          88,
+          126,
+          250,
+          279
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 9,
+        "sourceBounds": [
+          699,
+          260,
+          924,
+          478
+        ],
+        "sourceAnchor": [
+          786,
+          478
+        ],
+        "runtimeBounds": [
+          97,
+          123,
+          259,
+          280
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 10,
+        "sourceBounds": [
+          924,
+          268,
+          1146,
+          480
+        ],
+        "sourceAnchor": [
+          1015,
+          478
+        ],
+        "runtimeBounds": [
+          94,
+          129,
+          254,
+          282
+        ]
+      },
+      {
+        "status": "walk",
+        "index": 11,
+        "sourceBounds": [
+          1149,
+          268,
+          1368,
+          482
+        ],
+        "sourceAnchor": [
+          1248,
+          478
+        ],
+        "runtimeBounds": [
+          89,
+          129,
+          247,
+          283
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 12,
+        "sourceBounds": [
+          13,
+          491,
+          217,
+          714
+        ],
+        "sourceAnchor": [
+          113,
+          712
+        ],
+        "runtimeBounds": [
+          88,
+          121,
+          235,
+          282
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 13,
+        "sourceBounds": [
+          224,
+          496,
+          450,
+          713
+        ],
+        "sourceAnchor": [
+          338,
+          712
+        ],
+        "runtimeBounds": [
+          78,
+          124,
+          241,
+          280
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 14,
+        "sourceBounds": [
+          461,
+          515,
+          778,
+          710
+        ],
+        "sourceAnchor": [
+          565,
+          712
+        ],
+        "runtimeBounds": [
+          85,
+          138,
+          313,
+          278
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 15,
+        "sourceBounds": [
+          687,
+          539,
+          986,
+          714
+        ],
+        "sourceAnchor": [
+          786,
+          712
+        ],
+        "runtimeBounds": [
+          89,
+          155,
+          304,
+          281
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 16,
+        "sourceBounds": [
+          919,
+          511,
+          1168,
+          714
+        ],
+        "sourceAnchor": [
+          1015,
+          712
+        ],
+        "runtimeBounds": [
+          91,
+          135,
+          270,
+          281
+        ]
+      },
+      {
+        "status": "atk",
+        "index": 17,
+        "sourceBounds": [
+          1162,
+          499,
+          1365,
+          714
+        ],
+        "sourceAnchor": [
+          1248,
+          712
+        ],
+        "runtimeBounds": [
+          98,
+          127,
+          244,
+          282
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 18,
+        "sourceBounds": [
+          11,
+          725,
+          211,
+          942
+        ],
+        "sourceAnchor": [
+          113,
+          944
+        ],
+        "runtimeBounds": [
+          87,
+          122,
+          231,
+          278
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 19,
+        "sourceBounds": [
+          229,
+          726,
+          435,
+          946
+        ],
+        "sourceAnchor": [
+          338,
+          944
+        ],
+        "runtimeBounds": [
+          82,
+          123,
+          230,
+          281
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 20,
+        "sourceBounds": [
+          466,
+          726,
+          673,
+          944
+        ],
+        "sourceAnchor": [
+          565,
+          944
+        ],
+        "runtimeBounds": [
+          89,
+          123,
+          238,
+          280
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 21,
+        "sourceBounds": [
+          688,
+          771,
+          909,
+          947
+        ],
+        "sourceAnchor": [
+          786,
+          944
+        ],
+        "runtimeBounds": [
+          89,
+          155,
+          248,
+          282
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 22,
+        "sourceBounds": [
+          936,
+          737,
+          1147,
+          942
+        ],
+        "sourceAnchor": [
+          1015,
+          944
+        ],
+        "runtimeBounds": [
+          103,
+          131,
+          255,
+          279
+        ]
+      },
+      {
+        "status": "hit",
+        "index": 23,
+        "sourceBounds": [
+          1166,
+          741,
+          1365,
+          944
+        ],
+        "sourceAnchor": [
+          1248,
+          944
+        ],
+        "runtimeBounds": [
+          101,
+          134,
+          244,
+          280
+        ]
+      },
+      {
+        "status": "die",
+        "index": 24,
+        "sourceBounds": [
+          14,
+          938,
+          209,
+          1119
+        ],
+        "sourceAnchor": [
+          113,
+          1125
+        ],
+        "runtimeBounds": [
+          89,
+          145,
+          229,
+          275
+        ]
+      },
+      {
+        "status": "die",
+        "index": 25,
+        "sourceBounds": [
+          232,
+          997,
+          447,
+          1123
+        ],
+        "sourceAnchor": [
+          338,
+          1125
+        ],
+        "runtimeBounds": [
+          84,
+          188,
+          239,
+          279
+        ]
+      },
+      {
+        "status": "die",
+        "index": 26,
+        "sourceBounds": [
+          468,
+          1005,
+          708,
+          1127
+        ],
+        "sourceAnchor": [
+          565,
+          1125
+        ],
+        "runtimeBounds": [
+          90,
+          194,
+          263,
+          282
+        ]
+      },
+      {
+        "status": "die",
+        "index": 27,
+        "sourceBounds": [
+          701,
+          1014,
+          915,
+          1125
+        ],
+        "sourceAnchor": [
+          786,
+          1125
+        ],
+        "runtimeBounds": [
+          99,
+          200,
+          253,
+          280
+        ]
+      },
+      {
+        "status": "die",
+        "index": 28,
+        "sourceBounds": [
+          921,
+          1019,
+          1157,
+          1128
+        ],
+        "sourceAnchor": [
+          1015,
+          1125
+        ],
+        "runtimeBounds": [
+          92,
+          204,
+          262,
+          282
+        ]
+      },
+      {
+        "status": "die",
+        "index": 29,
+        "sourceBounds": [
+          1156,
+          1031,
+          1363,
+          1129
+        ],
+        "sourceAnchor": [
+          1248,
+          1125
+        ],
+        "runtimeBounds": [
+          94,
+          212,
+          243,
+          283
+        ]
+      }
+    ]
+  }
+}

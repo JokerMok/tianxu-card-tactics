@@ -15,6 +15,15 @@ interface Display { node: Node; animation: RecoveredAnimation; ready: Promise<vo
 interface Hooks { command(action: BattleAction): void; hide(): void; dismiss(): void; sound(skill: number): void;
   log(text: string): void; notice(text: string): void }
 
+const BATTLE_TOP_HUD_Y = 292;
+const BATTLE_TOP_HUD_HEIGHT = 16;
+const BATTLE_TOP_HUD_FONT_SIZE = 12;
+
+function fixedHudText(value: string, maxCharacters: number): string {
+  const characters = Array.from(value.trim());
+  return characters.length <= maxCharacters ? characters.join('') : characters.slice(0, maxCharacters).join('') + '…';
+}
+
 /** Server snapshots never directly move, hurt or remove a live presentation entity. */
 export class BattleSceneView {
   readonly presentation = new BattlePresentation();
@@ -103,7 +112,7 @@ export class BattleSceneView {
               ? metrics.nameOffsetY : (metrics?.anchorY ?? 70) + 1;
             // CreatureItem.updateNamePos uses raw anchor + 10. Keep the first
             // row text inside the viewport when the local battle places a hero there.
-            instance.name.node.setPosition(0, Math.min(nameOffsetY, 279 - instance.node.position.y), 0);
+            instance.name.node.setPosition(0, Math.min(nameOffsetY, 273 - instance.node.position.y), 0);
           }
         }).catch(error => this.hooks.notice(String(error)));
       }
@@ -149,7 +158,7 @@ export class BattleSceneView {
       }
     }
   }
-  private release(id: string) { const display = this.displays.get(id); if (!display) return;
+  private release(id: string, expected?: Display) { const display = this.displays.get(id); if (!display || (expected && display !== expected)) return;
     display.animation.destroy(); display.node.destroy(); this.displays.delete(id); }
   private advance() {
     if (this.processing || this.disposed) return;
@@ -230,19 +239,26 @@ export class BattleSceneView {
         }
       } else cue();
     } else if (step.kind === 'death' && display) {
-      display.dying = true; display.generation++; display.hp.string = '0';
+      display.dying = true; const generation = ++display.generation; display.hp.string = '0';
       // Keep the last recovered pose for the AS3 AlphaEffect fallback, never substitute stand as death.
       const pose = instantiate(display.animation.node); display.node.addChild(pose);
       const handle = display.animation.play('die', this.direction(display));
       if (handle.hasNativeState) pose.destroy();
-      const opacity = (handle.hasNativeState ? display.animation.node : pose).addComponent(UIOpacity);
-      // A native death clip remains visible through its final pose; the legacy alpha fallback starts immediately.
-      const fade = (handle.hasNativeState ? handle.completion : Promise.resolve()).then(() =>
-        new Promise<void>(resolve => tween(opacity).to(.6 / this.speed, { opacity: 0 }).call(() => resolve()).start()));
+      // Fade the stable unit display, not only its recovered pose. Stats, name,
+      // transient feedback and art therefore share one visual lifetime.
+      const opacity = display.node.getComponent(UIOpacity) ?? display.node.addComponent(UIOpacity);
+      // A native death clip remains fully visible through its final pose; the
+      // legacy alpha fallback starts immediately from its cloned last pose.
+      const fade = (handle.hasNativeState ? handle.completion : Promise.resolve()).then(() => {
+        if (this.disposed || !display.node.isValid || display.generation !== generation
+            || (step.actorId && this.displays.get(step.actorId) !== display)) return;
+        tween(opacity).to(.6 / this.speed, { opacity: 0 }).start();
+        return this.wait(.6);
+      });
       // CreatureDieState runs its recovered AlphaEffect and keeps the dying
       // creature registered for its full two-second lifetime before destroy.
       await Promise.all([fade, handle.completion, this.wait(2)]);
-      if (step.actorId) this.release(step.actorId);
+      if (step.actorId && display.generation === generation) this.release(step.actorId, display);
     } else if (step.kind === 'summon') {
       const summonedEvent = step.events.find(event => event.type === 'summon');
       const spawned = step.after.target ?? summonedEvent?.targetView;
@@ -356,8 +372,13 @@ export class BattleSceneView {
     if (!force && this.uiKey === key) return; this.uiKey = key;
     this.hud?.destroy(); this.hud = this.ui.node(this.parent, 'BattleWnd:original-layout', 1200, 600);
     const hud = this.hud; const active = state.players[state.activePlayer];
-    this.ui.label(hud, 'Round', `${state.turn}`, -20, 269.5, 100, 35, 35);
-    this.ui.label(hud, 'TurnName', this.locked ? '战斗进行中' : (active?.ai?sourceDisplayName(this.catalog,active.name):active?.name??'') + '行动', 0, 224, 350, 24, 14);
+    const activeName = active ? (active.ai ? sourceDisplayName(this.catalog, active.name) : active.name) : '';
+    const round = this.ui.label(hud, 'Round', `第${state.turn}回合`, -78, BATTLE_TOP_HUD_Y, 76,
+      BATTLE_TOP_HUD_HEIGHT, BATTLE_TOP_HUD_FONT_SIZE, Theme.gold);
+    round.overflow = Label.Overflow.CLAMP; round.enableWrapText = false; round.lineHeight = 14;
+    const turnName = this.ui.label(hud, 'TurnName', fixedHudText(activeName || '等待行动', 10) + (activeName ? '行动' : ''), 45,
+      BATTLE_TOP_HUD_Y, 156, BATTLE_TOP_HUD_HEIGHT, BATTLE_TOP_HUD_FONT_SIZE);
+    turnName.overflow = Label.Overflow.CLAMP; turnName.enableWrapText = false; turnName.lineHeight = 14;
     this.skinButton(hud, 'Battle:Menu', 'ajbangzhu', '', '设置', 551, 274, 75, 27, () => this.hooks.hide());
     this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${({move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','terrain-add':'地形生效','terrain-update':'地形变化','terrain-remove':'地形结束','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.amount ?? ''}`).join('\n')));
     // BattleWnd rightContent is aligned EAST, not a full-width replacement panel.

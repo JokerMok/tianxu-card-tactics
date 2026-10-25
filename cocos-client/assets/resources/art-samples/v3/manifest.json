@@ -1,0 +1,522 @@
+{
+  "version": 2,
+  "id": "steelwood-batch-2-20261025",
+  "images": {
+    "forest-map-1": {
+      "file": "../v2/forest-map-1-f28d50c907f0.jpg",
+      "size": [
+        1600,
+        800
+      ]
+    },
+    "panel": {
+      "file": "../v2/panel-2eacf473ca05.png",
+      "size": [
+        384,
+        288
+      ],
+      "insets": [
+        26,
+        26,
+        24,
+        24
+      ]
+    },
+    "card-frame": {
+      "file": "../v2/quality-frame-0-5f3cb01cf5cc.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-0": {
+      "file": "../v2/quality-frame-0-5f3cb01cf5cc.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-1": {
+      "file": "../v2/quality-frame-1-c23b53ca7072.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-2": {
+      "file": "../v2/quality-frame-2-943df56c10a9.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-3": {
+      "file": "../v2/quality-frame-3-be3ff2a7cdc2.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-4": {
+      "file": "../v2/quality-frame-4-36715f65daa0.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-5": {
+      "file": "../v2/quality-frame-5-05771767fb67.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "button-normal": {
+      "file": "../v2/button-secondary-normal-a4b8c8436eee.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-selected": {
+      "file": "../v2/button-secondary-selected-3b255083fe7f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-pressed": {
+      "file": "../v2/button-secondary-pressed-3a15124090c6.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-disabled": {
+      "file": "../v2/button-secondary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-normal": {
+      "file": "../v2/button-primary-normal-09f651df4458.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-selected": {
+      "file": "../v2/button-primary-selected-83e2dde0886f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-pressed": {
+      "file": "../v2/button-primary-pressed-f940dab50c82.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-disabled": {
+      "file": "../v2/button-primary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-normal": {
+      "file": "../v2/button-secondary-normal-a4b8c8436eee.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-selected": {
+      "file": "../v2/button-secondary-selected-3b255083fe7f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-pressed": {
+      "file": "../v2/button-secondary-pressed-3a15124090c6.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-disabled": {
+      "file": "../v2/button-secondary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-normal": {
+      "file": "../v2/button-compact-normal-6aacda81f743.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-selected": {
+      "file": "../v2/button-compact-selected-4d7fe224f303.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-pressed": {
+      "file": "../v2/button-compact-pressed-ab5584ff24be.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-disabled": {
+      "file": "../v2/button-compact-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "hud-draw": {
+      "file": "../v2/hud-draw-b9c13d8aa004.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "hud-hand": {
+      "file": "../v2/hud-hand-276f28405742.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "hud-graveyard": {
+      "file": "../v2/hud-graveyard-b75fe1d66f7d.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "control-plus": {
+      "file": "../v2/control-plus-78492f22ff4d.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "control-minus": {
+      "file": "../v2/control-minus-6a7da52d2205.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "control-locked": {
+      "file": "../v2/control-locked-62ab65165d9f.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "quality-frame-6": {
+      "file": "../v2/quality-frame-6-904a8018cffa.png",
+      "size": [
+        256,
+        352
+      ]
+    }
+  },
+  "maps": {
+    "main:map:1": "forest-map-1"
+  },
+  "units": {
+    "main:monster:1": {
+      "atlas": "../v2/guard-atlas-66fe5e2e27dd.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "columns": 6,
+      "frameCount": 35,
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "mount": [
+        128,
+        178
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 8,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 14,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 20,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 26,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "reactions": {
+        "block": {
+          "start": 32,
+          "count": 3,
+          "fps": 15,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:19": {
+      "atlas": "squire-10c34cd8249a.png",
+      "frameSize": [
+        256,
+        256
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        170,
+        170
+      ],
+      "foot": [
+        128,
+        220
+      ],
+      "mount": [
+        128,
+        178
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:43": {
+      "atlas": "lancer-535e44dd3d9a.png",
+      "frameSize": [
+        320,
+        320
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        200,
+        200
+      ],
+      "foot": [
+        160,
+        280
+      ],
+      "mount": [
+        165,
+        196
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 68,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    }
+  }
+}
