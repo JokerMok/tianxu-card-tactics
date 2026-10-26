@@ -1,0 +1,171 @@
+{
+  "id": "steelwood-chapter1-production-20261026",
+  "sourceDir": "art-source/chapter1-production",
+  "outputDir": "cocos-client/assets/resources/art-samples/v5",
+  "baseManifest": "cocos-client/assets/resources/art-samples/v4/manifest.json",
+  "existingModels": [
+    {
+      "modelId": "model:37d68956aa077843b62b",
+      "monsterId": 1
+    },
+    {
+      "modelId": "model:e1eec96444fbab197d3f",
+      "monsterId": 19
+    },
+    {
+      "modelId": "model:b0e55c408ff64a7afef5",
+      "monsterId": 43
+    },
+    {
+      "modelId": "model:084ab6a537029e5baa0a",
+      "monsterId": 61
+    },
+    {
+      "modelId": "model:00fc2a2e0efd186fb8fa",
+      "monsterId": 5019
+    },
+    {
+      "modelId": "model:8b1c69f6618c1d1f3f5f",
+      "monsterId": 3001
+    },
+    {
+      "modelId": "model:8d96ae7e7cc6096e8d46",
+      "monsterId": 3019
+    },
+    {
+      "modelId": "model:e20d7e5947f126a1af02",
+      "monsterId": 60003
+    },
+    {
+      "modelId": "model:d9297fe5cbede4982581",
+      "monsterId": 4001
+    }
+  ],
+  "models": [
+    {
+      "key": "captain",
+      "modelId": "model:30945d8c76c9d4a31508",
+      "monsterId": 60007,
+      "source": "captain-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 190,
+      "bodyHeight": 120,
+      "nameOffsetY": 78,
+      "profile": "ground"
+    },
+    {
+      "key": "sentinel",
+      "modelId": "model:26b078148d1f7af2f252",
+      "monsterId": 8,
+      "source": "sentinel-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 100,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    },
+    {
+      "key": "champion",
+      "modelId": "model:50631ca22c8b0f5b8c65",
+      "monsterId": 75,
+      "source": "champion-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 200,
+      "bodyHeight": 125,
+      "nameOffsetY": 68,
+      "profile": "mounted"
+    },
+    {
+      "key": "elfin",
+      "modelId": "model:0df57cc09535e694bf3f",
+      "monsterId": 9017,
+      "source": "elfin-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 120,
+      "bodyHeight": 65,
+      "nameOffsetY": 56,
+      "profile": "wisp",
+      "minPartPixels": 100,
+      "minBodyPixels": 900
+    },
+    {
+      "key": "lich",
+      "modelId": "model:b6ed3d6b0e27049555a8",
+      "monsterId": 1253,
+      "source": "lich-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 110,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    },
+    {
+      "key": "skeleton",
+      "modelId": "model:0d666e654103978eeeea",
+      "monsterId": 1127,
+      "source": "skeleton-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 100,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    },
+    {
+      "key": "angel",
+      "modelId": "model:ef2eef79f0c1b1d050ad",
+      "monsterId": 21253,
+      "source": "angel-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 125,
+      "nameOffsetY": 56,
+      "profile": "flying"
+    },
+    {
+      "key": "bully",
+      "modelId": "model:f3da6c4354da1f7d6173",
+      "monsterId": 9000,
+      "source": "bully-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 85,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    },
+    {
+      "key": "ice-archer",
+      "modelId": "model:1d70c415b27c5a6b316a",
+      "monsterId": 21325,
+      "source": "ice-archer-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 110,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    },
+    {
+      "key": "flame",
+      "modelId": "model:876528e0f89a84e7fd6b",
+      "monsterId": 21319,
+      "source": "flame-poses.png",
+      "cueSeconds": 0.375,
+      "displayHeight": 170,
+      "bodyHeight": 100,
+      "nameOffsetY": 56,
+      "profile": "ground"
+    }
+  ],
+  "retouches": [
+    {
+      "monsterId": 60003,
+      "key": "ogre-destroyer",
+      "atlas": "ogre-destroyer-material-atlas.png"
+    },
+    {
+      "monsterId": 60005,
+      "key": "ogre-marauder",
+      "atlas": "ogre-marauder-material-atlas.png"
+    }
+  ],
+  "format": "webp-lossless"
+}

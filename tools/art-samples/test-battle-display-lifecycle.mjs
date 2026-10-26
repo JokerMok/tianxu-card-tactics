@@ -11,6 +11,7 @@ class FakeNode{
  addChild(n){n.parent=this;this.children.push(n)}
  getComponent(T){return this.components.get(T)}
  addComponent(T){const c=new T();this.components.set(T,c);return c}
+ on(name,fn){this.handlers??=new Map();this.handlers.set(name,fn)}
  destroy(){this.isValid=false;for(const c of this.children)c.destroy()}
  get visibleAlpha(){return(this.getComponent(UIOpacity)?.opacity??255)/255*(this.parent?.visibleAlpha??1)}
 }
@@ -18,7 +19,7 @@ const tweens=[];
 function tween(target){let seconds=0,values;return{to(n,v){seconds=n;values=v;return this},start(){tweens.push({target,seconds,values})}}}
 const Label={Overflow:{CLAMP:1}};
 const transpiled=stripTypeScriptTypes(source.replace(/^import .*;\s*$/gm,''),{mode:'transform'}).replace('export class BattleSceneView','class BattleSceneView')+'\nreturn {BattleSceneView,unitNameLane};';
-const exports=new Function('instantiate','tween','UIOpacity','Label','ArtSkin','Theme','Color',transpiled)(()=>new FakeNode(),tween,UIOpacity,Label,{image:()=>undefined,url:()=>undefined},{gold:'gold',text:'white'},class Color{});
+const exports=new Function('instantiate','tween','UIOpacity','Label','ArtSkin','Theme','Color','Node','effectDisplay',transpiled)(()=>new FakeNode(),tween,UIOpacity,Label,{image:()=>undefined,url:()=>undefined},{gold:'gold',text:'white'},class Color{},{EventType:{TOUCH_END:'end'}},(_,id)=>({name:'状态'+id}));
 const {BattleSceneView,unitNameLane}=exports;
 const flush=async()=>{for(let i=0;i<5;i++)await Promise.resolve()};
 function actor(){const node=new FakeNode();const art=new FakeNode(node),name=new FakeNode(node),hpNode=new FakeNode(node);let finish;let destroyed=false;const completion=new Promise(r=>finish=r);return{node,generation:0,dying:false,ready:Promise.resolve(),hp:{node:hpNode,string:'3'},name:{node:name},animation:{node:art,play(){return{hasNativeState:true,completion}},destroy(){destroyed=true}},finish,get destroyed(){return destroyed}}}
@@ -62,4 +63,17 @@ test('actual HUD render places bounded fixed-font global information above upper
  const labels=[];const v=Object.create(BattleSceneView.prototype);const state={revision:1,turn:123,players:[{id:'me',name:'这是一个需要明确截断的超长角色名称ABC',ai:false,hand:[],drawPile:[],graveyard:[]}],activePlayer:0,terrains:[],events:[]};
  Object.assign(v,{presentation:{visibleState:state,locked:false,settledReady:false},disposed:false,processing:false,me:'me',parent:new FakeNode(),original:{catalog:{skins:{}}},latest:{settled:false,legalPlays:[]},selectedHandPositions:new Map(),skinButton(){},ui:{node:()=>new FakeNode(),panel(){},label(parent,name,text,x,y,w,h,size){const l={name,string:text,x,y,w,h,fontSize:size};labels.push(l);return l}}});
  v.renderHud();const globals=labels.filter(x=>['Round','TurnName'].includes(x.name));assert.equal(globals.length,2);for(const l of globals){assert.ok(300-l.y-l.h/2>=0);assert.ok(300-l.y+l.h/2<=16);assert.equal(l.fontSize,12);assert.equal(l.enableWrapText,false);assert.equal(l.overflow,Label.Overflow.CLAMP)}assert.ok(globals[1].string.includes('…'));assert.ok(globals[1].string.length<=13);assert.ok(!globals.some(x=>x.string.includes('战斗进行中')));
+});
+
+test('focused unit values stay readable outside dense rows, reuse nodes, and hide for death',()=>{
+ const d=actor();d.name.string='哥布林头目';d.attack={string:'4'};d.hp.string='16';
+ const v=presenter(d),labels=[],logs=[];v.focusId='unit:7';v.hud=new FakeNode();
+ v.presentation={visibleState:{units:[{id:'unit:7',hp:16,maxHp:16,range:1,movement:1,statuses:[{id:7,turns:2}]}]}};
+ v.catalog={};v.hooks={log:text=>logs.push(text)};
+ v.ui={node(parent,name,w,h,x,y){const n=new FakeNode(parent);Object.assign(n,{name,w,h,x,y});return n},label(parent,name,string){const l={node:new FakeNode(parent),name,string};labels.push(l);return l}};
+ v.renderFocusInfo();const panel=v.focusPanel;assert.deepEqual([panel.w,panel.h,panel.x,panel.y],[300,106,-430,-235]);
+ assert.equal(v.focusLabels.stats.string,'攻击 4　生命 16/16');assert.equal(v.focusLabels.status.string,'状态7（2回合）');
+ d.hp.string='9';v.presentation.visibleState.units[0].hp=9;v.renderFocusInfo();assert.equal(v.focusPanel,panel);assert.equal(labels.length,3,'polls must not rebuild the focused labels');assert.equal(v.focusLabels.stats.string,'攻击 4　生命 9/16');
+ panel.handlers.get('end')();assert.match(logs[0],/状态7（2回合）/);
+ d.dying=true;v.renderFocusInfo();assert.equal(panel.active,false,'focused numbers must not linger after the death lifecycle starts');
 });

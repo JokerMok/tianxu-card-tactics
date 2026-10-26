@@ -1,0 +1,916 @@
+{
+  "ogre-destroyer": {
+    "frames": [
+      {
+        "frame": 0,
+        "originalBounds": [
+          71,
+          81,
+          199,
+          219
+        ],
+        "materialBounds": [
+          65,
+          71,
+          179,
+          198
+        ]
+      },
+      {
+        "frame": 1,
+        "originalBounds": [
+          70,
+          79,
+          199,
+          219
+        ],
+        "materialBounds": [
+          64,
+          71,
+          180,
+          197
+        ]
+      },
+      {
+        "frame": 2,
+        "originalBounds": [
+          64,
+          81,
+          188,
+          220
+        ],
+        "materialBounds": [
+          59,
+          72,
+          171,
+          197
+        ]
+      },
+      {
+        "frame": 3,
+        "originalBounds": [
+          64,
+          83,
+          181,
+          219
+        ],
+        "materialBounds": [
+          59,
+          73,
+          164,
+          197
+        ]
+      },
+      {
+        "frame": 4,
+        "originalBounds": [
+          54,
+          85,
+          181,
+          221
+        ],
+        "materialBounds": [
+          51,
+          75,
+          164,
+          198
+        ]
+      },
+      {
+        "frame": 5,
+        "originalBounds": [
+          63,
+          77,
+          192,
+          220
+        ],
+        "materialBounds": [
+          60,
+          69,
+          178,
+          198
+        ]
+      },
+      {
+        "frame": 6,
+        "originalBounds": [
+          72,
+          87,
+          194,
+          219
+        ],
+        "materialBounds": [
+          67,
+          77,
+          174,
+          197
+        ]
+      },
+      {
+        "frame": 7,
+        "originalBounds": [
+          72,
+          87,
+          201,
+          219
+        ],
+        "materialBounds": [
+          65,
+          78,
+          181,
+          198
+        ]
+      },
+      {
+        "frame": 8,
+        "originalBounds": [
+          64,
+          87,
+          191,
+          220
+        ],
+        "materialBounds": [
+          60,
+          77,
+          173,
+          198
+        ]
+      },
+      {
+        "frame": 9,
+        "originalBounds": [
+          64,
+          86,
+          188,
+          220
+        ],
+        "materialBounds": [
+          61,
+          77,
+          173,
+          197
+        ]
+      },
+      {
+        "frame": 10,
+        "originalBounds": [
+          63,
+          84,
+          191,
+          220
+        ],
+        "materialBounds": [
+          61,
+          76,
+          175,
+          198
+        ]
+      },
+      {
+        "frame": 11,
+        "originalBounds": [
+          57,
+          85,
+          181,
+          220
+        ],
+        "materialBounds": [
+          58,
+          77,
+          167,
+          198
+        ]
+      },
+      {
+        "frame": 12,
+        "originalBounds": [
+          71,
+          86,
+          208,
+          219
+        ],
+        "materialBounds": [
+          64,
+          76,
+          187,
+          197
+        ]
+      },
+      {
+        "frame": 13,
+        "originalBounds": [
+          66,
+          56,
+          198,
+          219
+        ],
+        "materialBounds": [
+          61,
+          49,
+          180,
+          197
+        ]
+      },
+      {
+        "frame": 14,
+        "originalBounds": [
+          55,
+          61,
+          198,
+          220
+        ],
+        "materialBounds": [
+          51,
+          54,
+          180,
+          198
+        ]
+      },
+      {
+        "frame": 15,
+        "originalBounds": [
+          55,
+          91,
+          209,
+          224
+        ],
+        "materialBounds": [
+          51,
+          82,
+          191,
+          202
+        ]
+      },
+      {
+        "frame": 16,
+        "originalBounds": [
+          59,
+          94,
+          251,
+          221
+        ],
+        "materialBounds": [
+          56,
+          83,
+          229,
+          198
+        ]
+      },
+      {
+        "frame": 17,
+        "originalBounds": [
+          65,
+          86,
+          194,
+          220
+        ],
+        "materialBounds": [
+          0,
+          78,
+          180,
+          198
+        ]
+      },
+      {
+        "frame": 18,
+        "originalBounds": [
+          77,
+          87,
+          220,
+          221
+        ],
+        "materialBounds": [
+          69,
+          77,
+          197,
+          199
+        ]
+      },
+      {
+        "frame": 19,
+        "originalBounds": [
+          73,
+          95,
+          200,
+          219
+        ],
+        "materialBounds": [
+          66,
+          85,
+          180,
+          197
+        ]
+      },
+      {
+        "frame": 20,
+        "originalBounds": [
+          69,
+          99,
+          194,
+          225
+        ],
+        "materialBounds": [
+          63,
+          88,
+          175,
+          202
+        ]
+      },
+      {
+        "frame": 21,
+        "originalBounds": [
+          57,
+          95,
+          174,
+          220
+        ],
+        "materialBounds": [
+          54,
+          86,
+          157,
+          198
+        ]
+      },
+      {
+        "frame": 22,
+        "originalBounds": [
+          50,
+          95,
+          183,
+          220
+        ],
+        "materialBounds": [
+          49,
+          85,
+          166,
+          199
+        ]
+      },
+      {
+        "frame": 23,
+        "originalBounds": [
+          66,
+          95,
+          193,
+          221
+        ],
+        "materialBounds": [
+          64,
+          85,
+          179,
+          200
+        ]
+      },
+      {
+        "frame": 24,
+        "originalBounds": [
+          72,
+          102,
+          208,
+          219
+        ],
+        "materialBounds": [
+          65,
+          92,
+          186,
+          199
+        ]
+      },
+      {
+        "frame": 25,
+        "originalBounds": [
+          67,
+          110,
+          198,
+          218
+        ],
+        "materialBounds": [
+          60,
+          99,
+          180,
+          197
+        ]
+      },
+      {
+        "frame": 26,
+        "originalBounds": [
+          58,
+          118,
+          208,
+          220
+        ],
+        "materialBounds": [
+          54,
+          107,
+          189,
+          198
+        ]
+      },
+      {
+        "frame": 27,
+        "originalBounds": [
+          50,
+          124,
+          201,
+          222
+        ],
+        "materialBounds": [
+          47,
+          112,
+          184,
+          201
+        ]
+      },
+      {
+        "frame": 28,
+        "originalBounds": [
+          42,
+          145,
+          190,
+          219
+        ],
+        "materialBounds": [
+          42,
+          131,
+          175,
+          199
+        ]
+      },
+      {
+        "frame": 29,
+        "originalBounds": [
+          35,
+          153,
+          201,
+          222
+        ],
+        "materialBounds": [
+          34,
+          138,
+          185,
+          201
+        ]
+      }
+    ],
+    "originalAlphaExactlyPreserved": true,
+    "timingAndPosesUnchanged": true,
+    "processing": "generated RGB material aligned per existing pose; source alpha retained exactly"
+  },
+  "ogre-marauder": {
+    "frames": [
+      {
+        "frame": 0,
+        "originalBounds": [
+          61,
+          88,
+          168,
+          220
+        ],
+        "materialBounds": [
+          43,
+          76,
+          168,
+          218
+        ]
+      },
+      {
+        "frame": 1,
+        "originalBounds": [
+          53,
+          87,
+          164,
+          220
+        ],
+        "materialBounds": [
+          35,
+          74,
+          163,
+          218
+        ]
+      },
+      {
+        "frame": 2,
+        "originalBounds": [
+          54,
+          88,
+          163,
+          219
+        ],
+        "materialBounds": [
+          42,
+          76,
+          168,
+          218
+        ]
+      },
+      {
+        "frame": 3,
+        "originalBounds": [
+          52,
+          88,
+          163,
+          219
+        ],
+        "materialBounds": [
+          54,
+          76,
+          179,
+          218
+        ]
+      },
+      {
+        "frame": 4,
+        "originalBounds": [
+          53,
+          88,
+          162,
+          220
+        ],
+        "materialBounds": [
+          61,
+          76,
+          188,
+          218
+        ]
+      },
+      {
+        "frame": 5,
+        "originalBounds": [
+          61,
+          90,
+          170,
+          220
+        ],
+        "materialBounds": [
+          67,
+          77,
+          193,
+          218
+        ]
+      },
+      {
+        "frame": 6,
+        "originalBounds": [
+          56,
+          94,
+          172,
+          221
+        ],
+        "materialBounds": [
+          35,
+          79,
+          170,
+          219
+        ]
+      },
+      {
+        "frame": 7,
+        "originalBounds": [
+          61,
+          97,
+          181,
+          220
+        ],
+        "materialBounds": [
+          39,
+          81,
+          178,
+          219
+        ]
+      },
+      {
+        "frame": 8,
+        "originalBounds": [
+          58,
+          91,
+          180,
+          220
+        ],
+        "materialBounds": [
+          50,
+          78,
+          193,
+          219
+        ]
+      },
+      {
+        "frame": 9,
+        "originalBounds": [
+          59,
+          93,
+          181,
+          220
+        ],
+        "materialBounds": [
+          58,
+          79,
+          199,
+          219
+        ]
+      },
+      {
+        "frame": 10,
+        "originalBounds": [
+          63,
+          94,
+          188,
+          221
+        ],
+        "materialBounds": [
+          54,
+          79,
+          198,
+          219
+        ]
+      },
+      {
+        "frame": 11,
+        "originalBounds": [
+          65,
+          94,
+          177,
+          220
+        ],
+        "materialBounds": [
+          65,
+          79,
+          195,
+          220
+        ]
+      },
+      {
+        "frame": 12,
+        "originalBounds": [
+          56,
+          95,
+          174,
+          220
+        ],
+        "materialBounds": [
+          34,
+          85,
+          170,
+          223
+        ]
+      },
+      {
+        "frame": 13,
+        "originalBounds": [
+          57,
+          68,
+          180,
+          220
+        ],
+        "materialBounds": [
+          35,
+          50,
+          176,
+          223
+        ]
+      },
+      {
+        "frame": 14,
+        "originalBounds": [
+          51,
+          64,
+          173,
+          220
+        ],
+        "materialBounds": [
+          39,
+          48,
+          181,
+          222
+        ]
+      },
+      {
+        "frame": 15,
+        "originalBounds": [
+          39,
+          105,
+          251,
+          220
+        ],
+        "materialBounds": [
+          34,
+          95,
+          229,
+          223
+        ]
+      },
+      {
+        "frame": 16,
+        "originalBounds": [
+          49,
+          107,
+          221,
+          221
+        ],
+        "materialBounds": [
+          0,
+          95,
+          229,
+          223
+        ]
+      },
+      {
+        "frame": 17,
+        "originalBounds": [
+          68,
+          97,
+          175,
+          222
+        ],
+        "materialBounds": [
+          0,
+          85,
+          189,
+          226
+        ]
+      },
+      {
+        "frame": 18,
+        "originalBounds": [
+          65,
+          89,
+          179,
+          220
+        ],
+        "materialBounds": [
+          48,
+          72,
+          178,
+          222
+        ]
+      },
+      {
+        "frame": 19,
+        "originalBounds": [
+          69,
+          101,
+          181,
+          221
+        ],
+        "materialBounds": [
+          45,
+          84,
+          176,
+          226
+        ]
+      },
+      {
+        "frame": 20,
+        "originalBounds": [
+          61,
+          98,
+          172,
+          223
+        ],
+        "materialBounds": [
+          49,
+          87,
+          179,
+          229
+        ]
+      },
+      {
+        "frame": 21,
+        "originalBounds": [
+          52,
+          113,
+          163,
+          219
+        ],
+        "materialBounds": [
+          53,
+          103,
+          179,
+          221
+        ]
+      },
+      {
+        "frame": 22,
+        "originalBounds": [
+          58,
+          102,
+          163,
+          220
+        ],
+        "materialBounds": [
+          53,
+          90,
+          174,
+          222
+        ]
+      },
+      {
+        "frame": 23,
+        "originalBounds": [
+          67,
+          93,
+          172,
+          222
+        ],
+        "materialBounds": [
+          66,
+          77,
+          190,
+          225
+        ]
+      },
+      {
+        "frame": 24,
+        "originalBounds": [
+          52,
+          110,
+          159,
+          220
+        ],
+        "materialBounds": [
+          33,
+          77,
+          155,
+          205
+        ]
+      },
+      {
+        "frame": 25,
+        "originalBounds": [
+          46,
+          127,
+          170,
+          223
+        ],
+        "materialBounds": [
+          22,
+          99,
+          165,
+          211
+        ]
+      },
+      {
+        "frame": 26,
+        "originalBounds": [
+          36,
+          128,
+          185,
+          213
+        ],
+        "materialBounds": [
+          23,
+          99,
+          198,
+          199
+        ]
+      },
+      {
+        "frame": 27,
+        "originalBounds": [
+          42,
+          136,
+          180,
+          219
+        ],
+        "materialBounds": [
+          31,
+          108,
+          196,
+          205
+        ]
+      },
+      {
+        "frame": 28,
+        "originalBounds": [
+          36,
+          142,
+          167,
+          220
+        ],
+        "materialBounds": [
+          37,
+          113,
+          192,
+          205
+        ]
+      },
+      {
+        "frame": 29,
+        "originalBounds": [
+          17,
+          157,
+          177,
+          221
+        ],
+        "materialBounds": [
+          14,
+          128,
+          201,
+          204
+        ]
+      }
+    ],
+    "originalAlphaExactlyPreserved": true,
+    "timingAndPosesUnchanged": true,
+    "processing": "generated RGB material aligned per existing pose; source alpha retained exactly"
+  }
+}

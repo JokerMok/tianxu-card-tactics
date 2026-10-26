@@ -1,7 +1,7 @@
 import {assetManager,ImageAsset,Texture2D,SpriteFrame,Sprite,Node} from 'cc';
 import {SampleUnitAnimation,type SampleUnitSpec} from './SampleUnitAnimation.ts';
 interface ImageSpec {file:string;size:[number,number];insets?:[number,number,number,number]}
-interface Manifest {version:1|2;id:string;images:Record<string,ImageSpec>;maps:Record<string,string>;units:Record<string,SampleUnitSpec>}
+interface Manifest {version:1|2;id:string;images:Record<string,ImageSpec>;maps:Record<string,string>;units:Record<string,SampleUnitSpec>;models?:Record<string,string>}
 type State='normal'|'selected'|'pressed'|'disabled';
 export type ButtonKind='primary'|'secondary'|'compact';
 const images=new Map<string,Promise<{image:ImageAsset;texture:Texture2D;frame:SpriteFrame}>>();
@@ -18,7 +18,7 @@ export class ArtSkin {
  static async load(origin:string){
   if(!['ui','unit','background'].some(k=>this.enabled(k as 'ui'|'unit'|'background')))return;
   if(manifest)return;const requested=typeof location==='undefined'?'sample':new URLSearchParams(location.search).get('skin')??'sample';
-  const version=requested==='sample-v1'?'v1':requested==='sample-r2'?'v2':requested==='sample-batch2'?'v3':'v4';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
+  const version=requested==='sample-v1'?'v1':requested==='sample-r2'?'v2':requested==='sample-batch2'?'v3':requested==='sample-batch3'?'v4':'v5';base=origin.replace(/\/$/,'')+'/art/'+version+'/';disposed=false;
   const res=await fetch(base+'manifest.json');if(!res.ok)throw new Error('美术样板清单载入失败，请检查本机资源目录。');
   const value=await res.json();if(![1,2].includes(value.version)||!value.images||!value.units||!value.maps)throw new Error('美术样板清单格式错误。');manifest=value;
   // Prepare all four states before the first real press, rather than loading a pressed image after release.
@@ -26,7 +26,12 @@ export class ArtSkin {
  }
  static image(key:string){return this.enabled('ui')?manifest?.images[key]:undefined;}
  static background(scope:string,id:number){const key=this.enabled('background')?manifest?.maps[`${scope}:map:${id}`]:undefined;return key?base+manifest!.images[key].file:undefined;}
- static unit(scope:string,id:number){return this.enabled('unit')?manifest?.units[`${scope}:monster:${id}`]:undefined;}
+ static unit(scope:string,id:number,modelId?:string){
+  if(!this.enabled('unit')||!manifest)return undefined;
+  const exact=manifest.units[`${scope}:monster:${id}`];if(exact)return exact;
+  const shared=modelId?manifest.models?.[`${scope}:${modelId}`]:undefined;
+  return shared?manifest.units[shared]:undefined;
+ }
  static unitBase(){return base;}
  static url(key:string){const image=this.image(key);return image?base+image.file:undefined;}
  static async paint(node:Node,key:string){

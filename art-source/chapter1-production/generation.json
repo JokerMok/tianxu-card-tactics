@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-26",
+  "tool": "built-in image_gen; no CLI/API key/web assets",
+  "outputs": {
+    "ogre-destroyer-material-source": "exec-e8795ef7-0c2d-41e7-a9f5-400013d0cc62.png",
+    "ogre-marauder-material-source": "exec-e047266f-0ceb-463c-af70-3ce91bc543e7.png",
+    "sentinel-poses": "exec-ee3781d4-ef90-49bc-869e-d0bd3d3d1312.png",
+    "captain-poses": "exec-5a56453e-35b3-4c8d-a290-2294ab3e3477.png",
+    "champion-poses": "exec-4c7d3696-6cb9-4aa1-a7ac-60b18dbf7adc.png",
+    "elfin-poses": "exec-fb0c1a70-c9f4-4441-ac40-7e241b52876e.png",
+    "lich-poses": "exec-dc46d199-8589-4f06-80f1-e208cd7018c2.png",
+    "skeleton-poses": "exec-eb4a3428-d226-4780-bf0c-7c59c8e7e407.png",
+    "angel-poses": "exec-14e0e3c4-17e4-4204-be5c-ab5aa248d77e.png",
+    "bully-poses": "exec-5b531c00-735d-44b5-94f2-d6afee8aa760.png",
+    "ice-archer-poses": "exec-65484bf4-4590-4ce7-8ed1-0f15f060a482.png",
+    "flame-poses": "exec-6023cc56-b4aa-41af-9fb9-d0ff2ecef6df.png",
+    "captain-layout": "exec-3ebdfab0-71c3-4be9-a32e-8fc77e459bc4.png",
+    "angel-layout": "exec-a6ea2fdf-173a-4caa-994c-432527d5d817.png",
+    "flame-layout": "exec-a205957e-fb96-47f3-9e00-c8b9f775fc10.png",
+    "elfin-layout": "exec-dda76e8e-139e-4398-bd9b-d3e58249c742.png"
+  },
+  "originalResources": "read-only",
+  "materialEditPolicy": "reuse exact action/alpha registration; raw retouch geometry changes rejected from runtime; source alpha retained by technical alignment",
+  "promptContract": "6 columns x5 rows,30 independent drawn states, fixed3/4 camera and physical proportions, stand/walk/attack/hit/death, contact pose4; matte hand-painted fantasy tactical card materials; exact identity reference per selected.json; same R2 style; no UI or words",
+  "finalSources": [
+    {
+      "key": "captain",
+      "file": "captain-poses.png",
+      "sha256": "19c0200d845638148fe24311f84b0f45922962cae164e54ce5fc75bc0eec8fad",
+      "modelId": "model:30945d8c76c9d4a31508",
+      "identityReference": "cocos-client/assets/resources/recovered/images/e6ce90c2ae388dbf3c15.png",
+      "originalFieldBitmap": "cocos-client/assets/resources/recovered/images/6fcc7441d2456934d0fc.png"
+    },
+    {
+      "key": "sentinel",
+      "file": "sentinel-poses.png",
+      "sha256": "9c073a93e4473dcb1ff144d0d6195d9d5579c9a4719e2be5d9ba4262af085183",
+      "modelId": "model:26b078148d1f7af2f252",
+      "identityReference": "cocos-client/assets/resources/recovered/images/cc3548a1fce65022a08d.png"
+    },
+    {
+      "key": "champion",
+      "file": "champion-poses.png",
+      "sha256": "99c52ee45c1afd9ce212eb6ae518780e1cd6c4a49c0668b9e2fd1a13db160e19",
+      "modelId": "model:50631ca22c8b0f5b8c65",
+      "identityReference": "cocos-client/assets/resources/recovered/images/5fc1697934e232d1f0d8.png"
+    },
+    {
+      "key": "elfin",
+      "file": "elfin-poses.png",
+      "sha256": "b4da56c5ab076c492b8716767a2afd2cf68916310e79a296ac79480e5df4fe7f",
+      "modelId": "model:0df57cc09535e694bf3f",
+      "identityReference": "cocos-client/assets/resources/recovered/images/d09986babf2dea15985a.png"
+    },
+    {
+      "key": "lich",
+      "file": "lich-poses.png",
+      "sha256": "7f99de2fb6918ad693f1caff4e086822ef031f761955bc481ea94986bcf4ebec",
+      "modelId": "model:b6ed3d6b0e27049555a8",
+      "identityReference": "cocos-client/assets/resources/recovered/images/d8805e3407cab483d4e1.png"
+    },
+    {
+      "key": "skeleton",
+      "file": "skeleton-poses.png",
+      "sha256": "6d3a5ebae8af6a81e2646842b7578eed0c1ba3fb49e8d3a6802ff1aa523bad7e",
+      "modelId": "model:0d666e654103978eeeea",
+      "identityReference": "cocos-client/assets/resources/recovered/images/da94e5c35560ed7575e2.png"
+    },
+    {
+      "key": "angel",
+      "file": "angel-poses.png",
+      "sha256": "452d5e37ae0100b57c2e8bcdf7aa39114ba3d01702d7b49aaecbc1f8568d28f1",
+      "modelId": "model:ef2eef79f0c1b1d050ad",
+      "identityReference": "cocos-client/assets/resources/recovered/images/3c4236d6f0bc1e0c529e.png",
+      "originalFieldBitmap": "cocos-client/assets/resources/recovered/images/7f54ea4797eb1d7fbe27.png"
+    },
+    {
+      "key": "bully",
+      "file": "bully-poses.png",
+      "sha256": "4345a1d2006518f1f60db1c9e313fb7fe8d44daf4e584e29cca7c50e633ea910",
+      "modelId": "model:f3da6c4354da1f7d6173",
+      "identityReference": "cocos-client/assets/resources/recovered/images/e6ce90c2ae388dbf3c15.png",
+      "originalFieldBitmap": "cocos-client/assets/resources/recovered/images/426e8f7d500c66183c4b.png"
+    },
+    {
+      "key": "ice-archer",
+      "file": "ice-archer-poses.png",
+      "sha256": "2fb1c3331fd7335f4ddbaafcd4e0347b84f48bf0faf031c18dba04c175e05c34",
+      "modelId": "model:1d70c415b27c5a6b316a",
+      "identityReference": "cocos-client/assets/resources/recovered/images/ff11cb4a444a1cf9a220.png",
+      "originalFieldBitmap": "cocos-client/assets/resources/recovered/images/491bf5ba0ec5615c265f.png"
+    },
+    {
+      "key": "flame",
+      "file": "flame-poses.png",
+      "sha256": "0e2df85c31520a1d116ebac3ddd4aec7ad9bd023460ea955fa94c1f4c0d91618",
+      "modelId": "model:876528e0f89a84e7fd6b",
+      "identityReference": "cocos-client/assets/resources/recovered/images/62fd36ad81e6ee00a68d.png",
+      "originalFieldBitmap": "cocos-client/assets/resources/recovered/images/30624b5ab5096291a527.png"
+    }
+  ],
+  "productionSpec": "production-spec.md",
+  "licenseBoundary": "Generated outputs and technical derivatives tracked separately; identity/card references are recovered private project materials, no claim of all-original artwork or rights clearance. No third-party downloaded art or new paid service.",
+  "corrections": "captain, angel, flame and elfin layout outputs supersede unspaced pose candidates; raw candidates retained. Technical packing rejects joined body silhouettes."
+}

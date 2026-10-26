@@ -86,10 +86,10 @@ interface ActivePlayback {
 
 const REQUIRED_STATUSES: RecoveredAnimationStatus[] = ['stand', 'walk', 'atk', 'hit', 'die'];
 // Admission is based on the decoded RGBA texture footprint, not compressed PNG
-// bytes. Nine distinct live atlases cover the current three models plus the
-// approved six-model chapter batch; 80 MiB covers its expected 77.44 MiB peak.
-const MAX_ACTIVE_ATLAS_ENTRIES = 9;
-const MAX_ACTIVE_ATLAS_BYTES = 80 * 1024 * 1024;
+// bytes. Nineteen shared atlases cover the current chapter production batch;
+// common-frame alpha trimming keeps its 98.32 MiB base RGBA below 128 MiB.
+const MAX_ACTIVE_ATLAS_ENTRIES = 19;
+const MAX_ACTIVE_ATLAS_BYTES = 128 * 1024 * 1024;
 
 function atlasUrl(base: string, atlas: string): string {
   if (/^(?:[a-z]+:)?\/\//i.test(atlas) || atlas.startsWith('/') || atlas.startsWith('data:')) return atlas;
@@ -203,7 +203,8 @@ class SharedAtlasBank {
   }
 
   private static load(entry: AtlasEntry): void {
-    const extension = /\.jpe?g(?:$|[?#])/i.test(entry.url) ? '.jpg' : '.png';
+    const extension = /\.webp(?:$|[?#])/i.test(entry.url) ? '.webp'
+      : /\.jpe?g(?:$|[?#])/i.test(entry.url) ? '.jpg' : '.png';
     assetManager.loadRemote<ImageAsset>(entry.url, { ext: extension }, (error, image) => {
       if (entry.state !== 'pending') {
         if (image) assetManager.releaseAsset(image);

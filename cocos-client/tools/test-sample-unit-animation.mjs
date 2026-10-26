@@ -84,7 +84,7 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   assert.deepEqual(first.getPerformanceStats(), {
     atlasPoolEntries: 1, atlasPoolPendingEntries: 0, atlasPoolLiveReferences: 2, atlasPoolSpriteFrames: 54,
     atlasPoolEstimatedBytes: 9 * 256 * 6 * 256 * 4,
-    atlasPoolMaxEntries: 9, atlasPoolMaxEstimatedBytes: 80 * 1024 * 1024,
+    atlasPoolMaxEntries: 19, atlasPoolMaxEstimatedBytes: 128 * 1024 * 1024,
     instanceLoaded: true, instancePlaying: false, instanceFrame: -1,
     plays: 0, frameChanges: 0, cues: 0, completions: 0, cancellations: 0,
   });
@@ -194,6 +194,11 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   await shared.load();instances.push(shared);
   assert.equal(shared.getPerformanceStats().atlasPoolEntries,9,'same-model instances share one atlas');
   assert.equal(shared.getPerformanceStats().atlasPoolLiveReferences,13);
+  for(let index=0;index<10;index++){
+    const tiny={...pack.units['main:monster:19'],atlas:`count-${index}.png`,frameSize:[16,16],displaySize:[16,16],foot:[8,14],mount:[8,8]};
+    const animation=new SampleUnitAnimation(host,'mock://count-budget',tiny);
+    const loading=animation.load();cc.resolveNext(96,80);await loading;instances.push(animation);
+  }
   const beforeRejectedAdmission=cc.metrics.framesDestroyed;
   const overflow=new SampleUnitAnimation(host,'mock://chapter1',{...pack.units['main:monster:19'],atlas:'chapter-overflow.png'});
   await assert.rejects(overflow.load(),/active-count budget exceeded/);
@@ -201,20 +206,20 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   assert.equal(cc.metrics.framesDestroyed,beforeRejectedAdmission,'admission never evicts a live atlas');
   for(const animation of instances)animation.destroy();
   assert.equal(instances[0].getPerformanceStats().atlasPoolEntries,0);
-  assert.equal(cc.metrics.framesDestroyed-frameBase,275,'last release destroys each shared frame bank exactly once');
+  assert.equal(cc.metrics.framesDestroyed-frameBase,575,'last release destroys each shared frame bank exactly once');
 
-  // The byte gate is independent from the count gate: six large atlases fit,
-  // while a seventh would cross 80 MiB even though only seven slots are used.
+  // The byte gate is independent from the count gate: ten large atlases fit,
+  // while an eleventh crosses 128 MiB with slots still available.
   const large=[];const largeSpec={...pack.units['main:monster:43']};
-  for(let index=0;index<6;index++){
+  for(let index=0;index<10;index++){
     const animation=new SampleUnitAnimation(host,'mock://byte-budget',{...largeSpec,atlas:`large-${index}.png`});
     const loading=animation.load();cc.resolveNext(1920,1600);await loading;large.push(animation);
   }
-  const byteOverflow=new SampleUnitAnimation(host,'mock://byte-budget',{...largeSpec,atlas:'large-6.png'});
+  const byteOverflow=new SampleUnitAnimation(host,'mock://byte-budget',{...largeSpec,atlas:'large-overflow.png'});
   await assert.rejects(byteOverflow.load(),/active-byte budget exceeded/);
   byteOverflow.destroy();
-  assert.equal(large[0].getPerformanceStats().atlasPoolEntries,6);
-  assert.equal(large[0].getPerformanceStats().atlasPoolEstimatedBytes,70.3125*1024*1024);
+  assert.equal(large[0].getPerformanceStats().atlasPoolEntries,10);
+  assert.equal(large[0].getPerformanceStats().atlasPoolEstimatedBytes,117.1875*1024*1024);
   const underestimated={...pack.units['main:monster:19'],atlas:'underestimated.png',frameSize:[128,128],
     displaySize:[100,100],foot:[64,110],mount:[64,80]};
   const underestimatedAnimation=new SampleUnitAnimation(host,'mock://byte-budget',underestimated);
@@ -223,9 +228,23 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   await assert.rejects(underestimatedLoad,/active-byte budget exceeded/,
     'actual decoded dimensions recheck an atlas that understated its layout footprint');
   underestimatedAnimation.destroy();
-  assert.equal(large[0].getPerformanceStats().atlasPoolEntries,6,'a rejected image leaves all active atlases intact');
+  assert.equal(large[0].getPerformanceStats().atlasPoolEntries,10,'a rejected image leaves all active atlases intact');
   large.forEach(animation=>animation.destroy());
   assert.equal(large[0].getPerformanceStats().atlasPoolEntries,0,'idle atlases are released instead of retained as preloads');
+
+  const production=JSON.parse(await readFile(resolve(root,'cocos-client/assets/resources/art-samples/v5/manifest.json'),'utf8'));
+  const productionUnits=Object.values(production.units).filter((s,i,a)=>a.findIndex(t=>t.atlas===s.atlas)===i);
+  assert.equal(productionUnits.length,19);
+  const productionActors=[];
+  for(const actual of productionUnits){
+    const pair=[new SampleUnitAnimation(host,'mock://production',actual),new SampleUnitAnimation(host,'mock://production',actual)];
+    const loads=pair.map(a=>a.load());cc.resolveNext(actual.columns*actual.frameSize[0],Math.ceil(actual.frameCount/actual.columns)*actual.frameSize[1]);await Promise.all(loads);productionActors.push(...pair);
+    const attack=pair[0].play('atk','west');pair[0].update(2);await attack.completion;
+  }
+  assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolEntries,19);
+  assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolLiveReferences,38);
+  assert.ok(SampleUnitAnimation.atlasMetrics().atlasPoolEstimatedBytes<128*1024*1024);
+  productionActors.forEach(a=>a.destroy());assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolEntries,0);
 } finally {
   await rm(scratch, { recursive: true, force: true });
 }

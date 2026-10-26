@@ -1,0 +1,204 @@
+{
+  "id": "steelwood-chapter1-production-20261026",
+  "atlases": {
+    "guard-atlas-66fe5e2e27dd-630fcb486c5c.webp": {
+      "pngBytes": 784319,
+      "downloadBytes": 576962,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 9437184,
+      "estimatedRgbaBytes": 4250304,
+      "rgbaReductionBytes": 5186880,
+      "rgbaReductionRatio": 0.54962158203125
+    },
+    "squire-10c34cd8249a-b65536e9c577.webp": {
+      "pngBytes": 741334,
+      "downloadBytes": 610308,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 3492000,
+      "rgbaReductionBytes": 4372320,
+      "rgbaReductionRatio": 0.55596923828125
+    },
+    "lancer-535e44dd3d9a-e396f4d68575.webp": {
+      "pngBytes": 1028857,
+      "downloadBytes": 848696,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 12288000,
+      "estimatedRgbaBytes": 5363160,
+      "rgbaReductionBytes": 6924840,
+      "rgbaReductionRatio": 0.5635449218749999
+    },
+    "horseman-e085efcf9726-67f7cd7c6a5c.webp": {
+      "pngBytes": 1337804,
+      "downloadBytes": 1103918,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 12288000,
+      "estimatedRgbaBytes": 5920200,
+      "rgbaReductionBytes": 6367800,
+      "rgbaReductionRatio": 0.518212890625
+    },
+    "elven-hunter-86861df505a3-aa499c657474.webp": {
+      "pngBytes": 744279,
+      "downloadBytes": 586268,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 2845800,
+      "rgbaReductionBytes": 5018520,
+      "rgbaReductionRatio": 0.6381378173828125
+    },
+    "goblin-bandit-2d9929f96c2d-4598550dd25f.webp": {
+      "pngBytes": 621490,
+      "downloadBytes": 486558,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 3241200,
+      "rgbaReductionBytes": 4623120,
+      "rgbaReductionRatio": 0.587860107421875
+    },
+    "goblin-marauder-7aa44029e47a-ac5f465d6c63.webp": {
+      "pngBytes": 703313,
+      "downloadBytes": 557582,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 3118560,
+      "rgbaReductionBytes": 4745760,
+      "rgbaReductionRatio": 0.60345458984375
+    },
+    "ogre-destroyer-62e3b383197c.webp": {
+      "pngBytes": 996304,
+      "downloadBytes": 770972,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 4683000,
+      "rgbaReductionBytes": 3181320,
+      "rgbaReductionRatio": 0.4045257568359375
+    },
+    "ogre-marauder-c4edd710bea4.webp": {
+      "pngBytes": 865815,
+      "downloadBytes": 649834,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 4752000,
+      "rgbaReductionBytes": 3112320,
+      "rgbaReductionRatio": 0.395751953125
+    },
+    "captain-89022357add6.webp": {
+      "pngBytes": 1415162,
+      "downloadBytes": 1074086,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 13068000,
+      "estimatedRgbaBytes": 8526120,
+      "rgbaReductionBytes": 4541880,
+      "rgbaReductionRatio": 0.34755739210284664
+    },
+    "sentinel-cc7e6067fe73.webp": {
+      "pngBytes": 1197030,
+      "downloadBytes": 909736,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 9207480,
+      "estimatedRgbaBytes": 5651040,
+      "rgbaReductionBytes": 3556440,
+      "rgbaReductionRatio": 0.3862555226837311
+    },
+    "champion-82987f71c3a4.webp": {
+      "pngBytes": 1746563,
+      "downloadBytes": 1393422,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 12288000,
+      "estimatedRgbaBytes": 6876480,
+      "rgbaReductionBytes": 5411520,
+      "rgbaReductionRatio": 0.44039062500000004
+    },
+    "elfin-230ad616fef0.webp": {
+      "pngBytes": 801294,
+      "downloadBytes": 639406,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 4630800,
+      "rgbaReductionBytes": 3233520,
+      "rgbaReductionRatio": 0.411163330078125
+    },
+    "lich-b67b94bb10b9.webp": {
+      "pngBytes": 1086300,
+      "downloadBytes": 882034,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 4775760,
+      "rgbaReductionBytes": 3088560,
+      "rgbaReductionRatio": 0.392730712890625
+    },
+    "skeleton-011a59a6b2a9.webp": {
+      "pngBytes": 1060548,
+      "downloadBytes": 801118,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 10161720,
+      "estimatedRgbaBytes": 6127200,
+      "rgbaReductionBytes": 4034520,
+      "rgbaReductionRatio": 0.39703121125163854
+    },
+    "angel-788ba7ad6e28.webp": {
+      "pngBytes": 1791524,
+      "downloadBytes": 1369696,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 16428000,
+      "estimatedRgbaBytes": 9838080,
+      "rgbaReductionBytes": 6589920,
+      "rgbaReductionRatio": 0.40113951789627467
+    },
+    "bully-6e0f9ae116b5.webp": {
+      "pngBytes": 759357,
+      "downloadBytes": 603280,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 9274080,
+      "estimatedRgbaBytes": 5003880,
+      "rgbaReductionBytes": 4270200,
+      "rgbaReductionRatio": 0.4604445939651157
+    },
+    "ice-archer-2f1cbf00c315.webp": {
+      "pngBytes": 1330248,
+      "downloadBytes": 1106766,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 7864320,
+      "estimatedRgbaBytes": 6105840,
+      "rgbaReductionBytes": 1758480,
+      "rgbaReductionRatio": 0.223602294921875
+    },
+    "flame-26c82ed94e34.webp": {
+      "pngBytes": 1204367,
+      "downloadBytes": 1010884,
+      "encoding": "webp-lossless",
+      "visiblePixelsExact": true,
+      "sourceEstimatedRgbaBytes": 14868480,
+      "estimatedRgbaBytes": 7892640,
+      "rgbaReductionBytes": 6975840,
+      "rgbaReductionRatio": 0.46916967975206614
+    }
+  },
+  "totals": {
+    "uniqueAtlases": 19,
+    "pngBytes": 20215908,
+    "downloadBytes": 15981526,
+    "sourceEstimatedRgbaBytes": 190087824,
+    "estimatedRgbaBytes": 103094064,
+    "rgbaReductionBytes": 86993760,
+    "rgbaReductionRatio": 0.45765035429097234
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "pack": "steelwood-chapter1-production-20261026",
+  "files": [
+    {
+      "file": "art-samples/v2/button-compact-disabled-ed2373100a0e.png",
+      "bytes": 4259,
+      "sha256": "ed2373100a0efac63f930c06c0307550b5c16991caa38bbb8c9dee7ae0557f79",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-compact-normal-6aacda81f743.png",
+      "bytes": 3783,
+      "sha256": "6aacda81f74338c919cf1d43e4b64e2aee1b0a2da6f0c0621d4786096fbbce0d",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-compact-pressed-ab5584ff24be.png",
+      "bytes": 2300,
+      "sha256": "ab5584ff24be4068efc5d28974185b323a885b0b48afed04b0e571bff6acf2e9",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-compact-selected-4d7fe224f303.png",
+      "bytes": 4421,
+      "sha256": "4d7fe224f3039e4b3927e3da82b4332c2ea80cb1338599cc187b239addf576c5",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-primary-disabled-ed2373100a0e.png",
+      "bytes": 4259,
+      "sha256": "ed2373100a0efac63f930c06c0307550b5c16991caa38bbb8c9dee7ae0557f79",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-primary-normal-09f651df4458.png",
+      "bytes": 3759,
+      "sha256": "09f651df4458b6479c13e6d0ba0dc47badc4827a9b374e9d2c589e1f8a2cfa39",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-primary-pressed-f940dab50c82.png",
+      "bytes": 2459,
+      "sha256": "f940dab50c82b7f5776451f667b97c60218dfc85cf699da056fea0dbd3f9db47",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-primary-selected-83e2dde0886f.png",
+      "bytes": 4310,
+      "sha256": "83e2dde0886fa53a461b209f01eab4ad1044aee6203b70293e0a8db409831761",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-secondary-disabled-ed2373100a0e.png",
+      "bytes": 4259,
+      "sha256": "ed2373100a0efac63f930c06c0307550b5c16991caa38bbb8c9dee7ae0557f79",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-secondary-normal-a4b8c8436eee.png",
+      "bytes": 3569,
+      "sha256": "a4b8c8436eeeb4b43a76d85a9bcdff4b963de324d968350f7ef3014e544e8e7f",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-secondary-pressed-3a15124090c6.png",
+      "bytes": 2223,
+      "sha256": "3a15124090c65db1013cf072c932f226126b975d8a92addb66d494b886c24f46",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/button-secondary-selected-3b255083fe7f.png",
+      "bytes": 4373,
+      "sha256": "3b255083fe7f77a85d8ac5ffff3ffcac465cc8e4989f461391f3fa8c7b32c8e2",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/control-locked-62ab65165d9f.png",
+      "bytes": 1268,
+      "sha256": "62ab65165d9fd2d6cfa6c9dc39d39b870637e501bb9acb0cac7442a6272b42de",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/control-minus-6a7da52d2205.png",
+      "bytes": 933,
+      "sha256": "6a7da52d220578fc634f6426fefefcfcb4096884acf3e16fb9426eb82a753a09",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/control-plus-78492f22ff4d.png",
+      "bytes": 1173,
+      "sha256": "78492f22ff4dd151f9ecec00bd547329a19edcd97434f8222f32fa90b40eb410",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/forest-map-1-f28d50c907f0.jpg",
+      "bytes": 343478,
+      "sha256": "f28d50c907f0c48cbcd4b206cab4f528e3748e3371d31e8c171bf06f4027ae2b",
+      "httpContentType": "image/jpeg"
+    },
+    {
+      "file": "art-samples/v2/hud-draw-b9c13d8aa004.png",
+      "bytes": 3479,
+      "sha256": "b9c13d8aa0044dd97c18ac74ab0e239351dfe408bfcf6e286fca0a833835fd3b",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/hud-graveyard-b75fe1d66f7d.png",
+      "bytes": 3899,
+      "sha256": "b75fe1d66f7d4b147464ad1c869ff5cf31949de974733905b11ee00bebe26dff",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/hud-hand-276f28405742.png",
+      "bytes": 4532,
+      "sha256": "276f28405742276c7b26f69558a0939bc9b6dcf356fd72e2cbd1168ceb879322",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/panel-2eacf473ca05.png",
+      "bytes": 164830,
+      "sha256": "2eacf473ca05028628b303d2b6d9fb9e59c19c1d066b3c92535bfd7d1c98bc5a",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "bytes": 8863,
+      "sha256": "5f3cb01cf5cc744e64e4951864c4a839068d4c9776adb8c7bbaa775a3ae08776",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-1-c23b53ca7072.png",
+      "bytes": 8806,
+      "sha256": "c23b53ca7072d4f5eb117e3dc9e71e073ceb3ab2d5874a225b80a543fa290b72",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-2-943df56c10a9.png",
+      "bytes": 8961,
+      "sha256": "943df56c10a986961858044f7e8dd654bfd214de0056e87b9eaabf64eb275cd9",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-3-be3ff2a7cdc2.png",
+      "bytes": 9038,
+      "sha256": "be3ff2a7cdc22c12615c734ea93c847be13dc432784f7364eb63a6d4f1604779",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-4-36715f65daa0.png",
+      "bytes": 8971,
+      "sha256": "36715f65daa0cbe62e50c3b2adbc04ecf8c759f29310fbf3b1650e773667447d",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-5-05771767fb67.png",
+      "bytes": 8790,
+      "sha256": "05771767fb67f094de24ab773051616a93aa458717b5a8a2be1ae15d6f1ab174",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v2/quality-frame-6-904a8018cffa.png",
+      "bytes": 9059,
+      "sha256": "904a8018cffaca9e59b86c52ea0023207698bc60d03995f769502b97fb7b7219",
+      "httpContentType": "image/png"
+    },
+    {
+      "file": "art-samples/v5/angel-788ba7ad6e28.webp",
+      "bytes": 1369696,
+      "sha256": "788ba7ad6e2837534c7f847bd8567efef880f59b314d6e3a6b1d65437c93baeb",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/bully-6e0f9ae116b5.webp",
+      "bytes": 603280,
+      "sha256": "6e0f9ae116b533dd8c35aff53ffb83ed3301f6ddbaba7427fd6de139117b3aa6",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/captain-89022357add6.webp",
+      "bytes": 1074086,
+      "sha256": "89022357add63064a4cfb6a69be54fee50249d068c6e346cffa4ef2ed2fab43a",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/champion-82987f71c3a4.webp",
+      "bytes": 1393422,
+      "sha256": "82987f71c3a4d7c5a5e2785eb111390216f805abd35387b439144d56069f1913",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/elfin-230ad616fef0.webp",
+      "bytes": 639406,
+      "sha256": "230ad616fef07014076739c5cd5349bcfb7b5a65529b49373da7959d661aae9c",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+      "bytes": 586268,
+      "sha256": "aa499c65747482c2cab5fdecb3e73661890c12c0e5df66a741b7df1f4bc306f4",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/flame-26c82ed94e34.webp",
+      "bytes": 1010884,
+      "sha256": "26c82ed94e34e28b066a77abed76816a534a1fb04291f4c19702ffa556ea0aa8",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "bytes": 486558,
+      "sha256": "4598550dd25f22e5d056daa221cc550e7fc999d850496a37286a71325896af3f",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+      "bytes": 557582,
+      "sha256": "ac5f465d6c637db75566c5e074015e75ee86c189d03c852d14f6caffb3435340",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "bytes": 576962,
+      "sha256": "630fcb486c5c731eb226838506618db581cb304dbfd8d397c0a360f7cd85cb59",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+      "bytes": 1103918,
+      "sha256": "67f7cd7c6a5c0b9e1a832704dfc5cbb502954287ae4557ebc55473eec4408c78",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/ice-archer-2f1cbf00c315.webp",
+      "bytes": 1106766,
+      "sha256": "2f1cbf00c3153fee9961fc494a228e336858fabf2f059754e5674520d24722f5",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "bytes": 848696,
+      "sha256": "e396f4d68575941ab8ccd2aa0ee1b274e3d3226634db027d95256d74e9b5eb55",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/lich-b67b94bb10b9.webp",
+      "bytes": 882034,
+      "sha256": "b67b94bb10b9086e05f5cbb368caf79592d24beeb8425300cfb83635e0ce4a63",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/manifest.json",
+      "bytes": 31064,
+      "sha256": "063cea7887f9e201fba70555a5aef0761946d3afb3c5e924a0b0b409cf4a0983",
+      "httpContentType": "application/json"
+    },
+    {
+      "file": "art-samples/v5/ogre-destroyer-62e3b383197c.webp",
+      "bytes": 770972,
+      "sha256": "62e3b383197cfe84bf8906701e7d93fb95e6107c29ff659f4657ed53be540eb4",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/ogre-marauder-c4edd710bea4.webp",
+      "bytes": 649834,
+      "sha256": "c4edd710bea4a671b2edf24ea9facd0ae3274fc7e8e529957fcfd9af19840d6b",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/sentinel-cc7e6067fe73.webp",
+      "bytes": 909736,
+      "sha256": "cc7e6067fe73a9f828b2e4f8f8e172438b4196486c4bb46da29792dee91e17ed",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/skeleton-011a59a6b2a9.webp",
+      "bytes": 801118,
+      "sha256": "011a59a6b2a9a8c5ecbaf5844e529d16d8f4081661895ef773cd3c7b9fbf94bd",
+      "httpContentType": "image/webp"
+    },
+    {
+      "file": "art-samples/v5/squire-10c34cd8249a-b65536e9c577.webp",
+      "bytes": 610308,
+      "sha256": "b65536e9c5771294edb31eae46cd92ef17f76884f5d91d89b95af15e81067c84",
+      "httpContentType": "image/webp"
+    }
+  ],
+  "fileCount": 47,
+  "compressedPackageBytes": 16618978,
+  "packageSha256": "a79b932d4b42cc995774b1d2dbd905f686a454a2732e9468b7270f1c55d95ab3",
+  "scope": "Runtime art only; raw source, review media, accounts, DB, logs excluded"
+}

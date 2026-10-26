@@ -1,5 +1,5 @@
 import { ArtSkin } from './ArtSkin.ts';
-import { cardName,cardDisplay,sourceDisplayName } from './GameText.ts';
+import { cardName,cardDisplay,sourceDisplayName,effectDisplay } from './GameText.ts';
 import { Color, Graphics, instantiate, Label, Node, tween, UIOpacity, UITransform, Vec3, EventTouch } from 'cc';
 import { CocosUi, Theme } from './CocosUi.ts';
 import { OriginalUi } from './OriginalUi.ts';
@@ -54,6 +54,8 @@ export class BattleSceneView {
   private clocks: { remaining: number; done(): void }[] = [];
   private flights: Node[] = []; private selectedHandPositions = new Map<string, Vec3>();
   private pendingFlight?: { cardId: string; origin: Vec3 }; private impacted = new Set<string>();
+  private focusId = ''; private focusPanel?: Node;
+  private focusLabels?: {title:Label;stats:Label;status:Label};
   private readonly speed = 1; autoplay = false;
 
   constructor(private parent: Node, private ui: CocosUi, private original: OriginalUi,
@@ -131,12 +133,16 @@ export class BattleSceneView {
         const nameHit = this.ui.node(node, 'NameHitRegion', 84, 90, 0, 10);
         nameHit.on(Node.EventType.MOUSE_ENTER, () => {
           instance.nameHovered = true; this.applyNameVisibility(instance);
+          this.focusId = unit.id; this.renderFocusInfo();
         });
         nameHit.on(Node.EventType.MOUSE_LEAVE, () => {
           instance.nameHovered = false; this.applyNameVisibility(instance);
+          if(this.focusId===unit.id&&!instance.namePinned){this.focusId=Array.from(this.displays).find(([,d])=>d.namePinned)?.[0]??'';this.renderFocusInfo();}
         });
         nameHit.on(Node.EventType.TOUCH_END, () => {
           instance.namePinned = !instance.namePinned; this.applyNameVisibility(instance);
+          if(instance.namePinned)for(const [id,other] of this.displays)if(id!==unit.id){other.namePinned=false;this.applyNameVisibility(other);}
+          this.focusId=instance.namePinned||instance.nameHovered?unit.id:'';this.renderFocusInfo();
         });
         void ready.then(() => {
           if (!this.disposed && this.displays.get(unit.id) === instance
@@ -166,6 +172,31 @@ export class BattleSceneView {
     for (const [id, display] of this.displays) if (!state.units.some(unit => unit.id === id) && !display.dying) this.release(id);
     const ordered = Array.from(this.displays.values()).sort((a, b) => b.node.position.y - a.node.position.y);
     ordered.forEach((display, index) => display.node.setSiblingIndex(index));
+    this.renderFocusInfo();
+  }
+  private renderFocusInfo(): void {
+    if(!this.focusId){if(this.focusPanel?.isValid)this.focusPanel.active=false;return;}
+    const d=this.displays.get(this.focusId),unit=this.presentation.visibleState?.units.find(u=>u.id===this.focusId);
+    if(!this.hud?.isValid||!d||!unit||d.dying||unit.hp<=0){if(this.focusPanel?.isValid)this.focusPanel.active=false;return;}
+    if(!this.focusPanel?.isValid||this.focusPanel.parent!==this.hud){
+      const panel=this.ui.node(this.hud,'FocusedUnit:readable',300,106,-430,-235);this.focusPanel=panel;
+      if(ArtSkin.image('panel'))void ArtSkin.paint(panel,'panel');
+      const title=this.ui.label(panel,'FocusedName','',0,28,272,32,15,Theme.gold);
+      title.overflow=Label.Overflow.CLAMP;title.lineHeight=16;
+      const stats=this.ui.label(panel,'FocusedStats','',0,0,272,25,17);
+      const status=this.ui.label(panel,'FocusedStatus','',0,-30,272,30,12);
+      status.overflow=Label.Overflow.CLAMP;status.lineHeight=14;this.focusLabels={title,stats,status};
+      panel.on(Node.EventType.TOUCH_END,()=>{
+        const current=this.presentation.visibleState?.units.find(u=>u.id===this.focusId),shown=this.displays.get(this.focusId);
+        if(current&&shown&&current.statuses.length)this.hooks.log(`${shown.name.string}\n攻击 ${shown.attack.string}　生命 ${shown.hp.string}/${current.maxHp}\n${current.statuses.map(s=>`${effectDisplay(this.catalog,s.id).name}（${s.turns}回合）`).join('\n')}`);
+      });
+    }
+    this.focusPanel.active=true;
+    this.focusLabels!.title.string=d.name.string;
+    this.focusLabels!.stats.string=`攻击 ${d.attack.string}　生命 ${d.hp.string}/${unit.maxHp}`;
+    const descriptions=unit.statuses.map(s=>`${effectDisplay(this.catalog,s.id).name}（${s.turns}回合）`);
+    const statusText=descriptions.join(' · ');
+    this.focusLabels!.status.string=statusText||`射程 ${unit.range}　移动 ${unit.movement}`;
   }
   private applyNameVisibility(display: Display): void {
     display.name.node.active = !display.nameSuppressed || display.nameHovered || display.namePinned;
@@ -455,6 +486,7 @@ export class BattleSceneView {
     if (skin?.path) this.ui.skin(hud, 'HandPane:source-zdjm_1', 'zdjm_1', 173, -228, 854, 144);
     else this.ui.panel(hud, 'HandPane:missing-source', 854, 144, 173, -228, new Color(45, 34, 20, 210));
     const me = state.players.find(player => player.id === this.me); if (!me) return;
+    this.renderFocusInfo();
     const mine = !this.locked && !this.latest.settled && active?.id === this.me;
     const terrainCount = (state.terrains ?? []).reduce((sum, t) => sum + t.cells.length, 0);
     if (terrainCount) this.ui.label(hud, 'Terrain:legend', `地形 ${terrainCount}格 · 点击格子查看效果 · 数字为玩家回合`, -302, -136, 510, 25, 13, Theme.gold);

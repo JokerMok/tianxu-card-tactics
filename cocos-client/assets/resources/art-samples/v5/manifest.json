@@ -1,0 +1,1664 @@
+{
+  "version": 2,
+  "id": "steelwood-chapter1-production-20261026",
+  "images": {
+    "forest-map-1": {
+      "file": "../v2/forest-map-1-f28d50c907f0.jpg",
+      "size": [
+        1600,
+        800
+      ]
+    },
+    "panel": {
+      "file": "../v2/panel-2eacf473ca05.png",
+      "size": [
+        384,
+        288
+      ],
+      "insets": [
+        26,
+        26,
+        24,
+        24
+      ]
+    },
+    "card-frame": {
+      "file": "../v2/quality-frame-0-5f3cb01cf5cc.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-0": {
+      "file": "../v2/quality-frame-0-5f3cb01cf5cc.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-1": {
+      "file": "../v2/quality-frame-1-c23b53ca7072.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-2": {
+      "file": "../v2/quality-frame-2-943df56c10a9.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-3": {
+      "file": "../v2/quality-frame-3-be3ff2a7cdc2.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-4": {
+      "file": "../v2/quality-frame-4-36715f65daa0.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "quality-frame-5": {
+      "file": "../v2/quality-frame-5-05771767fb67.png",
+      "size": [
+        256,
+        352
+      ]
+    },
+    "button-normal": {
+      "file": "../v2/button-secondary-normal-a4b8c8436eee.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-selected": {
+      "file": "../v2/button-secondary-selected-3b255083fe7f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-pressed": {
+      "file": "../v2/button-secondary-pressed-3a15124090c6.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-disabled": {
+      "file": "../v2/button-secondary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-normal": {
+      "file": "../v2/button-primary-normal-09f651df4458.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-selected": {
+      "file": "../v2/button-primary-selected-83e2dde0886f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-pressed": {
+      "file": "../v2/button-primary-pressed-f940dab50c82.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-primary-disabled": {
+      "file": "../v2/button-primary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-normal": {
+      "file": "../v2/button-secondary-normal-a4b8c8436eee.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-selected": {
+      "file": "../v2/button-secondary-selected-3b255083fe7f.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-pressed": {
+      "file": "../v2/button-secondary-pressed-3a15124090c6.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-secondary-disabled": {
+      "file": "../v2/button-secondary-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-normal": {
+      "file": "../v2/button-compact-normal-6aacda81f743.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-selected": {
+      "file": "../v2/button-compact-selected-4d7fe224f303.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-pressed": {
+      "file": "../v2/button-compact-pressed-ab5584ff24be.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "button-compact-disabled": {
+      "file": "../v2/button-compact-disabled-ed2373100a0e.png",
+      "size": [
+        256,
+        56
+      ],
+      "insets": [
+        24,
+        24,
+        12,
+        12
+      ]
+    },
+    "hud-draw": {
+      "file": "../v2/hud-draw-b9c13d8aa004.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "hud-hand": {
+      "file": "../v2/hud-hand-276f28405742.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "hud-graveyard": {
+      "file": "../v2/hud-graveyard-b75fe1d66f7d.png",
+      "size": [
+        48,
+        48
+      ]
+    },
+    "control-plus": {
+      "file": "../v2/control-plus-78492f22ff4d.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "control-minus": {
+      "file": "../v2/control-minus-6a7da52d2205.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "control-locked": {
+      "file": "../v2/control-locked-62ab65165d9f.png",
+      "size": [
+        24,
+        24
+      ]
+    },
+    "quality-frame-6": {
+      "file": "../v2/quality-frame-6-904a8018cffa.png",
+      "size": [
+        256,
+        352
+      ]
+    }
+  },
+  "maps": {
+    "main:map:1": "forest-map-1"
+  },
+  "units": {
+    "main:monster:1": {
+      "atlas": "guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "frameSize": [
+        188,
+        157
+      ],
+      "columns": 6,
+      "frameCount": 35,
+      "displaySize": [
+        124.84375,
+        104.2578125
+      ],
+      "foot": [
+        72,
+        148
+      ],
+      "mount": [
+        72,
+        106
+      ],
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 8,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 14,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 20,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 26,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      },
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "reactions": {
+        "block": {
+          "start": 32,
+          "count": 3,
+          "fps": 15,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:19": {
+      "atlas": "squire-10c34cd8249a-b65536e9c577.webp",
+      "frameSize": [
+        194,
+        150
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        128.828125,
+        99.609375
+      ],
+      "foot": [
+        75,
+        144
+      ],
+      "mount": [
+        75,
+        102
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:43": {
+      "atlas": "lancer-535e44dd3d9a-e396f4d68575.webp",
+      "frameSize": [
+        239,
+        187
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        149.375,
+        116.875
+      ],
+      "foot": [
+        84,
+        182
+      ],
+      "mount": [
+        89,
+        98
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 68,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:61": {
+      "atlas": "horseman-e085efcf9726-67f7cd7c6a5c.webp",
+      "frameSize": [
+        253,
+        195
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        158.125,
+        121.875
+      ],
+      "foot": [
+        121,
+        182
+      ],
+      "mount": [
+        121,
+        98
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 68,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:5019": {
+      "atlas": "elven-hunter-86861df505a3-aa499c657474.webp",
+      "frameSize": [
+        155,
+        153
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        102.9296875,
+        101.6015625
+      ],
+      "foot": [
+        77,
+        145
+      ],
+      "mount": [
+        77,
+        103
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:60001": {
+      "atlas": "goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "frameSize": [
+        185,
+        146
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        122.8515625,
+        96.953125
+      ],
+      "foot": [
+        77,
+        138
+      ],
+      "mount": [
+        77,
+        96
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:3001": {
+      "atlas": "goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "frameSize": [
+        185,
+        146
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        122.8515625,
+        96.953125
+      ],
+      "foot": [
+        77,
+        138
+      ],
+      "mount": [
+        77,
+        96
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:60002": {
+      "atlas": "goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+      "frameSize": [
+        178,
+        146
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        118.203125,
+        96.953125
+      ],
+      "foot": [
+        83,
+        138
+      ],
+      "mount": [
+        83,
+        96
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:3019": {
+      "atlas": "goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+      "frameSize": [
+        178,
+        146
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        118.203125,
+        96.953125
+      ],
+      "foot": [
+        83,
+        138
+      ],
+      "mount": [
+        83,
+        96
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:60003": {
+      "atlas": "ogre-destroyer-62e3b383197c.webp",
+      "frameSize": [
+        223,
+        175
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        165.5078125,
+        129.8828125
+      ],
+      "foot": [
+        93,
+        167
+      ],
+      "mount": [
+        93,
+        125
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 78,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:60005": {
+      "atlas": "ogre-marauder-c4edd710bea4.webp",
+      "frameSize": [
+        240,
+        165
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        178.125,
+        122.4609375
+      ],
+      "foot": [
+        94,
+        159
+      ],
+      "mount": [
+        94,
+        117
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 78,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:4001": {
+      "atlas": "ogre-marauder-c4edd710bea4.webp",
+      "frameSize": [
+        240,
+        165
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        178.125,
+        122.4609375
+      ],
+      "foot": [
+        94,
+        159
+      ],
+      "mount": [
+        94,
+        117
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 78,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:60007": {
+      "atlas": "captain-89022357add6.webp",
+      "frameSize": [
+        313,
+        227
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        232.3046875,
+        168.4765625
+      ],
+      "foot": [
+        113,
+        218
+      ],
+      "mount": [
+        113,
+        176
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 78,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:8": {
+      "atlas": "sentinel-cc7e6067fe73.webp",
+      "frameSize": [
+        244,
+        193
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        162.03125,
+        128.1640625
+      ],
+      "foot": [
+        97,
+        188
+      ],
+      "mount": [
+        97,
+        146
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:75": {
+      "atlas": "champion-82987f71c3a4.webp",
+      "frameSize": [
+        247,
+        232
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        154.375,
+        145.0
+      ],
+      "foot": [
+        106,
+        225
+      ],
+      "mount": [
+        106,
+        141
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 68,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 16.666666666666668,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:9017": {
+      "atlas": "elfin-230ad616fef0.webp",
+      "frameSize": [
+        227,
+        170
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        106.40625,
+        79.6875
+      ],
+      "foot": [
+        114,
+        158
+      ],
+      "mount": [
+        114,
+        116
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:1253": {
+      "atlas": "lich-b67b94bb10b9.webp",
+      "frameSize": [
+        201,
+        198
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        133.4765625,
+        131.484375
+      ],
+      "foot": [
+        102,
+        184
+      ],
+      "mount": [
+        102,
+        142
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:1127": {
+      "atlas": "skeleton-011a59a6b2a9.webp",
+      "frameSize": [
+        276,
+        185
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        183.28125,
+        122.8515625
+      ],
+      "foot": [
+        115,
+        176
+      ],
+      "mount": [
+        115,
+        134
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:21253": {
+      "atlas": "angel-788ba7ad6e28.webp",
+      "frameSize": [
+        366,
+        224
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        243.046875,
+        148.75
+      ],
+      "foot": [
+        134,
+        213
+      ],
+      "mount": [
+        134,
+        171
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:9000": {
+      "atlas": "bully-6e0f9ae116b5.webp",
+      "frameSize": [
+        259,
+        161
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        171.9921875,
+        106.9140625
+      ],
+      "foot": [
+        111,
+        152
+      ],
+      "mount": [
+        111,
+        110
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:21325": {
+      "atlas": "ice-archer-2f1cbf00c315.webp",
+      "frameSize": [
+        247,
+        206
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        164.0234375,
+        136.796875
+      ],
+      "foot": [
+        140,
+        194
+      ],
+      "mount": [
+        140,
+        152
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    },
+    "main:monster:21319": {
+      "atlas": "flame-26c82ed94e34.webp",
+      "frameSize": [
+        348,
+        189
+      ],
+      "columns": 6,
+      "frameCount": 30,
+      "displaySize": [
+        231.09375,
+        125.5078125
+      ],
+      "foot": [
+        134,
+        175
+      ],
+      "mount": [
+        134,
+        133
+      ],
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 8.0,
+          "cueFrame": 3,
+          "loop": false
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    }
+  },
+  "models": {
+    "main:model:37d68956aa077843b62b": "main:monster:1",
+    "main:model:e1eec96444fbab197d3f": "main:monster:19",
+    "main:model:b0e55c408ff64a7afef5": "main:monster:43",
+    "main:model:084ab6a537029e5baa0a": "main:monster:61",
+    "main:model:00fc2a2e0efd186fb8fa": "main:monster:5019",
+    "main:model:8b1c69f6618c1d1f3f5f": "main:monster:3001",
+    "main:model:8d96ae7e7cc6096e8d46": "main:monster:3019",
+    "main:model:e20d7e5947f126a1af02": "main:monster:60003",
+    "main:model:d9297fe5cbede4982581": "main:monster:4001",
+    "main:model:30945d8c76c9d4a31508": "main:monster:60007",
+    "main:model:26b078148d1f7af2f252": "main:monster:8",
+    "main:model:50631ca22c8b0f5b8c65": "main:monster:75",
+    "main:model:0df57cc09535e694bf3f": "main:monster:9017",
+    "main:model:b6ed3d6b0e27049555a8": "main:monster:1253",
+    "main:model:0d666e654103978eeeea": "main:monster:1127",
+    "main:model:ef2eef79f0c1b1d050ad": "main:monster:21253",
+    "main:model:f3da6c4354da1f7d6173": "main:monster:9000",
+    "main:model:1d70c415b27c5a6b316a": "main:monster:21325",
+    "main:model:876528e0f89a84e7fd6b": "main:monster:21319"
+  }
+}

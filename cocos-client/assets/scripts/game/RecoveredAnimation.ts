@@ -169,10 +169,10 @@ export class RecoveredAnimation {
 
   async setMonster(monsterId: number, scope: DataScope = 'main'): Promise<void> {
     if (this.disposed) throw new Error('RecoveredAnimation has been destroyed');
-    const replacement=ArtSkin.unit(scope,monsterId);
+    const link = this.catalog.scopes[scope]?.monsterModels?.[String(monsterId)];
+    const replacement=ArtSkin.unit(scope,monsterId,link?.modelId);
     if(replacement){this.sample?.destroy();this.clearDisplay();this.sample=new SampleUnitAnimation(this.node,ArtSkin.unitBase(),replacement);await this.sample.load();this.play('stand','east');return;}
     this.sample?.destroy();this.sample=undefined;
-    const link = this.catalog.scopes[scope]?.monsterModels?.[String(monsterId)];
     if (!link?.modelId) throw new Error(`No recovered ${scope} items.xml model for monster ${monsterId}`);
     await this.setModels([link.modelId]);
     this.play('stand', 'east');

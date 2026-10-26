@@ -49226,6 +49226,41 @@
       "source": "English Name; candidate translation",
       "originalName": "Queen Reversed",
       "sourceRow": "config_row:b0288a2fa0f4c2c90cec"
+    },
+    "main:card:60001": {
+      "name": "哥布林强盗",
+      "status": "candidate",
+      "source": "English fixed-encounter Name; Chinese display candidate",
+      "originalName": "Goblin Bandit",
+      "sourceRow": "config_row:49f205e7e187f29f8748"
+    },
+    "main:card:60002": {
+      "name": "哥布林掠夺者",
+      "status": "candidate",
+      "source": "English fixed-encounter Name; Chinese display candidate",
+      "originalName": "Goblin Maurader",
+      "sourceRow": "config_row:aef25a2dfd84df392973"
+    },
+    "main:card:60003": {
+      "name": "食人魔毁灭者",
+      "status": "candidate",
+      "source": "English fixed-encounter Name; Chinese display candidate",
+      "originalName": "Ogre Destroyer",
+      "sourceRow": "config_row:9de6c7dcb3d2fce91aad"
+    },
+    "main:card:60005": {
+      "name": "食人魔掠夺者",
+      "status": "candidate",
+      "source": "English fixed-encounter Name; Chinese display candidate",
+      "originalName": "Ogre Marauder",
+      "sourceRow": "config_row:362910ea7ec0f9ebde64"
+    },
+    "main:card:60007": {
+      "name": "哥布林头目",
+      "status": "candidate",
+      "source": "English fixed-encounter Name; Chinese display candidate",
+      "originalName": "Goblin Captain",
+      "sourceRow": "config_row:021dcfbeb7c6ab3514b4"
     }
   },
   "effects": {
