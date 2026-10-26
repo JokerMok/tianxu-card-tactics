@@ -1,0 +1,174 @@
+{
+  "environment": "Isolated .local/art-samples/game.sqlite, read-only query; no credentials or database copied",
+  "accountPath": "Existing normal starter account, no GM/fixture resource grant",
+  "level": 3,
+  "deck": [
+    "main:card:19",
+    "main:card:43",
+    "main:card:61",
+    "main:card:5019",
+    "main:card:8"
+  ],
+  "currencies": {
+    "silver": 500,
+    "gold": 20,
+    "crystal": 0
+  },
+  "ownedChapterRewardCards": {
+    "5019": 1,
+    "2": 1,
+    "19": 2,
+    "8": 1,
+    "75": 0
+  },
+  "latestBattles": [
+    {
+      "nodeId": "main:scene:1:node:101",
+      "triggerId": "main:scene:1:node:101:trigger:101002",
+      "createdAt": 1792992000320,
+      "turn": 5,
+      "settled": true,
+      "dismissed": true,
+      "playerWon": true,
+      "rewards": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "uniqueSettlementRows": 1,
+      "playerDeployedMonsterIds": [
+        19,
+        43,
+        61
+      ]
+    },
+    {
+      "nodeId": "main:scene:1:node:102",
+      "triggerId": "main:scene:1:node:102:trigger:102002",
+      "createdAt": 1792992152341,
+      "turn": 4,
+      "settled": true,
+      "dismissed": true,
+      "playerWon": true,
+      "rewards": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "uniqueSettlementRows": 1,
+      "playerDeployedMonsterIds": [
+        19,
+        43,
+        61
+      ]
+    },
+    {
+      "nodeId": "main:scene:1:node:103",
+      "triggerId": "main:scene:1:node:103:trigger:103002",
+      "createdAt": 1792992458432,
+      "turn": 5,
+      "settled": true,
+      "dismissed": true,
+      "playerWon": true,
+      "rewards": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "uniqueSettlementRows": 1,
+      "playerDeployedMonsterIds": [
+        19,
+        43,
+        61
+      ]
+    },
+    {
+      "nodeId": "main:scene:1:node:105",
+      "triggerId": "main:scene:1:node:105:trigger:105002",
+      "createdAt": 1792992828563,
+      "turn": 5,
+      "settled": true,
+      "dismissed": true,
+      "playerWon": true,
+      "rewards": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "uniqueSettlementRows": 1,
+      "playerDeployedMonsterIds": [
+        19,
+        43,
+        61
+      ]
+    },
+    {
+      "nodeId": "main:scene:1:node:107",
+      "triggerId": "main:scene:1:node:107:trigger:107001",
+      "createdAt": 1792992984667,
+      "turn": 8,
+      "settled": true,
+      "dismissed": true,
+      "playerWon": false,
+      "rewards": {
+        "won": false,
+        "silver": 0,
+        "xp": 0,
+        "cards": []
+      },
+      "uniqueSettlementRows": 1,
+      "playerDeployedMonsterIds": [
+        8,
+        19,
+        43,
+        61,
+        5019
+      ]
+    }
+  ],
+  "ordinary107Boundary": "First normal attempt failed at turn8; Sentinel deployed, Captain displayed. Champion75 source/mixed QA only, not claimed as normally obtained this run."
+}

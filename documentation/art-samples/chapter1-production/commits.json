@@ -1,0 +1,9 @@
+{
+  "baseline": "64cf3d0d0185692c8f28cecdc4340ea74dfc6559",
+  "implementation": "8047cc972e9957c9b82cd5dfd085816b04bdde68",
+  "branch": "codex/art-samples-pve",
+  "documentation": "This record and evidence are committed separately after implementation; see git log.",
+  "publication": "local only, no push/main merge/server access",
+  "checkpoint": ".local/art-production/checkpoint.json",
+  "runtime": "evidence/release.json"
+}

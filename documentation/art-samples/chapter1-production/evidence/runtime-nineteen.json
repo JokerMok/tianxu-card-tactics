@@ -1,0 +1,1198 @@
+{
+  "elapsedMs": 175720.60000038147,
+  "page": "home",
+  "ready": true,
+  "busy": false,
+  "nodes": 349,
+  "sprites": 46,
+  "missing": 0,
+  "emptyNames": [],
+  "sampleGeometry": [
+    {
+      "size": {
+        "width": 124.84375,
+        "height": 104.2578125
+      },
+      "anchor": {
+        "x": 0.3829787234042553,
+        "y": 0.0573248407643312
+      },
+      "pos": {
+        "x": 915,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 188,
+        "height": 157
+      },
+      "original": {
+        "width": 188,
+        "height": 157
+      }
+    },
+    {
+      "size": {
+        "width": 102.9296875,
+        "height": 101.6015625
+      },
+      "anchor": {
+        "x": 0.4967741935483871,
+        "y": 0.05228758169934644
+      },
+      "pos": {
+        "x": 735,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 155,
+        "y": 0,
+        "width": 155,
+        "height": 153
+      },
+      "original": {
+        "width": 155,
+        "height": 153
+      }
+    },
+    {
+      "size": {
+        "width": 178.125,
+        "height": 122.4609375
+      },
+      "anchor": {
+        "x": 0.39166666666666666,
+        "y": 0.036363636363636376
+      },
+      "pos": {
+        "x": 645,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 240,
+        "y": 0,
+        "width": 240,
+        "height": 165
+      },
+      "original": {
+        "width": 240,
+        "height": 165
+      }
+    },
+    {
+      "size": {
+        "width": 106.40625,
+        "height": 79.6875
+      },
+      "anchor": {
+        "x": 0.5022026431718062,
+        "y": 0.07058823529411762
+      },
+      "pos": {
+        "x": 465,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 227,
+        "y": 0,
+        "width": 227,
+        "height": 170
+      },
+      "original": {
+        "width": 227,
+        "height": 170
+      }
+    },
+    {
+      "size": {
+        "width": 171.9921875,
+        "height": 106.9140625
+      },
+      "anchor": {
+        "x": 0.42857142857142855,
+        "y": 0.05590062111801242
+      },
+      "pos": {
+        "x": 285,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 518,
+        "y": 0,
+        "width": 259,
+        "height": 161
+      },
+      "original": {
+        "width": 259,
+        "height": 161
+      }
+    },
+    {
+      "size": {
+        "width": 128.828125,
+        "height": 99.609375
+      },
+      "anchor": {
+        "x": 0.3865979381443299,
+        "y": 0.040000000000000036
+      },
+      "pos": {
+        "x": 915,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 194,
+        "y": 0,
+        "width": 194,
+        "height": 150
+      },
+      "original": {
+        "width": 194,
+        "height": 150
+      }
+    },
+    {
+      "size": {
+        "width": 122.8515625,
+        "height": 96.953125
+      },
+      "anchor": {
+        "x": 0.41621621621621624,
+        "y": 0.0547945205479452
+      },
+      "pos": {
+        "x": 735,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 185,
+        "y": 0,
+        "width": 185,
+        "height": 146
+      },
+      "original": {
+        "width": 185,
+        "height": 146
+      }
+    },
+    {
+      "size": {
+        "width": 232.3046875,
+        "height": 168.4765625
+      },
+      "anchor": {
+        "x": 0.3610223642172524,
+        "y": 0.03964757709251099
+      },
+      "pos": {
+        "x": 645,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 313,
+        "y": 0,
+        "width": 313,
+        "height": 227
+      },
+      "original": {
+        "width": 313,
+        "height": 227
+      }
+    },
+    {
+      "size": {
+        "width": 133.4765625,
+        "height": 131.484375
+      },
+      "anchor": {
+        "x": 0.5074626865671642,
+        "y": 0.07070707070707072
+      },
+      "pos": {
+        "x": 465,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 201,
+        "y": 0,
+        "width": 201,
+        "height": 198
+      },
+      "original": {
+        "width": 201,
+        "height": 198
+      }
+    },
+    {
+      "size": {
+        "width": 164.0234375,
+        "height": 136.796875
+      },
+      "anchor": {
+        "x": 0.5668016194331984,
+        "y": 0.058252427184465994
+      },
+      "pos": {
+        "x": 285,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 494,
+        "y": 0,
+        "width": 247,
+        "height": 206
+      },
+      "original": {
+        "width": 247,
+        "height": 206
+      }
+    },
+    {
+      "size": {
+        "width": 149.375,
+        "height": 116.875
+      },
+      "anchor": {
+        "x": 0.3514644351464435,
+        "y": 0.0267379679144385
+      },
+      "pos": {
+        "x": 915,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 239,
+        "y": 0,
+        "width": 239,
+        "height": 187
+      },
+      "original": {
+        "width": 239,
+        "height": 187
+      }
+    },
+    {
+      "size": {
+        "width": 118.203125,
+        "height": 96.953125
+      },
+      "anchor": {
+        "x": 0.46629213483146065,
+        "y": 0.0547945205479452
+      },
+      "pos": {
+        "x": 735,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 178,
+        "y": 0,
+        "width": 178,
+        "height": 146
+      },
+      "original": {
+        "width": 178,
+        "height": 146
+      }
+    },
+    {
+      "size": {
+        "width": 162.03125,
+        "height": 128.1640625
+      },
+      "anchor": {
+        "x": 0.3975409836065574,
+        "y": 0.025906735751295318
+      },
+      "pos": {
+        "x": 645,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 244,
+        "y": 0,
+        "width": 244,
+        "height": 193
+      },
+      "original": {
+        "width": 244,
+        "height": 193
+      }
+    },
+    {
+      "size": {
+        "width": 183.28125,
+        "height": 122.8515625
+      },
+      "anchor": {
+        "x": 0.4166666666666667,
+        "y": 0.048648648648648596
+      },
+      "pos": {
+        "x": 465,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 276,
+        "y": 0,
+        "width": 276,
+        "height": 185
+      },
+      "original": {
+        "width": 276,
+        "height": 185
+      }
+    },
+    {
+      "size": {
+        "width": 231.09375,
+        "height": 125.5078125
+      },
+      "anchor": {
+        "x": 0.3850574712643678,
+        "y": 0.07407407407407407
+      },
+      "pos": {
+        "x": 285,
+        "y": 285.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 696,
+        "y": 0,
+        "width": 348,
+        "height": 189
+      },
+      "original": {
+        "width": 348,
+        "height": 189
+      }
+    },
+    {
+      "size": {
+        "width": 158.125,
+        "height": 121.875
+      },
+      "anchor": {
+        "x": 0.4782608695652174,
+        "y": 0.06666666666666665
+      },
+      "pos": {
+        "x": 915,
+        "y": 190.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 253,
+        "y": 0,
+        "width": 253,
+        "height": 195
+      },
+      "original": {
+        "width": 253,
+        "height": 195
+      }
+    },
+    {
+      "size": {
+        "width": 165.5078125,
+        "height": 129.8828125
+      },
+      "anchor": {
+        "x": 0.4170403587443946,
+        "y": 0.04571428571428571
+      },
+      "pos": {
+        "x": 735,
+        "y": 190.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 223,
+        "y": 0,
+        "width": 223,
+        "height": 175
+      },
+      "original": {
+        "width": 223,
+        "height": 175
+      }
+    },
+    {
+      "size": {
+        "width": 154.375,
+        "height": 145
+      },
+      "anchor": {
+        "x": 0.4291497975708502,
+        "y": 0.030172413793103425
+      },
+      "pos": {
+        "x": 645,
+        "y": 190.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 247,
+        "y": 0,
+        "width": 247,
+        "height": 232
+      },
+      "original": {
+        "width": 247,
+        "height": 232
+      }
+    },
+    {
+      "size": {
+        "width": 243.046875,
+        "height": 148.75
+      },
+      "anchor": {
+        "x": 0.366120218579235,
+        "y": 0.049107142857142905
+      },
+      "pos": {
+        "x": 465,
+        "y": 190.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 732,
+        "y": 0,
+        "width": 366,
+        "height": 224
+      },
+      "original": {
+        "width": 366,
+        "height": 224
+      }
+    }
+  ],
+  "units": 21,
+  "maxUnits": 21,
+  "animations": 21,
+  "blankSamples": 149,
+  "warmBlankSamples": 0,
+  "animationSamples": 166740,
+  "blankClassification": {
+    "initialUnrendered": 149,
+    "currentInitialUnrendered": 0,
+    "expectedOpacityZero": 0,
+    "zeroHpSourceEmpty": 0,
+    "unexpected": 0,
+    "currentExpectedOpacityZero": 0,
+    "currentZeroHpSourceEmpty": 0,
+    "currentUnexpected": 0,
+    "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+  },
+  "opacityDiagnostics": {
+    "transparentAnimations": 0,
+    "fadingAnimations": 0,
+    "currentTransparent": 0,
+    "currentFading": 0
+  },
+  "spriteChanges": 10099,
+  "homeBuilds": 0,
+  "p95": 9.200000000011642,
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 466,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 3,
+      "x": 641,
+      "y": 572,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 4,
+      "x": 640,
+      "y": 226,
+      "firstMs": 595.4000001907407,
+      "usableMs": 895.3000001907349
+    }
+  ],
+  "startup": [
+    {
+      "path": "/api/bootstrap",
+      "ms": 1.1000003814697266,
+      "encoded": 89,
+      "decoded": 89,
+      "transfer": 389
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "ms": 6.599999904632568,
+      "encoded": 6653356,
+      "decoded": 6653356,
+      "transfer": 6653656
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "ms": 4,
+      "encoded": 224590,
+      "decoded": 224590,
+      "transfer": 224890
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "ms": 2.3000001907348633,
+      "encoded": 93602,
+      "decoded": 93602,
+      "transfer": 93902
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "ms": 2.0999999046325684,
+      "encoded": 11375,
+      "decoded": 11375,
+      "transfer": 11675
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "ms": 2.200000286102295,
+      "encoded": 3016,
+      "decoded": 3016,
+      "transfer": 3316
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "ms": 2.200000286102295,
+      "encoded": 1761,
+      "decoded": 1761,
+      "transfer": 2061
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "ms": 1.9000000953674316,
+      "encoded": 154025,
+      "decoded": 154025,
+      "transfer": 0
+    },
+    {
+      "path": "/api/catalog",
+      "ms": 70.40000009536743,
+      "encoded": 9100522,
+      "decoded": 67037870,
+      "transfer": 300
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "ms": 2.6000003814697266,
+      "encoded": 5623,
+      "decoded": 5623,
+      "transfer": 0
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "ms": 1.1999998092651367,
+      "encoded": 795,
+      "decoded": 795,
+      "transfer": 0
+    }
+  ],
+  "atlasResources": [
+    {
+      "path": "/art/v5/flame-26c82ed94e34.webp",
+      "ms": 6.299999713897705,
+      "encoded": 1010884,
+      "decoded": 1010884,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/bully-6e0f9ae116b5.webp",
+      "ms": 6.699999809265137,
+      "encoded": 603280,
+      "decoded": 603280,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+      "ms": 7.199999809265137,
+      "encoded": 1106766,
+      "decoded": 1106766,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/angel-788ba7ad6e28.webp",
+      "ms": 7.599999904632568,
+      "encoded": 1369696,
+      "decoded": 1369696,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+      "ms": 3.4000000953674316,
+      "encoded": 801118,
+      "decoded": 801118,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/lich-b67b94bb10b9.webp",
+      "ms": 3.8000001907348633,
+      "encoded": 882034,
+      "decoded": 882034,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/elfin-230ad616fef0.webp",
+      "ms": 3.9000000953674316,
+      "encoded": 639406,
+      "decoded": 639406,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/champion-82987f71c3a4.webp",
+      "ms": 4.900000095367432,
+      "encoded": 1393422,
+      "decoded": 1393422,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+      "ms": 4.100000381469727,
+      "encoded": 909736,
+      "decoded": 909736,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+      "ms": 6.400000095367432,
+      "encoded": 649834,
+      "decoded": 649834,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+      "ms": 6.700000286102295,
+      "encoded": 770972,
+      "decoded": 770972,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+      "ms": 6.600000381469727,
+      "encoded": 557582,
+      "decoded": 557582,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "ms": 6.300000190734863,
+      "encoded": 486558,
+      "decoded": 486558,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+      "ms": 7.200000286102295,
+      "encoded": 586268,
+      "decoded": 586268,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+      "ms": 8.400000095367432,
+      "encoded": 610308,
+      "decoded": 610308,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "ms": 8.800000190734863,
+      "encoded": 848696,
+      "decoded": 848696,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/captain-89022357add6.webp",
+      "ms": 3.1000003814697266,
+      "encoded": 1074086,
+      "decoded": 1074086,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+      "ms": 7.700000286102295,
+      "encoded": 1103918,
+      "decoded": 1103918,
+      "transfer": 0
+    },
+    {
+      "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "ms": 2.6999998092651367,
+      "encoded": 576962,
+      "decoded": 576962,
+      "transfer": 0
+    }
+  ],
+  "lastResources": [
+    {
+      "path": "/api/state",
+      "ms": 8.599999904632568,
+      "encoded": 110,
+      "decoded": 110,
+      "transfer": 410
+    },
+    {
+      "path": "/api/state",
+      "ms": 383,
+      "encoded": 480913,
+      "decoded": 480913,
+      "transfer": 481213
+    },
+    {
+      "path": "/api/state",
+      "ms": 425.19999980926514,
+      "encoded": 480913,
+      "decoded": 480913,
+      "transfer": 481213
+    },
+    {
+      "path": "/api/state",
+      "ms": 7.699999809265137,
+      "encoded": 110,
+      "decoded": 110,
+      "transfer": 410
+    },
+    {
+      "path": "/api/state",
+      "ms": 6.5,
+      "encoded": 110,
+      "decoded": 110,
+      "transfer": 410
+    },
+    {
+      "path": "/api/state",
+      "ms": 5.900000095367432,
+      "encoded": 110,
+      "decoded": 110,
+      "transfer": 410
+    },
+    {
+      "path": "/api/state",
+      "ms": 7,
+      "encoded": 110,
+      "decoded": 110,
+      "transfer": 410
+    },
+    {
+      "path": "/api/state",
+      "ms": 507.2999997138977,
+      "encoded": 480913,
+      "decoded": 480913,
+      "transfer": 481213
+    }
+  ],
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-production-20261026",
+      "uiTextures": 10,
+      "loads": 10,
+      "failures": 0,
+      "maxPrepareMs": 241,
+      "unitAtlases": {
+        "atlasPoolEntries": 19,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 19,
+        "atlasPoolSpriteFrames": 575,
+        "atlasPoolEstimatedBytes": 103094064,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      }
+    },
+    "battle": {
+      "liveDisplays": 21,
+      "animations": [
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 490,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 490,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 0,
+          "plays": 2,
+          "frameChanges": 529,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 1,
+          "plays": 2,
+          "frameChanges": 530,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 531,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 531,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 531,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 19,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 19,
+          "atlasPoolSpriteFrames": 575,
+          "atlasPoolEstimatedBytes": 103094064,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 2,
+          "plays": 2,
+          "frameChanges": 531,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 1
+        }
+      ]
+    }
+  }
+}
