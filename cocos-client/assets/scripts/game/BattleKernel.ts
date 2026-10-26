@@ -78,7 +78,7 @@ function cardRaw(content: RecoveredContent, cardId: string): RawRow | undefined 
 
 interface EffectRow { id: number; type: number; raw: RawRow }
 
-function collectEffectRows(content: RecoveredContent, ids: readonly number[], output: EffectRow[], seen: Set<number>): void {
+function collectEffectRows(content: RecoveredContent, ids: readonly number[], output: EffectRow[], seen: Set<number>, flags?: BattleUnit['flags']): void {
   for (const id of ids) {
     if (id <= 0 || seen.has(id)) continue;
     seen.add(id);
@@ -92,7 +92,12 @@ function collectEffectRows(content: RecoveredContent, ids: readonly number[], ou
         const child = optionalNumber(raw, `param${index}`, 0);
         if (child > 0) children.push(child);
       }
-      collectEffectRows(content, children, output, seen);
+      collectEffectRows(content, children, output, seen, flags);
+    } else if (type === 50) {
+      // A timed wrapper contains param2, not all positive parameters. Its clock
+      // counts this creature's actions, and survives snapshots in unit.flags.
+      const remaining = flags?.[`compositeTurns:${id}`] ?? flags?.timedCompositeTurns ?? optionalNumber(raw, 'param1', 1);
+      if (remaining > 0) collectEffectRows(content, [optionalNumber(raw, 'param2', 0)], output, seen, flags);
     }
   }
 }
@@ -105,10 +110,10 @@ function activeEffectRows(content: RecoveredContent, unit: BattleUnit, type?: nu
     return raw ? effectIdsFromStatus(raw) : [];
   });
   const stripsBaseAbilities = statusEffectIds.some(id => optionalNumber(content.data.effects[String(id)] ?? {}, 'TypeID', 0) === 30);
-  if (!stripsBaseAbilities) collectEffectRows(content, unit.effects, rows, seen);
+  if (!stripsBaseAbilities) collectEffectRows(content, unit.effects, rows, seen, unit.flags);
   for (const status of unit.statuses) {
     const raw = content.data.statuses[String(status.id)];
-    if (raw) collectEffectRows(content, effectIdsFromStatus(raw), rows, seen);
+    if (raw) collectEffectRows(content, effectIdsFromStatus(raw), rows, seen, unit.flags);
   }
   return type === undefined ? rows : rows.filter(effect => effect.type === type);
 }
@@ -545,6 +550,7 @@ function applyStaticEffects(
         const child = p2;
         if (child > 0 && content.data.effects[String(child)]) applyStaticEffects(content, state, unit, [child], visited);
         unit.flags.timedCompositeTurns = Math.max(1, p1);
+        unit.flags[`compositeTurns:${effectId}`] ??= Math.max(1, p1);
         break;
       }
       case 51: unit.flags.piercing = 1; break;
@@ -1106,6 +1112,11 @@ function protectionTarget(
 }
 
 function handleKillEffects(content: RecoveredContent, state: MutableState, source: BattleUnit, target: BattleUnit): void {
+  // 7702 blocks Reanimate/Soulbound/Skeleton; it does not erase the card or
+  // suppress unrelated death abilities. Type251 retains its own chance below.
+  if (source.flags.eraseKills === 1 && hasEffectId(content, source, 7702)) {
+    target.flags.revivalBlocked = 1;
+  }
   if (target.flags.killHandled === 1) return;
   target.flags.killHandled = 1;
   const owner = player(state, source.playerId);
@@ -1583,7 +1594,8 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
         emit(state, { type: 'status', actor: unit.id, target: unit.id, message: 'guardian-angel' });
         continue;
       }
-      if (!resurrectionBlocked && (unit.flags.resurrectChance ?? 0) > 0 && unit.flags.resurrected !== 1 && chance(state, unit.flags.resurrectChance!)) {
+      const revivalBlocked = resurrectionBlocked || unit.flags.revivalBlocked === 1;
+      if (!revivalBlocked && (unit.flags.resurrectChance ?? 0) > 0 && unit.flags.resurrected !== 1 && chance(state, unit.flags.resurrectChance!)) {
         unit.flags.resurrected = 1;
         unit.flags.deathProcessed = 0;
         unit.hp = Math.max(1, unit.maxHp);
@@ -1606,7 +1618,12 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
         }
       }
       if (!resurrectionBlocked && (unit.flags.deathSummonMonster ?? 0) > 0) summonToken(content, state, player(state, unit.playerId), unit.flags.deathSummonMonster!, unit.row, unit.col);
-      if (!resurrectionBlocked && (unit.flags.skeletonMonster ?? 0) > 0) summonToken(content, state, player(state, unit.playerId), unit.flags.skeletonMonster!, unit.row, unit.col);
+      // Skeletal collapses on its own square. Keep its source identity and card
+      // with the heap until final death, rather than leaving a live copy while
+      // also placing its card in the graveyard. The dead source is not occupied.
+      const bone = !revivalBlocked && (unit.flags.skeletonMonster ?? 0) > 0
+        ? summonTokenAt(content, state, player(state, unit.playerId), unit.flags.skeletonMonster!, unit.row, unit.col,
+          { cardId: unit.cardId, flags: { boneSourceMonster: unit.monsterId } }) : undefined;
       if (!resurrectionBlocked && unit.flags.incubate === 1) {
         const outcomes = [2154, 6094, 6028, 2010, 9007, 0];
         const monsterId = outcomes[Math.floor(nextRandom(state) * outcomes.length)]!;
@@ -1615,7 +1632,8 @@ function removeDead(content: RecoveredContent, state: MutableState): void {
       if (unit.flags.hero !== 1) {
         const owner = player(state, unit.playerId);
         const raw = cardRaw(content, unit.cardId);
-        if (!resurrectionBlocked && unit.flags.noReturn !== 1 && raw && (unit.flags.returnHandChance ?? 0) > 0 && chance(state, unit.flags.returnHandChance!)) {
+        if (bone) { /* The heap owns this battlefield card, even if terrain immediately kills it. */ }
+        else if (!revivalBlocked && unit.flags.noReturn !== 1 && raw && (unit.flags.returnHandChance ?? 0) > 0 && chance(state, unit.flags.returnHandChance!)) {
           owner.hand.push({ instanceId: `card:${state.nextId++}`, cardId: unit.cardId, wait: Math.max(0, numeric(raw, 'InitReady')) });
         } else if (raw && unit.flags.erased !== 1 && unit.flags.noGraveyard !== 1) owner.graveyard.push(unit.cardId);
       }
@@ -2665,7 +2683,7 @@ function attack(content: RecoveredContent, state: MutableState, attacker: Battle
   removeDead(content, state);
 }
 
-function summonToken(content: RecoveredContent, state: MutableState, owner: BattlePlayer, monsterId: number, nearRow: number, nearCol: number): void {
+function summonToken(content: RecoveredContent, state: MutableState, owner: BattlePlayer, monsterId: number, nearRow: number, nearCol: number): BattleUnit | undefined {
   const cells: Array<[number, number]> = [[nearRow, nearCol + (owner.team === 0 ? -1 : 1)], [nearRow - 1, nearCol], [nearRow + 1, nearCol]];
   const cell = cells.find(([row, col]) => row >= 0 && row < state.rows && col > 0 && col < COLUMNS - 1 && !occupied(state, row, col));
   if (!cell || !content.data.monsters[String(monsterId)]) return;
@@ -2673,13 +2691,16 @@ function summonToken(content: RecoveredContent, state: MutableState, owner: Batt
   state.units.push(unit);
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, row: unit.row, col: unit.col, message: 'effect' });
   enterTerrainCell(content, state, unit, unit.row, unit.col);
-  if (unit.hp <= 0) { removeDead(content, state); return; }
+  if (unit.hp <= 0) { removeDead(content, state); return unit; }
   resolveSummonEffects(content, state, unit);
+  return unit;
 }
 
-function summonTokenAt(content: RecoveredContent, state: MutableState, owner: BattlePlayer, monsterId: number, row: number, col: number): BattleUnit | undefined {
+function summonTokenAt(content: RecoveredContent, state: MutableState, owner: BattlePlayer, monsterId: number, row: number, col: number,
+  lineage?: { cardId: string; flags: BattleUnit['flags'] }): BattleUnit | undefined {
   if (row < 0 || row >= state.rows || col <= 0 || col >= state.columns - 1 || occupied(state, row, col) || !content.data.monsters[String(monsterId)]) return undefined;
-  const unit = makeUnit(content, state, owner, monsterId, `token:${monsterId}`, row, col, false);
+  const unit = makeUnit(content, state, owner, monsterId, lineage?.cardId ?? `token:${monsterId}`, row, col, false);
+  if (lineage) Object.assign(unit.flags, lineage.flags);
   state.units.push(unit);
   emit(state, { type: 'summon', actor: owner.id, target: unit.id, row, col, message: 'effect' });
   enterTerrainCell(content, state, unit, row, col);
@@ -2765,6 +2786,32 @@ function removeInvalidTribalThresholds(content: RecoveredContent, state: Mutable
   }
 }
 
+const boneParents = new WeakMap<RecoveredContent, Map<number, number>>();
+function boneParent(content: RecoveredContent, unit: BattleUnit): number | undefined {
+  let parents = boneParents.get(content);
+  if (!parents) {
+    parents = new Map();
+    for (const [id, monster] of Object.entries(content.data.monsters)) {
+      const rows: EffectRow[] = [];
+      collectEffectRows(content, effectIds(monster), rows, new Set());
+      for (const row of rows.filter(row => row.type === 85)) {
+        const heap = optionalNumber(row.raw, 'param1', 0), previous = parents.get(heap);
+        if (heap > 0) parents.set(heap, previous === undefined || previous === Number(id) ? Number(id) : 0);
+      }
+    }
+    boneParents.set(content, parents);
+  }
+  const source = unit.flags.boneSourceMonster;
+  if (source && content.data.monsters[String(source)]) {
+    const rows: EffectRow[] = [];
+    collectEffectRows(content, effectIds(content.data.monsters[String(source)]!), rows, new Set());
+    if (rows.some(row => row.type === 85 && optionalNumber(row.raw, 'param1', 0) === unit.monsterId)) return source;
+  }
+  // Directly deployed/legacy heaps have no lineage. Only a unique reverse
+  // config link is safe (1169→1127,1187→1145,1380→1379), never a name/race guess.
+  return parents.get(unit.monsterId) || undefined;
+}
+
 function resolveTurnEffects(content: RecoveredContent, state: MutableState, unit: BattleUnit): void {
   const owner = player(state, unit.playerId);
   for (const effect of activeEffectRows(content, unit)) {
@@ -2811,8 +2858,8 @@ function resolveTurnEffects(content: RecoveredContent, state: MutableState, unit
           const threshold = optionalNumber(effect.raw, `param${index + 1}`, 0);
           if (candidate > 0 && roll <= threshold) { monsterId = candidate; break; }
         }
-        if (monsterId) summonToken(content, state, owner, monsterId, unit.row, unit.col);
-        emitEffect(state, unit, effect, 'turn-summon', unit, monsterId);
+        const summoned = monsterId ? summonToken(content, state, owner, monsterId, unit.row, unit.col) : undefined;
+        emitEffect(state, unit, effect, summoned ? 'turn-summon' : 'summon-blocked', unit, summoned ? monsterId : 0);
         break;
       }
       case 131: {
@@ -3140,18 +3187,33 @@ function processUnitTurn(content: RecoveredContent, state: MutableState, unit: B
       emitEffect(state, unit, row, 'random-effect', target, child ?? 0);
     }
   }
+  let recombined = false;
+  if (unit.flags.transformAfterTurns && unit.flags.transformed === 1 && hasEffectType(content, unit, 86)) {
+    // Compatibility for an already-active old snapshot: the old reducer left
+    // heap effects on an arbitrary race-based model. The token/card identity
+    // still names its heap; repair only that config-backed combination.
+    const heapId = Number(unit.cardId.split(':').at(-1));
+    const raw = content.data.monsters[String(heapId)], rows: EffectRow[] = [];
+    if (raw) collectEffectRows(content, effectIds(raw), rows, new Set());
+    if (rows.some(row => row.type === 86)) { unit.monsterId = heapId; unit.flags.transformed = 0; }
+  }
+  if ((unit.flags.transformAfterTurns ?? 0) > 0 && unit.flags.transformed !== 1) {
+    unit.flags.recombineActions = (unit.flags.recombineActions ?? 0) + 1;
+  }
   if ((unit.flags.transformAfterTurns ?? 0) > 0 && unit.flags.transformed !== 1
-      && state.turn - unit.summonedTurn >= unit.flags.transformAfterTurns!) {
-    const candidates = Object.entries(content.data.monsters).filter(([id, raw]) => Number(id) > 0 && Number(id) !== unit.monsterId
-      && optionalNumber(raw, 'Phyle', -1) === monsterValue(content, unit, 'Phyle', -2));
-    const selected = candidates[0];
-    if (selected) {
-      unit.monsterId = Number(selected[0]);
-      unit.attack = Math.max(0, optionalNumber(selected[1], 'Attack', unit.attack));
-      unit.maxHp = Math.max(1, optionalNumber(selected[1], 'HP', unit.maxHp));
-      unit.hp = Math.min(unit.hp, unit.maxHp);
-      unit.flags.transformed = 1;
-      emit(state, { type: 'effect', actor: unit.id, target: unit.id, amount: unit.monsterId, message: 'timed-transform' });
+      && unit.flags.recombineActions! >= unit.flags.transformAfterTurns!) {
+    const targetId = boneParent(content, unit);
+    if (targetId) {
+      const identity = unit.id, statuses = unit.statuses;
+      const rebuilt = makeUnit(content, state, player(state, unit.playerId), targetId, unit.cardId, unit.row, unit.col, false);
+      rebuilt.id = identity; rebuilt.statuses = statuses; rebuilt.flags.transformed = 1;
+      for (const status of statuses) applyStatusModifiers(content, rebuilt, status.id, 1);
+      Object.assign(unit, rebuilt);
+      recombined = true;
+      emit(state, { type: 'effect', actor: unit.id, target: unit.id, amount: targetId, message: 'timed-transform' });
+    } else if (!unit.flags.recombineUnresolved) {
+      unit.flags.recombineUnresolved = 1;
+      emit(state, { type: 'effect', actor: unit.id, target: unit.id, message: 'recombine-unresolved' });
     }
   }
   if ((unit.flags.turnSummonMonster ?? 0) > 0) summonToken(content, state, player(state, unit.playerId), unit.flags.turnSummonMonster!, unit.row, unit.col);
@@ -3175,7 +3237,7 @@ function processUnitTurn(content: RecoveredContent, state: MutableState, unit: B
     const enemy = randomItem(state, state.players.filter(candidate => candidate.team !== unit.team && candidate.hand.length > 0));
     const card = enemy ? randomItem(state, enemy.hand) : undefined; if (card) card.wait += unit.flags.enemyHandSlow!;
   }
-  const prevented = unit.flags.noAct === 1 || (unit.flags.statusNoAct ?? 0) > 0;
+  const prevented = recombined || unit.flags.noAct === 1 || (unit.flags.statusNoAct ?? 0) > 0;
   if (!prevented) {
     const enemies = state.units.filter(candidate => candidate.id !== unit.id && candidate.hp > 0
       && (unit.flags.charmed === 1 || (unit.flags.statusCharmed ?? 0) > 0 ? candidate.team === unit.team : candidate.team !== unit.team)
@@ -3208,6 +3270,7 @@ function processUnitTurn(content: RecoveredContent, state: MutableState, unit: B
   for (const key of ['damageImmuneTurns', 'armorBreakImmune', 'controlImmuneTurns', 'noGrowthTurns', 'timedCompositeTurns']) {
     if ((unit.flags[key] ?? 0) > 0) unit.flags[key] -= 1;
   }
+  for (const key of Object.keys(unit.flags)) if (key.startsWith('compositeTurns:') && unit.flags[key]! > 0) unit.flags[key]! -= 1;
   for (const status of unit.statuses) if (status.auraEffectId === undefined) status.turns -= 1;
   for (const expired of unit.statuses.filter(status => status.turns <= 0)) applyStatusModifiers(content, unit, expired.id, -1);
   unit.statuses = unit.statuses.filter(status => status.turns > 0);

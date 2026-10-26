@@ -54261,9 +54261,9 @@
     },
     "main:effect:1550": {
       "name": "骸骨堆",
-      "text": "无法移动或攻击。行动时重组为一具骷髅。",
-      "status": "candidate",
-      "source": "config_row:bc7cb121b6232cc770f3; TypeID=15; local-model-assisted draft; Sol-reviewed and corrected against complete EffectDes",
+      "text": "无法移动或攻击。在下一次自身行动时，于原格重组为对应的骷髅。重组占用本次行动，之后可正常行动。",
+      "status": "version-implementation",
+      "source": "config_row:bc7cb121b6232cc770f3; TypeID=15; local-model-assisted draft; Sol-reviewed and corrected against complete EffectDes; current-version mechanics: Type85/86 exact lineage and action-consuming recombination",
       "originalName": "Bone Heap",
       "originalText": "Cannot move or attack. Upon acting, recombines into a Skeleton. ",
       "sourceRow": "config_row:bc7cb121b6232cc770f3"
@@ -64134,9 +64134,9 @@
     },
     "main:effect:5027": {
       "name": "覆鳞幼兽1",
-      "text": "此生物首回合，在相邻格随机召唤1个龙族生物（烈焰幼龙、烈焰巨龙、烈焰龙裔或凯利瑟斯），召唤品质范围为普通至史诗。",
-      "status": "candidate",
-      "source": "config_row:3141817ffe0ce4e575ac",
+      "text": "此生物首次自身行动时，在相邻空格随机召唤1个龙族生物（烈焰幼龙、烈焰巨龙、烈焰龙裔或凯利瑟斯），品质为普通至史诗。没有合法空格时召唤失败，之后不再补召。",
+      "status": "version-implementation",
+      "source": "config_row:3141817ffe0ce4e575ac; current-version mechanics: Type50 one own action, Type117 configured candidates, existing legal adjacent slots, no backlog",
       "originalName": "Scaly Hatchling 1",
       "originalText": "On this creature's first turn, summons 1 random Dragon creature (Flame Whelp, Flame Dragon, Flame Dragonkin, or Kaelithus) in an adjacent square. Summons ranks: Common - Epic",
       "sourceRow": "config_row:3141817ffe0ce4e575ac"

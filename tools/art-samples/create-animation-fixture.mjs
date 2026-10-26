@@ -10,6 +10,9 @@ const death=process.argv.includes('--death');
 const batchTwo=process.argv.includes('--batch-two');
 const chapterThree=process.argv.includes('--chapter-three');
 const production=process.argv.includes('--production');
+const mechanics=process.argv.includes('--mechanics');
+const budget=process.argv.includes('--budget');
+if(budget&&!mechanics)throw new Error('--budget requires --mechanics');
 const reverseSides=process.argv.includes('--reverse-sides');
 if(reverseSides&&!chapterThree&&!production)throw new Error('--reverse-sides requires a chapter-three or production fixture');
 const emptyHand=process.argv.includes('--empty-hand');
@@ -22,14 +25,16 @@ const content=new ServerContent(path.join(root,'cocos-client/assets/resources/re
 const username='art_motion_'+Date.now(),password=randomBytes(12).toString('hex');
 const session=store.register(username,password),accountId=store.authenticate(session.token);
 const res=service.act(accountId,'',randomUUID(),'character.create',{name:'动作验收'+Date.now().toString().slice(-5),profession:1,gender:1});
-const actorId=res.result.characterId,id=randomUUID(),enemy='ai:'+id;
+const actorId=res.result.characterId,id=randomUUID(),enemy='ai:'+id;let initialUnitCount=0;
 store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  const actor=world.characters[actorId];
  const playerSpec=service.playerSpec(world,actor,0);
  const deck=emptyHand?[]:playerSpec.deck;
  const players=[{...playerSpec,deck},{id:enemy,name:'隔离动作对照',team:1,hp:8,attack:1,ai:true,profession:1,deck:[...deck]}];
- const productionIds=production?[1,19,43,61,5019,60001,60002,60003,60005,...JSON.parse(readFileSync(path.join(root,'art-source/chapter1-production/batch.json'),'utf8')).models.map(m=>m.monsterId)]:[];
- const initialUnits=production?productionIds.map((monsterId,i)=>{const col=[2,4,5,7,9][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<=5?actorId:enemy}}):chapterThree?[
+ const productionIds=production||budget?[1,19,43,61,5019,60001,60002,60003,60005,...JSON.parse(readFileSync(path.join(root,'art-source/chapter1-production/batch.json'),'utf8')).models.map(m=>m.monsterId)]:[];
+ const mechanismUnits=[{monsterId:1127,playerId:actorId,row:1,col:4},{monsterId:1,playerId:enemy,row:1,col:5},
+  {monsterId:12025,playerId:actorId,row:2,col:4},{monsterId:11043,playerId:actorId,row:3,col:4}];
+ const initialUnits=mechanics?[...mechanismUnits,...(budget?productionIds.map((monsterId,i)=>{const col=[1,2,8,9,10][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<4?actorId:enemy}}):[])]:production?productionIds.map((monsterId,i)=>{const col=[2,4,5,7,9][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<=5?actorId:enemy}}):chapterThree?[
  {monsterId:19,playerId:actorId,row:0,col:3},{monsterId:60001,playerId:enemy,row:0,col:5},
  {monsterId:61,playerId:actorId,row:1,col:4},{monsterId:60003,playerId:enemy,row:1,col:6},{monsterId:5019,playerId:actorId,row:1,col:2},
  {monsterId:1,playerId:actorId,row:2,col:3},{monsterId:60005,playerId:enemy,row:2,col:5},{monsterId:43,playerId:actorId,row:2,col:1},
@@ -47,11 +52,12 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  {monsterId:1,playerId:actorId,row:2,col:2},{monsterId:1,playerId:enemy,row:2,col:7},
  {monsterId:19,playerId:actorId,row:3,col:3},{monsterId:1,playerId:enemy,row:3,col:6}];
  const positioned=reverseSides?initialUnits.map(unit=>({...unit,col:11-unit.col,playerId:unit.playerId===actorId?enemy:actorId})):initialUnits;
+ initialUnitCount=positioned.length;
  const entryState=createBattle(content,{id,seed:1024,mapId:1,players,rows:4,firstPlayer:0,initialUnits:positioned});
  world.battles[id]={id,entryState,state:structuredClone(entryState),mode:'pve',pve:{mode:'art-fixture'},participants:[actorId],createdAt:Date.now(),settled:false,rewards:{},dismissed:[]};
  return {message:'Local animation fixture only'};
 });
 writeFileSync(path.join(folder,'fixture-login.json'),JSON.stringify({username,password,characterId:actorId}),{mode:0o600});
-writeFileSync(path.join(folder,production?`evidence/chapter-1-production${reverseSides?'-reverse':''}-fixture-contract.json`:chapterThree?`evidence/chapter-1-batch3${reverseSides?'-reverse':''}-fixture-contract.json`:batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:production?19:chapterThree?10:8,initialHeroUnits:2,reverseSides,source:'createBattle using original monster configuration, including chapter-1 IDs. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
+writeFileSync(path.join(folder,mechanics?`evidence/chapter-1-mechanics${budget?'-budget':''}-fixture-contract.json`:production?`evidence/chapter-1-production${reverseSides?'-reverse':''}-fixture-contract.json`:chapterThree?`evidence/chapter-1-batch3${reverseSides?'-reverse':''}-fixture-contract.json`:batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:initialUnitCount,initialHeroUnits:2,reverseSides,source:'createBattle using original monster configuration, including chapter-1 IDs. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
 console.log('Created isolated authoritative animation fixture; private login stored locally.');
 } finally{store.close();}

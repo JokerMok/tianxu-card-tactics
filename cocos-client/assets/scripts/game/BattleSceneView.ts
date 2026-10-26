@@ -12,6 +12,7 @@ import type { BattleAction, BattleState, BattleUnit, BattleTerrain, LegalPlay } 
 interface BattleView { id: string; settled: boolean; state: BattleState; entryState?: BattleState; legalPlays: LegalPlay[];
   rewards?: { won: boolean; silver: number; xp: number; cards?: { id: string; count: number }[] } }
 interface Display { node: Node; animation: RecoveredAnimation; ready: Promise<void>; hp: Label; attack: Label; name: Label; team: number; dying: boolean; generation: number;
+  monsterId?: number; pendingAnimation?: RecoveredAnimation;
   preferredNameOffsetY: number; nameSuppressed: boolean; nameHovered: boolean; namePinned: boolean }
 interface Hooks { command(action: BattleAction): void; hide(): void; dismiss(): void; sound(skill: number): void;
   log(text: string): void; notice(text: string): void }
@@ -92,7 +93,7 @@ export class BattleSceneView {
   }
   destroy() {
     this.disposed = true; this.effects.destroy();
-    for (const display of this.displays.values()) display.animation.destroy();
+    for (const display of this.displays.values()) {display.pendingAnimation?.destroy();display.animation.destroy();}
     this.displays.clear(); for (const clock of this.clocks) clock.done(); this.clocks.length = 0;
     for (const flight of this.flights) if (flight.isValid) flight.destroy(); this.flights.length = 0;
     this.scene.destroy(); this.hud?.destroy(); this.result?.destroy();
@@ -118,7 +119,7 @@ export class BattleSceneView {
         const animation = new RecoveredAnimation(visual, this.catalog, this.base + '/recovered/');
         const owner = state.players.find(player => player.id === unit.playerId);
         const ready = (unit.flags.hero === 1 && !unit.monsterId ? animation.setActor(owner?.profession ?? 1, owner?.sex ?? 1) : animation.setMonster(unit.monsterId));
-        display = { node, animation, ready, team: unit.team, dying: false, generation: 0,
+        display = { node, animation, ready, monsterId: unit.monsterId, team: unit.team, dying: false, generation: 0,
           preferredNameOffsetY: ADJACENT_NAME_SAFE_OFFSET_Y, nameSuppressed: false, nameHovered: false, namePinned: false,
           hp: this.ui.label(node, 'Health', `${unit.hp}`, 16, -34, 35, 22, 16, Theme.red),
           attack: this.ui.label(node, 'Attack', `${unit.attack}`, -16, -34, 35, 22, 16, Theme.text),
@@ -160,6 +161,8 @@ export class BattleSceneView {
         }).catch(error => this.hooks.notice(String(error)));
       }
       if (display && !display.dying) {
+        if (display.monsterId !== undefined && display.monsterId !== unit.monsterId) this.replaceAppearance(display, unit);
+        if (!unit.flags.hero) display.name.string = unit.flags.transformAfterTurns && !unit.flags.transformed ? '骨堆' : cardName(this.catalog,unit.cardId);
         display.hp.string = `${unit.hp}`; display.attack.string = `${unit.attack}`;
         if (!this.presentation.locked) display.node.setPosition(this.position(unit.row, unit.col));
       }
@@ -173,6 +176,28 @@ export class BattleSceneView {
     const ordered = Array.from(this.displays.values()).sort((a, b) => b.node.position.y - a.node.position.y);
     ordered.forEach((display, index) => display.node.setSiblingIndex(index));
     this.renderFocusInfo();
+  }
+  private replaceAppearance(display: Display, unit: BattleUnit): void {
+    display.monsterId=unit.monsterId;
+    display.pendingAnimation?.destroy();
+    const visual=this.ui.node(display.node,'RecoveredVisual:replacement',170,170);
+    visual.active=false;
+    const next=new RecoveredAnimation(visual,this.catalog,this.base+'/recovered/');
+    display.pendingAnimation=next;
+    // Keep the complete old pose until the new model is ready. A transform
+    // changes appearance, not unitId, labels, selection or logical position.
+    display.ready=next.setMonster(unit.monsterId).then(()=>{
+      if(this.disposed||this.displays.get(unit.id)!==display||display.dying||display.pendingAnimation!==next){next.destroy();if(visual.isValid)visual.destroy();return;}
+      const previous=display.animation;display.animation=next;display.pendingAnimation=undefined;
+      visual.active=true;next.play('stand',this.direction(display));
+      const previousHost=previous.node.parent;previous.destroy();
+      if(previousHost?.isValid&&previousHost!==display.node)previousHost.destroy();
+      const metrics=next.getSourceLayoutMetrics(this.direction(display));
+      const offset=metrics&&'nameOffsetY' in metrics&&typeof metrics.nameOffsetY==='number'?metrics.nameOffsetY:(metrics?.anchorY??70)+1;
+      display.preferredNameOffsetY=Math.min(offset,273-display.node.position.y);
+      if(this.presentation.visibleState)this.syncNameLanes(this.presentation.visibleState);
+    });
+    void display.ready.catch(error=>{if(!this.disposed)this.hooks.notice(String(error));});
   }
   private renderFocusInfo(): void {
     if(!this.focusId){if(this.focusPanel?.isValid)this.focusPanel.active=false;return;}
@@ -195,6 +220,7 @@ export class BattleSceneView {
     this.focusLabels!.title.string=d.name.string;
     this.focusLabels!.stats.string=`攻击 ${d.attack.string}　生命 ${d.hp.string}/${unit.maxHp}`;
     const descriptions=unit.statuses.map(s=>`${effectDisplay(this.catalog,s.id).name}（${s.turns}回合）`);
+    if(unit.flags.transformAfterTurns && !unit.flags.transformed) descriptions.unshift('不能移动或攻击 · 下次行动原格重组');
     const statusText=descriptions.join(' · ');
     this.focusLabels!.status.string=statusText||`射程 ${unit.range}　移动 ${unit.movement}`;
   }
@@ -258,7 +284,7 @@ export class BattleSceneView {
     }
   }
   private release(id: string, expected?: Display) { const display = this.displays.get(id); if (!display || (expected && display !== expected)) return;
-    display.animation.destroy(); display.node.destroy(); this.displays.delete(id); }
+    display.pendingAnimation?.destroy(); display.animation.destroy(); display.node.destroy(); this.displays.delete(id); }
   private advance() {
     if (this.processing || this.disposed) return;
     const step = this.presentation.nextStep();
@@ -363,6 +389,12 @@ export class BattleSceneView {
       const summonedEvent = step.events.find(event => event.type === 'summon');
       const spawned = step.after.target ?? summonedEvent?.targetView;
       if (spawned) { const instance = this.displays.get(spawned.id); if (instance) await instance.ready; }
+    } else if (step.events.some(event => event.message === 'timed-transform') && display && step.after.target) {
+      this.replaceAppearance(display, step.after.target);
+      await display.ready;
+      if(this.disposed||display.dying)return;
+      const label=this.ui.label(display.node,'Recombine:feedback','重组',0,38,100,28,18,Theme.gold);
+      await this.wait(.4);if(label.node.isValid)label.node.destroy();
     } else if (step.events.some(event => event.type.startsWith('terrain-'))) {
       const event = step.events.find(event => event.type.startsWith('terrain-'))!;
       if (event.type === 'terrain-update') return;

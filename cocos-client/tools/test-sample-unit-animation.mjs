@@ -245,6 +245,15 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
   assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolLiveReferences,38);
   assert.ok(SampleUnitAnimation.atlasMetrics().atlasPoolEstimatedBytes<128*1024*1024);
   productionActors.forEach(a=>a.destroy());assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolEntries,0);
+  const residueSpec={atlas:'residue.png',frameSize:[8,8],columns:1,frameCount:1,
+    displaySize:[16,16],foot:[4,7],mount:[0,0],requiredStatuses:['stand'],
+    clips:{stand:{start:0,count:1,fps:2,loop:true}}};
+  const residue=new SampleUnitAnimation(host,'mock://special',residueSpec);
+  const residueLoad=residue.load();cc.resolveNext(8,8);await residueLoad;
+  const idle=residue.play('stand','west');residue.update(2);
+  assert.equal(idle.durationSeconds,.5,'special clip timing comes from its own manifest');
+  assert.equal(residue.play('atk','west').hasNativeState,false,'missing residue actions are not fake actor animations');
+  residue.destroy();assert.equal(SampleUnitAnimation.atlasMetrics().atlasPoolEntries,0);
 } finally {
   await rm(scratch, { recursive: true, force: true });
 }

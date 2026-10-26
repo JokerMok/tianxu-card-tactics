@@ -19,7 +19,14 @@ const tweens=[];
 function tween(target){let seconds=0,values;return{to(n,v){seconds=n;values=v;return this},start(){tweens.push({target,seconds,values})}}}
 const Label={Overflow:{CLAMP:1}};
 const transpiled=stripTypeScriptTypes(source.replace(/^import .*;\s*$/gm,''),{mode:'transform'}).replace('export class BattleSceneView','class BattleSceneView')+'\nreturn {BattleSceneView,unitNameLane};';
-const exports=new Function('instantiate','tween','UIOpacity','Label','ArtSkin','Theme','Color','Node','effectDisplay',transpiled)(()=>new FakeNode(),tween,UIOpacity,Label,{image:()=>undefined,url:()=>undefined},{gold:'gold',text:'white'},class Color{},{EventType:{TOUCH_END:'end'}},(_,id)=>({name:'状态'+id}));
+const appearanceLoads=[];
+class FakeAppearance{
+ constructor(parent){this.node=new FakeNode(parent)}
+ setMonster(id){this.id=id;return new Promise(resolve=>appearanceLoads.push(resolve))}
+ play(){}getSourceLayoutMetrics(){return{nameOffsetY:64}}
+ destroy(){this.node.destroy();this.destroyed=true}
+}
+const exports=new Function('instantiate','tween','UIOpacity','Label','ArtSkin','Theme','Color','Node','effectDisplay','RecoveredAnimation',transpiled)(()=>new FakeNode(),tween,UIOpacity,Label,{image:()=>undefined,url:()=>undefined},{gold:'gold',text:'white'},class Color{},{EventType:{TOUCH_END:'end'}},(_,id)=>({name:'状态'+id}),FakeAppearance);
 const {BattleSceneView,unitNameLane}=exports;
 const flush=async()=>{for(let i=0;i<5;i++)await Promise.resolve()};
 function actor(){const node=new FakeNode();const art=new FakeNode(node),name=new FakeNode(node),hpNode=new FakeNode(node);let finish;let destroyed=false;const completion=new Promise(r=>finish=r);return{node,generation:0,dying:false,ready:Promise.resolve(),hp:{node:hpNode,string:'3'},name:{node:name},animation:{node:art,play(){return{hasNativeState:true,completion}},destroy(){destroyed=true}},finish,get destroyed(){return destroyed}}}
@@ -68,12 +75,27 @@ test('actual HUD render places bounded fixed-font global information above upper
 test('focused unit values stay readable outside dense rows, reuse nodes, and hide for death',()=>{
  const d=actor();d.name.string='哥布林头目';d.attack={string:'4'};d.hp.string='16';
  const v=presenter(d),labels=[],logs=[];v.focusId='unit:7';v.hud=new FakeNode();
- v.presentation={visibleState:{units:[{id:'unit:7',hp:16,maxHp:16,range:1,movement:1,statuses:[{id:7,turns:2}]}]}};
+ v.presentation={visibleState:{units:[{id:'unit:7',hp:16,maxHp:16,range:1,movement:1,flags:{},statuses:[{id:7,turns:2}]}]}};
  v.catalog={};v.hooks={log:text=>logs.push(text)};
  v.ui={node(parent,name,w,h,x,y){const n=new FakeNode(parent);Object.assign(n,{name,w,h,x,y});return n},label(parent,name,string){const l={node:new FakeNode(parent),name,string};labels.push(l);return l}};
  v.renderFocusInfo();const panel=v.focusPanel;assert.deepEqual([panel.w,panel.h,panel.x,panel.y],[300,106,-430,-235]);
  assert.equal(v.focusLabels.stats.string,'攻击 4　生命 16/16');assert.equal(v.focusLabels.status.string,'状态7（2回合）');
  d.hp.string='9';v.presentation.visibleState.units[0].hp=9;v.renderFocusInfo();assert.equal(v.focusPanel,panel);assert.equal(labels.length,3,'polls must not rebuild the focused labels');assert.equal(v.focusLabels.stats.string,'攻击 4　生命 9/16');
  panel.handlers.get('end')();assert.match(logs[0],/状态7（2回合）/);
+ v.presentation.visibleState.units[0].flags.transformAfterTurns=1;v.renderFocusInfo();assert.match(v.focusLabels.status.string,/不能移动或攻击.*下次行动原格重组/);
+ v.presentation.visibleState.units[0].flags.transformed=1;v.renderFocusInfo();assert.doesNotMatch(v.focusLabels.status.string,/原格重组/);
  d.dying=true;v.renderFocusInfo();assert.equal(panel.active,false,'focused numbers must not linger after the death lifecycle starts');
+});
+
+test('same unit transform prepares a new model then atomically releases old appearance; late loads cannot resurrect it',async()=>{
+ const d=actor(),v=presenter(d);d.node.position={y:100};d.monsterId=1169;
+ Object.assign(v,{catalog:{},base:'local',ui:{node(parent,name){const n=new FakeNode(parent);n.name=name;return n}},hooks:{notice(){}},syncNameLanes(){},presentation:{visibleState:{units:[]}}});
+ const old=d.animation;v.replaceAppearance(d,{id:'unit:7',monsterId:1127});
+ assert.equal(d.animation,old);assert.equal(d.pendingAnimation.node.parent.active,false);
+ appearanceLoads.shift()();await d.ready;
+ assert.equal(d.animation.id,1127);assert.equal(d.pendingAnimation,undefined);assert.equal(d.destroyed,true);
+ assert.equal(d.preferredNameOffsetY,64);assert.equal(d.node.isValid,true,'same stable annotation root remains');
+ v.replaceAppearance(d,{id:'unit:7',monsterId:1169});const late=d.pendingAnimation;
+ v.release('unit:7',d);appearanceLoads.shift()();await d.ready;
+ assert.equal(late.destroyed,true);assert.equal(v.displays.size,0);assert.equal(d.node.isValid,false);
 });

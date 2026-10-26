@@ -3242,9 +3242,9 @@
     },
     "main:effect:1550": {
       "name": "骸骨堆",
-      "text": "无法移动或攻击。行动时重组为一具骷髅。",
-      "status": "candidate",
-      "source": "config_row:bc7cb121b6232cc770f3; TypeID=15; local-model-assisted draft; Sol-reviewed and corrected against complete EffectDes",
+      "text": "无法移动或攻击。在下一次自身行动时，于原格重组为对应的骷髅。重组占用本次行动，之后可正常行动。",
+      "status": "version-implementation",
+      "source": "config_row:bc7cb121b6232cc770f3; TypeID=15; local-model-assisted draft; Sol-reviewed and corrected against complete EffectDes; current-version mechanics: Type85/86 exact lineage and action-consuming recombination",
       "originalName": "Bone Heap",
       "originalText": "Cannot move or attack. Upon acting, recombines into a Skeleton. "
     },

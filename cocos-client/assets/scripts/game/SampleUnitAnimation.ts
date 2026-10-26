@@ -28,15 +28,18 @@ export interface SampleUnitSpec {
   origin?: [number, number];
   /** Head label position above the board point, independent of transparent atlas padding. */
   nameOffsetY?: number;
+  /** Ordinary actors default to five states. Residues may explicitly require
+   * only stand/hit/die; absent actions complete without inventing animation. */
+  requiredStatuses?: RecoveredAnimationStatus[];
   /** Optional presentation of an authoritative blocked impact; not a new battle action. */
   reactions?: {block?: {start:number;count:number;fps:number;loop:boolean}};
-  clips: Record<RecoveredAnimationStatus, {
+  clips: Partial<Record<RecoveredAnimationStatus, {
     start: number;
     count: number;
     fps: number;
     loop: boolean;
     cueFrame?: number;
-  }>;
+  }>>;
 }
 
 interface AtlasLayout {
@@ -118,7 +121,10 @@ function validateSpec(spec: SampleUnitSpec): AtlasLayout {
       || spec.foot[1] < 0 || spec.foot[1] > frameHeight) {
     throw new Error('Sample unit display layout is invalid');
   }
-  for (const status of REQUIRED_STATUSES) {
+  const required=spec.requiredStatuses??REQUIRED_STATUSES;
+  if(!Array.isArray(required)||!required.every(status=>REQUIRED_STATUSES.includes(status))||!spec.clips.stand)
+    throw new Error('Sample required animation states are invalid');
+  for (const status of new Set([...required,...Object.keys(spec.clips) as RecoveredAnimationStatus[]])) {
     const clip = spec.clips?.[status];
     if (!clip || !Number.isInteger(clip.start) || clip.start < 0
         || !positiveInteger(clip.count) || !Number.isFinite(clip.fps) || clip.fps <= 0
