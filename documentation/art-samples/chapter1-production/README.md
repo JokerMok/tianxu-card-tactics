@@ -1,5 +1,7 @@
 # 首章美术生产批次（v5）
 
+当前接续：[首章机制修订与107实际结果](mechanics/README.md)。十九模型冻结；下文为美术生产批次的原始交付，旧的107失败和召唤缺口已由机制记录更新。
+
 2026-10-26，本机 `codex/art-samples-pve`，接续 `64cf3d0` / `3777490`。精简PVE范围、规则、卡池、ID与个人存档未改。未推送、合并main、连接或更新服务器。本批最多十个新模型，已到上限；不把继续制作记为用户最终视觉验收。
 
 试玩：[当前v5](http://127.0.0.1:7440/?skin=sample&client=batch2-normal)、[此前v4](http://127.0.0.1:7440/?skin=sample-batch3&client=batch2-normal)、[原资源](http://127.0.0.1:7440/?skin=original&client=batch2-normal)。先保存或撤销草稿再切换；只换资源，不回退数据。服务仅监听127.0.0.1，隔离数据库 `.local/art-samples/game.sqlite`，启动：

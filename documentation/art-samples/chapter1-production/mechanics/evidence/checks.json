@@ -1,0 +1,16 @@
+{
+  "targetedKernel": "node --test backend/game/chapter1-mechanics.test.mjs: 7 passed",
+  "affectedSharedKernel": "BattleKernel.test.mjs:41 passed; run after common effect traversal changes, reused after display-only changes",
+  "sampleAdapter": "test-sample-unit-animation.mjs passed including residue and shared references",
+  "displayAndChinese": "test-battle-display-lifecycle.mjs + test-chapter1-display-localization.mjs:8 passed after final focus feedback; fixed incomplete old fixture flags, no business-rule workaround",
+  "nativeBuild": "Cocos Creator3.8.8 web-desktop complete exit36;25 source files staged and hash matched",
+  "liveService": "recovery-and-retries.json: real process restart, state exact, request replay, altered content409, stale409",
+  "ordinary": "normal-107-result.json: current native Cocos manual win, actual claim, persisted after restart and refresh",
+  "scope": "not full game, all skills, all chapters, public server or all devices",
+  "media": {
+    "mechanisms.mp4": "5f6862a296dafffe0718c20eba058dca936349f36ae19a72cb01ba35f2385dce",
+    "normal-107-win.png": "5c3a3210862b2583f3bcfcd6d09cba4dd7c78179d27a437aad120e3c481a40be",
+    "normal-75-owned.png": "e79087d73b8dad1925fd48c17c4c01e4ed6c231eac8242dd51c717b630b011c6",
+    "budget-summoned.png": "eb0f58ecea2fce71794c27d6773061539321a383c0f0ffc8c145d5b6d23e703c"
+  }
+}

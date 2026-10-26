@@ -1,0 +1,1410 @@
+{
+  "scope": "native Cocos, isolated mechanics and dense fixture; frame interval includes idle and is not a benchmark or GPU memory measurement",
+  "design": [
+    1200,
+    600
+  ],
+  "canvas": {
+    "canvases": [
+      {
+        "backing": [
+          2560,
+          1440
+        ],
+        "display": [
+          1280,
+          720
+        ]
+      }
+    ],
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  "designScale": 1.0666666666666667,
+  "observations": {
+    "before": {
+      "page": "home",
+      "units": 25,
+      "maxUnits": 25,
+      "pool": {
+        "atlasPoolEntries": 19,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 21,
+        "atlasPoolSpriteFrames": 575,
+        "atlasPoolEstimatedBytes": 103094064,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 9.300000000046566,
+      "blankClassification": {
+        "initialUnrendered": 2577,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 0,
+        "zeroHpSourceEmpty": 0,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/bully-6e0f9ae116b5.webp",
+          "ms": 823.6999998092651,
+          "encoded": 603280,
+          "decoded": 603280,
+          "transfer": 603580
+        },
+        {
+          "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+          "ms": 825.7999997138977,
+          "encoded": 1106766,
+          "decoded": 1106766,
+          "transfer": 1107066
+        },
+        {
+          "path": "/art/v5/flame-26c82ed94e34.webp",
+          "ms": 827.1999998092651,
+          "encoded": 1010884,
+          "decoded": 1010884,
+          "transfer": 1011184
+        },
+        {
+          "path": "/art/v5/angel-788ba7ad6e28.webp",
+          "ms": 837.3000001907349,
+          "encoded": 1369696,
+          "decoded": 1369696,
+          "transfer": 1369996
+        },
+        {
+          "path": "/art/v5/lich-b67b94bb10b9.webp",
+          "ms": 796.7999997138977,
+          "encoded": 882034,
+          "decoded": 882034,
+          "transfer": 882334
+        },
+        {
+          "path": "/art/v5/elfin-230ad616fef0.webp",
+          "ms": 798.2999997138977,
+          "encoded": 639406,
+          "decoded": 639406,
+          "transfer": 639706
+        },
+        {
+          "path": "/art/v5/champion-82987f71c3a4.webp",
+          "ms": 841.6999998092651,
+          "encoded": 1393422,
+          "decoded": 1393422,
+          "transfer": 1393722
+        },
+        {
+          "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+          "ms": 807.5,
+          "encoded": 909736,
+          "decoded": 909736,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+          "ms": 818.5,
+          "encoded": 649834,
+          "decoded": 649834,
+          "transfer": 650134
+        },
+        {
+          "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+          "ms": 823.0999999046326,
+          "encoded": 770972,
+          "decoded": 770972,
+          "transfer": 771272
+        },
+        {
+          "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+          "ms": 829.2000002861023,
+          "encoded": 486558,
+          "decoded": 486558,
+          "transfer": 486858
+        },
+        {
+          "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+          "ms": 826.5,
+          "encoded": 557582,
+          "decoded": 557582,
+          "transfer": 557882
+        },
+        {
+          "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+          "ms": 834.3000001907349,
+          "encoded": 586268,
+          "decoded": 586268,
+          "transfer": 586568
+        },
+        {
+          "path": "/art/v5/captain-89022357add6.webp",
+          "ms": 835,
+          "encoded": 1074086,
+          "decoded": 1074086,
+          "transfer": 1074386
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 40.69999980926514,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 44.80000019073486,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 41,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 2.8999996185302734,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 3.5,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": [
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        }
+      ]
+    },
+    "after": {
+      "page": "home",
+      "units": 28,
+      "maxUnits": 28,
+      "pool": {
+        "atlasPoolEntries": 19,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 21,
+        "atlasPoolSpriteFrames": 575,
+        "atlasPoolEstimatedBytes": 103094064,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 8.800000000046566,
+      "blankClassification": {
+        "initialUnrendered": 2639,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 0,
+        "zeroHpSourceEmpty": 0,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/bully-6e0f9ae116b5.webp",
+          "ms": 823.6999998092651,
+          "encoded": 603280,
+          "decoded": 603280,
+          "transfer": 603580
+        },
+        {
+          "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+          "ms": 825.7999997138977,
+          "encoded": 1106766,
+          "decoded": 1106766,
+          "transfer": 1107066
+        },
+        {
+          "path": "/art/v5/flame-26c82ed94e34.webp",
+          "ms": 827.1999998092651,
+          "encoded": 1010884,
+          "decoded": 1010884,
+          "transfer": 1011184
+        },
+        {
+          "path": "/art/v5/angel-788ba7ad6e28.webp",
+          "ms": 837.3000001907349,
+          "encoded": 1369696,
+          "decoded": 1369696,
+          "transfer": 1369996
+        },
+        {
+          "path": "/art/v5/lich-b67b94bb10b9.webp",
+          "ms": 796.7999997138977,
+          "encoded": 882034,
+          "decoded": 882034,
+          "transfer": 882334
+        },
+        {
+          "path": "/art/v5/elfin-230ad616fef0.webp",
+          "ms": 798.2999997138977,
+          "encoded": 639406,
+          "decoded": 639406,
+          "transfer": 639706
+        },
+        {
+          "path": "/art/v5/champion-82987f71c3a4.webp",
+          "ms": 841.6999998092651,
+          "encoded": 1393422,
+          "decoded": 1393422,
+          "transfer": 1393722
+        },
+        {
+          "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+          "ms": 807.5,
+          "encoded": 909736,
+          "decoded": 909736,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+          "ms": 818.5,
+          "encoded": 649834,
+          "decoded": 649834,
+          "transfer": 650134
+        },
+        {
+          "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+          "ms": 823.0999999046326,
+          "encoded": 770972,
+          "decoded": 770972,
+          "transfer": 771272
+        },
+        {
+          "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+          "ms": 829.2000002861023,
+          "encoded": 486558,
+          "decoded": 486558,
+          "transfer": 486858
+        },
+        {
+          "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+          "ms": 826.5,
+          "encoded": 557582,
+          "decoded": 557582,
+          "transfer": 557882
+        },
+        {
+          "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+          "ms": 834.3000001907349,
+          "encoded": 586268,
+          "decoded": 586268,
+          "transfer": 586568
+        },
+        {
+          "path": "/art/v5/captain-89022357add6.webp",
+          "ms": 835,
+          "encoded": 1074086,
+          "decoded": 1074086,
+          "transfer": 1074386
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 40.69999980926514,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 44.80000019073486,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 41,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 2.8999996185302734,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 3.5,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": [
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 1,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        }
+      ]
+    },
+    "recombined": {
+      "page": "home",
+      "units": 30,
+      "maxUnits": 31,
+      "pool": {
+        "atlasPoolEntries": 19,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 575,
+        "atlasPoolEstimatedBytes": 103094064,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 9.299999999813735,
+      "blankClassification": {
+        "initialUnrendered": 2641,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 166,
+        "zeroHpSourceEmpty": 74,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/bully-6e0f9ae116b5.webp",
+          "ms": 823.6999998092651,
+          "encoded": 603280,
+          "decoded": 603280,
+          "transfer": 603580
+        },
+        {
+          "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+          "ms": 825.7999997138977,
+          "encoded": 1106766,
+          "decoded": 1106766,
+          "transfer": 1107066
+        },
+        {
+          "path": "/art/v5/flame-26c82ed94e34.webp",
+          "ms": 827.1999998092651,
+          "encoded": 1010884,
+          "decoded": 1010884,
+          "transfer": 1011184
+        },
+        {
+          "path": "/art/v5/angel-788ba7ad6e28.webp",
+          "ms": 837.3000001907349,
+          "encoded": 1369696,
+          "decoded": 1369696,
+          "transfer": 1369996
+        },
+        {
+          "path": "/art/v5/lich-b67b94bb10b9.webp",
+          "ms": 796.7999997138977,
+          "encoded": 882034,
+          "decoded": 882034,
+          "transfer": 882334
+        },
+        {
+          "path": "/art/v5/elfin-230ad616fef0.webp",
+          "ms": 798.2999997138977,
+          "encoded": 639406,
+          "decoded": 639406,
+          "transfer": 639706
+        },
+        {
+          "path": "/art/v5/champion-82987f71c3a4.webp",
+          "ms": 841.6999998092651,
+          "encoded": 1393422,
+          "decoded": 1393422,
+          "transfer": 1393722
+        },
+        {
+          "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+          "ms": 807.5,
+          "encoded": 909736,
+          "decoded": 909736,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+          "ms": 818.5,
+          "encoded": 649834,
+          "decoded": 649834,
+          "transfer": 650134
+        },
+        {
+          "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+          "ms": 823.0999999046326,
+          "encoded": 770972,
+          "decoded": 770972,
+          "transfer": 771272
+        },
+        {
+          "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+          "ms": 829.2000002861023,
+          "encoded": 486558,
+          "decoded": 486558,
+          "transfer": 486858
+        },
+        {
+          "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+          "ms": 826.5,
+          "encoded": 557582,
+          "decoded": 557582,
+          "transfer": 557882
+        },
+        {
+          "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+          "ms": 834.3000001907349,
+          "encoded": 586268,
+          "decoded": 586268,
+          "transfer": 586568
+        },
+        {
+          "path": "/art/v5/captain-89022357add6.webp",
+          "ms": 835,
+          "encoded": 1074086,
+          "decoded": 1074086,
+          "transfer": 1074386
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 40.69999980926514,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 44.80000019073486,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 41,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 2.8999996185302734,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 3.5,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": [
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        }
+      ]
+    },
+    "released": {
+      "page": "world",
+      "units": 0,
+      "maxUnits": 33,
+      "pool": {
+        "atlasPoolEntries": 0,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 0,
+        "atlasPoolSpriteFrames": 0,
+        "atlasPoolEstimatedBytes": 0,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 9.899999999906868,
+      "blankClassification": {
+        "initialUnrendered": 2642,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 500,
+        "zeroHpSourceEmpty": 222,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/bully-6e0f9ae116b5.webp",
+          "ms": 823.6999998092651,
+          "encoded": 603280,
+          "decoded": 603280,
+          "transfer": 603580
+        },
+        {
+          "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+          "ms": 825.7999997138977,
+          "encoded": 1106766,
+          "decoded": 1106766,
+          "transfer": 1107066
+        },
+        {
+          "path": "/art/v5/flame-26c82ed94e34.webp",
+          "ms": 827.1999998092651,
+          "encoded": 1010884,
+          "decoded": 1010884,
+          "transfer": 1011184
+        },
+        {
+          "path": "/art/v5/angel-788ba7ad6e28.webp",
+          "ms": 837.3000001907349,
+          "encoded": 1369696,
+          "decoded": 1369696,
+          "transfer": 1369996
+        },
+        {
+          "path": "/art/v5/lich-b67b94bb10b9.webp",
+          "ms": 796.7999997138977,
+          "encoded": 882034,
+          "decoded": 882034,
+          "transfer": 882334
+        },
+        {
+          "path": "/art/v5/elfin-230ad616fef0.webp",
+          "ms": 798.2999997138977,
+          "encoded": 639406,
+          "decoded": 639406,
+          "transfer": 639706
+        },
+        {
+          "path": "/art/v5/champion-82987f71c3a4.webp",
+          "ms": 841.6999998092651,
+          "encoded": 1393422,
+          "decoded": 1393422,
+          "transfer": 1393722
+        },
+        {
+          "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+          "ms": 807.5,
+          "encoded": 909736,
+          "decoded": 909736,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+          "ms": 818.5,
+          "encoded": 649834,
+          "decoded": 649834,
+          "transfer": 650134
+        },
+        {
+          "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+          "ms": 823.0999999046326,
+          "encoded": 770972,
+          "decoded": 770972,
+          "transfer": 771272
+        },
+        {
+          "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+          "ms": 829.2000002861023,
+          "encoded": 486558,
+          "decoded": 486558,
+          "transfer": 486858
+        },
+        {
+          "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+          "ms": 826.5,
+          "encoded": 557582,
+          "decoded": 557582,
+          "transfer": 557882
+        },
+        {
+          "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+          "ms": 834.3000001907349,
+          "encoded": 586268,
+          "decoded": 586268,
+          "transfer": 586568
+        },
+        {
+          "path": "/art/v5/captain-89022357add6.webp",
+          "ms": 835,
+          "encoded": 1074086,
+          "decoded": 1074086,
+          "transfer": 1074386
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 40.69999980926514,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 44.80000019073486,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 41,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 2.8999996185302734,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 0
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 3.5,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": []
+    }
+  },
+  "ordinaryMechanics": {
+    "during": {
+      "page": "home",
+      "units": 13,
+      "maxUnits": 13,
+      "pool": {
+        "atlasPoolEntries": 4,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 5,
+        "atlasPoolSpriteFrames": 125,
+        "atlasPoolEstimatedBytes": 19025664,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 9.200000000011642,
+      "blankClassification": {
+        "initialUnrendered": 100,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 0,
+        "zeroHpSourceEmpty": 0,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 9.599999904632568,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 577262
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 11.099999904632568,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 801418
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 6.200000286102295,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 848996
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 24.300000190734863,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 1104218
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 4.699999809265137,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 610608
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 1.0999999046325684,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": [
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "sample",
+          "retainedFrameTrees": null,
+          "activeFrameTrees": null,
+          "pendingFrameTrees": null
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "recovered",
+          "retainedFrameTrees": 1,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        }
+      ]
+    },
+    "released": {
+      "page": "world",
+      "units": 0,
+      "maxUnits": 18,
+      "pool": {
+        "atlasPoolEntries": 0,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 0,
+        "atlasPoolSpriteFrames": 0,
+        "atlasPoolEstimatedBytes": 0,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      },
+      "uiFailures": 0,
+      "p95FrameIntervalMs": 9.199999999953434,
+      "blankClassification": {
+        "initialUnrendered": 103,
+        "currentInitialUnrendered": 0,
+        "expectedOpacityZero": 334,
+        "zeroHpSourceEmpty": 147,
+        "unexpected": 0,
+        "currentExpectedOpacityZero": 0,
+        "currentZeroHpSourceEmpty": 0,
+        "currentUnexpected": 0,
+        "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+      },
+      "atlasResources": [
+        {
+          "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+          "ms": 9.599999904632568,
+          "encoded": 576962,
+          "decoded": 576962,
+          "transfer": 577262
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 11.099999904632568,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 801418
+        },
+        {
+          "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+          "ms": 6.200000286102295,
+          "encoded": 848696,
+          "decoded": 848696,
+          "transfer": 848996
+        },
+        {
+          "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+          "ms": 24.300000190734863,
+          "encoded": 1103918,
+          "decoded": 1103918,
+          "transfer": 1104218
+        },
+        {
+          "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+          "ms": 4.699999809265137,
+          "encoded": 610308,
+          "decoded": 610308,
+          "transfer": 610608
+        },
+        {
+          "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+          "ms": 1.0999999046325684,
+          "encoded": 801118,
+          "decoded": 801118,
+          "transfer": 0
+        }
+      ],
+      "animationFrameCaches": []
+    }
+  },
+  "artUnchanged": true,
+  "newArtwork": 0,
+  "decodedEstimateBytes": 103094064,
+  "gpuMemory": "not measured"
+}

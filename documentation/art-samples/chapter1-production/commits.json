@@ -5,5 +5,14 @@
   "documentation": "This record and evidence are committed separately after implementation; see git log.",
   "publication": "local only, no push/main merge/server access",
   "checkpoint": ".local/art-production/checkpoint.json",
-  "runtime": "evidence/release.json"
+  "runtime": "evidence/release.json",
+  "mechanics": {
+    "baseline": "24b58d6f90bb37444220686ddc288bb9d137db1b",
+    "implementation": "230e8c047790fe5b2f090e52e84969db9831dfc4",
+    "documentation": "Committed separately after implementation; this record is in the documentation commit",
+    "runtime": "mechanics/evidence/release.json",
+    "evidence": "mechanics/README.md",
+    "newArtworkModels": 0,
+    "publication": "local only; no push, merge, production connection or deployment"
+  }
 }

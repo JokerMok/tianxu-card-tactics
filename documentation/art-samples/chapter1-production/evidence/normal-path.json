@@ -170,5 +170,12 @@
       ]
     }
   ],
-  "ordinary107Boundary": "First normal attempt failed at turn8; Sentinel deployed, Captain displayed. Champion75 source/mixed QA only, not claimed as normally obtained this run."
+  "ordinary107Boundary": "First normal attempt failed at turn8; Sentinel deployed, Captain displayed. Champion75 source/mixed QA only, not claimed as normally obtained this run.",
+  "mechanicsFollowup": {
+    "date": "2026-10-26",
+    "previous107FailureRetained": true,
+    "newResult": "Ordinary Cocos win at turn10 after normal purchase of3 Slash and legal saved six-card deck; reward75 actually claimed and persisted",
+    "evidence": "../mechanics/evidence/normal-107-result.json",
+    "nextScene": "first chapter complete; actual second chapter access still requires level5, ordinary character level3; not entered"
+  }
 }

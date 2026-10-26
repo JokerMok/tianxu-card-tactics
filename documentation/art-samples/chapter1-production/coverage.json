@@ -3748,6 +3748,369 @@
           "TypeID": 85,
           "param1": 1169
         },
+        "runtimeStatus": "implemented_targeted_verified",
+        "runtimeRule": "Type85 creates its exact configured heap at the dead unit square, retaining owner, card lineage and source monster. Final destruction places the card in graveyard once."
+      },
+      {
+        "sourceMonsterIds": [
+          1379
+        ],
+        "sourceCardIds": [
+          1379
+        ],
+        "sourceName": "Skeleton Soldier",
+        "effectPath": [
+          8681
+        ],
+        "effectTypes": [
+          85
+        ],
+        "trigger": "death",
+        "targetMonsterIds": [
+          1380
+        ],
+        "targetModels": [
+          {
+            "monsterId": 1380,
+            "name": "Skeleton Soldier / Bone Heap",
+            "modelId": "model:47e0ec7e26e307dcb83f"
+          }
+        ],
+        "sourceParameters": {
+          "effectId": 8681,
+          "TypeID": 85,
+          "param1": 1380
+        },
+        "runtimeStatus": "implemented_targeted_verified",
+        "runtimeRule": "Type85 creates its exact configured heap at the dead unit square, retaining owner, card lineage and source monster. Final destruction places the card in graveyard once."
+      },
+      {
+        "sourceMonsterIds": [
+          11043
+        ],
+        "sourceCardIds": [
+          11043
+        ],
+        "sourceName": "Hamlyn the Piper",
+        "effectPath": [
+          6122
+        ],
+        "effectTypes": [
+          61
+        ],
+        "trigger": "each unit turn",
+        "targetMonsterIds": [
+          9038
+        ],
+        "targetModels": [
+          {
+            "monsterId": 9038,
+            "name": "Rats",
+            "modelId": "model:8b670eaeee9e14ecbe7f"
+          }
+        ],
+        "sourceParameters": {
+          "effectId": 6122,
+          "TypeID": 61,
+          "param1": 9038,
+          "param2": 39
+        },
+        "runtimeStatus": "implemented",
+        "runtimeRule": "applyStaticEffects stores param1 as turnSummonMonster; processUnitTurn summons monster 9038 in a nearby legal square."
+      },
+      {
+        "sourceMonsterIds": [
+          12025
+        ],
+        "sourceCardIds": [
+          12025
+        ],
+        "sourceName": "Blaze Adept",
+        "effectPath": [
+          5027,
+          11701
+        ],
+        "effectTypes": [
+          50,
+          117
+        ],
+        "trigger": "declared first turn / random summon",
+        "targetMonsterIds": [
+          12001,
+          12015,
+          12032,
+          12022
+        ],
+        "targetModels": [
+          {
+            "monsterId": 12001,
+            "name": "Flame Whelp",
+            "modelId": "model:2f50f04680a130eabcb9"
+          },
+          {
+            "monsterId": 12015,
+            "name": "Flame Dragon",
+            "modelId": "model:1239924ff5b6408b4d2d"
+          },
+          {
+            "monsterId": 12032,
+            "name": "Flame Dragonkin",
+            "modelId": "model:fce8d802fbf438dcc577"
+          },
+          {
+            "monsterId": 12022,
+            "name": "Kaelithus",
+            "modelId": "model:355bfda10f106bd84d06"
+          }
+        ],
+        "sourceParameters": {
+          "wrapper": {
+            "effectId": 5027,
+            "TypeID": 50,
+            "param1": 1,
+            "param2": 11701
+          },
+          "summon": {
+            "effectId": 11701,
+            "TypeID": 117,
+            "param1": 12001,
+            "param2": 70,
+            "param3": 12015,
+            "param4": 90,
+            "param5": 12032,
+            "param6": 99,
+            "param7": 12022,
+            "param8": 100
+          }
+        },
+        "runtimeStatus": "implemented_targeted_verified",
+        "runtimeRule": "Type50 param2 is active only within its per-effect own-action clock. Type117 uses configured weighted candidates and existing legal adjacent slots once; blocked first summon has no backlog."
+      }
+    ],
+    "transformAndRebirth": [
+      {
+        "sourceMonsterIds": [
+          1001
+        ],
+        "sourceCardIds": [
+          1001
+        ],
+        "sourceName": "Zombie Guard",
+        "effectPath": [
+          3201
+        ],
+        "sourceParameters": {
+          "effectId": 3201,
+          "TypeID": 32,
+          "param1": 33
+        },
+        "kind": "same-unit resurrection",
+        "targetMonsterIds": [
+          1001
+        ],
+        "targetModelIds": [
+          "model:e4c0d41319e04fc0008a"
+        ],
+        "runtimeStatus": "implemented",
+        "runtimeRule": "On death, a 33 percent roll restores the same unit once in its current square. This adds no new model dependency."
+      },
+      {
+        "sourceMonsterIds": [
+          1169,
+          1187,
+          1380
+        ],
+        "sourceCardIds": [
+          1169,
+          1187,
+          1380
+        ],
+        "sourceNames": [
+          "Vile Skeleton / Bone Heap",
+          "Foul Skeleton / Bone Heap",
+          "Skeleton Soldier / Bone Heap"
+        ],
+        "effectPath": [
+          1550,
+          1513,
+          2701,
+          3301,
+          8601
+        ],
+        "sourceParameters": {
+          "composite": {
+            "effectId": 1550,
+            "TypeID": 15,
+            "param1": 1513,
+            "param2": 8601
+          },
+          "wallComposite": {
+            "effectId": 1513,
+            "TypeID": 15,
+            "param1": 2701,
+            "param2": 3301
+          },
+          "noMove": {
+            "effectId": 2701,
+            "TypeID": 27
+          },
+          "noAttack": {
+            "effectId": 3301,
+            "TypeID": 33
+          },
+          "transform": {
+            "effectId": 8601,
+            "TypeID": 86,
+            "explicitTargetMonsterId": null
+          }
+        },
+        "kind": "bone-heap recombination",
+        "sourceDeclaredTarget": "Skeleton, without a concrete monster ID in the effect row.",
+        "currentRuntimeTargetMonsterIds": [
+          1127,
+          1145,
+          1379
+        ],
+        "currentRuntimeTargetModels": [
+          {
+            "monsterId": 1127,
+            "name": "Vile Skeleton",
+            "modelId": "model:0d666e654103978eeeea"
+          },
+          {
+            "monsterId": 1145,
+            "name": "Foul Skeleton",
+            "modelId": "model:4323868b230133647b45"
+          },
+          {
+            "monsterId": 1379,
+            "name": "Skeleton Soldier",
+            "modelId": "model:0d666e654103978eeeea"
+          }
+        ],
+        "runtimeStatus": "implemented_targeted_verified",
+        "runtimeRule": "1169->1127,1187->1145,1380->1379, from exact Type85 reverse config. Same heap unitId/owner/square, rebuilt source stats/effects without intrinsic noMove/noAttack/death flags. Recombine consumes one own action (current-version timing), normal action resumes next time. Old malformed snapshots repair only with surviving exact heap config."
+      }
+    ],
+    "dependencyBlockers": [
+      {
+        "sourceMonsterIds": [
+          211,
+          21247,
+          21451
+        ],
+        "sourceCardIds": [
+          211,
+          18175,
+          21247,
+          21451
+        ],
+        "effectId": 7702,
+        "TypeID": 77,
+        "runtimeStatus": "kill_suppression_implemented_targeted_verified",
+        "rule": "Lethal attacker marker is consumed to block Type32 Reanimate, Type41 Soulbound and Type85 Skeleton. Ordinary graveyard and unrelated death summons remain. Targeted tests compare actual activating control cases; this does not claim all other damage-immunity branches audited."
+      }
+    ],
+    "unresolvedDynamicFamilies": [
+      "No bounded root/composite reaches Type113/155/166/170/196/405/409 or incubation7703; not expanded this round.",
+      "Three adjacent candidate slots use existing summonToken semantics. Recombine action-consuming timing and old-snapshot repair are explicitly current-version choices, not proven original server code."
+    ],
+    "evidence": [
+      "cocos-client/assets/scripts/game/BattleKernel.ts: effectIds/makeUnit/applyStaticEffects/activeEffectRows/removeDead/processUnitTurn/resolveTurnEffects",
+      "cocos-client/assets/resources/recovered/catalog.json: monster ability rows, effect rows and stable monsterModels",
+      "backend/game/content.mjs: commonCards and enemyDeck level-1 filter",
+      "mechanics/README.md",
+      "mechanics/evidence/recovery-and-retries.json",
+      "backend/game/chapter1-mechanics.test.mjs"
+    ],
+    "inputs": {
+      "randomEnemyDeckCards": 129,
+      "directAndPoolInputCards": 134,
+      "directAndPoolInputMonsters": 134,
+      "reachableEffectRowsIncludingDeclaredWrappers": 133,
+      "rootFields": [
+        "ability1",
+        "ability2",
+        "ability3",
+        "ability4",
+        "ability5"
+      ]
+    }
+  },
+  "baselineV4": {
+    "summary": {
+      "relevantResolvedModels": 127,
+      "randomEnemyDeckCards": 129,
+      "randomEnemyDeckResolvedModels": 119,
+      "directResolvedModels": 12,
+      "directAndPoolOverlapModels": 4,
+      "currentSourceArtworkModels": 9,
+      "currentExactRuntimeMonsterMappings": 10,
+      "remainingResolvedModels": 118
+    },
+    "manifestMonsterIds": [
+      1,
+      19,
+      43,
+      61,
+      3001,
+      3019,
+      4001,
+      5019,
+      60001,
+      60002,
+      60003,
+      60005
+    ],
+    "mappedRelevantMonsterIds": [
+      1,
+      19,
+      43,
+      61,
+      3001,
+      5019,
+      60001,
+      60002,
+      60003,
+      60005
+    ]
+  },
+  "productionStatus": "v5 nineteen artwork models frozen; chapter-one mechanics fixes and ordinary107 win are separately recorded in mechanics/README.md. Artwork coverage remains19/127; no new art generated.",
+  "baselineV5MechanismInspection": {
+    "scope": "Static dependency extraction from the enabled direct Chapter 1 monsters and the 129 level-1 enemy-deck cards. Root effects are monster ability1..ability5; TypeID 15 composites are expanded recursively. No exhaustive battle-state execution is claimed.",
+    "denominatorNote": "These dependencies are downstream runtime products. They do not change the 127-model denominator, which remains direct Chapter 1 references union the initial random enemy-deck pool.",
+    "concreteMonsterTargets": [
+      {
+        "sourceMonsterIds": [
+          1127
+        ],
+        "sourceCardIds": [
+          1127,
+          21992
+        ],
+        "sourceName": "Vile Skeleton",
+        "effectPath": [
+          8501
+        ],
+        "effectTypes": [
+          85
+        ],
+        "trigger": "death",
+        "targetMonsterIds": [
+          1169
+        ],
+        "targetModels": [
+          {
+            "monsterId": 1169,
+            "name": "Vile Skeleton / Bone Heap",
+            "modelId": "model:47e0ec7e26e307dcb83f"
+          }
+        ],
+        "sourceParameters": {
+          "effectId": 8501,
+          "TypeID": 85,
+          "param1": 1169
+        },
         "runtimeStatus": "implemented",
         "runtimeRule": "applyStaticEffects stores param1 as skeletonMonster; removeDead summons that monster at the death square unless resurrection is blocked."
       },
@@ -4022,44 +4385,5 @@
         "ability5"
       ]
     }
-  },
-  "baselineV4": {
-    "summary": {
-      "relevantResolvedModels": 127,
-      "randomEnemyDeckCards": 129,
-      "randomEnemyDeckResolvedModels": 119,
-      "directResolvedModels": 12,
-      "directAndPoolOverlapModels": 4,
-      "currentSourceArtworkModels": 9,
-      "currentExactRuntimeMonsterMappings": 10,
-      "remainingResolvedModels": 118
-    },
-    "manifestMonsterIds": [
-      1,
-      19,
-      43,
-      61,
-      3001,
-      3019,
-      4001,
-      5019,
-      60001,
-      60002,
-      60003,
-      60005
-    ],
-    "mappedRelevantMonsterIds": [
-      1,
-      19,
-      43,
-      61,
-      3001,
-      5019,
-      60001,
-      60002,
-      60003,
-      60005
-    ]
-  },
-  "productionStatus": "10 additional models produced and native Cocos mixed action QA; direct model source coverage12/12, random/direct union19/127. Summon dependencies remain separately classified."
+  }
 }

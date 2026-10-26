@@ -1,0 +1,800 @@
+{
+  "scope": "ordinary account, normal shop + saved deck + manual native Cocos actions; not a fixture",
+  "createdAt": 1793003000644,
+  "battleId": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+  "turn": 10,
+  "player": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+  "winner": 0,
+  "settled": true,
+  "settlements": 1,
+  "reward": {
+    "won": true,
+    "silver": 30,
+    "xp": 6,
+    "cards": [
+      {
+        "id": "main:card:75",
+        "count": 1
+      }
+    ],
+    "extras": {
+      "items": [],
+      "cards": [],
+      "currencies": {},
+      "reputation": [
+        {
+          "type": 11,
+          "value": 11000
+        }
+      ],
+      "growth": {},
+      "xp": 0,
+      "randomGroups": [],
+      "preview": null
+    }
+  },
+  "campaignExtras": {
+    "6136cc1e-c2c1-402f-9e29-134690cc94b5": {
+      "items": [],
+      "cards": [],
+      "currencies": {},
+      "reputation": [
+        {
+          "type": 11,
+          "value": 11000
+        }
+      ],
+      "growth": {},
+      "xp": 0,
+      "randomGroups": [],
+      "preview": null
+    }
+  },
+  "deck": [
+    "main:card:43",
+    "main:card:61",
+    "main:card:8",
+    "main:card:41001",
+    "main:card:41001",
+    "main:card:41001"
+  ],
+  "level": 3,
+  "xp": 16,
+  "currencies": {
+    "silver": 80,
+    "gold": 20,
+    "crystal": 0
+  },
+  "cards": {
+    "slash": 3,
+    "captain": 1
+  },
+  "progress": {
+    "sceneId": 1,
+    "clearedNodes": [
+      "main:scene:1:node:101",
+      "main:scene:1:node:102",
+      "main:scene:1:node:103",
+      "main:scene:1:node:105",
+      "main:scene:1:node:107"
+    ],
+    "clearedTriggers": [
+      "main:scene:1:node:101:trigger:101001",
+      "main:scene:1:node:102:trigger:102001",
+      "main:scene:1:node:103:trigger:103001",
+      "main:scene:1:node:105:trigger:105001",
+      "main:scene:1:node:101:trigger:101002",
+      "main:scene:1:node:102:trigger:102002",
+      "main:scene:1:node:103:trigger:103002",
+      "main:scene:1:node:105:trigger:105002",
+      "main:scene:1:node:107:trigger:107001"
+    ],
+    "unlockedScenes": [
+      1
+    ],
+    "positionByScene": {}
+  },
+  "purchases": [
+    {
+      "at": 1793002151941,
+      "kind": "debit",
+      "asset": "silver",
+      "amount": -150,
+      "reason": "profession-skill-shop"
+    },
+    {
+      "at": 1793002151941,
+      "kind": "grant",
+      "asset": "main:card:41001",
+      "amount": 1,
+      "reason": "profession-skill-shop"
+    },
+    {
+      "at": 1793002377463,
+      "kind": "debit",
+      "asset": "silver",
+      "amount": -150,
+      "reason": "profession-skill-shop"
+    },
+    {
+      "at": 1793002377463,
+      "kind": "grant",
+      "asset": "main:card:41001",
+      "amount": 1,
+      "reason": "profession-skill-shop"
+    },
+    {
+      "at": 1793002877514,
+      "kind": "debit",
+      "asset": "silver",
+      "amount": -150,
+      "reason": "profession-skill-shop"
+    },
+    {
+      "at": 1793002877514,
+      "kind": "grant",
+      "asset": "main:card:41001",
+      "amount": 1,
+      "reason": "profession-skill-shop"
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 2,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 3,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 4,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 5,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 6,
+      "type": "draw",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0"
+    },
+    {
+      "seq": 7,
+      "type": "draw",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0"
+    },
+    {
+      "seq": 8,
+      "type": "draw",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0"
+    },
+    {
+      "seq": 9,
+      "type": "draw",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0"
+    },
+    {
+      "seq": 10,
+      "type": "battle-start",
+      "amount": 1088464256
+    },
+    {
+      "seq": 11,
+      "type": "turn-start",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 1
+    },
+    {
+      "seq": 12,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:10",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "seq": 13,
+      "type": "summon",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:10",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "seq": 14,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:11",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "seq": 15,
+      "type": "summon",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:11",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "seq": 16,
+      "type": "turn-end",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 1
+    },
+    {
+      "seq": 17,
+      "type": "damage",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 1,
+      "message": "fatigue"
+    },
+    {
+      "seq": 18,
+      "type": "fatigue",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 1
+    },
+    {
+      "seq": 19,
+      "type": "turn-start",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2
+    },
+    {
+      "seq": 20,
+      "type": "play",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:12",
+      "row": 0,
+      "col": 8
+    },
+    {
+      "seq": 21,
+      "type": "summon",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:12",
+      "row": 0,
+      "col": 8
+    },
+    {
+      "seq": 22,
+      "type": "play",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:13",
+      "row": 0,
+      "col": 9
+    },
+    {
+      "seq": 23,
+      "type": "summon",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:13",
+      "row": 0,
+      "col": 9
+    },
+    {
+      "seq": 24,
+      "type": "play",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:14",
+      "row": 0,
+      "col": 10
+    },
+    {
+      "seq": 25,
+      "type": "summon",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:14",
+      "row": 0,
+      "col": 10
+    },
+    {
+      "seq": 26,
+      "type": "turn-end",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2
+    },
+    {
+      "seq": 27,
+      "type": "draw",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5"
+    },
+    {
+      "seq": 28,
+      "type": "turn-start",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 3
+    },
+    {
+      "seq": 29,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:14",
+      "row": 0,
+      "col": 10
+    },
+    {
+      "seq": 30,
+      "type": "damage",
+      "target": "unit:14",
+      "amount": 6
+    },
+    {
+      "seq": 31,
+      "type": "death",
+      "actor": "unit:14",
+      "row": 0,
+      "col": 10
+    },
+    {
+      "seq": 32,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:13",
+      "row": 0,
+      "col": 9
+    },
+    {
+      "seq": 33,
+      "type": "damage",
+      "target": "unit:13",
+      "amount": 6
+    },
+    {
+      "seq": 34,
+      "type": "death",
+      "actor": "unit:13",
+      "row": 0,
+      "col": 9
+    },
+    {
+      "seq": 35,
+      "type": "move",
+      "actor": "unit:11",
+      "row": 2,
+      "col": 6
+    },
+    {
+      "seq": 36,
+      "type": "move",
+      "actor": "unit:10",
+      "row": 3,
+      "col": 6
+    },
+    {
+      "seq": 37,
+      "type": "turn-end",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 3
+    },
+    {
+      "seq": 38,
+      "type": "damage",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2,
+      "message": "fatigue"
+    },
+    {
+      "seq": 39,
+      "type": "fatigue",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2
+    },
+    {
+      "seq": 40,
+      "type": "turn-start",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 4
+    },
+    {
+      "seq": 41,
+      "type": "move",
+      "actor": "unit:12",
+      "row": 0,
+      "col": 7
+    },
+    {
+      "seq": 42,
+      "type": "turn-end",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 4
+    },
+    {
+      "seq": 43,
+      "type": "damage",
+      "target": "hero:6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 1,
+      "message": "fatigue"
+    },
+    {
+      "seq": 44,
+      "type": "fatigue",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 1
+    },
+    {
+      "seq": 45,
+      "type": "turn-start",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 5
+    },
+    {
+      "seq": 46,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:12",
+      "row": 0,
+      "col": 7
+    },
+    {
+      "seq": 47,
+      "type": "damage",
+      "target": "unit:12",
+      "amount": 6
+    },
+    {
+      "seq": 48,
+      "type": "death",
+      "actor": "unit:12",
+      "row": 0,
+      "col": 7
+    },
+    {
+      "seq": 49,
+      "type": "play",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:16",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "seq": 50,
+      "type": "summon",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "target": "unit:16",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "seq": 51,
+      "type": "move",
+      "actor": "unit:11",
+      "row": 2,
+      "col": 9
+    },
+    {
+      "seq": 52,
+      "type": "move",
+      "actor": "unit:10",
+      "row": 3,
+      "col": 9
+    },
+    {
+      "seq": 53,
+      "type": "turn-end",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 5
+    },
+    {
+      "seq": 54,
+      "type": "damage",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 3,
+      "message": "fatigue"
+    },
+    {
+      "seq": 55,
+      "type": "fatigue",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 3
+    },
+    {
+      "seq": 56,
+      "type": "turn-start",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 6
+    },
+    {
+      "seq": 57,
+      "type": "play",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:17",
+      "row": 0,
+      "col": 8
+    },
+    {
+      "seq": 58,
+      "type": "summon",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "target": "unit:17",
+      "row": 0,
+      "col": 8
+    },
+    {
+      "seq": 59,
+      "type": "turn-end",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 6
+    },
+    {
+      "seq": 60,
+      "type": "damage",
+      "target": "hero:6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 2,
+      "message": "fatigue"
+    },
+    {
+      "seq": 61,
+      "type": "fatigue",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 2
+    },
+    {
+      "seq": 62,
+      "type": "turn-start",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 7
+    },
+    {
+      "seq": 63,
+      "type": "move",
+      "actor": "unit:16",
+      "row": 1,
+      "col": 4
+    },
+    {
+      "seq": 64,
+      "type": "move",
+      "actor": "unit:11",
+      "row": 1,
+      "col": 8
+    },
+    {
+      "seq": 65,
+      "type": "attack",
+      "actor": "unit:11",
+      "target": "unit:17",
+      "amount": 1
+    },
+    {
+      "seq": 66,
+      "type": "damage",
+      "actor": "unit:11",
+      "target": "unit:17",
+      "amount": 1
+    },
+    {
+      "seq": 67,
+      "type": "death",
+      "actor": "unit:17",
+      "row": 0,
+      "col": 8
+    },
+    {
+      "seq": 68,
+      "type": "move",
+      "actor": "unit:10",
+      "row": 1,
+      "col": 10
+    },
+    {
+      "seq": 69,
+      "type": "turn-end",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 7
+    },
+    {
+      "seq": 70,
+      "type": "damage",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 4,
+      "message": "fatigue"
+    },
+    {
+      "seq": 71,
+      "type": "fatigue",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 4
+    },
+    {
+      "seq": 72,
+      "type": "turn-start",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 8
+    },
+    {
+      "seq": 73,
+      "type": "turn-end",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 8
+    },
+    {
+      "seq": 74,
+      "type": "damage",
+      "target": "hero:6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 3,
+      "message": "fatigue"
+    },
+    {
+      "seq": 75,
+      "type": "fatigue",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 3
+    },
+    {
+      "seq": 76,
+      "type": "turn-start",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 9
+    },
+    {
+      "seq": 77,
+      "type": "move",
+      "actor": "unit:10",
+      "row": 0,
+      "col": 10
+    },
+    {
+      "seq": 78,
+      "type": "attack",
+      "actor": "unit:10",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2
+    },
+    {
+      "seq": 79,
+      "type": "damage",
+      "actor": "unit:10",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 2
+    },
+    {
+      "seq": 80,
+      "type": "move",
+      "actor": "unit:11",
+      "row": 1,
+      "col": 10
+    },
+    {
+      "seq": 81,
+      "type": "move",
+      "actor": "unit:16",
+      "row": 1,
+      "col": 5
+    },
+    {
+      "seq": 82,
+      "type": "turn-end",
+      "actor": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "amount": 9
+    },
+    {
+      "seq": 83,
+      "type": "damage",
+      "target": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 5,
+      "message": "fatigue"
+    },
+    {
+      "seq": 84,
+      "type": "fatigue",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 5
+    },
+    {
+      "seq": 85,
+      "type": "turn-start",
+      "actor": "ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "amount": 10
+    },
+    {
+      "seq": 86,
+      "type": "death",
+      "actor": "hero:ai:bc7f1bb3-b7fc-4068-8229-eee1dde3590c:0",
+      "row": 0,
+      "col": 11
+    },
+    {
+      "seq": 87,
+      "type": "settled",
+      "amount": 0
+    }
+  ],
+  "nextChapter": {
+    "requiredLevel": 5,
+    "currentLevel": 3,
+    "entered": false,
+    "observed": "UI returns 需要等级5; first chapter complete, level requirement remains"
+  },
+  "entryRng": 1088464256,
+  "finalRng": 1088464256,
+  "ordinary107Attempts": [
+    {
+      "battleId": "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+      "entryRng": 961944309,
+      "turn": 8,
+      "winner": 1,
+      "settled": true,
+      "entryDeck": [
+        "main:card:19",
+        "main:card:43",
+        "main:card:61",
+        "main:card:5019",
+        "main:card:8"
+      ],
+      "entryHand": [
+        "main:card:5019",
+        "main:card:61",
+        "main:card:19",
+        "main:card:43",
+        "main:card:8"
+      ],
+      "reward": {
+        "won": false,
+        "silver": 0,
+        "xp": 0,
+        "cards": []
+      }
+    },
+    {
+      "battleId": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "entryRng": 1088464256,
+      "turn": 10,
+      "winner": 0,
+      "settled": true,
+      "entryDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "entryHand": [
+        "main:card:43",
+        "main:card:41001",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:61"
+      ],
+      "reward": {
+        "won": true,
+        "silver": 30,
+        "xp": 6,
+        "cards": [
+          {
+            "id": "main:card:75",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [
+            {
+              "type": 11,
+              "value": 11000
+            }
+          ],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "9b4df4f1-f881-426d-bfa8-872fa697630d",
+  "mapId": 1,
+  "seed": 1024,
+  "initialUnits": 4,
+  "initialHeroUnits": 2,
+  "reverseSides": false,
+  "source": "createBattle using original monster configuration, including chapter-1 IDs. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.",
+  "account": "dedicated local QA account; credentials excluded",
+  "liveDatabase": "isolated .local/art-samples/game.sqlite"
+}

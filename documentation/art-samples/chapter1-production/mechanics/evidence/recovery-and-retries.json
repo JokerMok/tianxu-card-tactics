@@ -1,0 +1,35 @@
+{
+  "scope": "live localhost isolated mechanics account, not ordinary progression",
+  "restart": {
+    "newServerInstance": true,
+    "stateDigest": "d09849fbac360fbebdf6a1cc2efeb8781b1d3db715b18155e9c39ac48a943418",
+    "stateExactlyRestored": true,
+    "before": {
+      "bone": 1,
+      "rats": 2,
+      "dragons": 1,
+      "recombinations": 1,
+      "turn": 5,
+      "revision": 8,
+      "events": 61
+    }
+  },
+  "request": {
+    "accepted": true,
+    "replayed": true,
+    "changedContentStatus": 409,
+    "changedContentCode": "REQUEST_REUSE",
+    "staleStatus": 409,
+    "after": {
+      "bone": 0,
+      "rats": 3,
+      "dragons": 1,
+      "recombinations": 2,
+      "turn": 7,
+      "revision": 10,
+      "events": 87
+    },
+    "assetsUnchanged": true
+  },
+  "credentials": "excluded"
+}
