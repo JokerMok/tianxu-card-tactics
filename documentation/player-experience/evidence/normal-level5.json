@@ -1,0 +1,223 @@
+{
+  "scope": "ordinary107 progress resumed in a consistent isolated database clone; normal HTTP actions only. Private session issued to the cloned account, not a login/password test.",
+  "before": {
+    "level": 3,
+    "xp": 16,
+    "scene": 1,
+    "pveWins": 9,
+    "silver": 80
+  },
+  "tasks": [
+    {
+      "id": "first-deck",
+      "after": {
+        "level": 3,
+        "xp": 26,
+        "scene": 1,
+        "pveWins": 9,
+        "silver": 110
+      }
+    },
+    {
+      "id": "first-battle",
+      "after": {
+        "level": 4,
+        "xp": 6,
+        "scene": 1,
+        "pveWins": 9,
+        "silver": 140
+      }
+    },
+    {
+      "id": "three-wins",
+      "after": {
+        "level": 4,
+        "xp": 16,
+        "scene": 1,
+        "pveWins": 9,
+        "silver": 240
+      }
+    }
+  ],
+  "battles": [
+    {
+      "id": "533ad9d5-8d47-482d-b397-6d74ae5e9e0e",
+      "node": 101,
+      "turn": 5,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 4,
+        "xp": 20,
+        "scene": 1,
+        "pveWins": 10,
+        "silver": 260
+      }
+    },
+    {
+      "id": "0303b787-8742-4806-8ee0-33b8193b1bd2",
+      "node": 101,
+      "turn": 4,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 4,
+        "xp": 24,
+        "scene": 1,
+        "pveWins": 11,
+        "silver": 280
+      }
+    },
+    {
+      "id": "2db11e68-d889-49c0-bc64-4b1d93eba815",
+      "node": 101,
+      "turn": 5,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 4,
+        "xp": 28,
+        "scene": 1,
+        "pveWins": 12,
+        "silver": 300
+      }
+    },
+    {
+      "id": "fdf95aeb-0519-4a9e-9aa7-f8e92ef000c5",
+      "node": 101,
+      "turn": 4,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 4,
+        "xp": 32,
+        "scene": 1,
+        "pveWins": 13,
+        "silver": 320
+      }
+    },
+    {
+      "id": "f11859f6-8808-45e3-9a31-89d327624fb8",
+      "node": 101,
+      "turn": 4,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 4,
+        "xp": 36,
+        "scene": 1,
+        "pveWins": 14,
+        "silver": 340
+      }
+    },
+    {
+      "id": "7659474d-f013-42da-9115-f2fd36df5245",
+      "node": 101,
+      "turn": 5,
+      "reward": {
+        "won": true,
+        "silver": 20,
+        "xp": 4,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "after": {
+        "level": 5,
+        "xp": 0,
+        "scene": 1,
+        "pveWins": 15,
+        "silver": 360
+      }
+    }
+  ],
+  "commands": 34,
+  "initialChapterGate": "VALIDATION_REJECTED: 需要等级5",
+  "transition": "accepted",
+  "after": {
+    "level": 5,
+    "xp": 0,
+    "scene": 2,
+    "pveWins": 15,
+    "silver": 360
+  },
+  "complete": true
+}

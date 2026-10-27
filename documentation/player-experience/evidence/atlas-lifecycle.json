@@ -1,0 +1,23 @@
+{
+  "active": {
+    "atlasPoolEntries": 3,
+    "atlasPoolPendingEntries": 0,
+    "atlasPoolLiveReferences": 3,
+    "atlasPoolSpriteFrames": 95,
+    "atlasPoolEstimatedBytes": 13105464,
+    "atlasPoolMaxEntries": 19,
+    "atlasPoolMaxEstimatedBytes": 134217728
+  },
+  "released": {
+    "atlasPoolEntries": 0,
+    "atlasPoolPendingEntries": 0,
+    "atlasPoolLiveReferences": 0,
+    "atlasPoolSpriteFrames": 0,
+    "atlasPoolEstimatedBytes": 0,
+    "atlasPoolMaxEntries": 19,
+    "atlasPoolMaxEstimatedBytes": 134217728
+  },
+  "resources": [],
+  "unexpectedBlanks": 0,
+  "scope": "one normal initial-deck PVE; three actually used replacement atlases, not all19 stress"
+}

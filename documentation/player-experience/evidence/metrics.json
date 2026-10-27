@@ -1,0 +1,119 @@
+{
+  "scope": "single comparable cold/new-origin + warm native Cocos samples, loopback only; not percentile benchmark",
+  "viewport": [
+    1280,
+    720
+  ],
+  "canvas": [
+    2560,
+    1440
+  ],
+  "design": [
+    1200,
+    600
+  ],
+  "dpr": 2,
+  "designToCssScale": 1.0666667,
+  "operations": [
+    {
+      "operation": "建角后首次主城",
+      "before": {
+        "firstUiMs": 1045.7,
+        "readyMs": 1644.5
+      },
+      "after": {
+        "firstUiMs": 356.6,
+        "readyMs": 507.2
+      }
+    },
+    {
+      "operation": "首次卡组",
+      "before": {
+        "firstUiMs": 47,
+        "readyMs": 151.1
+      },
+      "after": {
+        "firstUiMs": 39.4,
+        "readyMs": 96.4
+      }
+    },
+    {
+      "operation": "首次人物",
+      "before": {
+        "firstUiMs": 35.8,
+        "readyMs": 113.7
+      },
+      "after": {
+        "firstUiMs": 31,
+        "readyMs": 87.3
+      }
+    },
+    {
+      "operation": "首次地图",
+      "before": {
+        "firstUiMs": 19.8,
+        "readyMs": 57.5
+      },
+      "after": {
+        "firstUiMs": 22.6,
+        "readyMs": 52.6
+      }
+    },
+    {
+      "operation": "首次PVE开始",
+      "before": {
+        "firstUiMs": 461.5,
+        "readyMs": 497.5
+      },
+      "after": {
+        "firstUiMs": 103.2,
+        "readyMs": 138.7
+      }
+    },
+    {
+      "operation": "温热主城返回",
+      "before": {
+        "firstUiMs": 14.3,
+        "readyMs": 48.1
+      },
+      "after": {
+        "firstUiMs": 15.5,
+        "readyMs": 46.6
+      }
+    },
+    {
+      "operation": "温热卡组",
+      "before": {
+        "firstUiMs": 27.3,
+        "readyMs": 87.9
+      },
+      "after": {
+        "firstUiMs": 22.8,
+        "readyMs": 95
+      }
+    }
+  ],
+  "homeMountMs": [
+    572.8,
+    121.4
+  ],
+  "homeCreatedNodes": [
+    301,
+    301
+  ],
+  "firstStateHeadersMs": [
+    643.8,
+    121.7
+  ],
+  "catalogTextChars": 66201348,
+  "catalogParseMs": [
+    112.6,
+    90.5
+  ],
+  "limitations": [
+    "First draw is page-tree feedback, ready also waits local pending requests/resources and stable draws; not full user perception instrumentation.",
+    "Image callback combines network queue, decode and engine preparation. No GPU decoder or driver-memory attribution.",
+    "Different new accounts share starter configuration; server/world/cache timing is not perfectly controlled.",
+    "Warm cards did not improve; single sample variation."
+  ]
+}

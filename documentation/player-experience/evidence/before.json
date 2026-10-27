@@ -1,0 +1,4111 @@
+{
+  "elapsed": 7519001.5,
+  "page": "cards",
+  "busy": false,
+  "httpPending": 0,
+  "imagePending": 0,
+  "requests": [
+    {
+      "path": "/src/import-map.json",
+      "start": 25.199999809265137,
+      "headersMs": 3.9000000953674316,
+      "status": 200
+    },
+    {
+      "path": "/cocos-js/assets/spine-CC34fKUR.wasm",
+      "start": 125.5,
+      "headersMs": 2.1999998092651367,
+      "status": 200
+    },
+    {
+      "path": "/api/bootstrap",
+      "start": 2045.1999998092651,
+      "headersMs": 2.6999998092651367,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0.09999990463256836,
+      "textChars": 75
+    },
+    {
+      "path": "/art/v5/manifest.json",
+      "start": 2048.2999997138977,
+      "headersMs": 9.5,
+      "status": 200,
+      "bodyReadDecodeMs": 0.3000001907348633,
+      "parseMs": 0.19999980926513672,
+      "textChars": 31064
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "start": 2067.2999997138977,
+      "headersMs": 2.5999999046325684,
+      "status": 200,
+      "bodyReadDecodeMs": 9.200000286102295,
+      "parseMs": 6.900000095367432,
+      "textChars": 6652658
+    },
+    {
+      "path": "/api/login",
+      "start": 212666.5,
+      "headersMs": 29,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 106
+    },
+    {
+      "path": "/api/characters",
+      "start": 212695.7999997139,
+      "headersMs": 17.800000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 17
+    },
+    {
+      "path": "/api/act",
+      "start": 543730.1999998093,
+      "headersMs": 48.80000019073486,
+      "status": 200,
+      "bodyReadDecodeMs": 0.19999980926513672,
+      "parseMs": 0,
+      "textChars": 116
+    },
+    {
+      "path": "/api/characters",
+      "start": 543779.5999999046,
+      "headersMs": 8.599999904632568,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 102
+    },
+    {
+      "path": "/api/catalog",
+      "start": 543788.3999996185,
+      "headersMs": 3.1000003814697266,
+      "status": 200,
+      "bodyReadDecodeMs": 204.19999980926514,
+      "parseMs": 112.59999990463257,
+      "textChars": 66201348
+    },
+    {
+      "path": "/api/state",
+      "start": 544109,
+      "headersMs": 643.7999997138977,
+      "status": 200,
+      "bodyReadDecodeMs": 1.200000286102295,
+      "parseMs": 0.6999998092651367,
+      "textChars": 450010
+    },
+    {
+      "path": "/api/state",
+      "start": 545046.0999999046,
+      "headersMs": 7.299999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 0.10000038146972656,
+      "parseMs": 0,
+      "textChars": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 546045.8999996185,
+      "headersMs": 9.400000095367432,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 110
+    },
+    {
+      "path": "/api/act",
+      "start": 4753114.299999714,
+      "headersMs": 34.30000019073486,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 83
+    },
+    {
+      "path": "/api/act",
+      "start": 7224657.099999905,
+      "headersMs": 27.199999809265137,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0.09999990463256836,
+      "textChars": 132
+    },
+    {
+      "path": "/api/act",
+      "start": 7289187.299999714,
+      "headersMs": 22.800000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 7290050.699999809,
+      "headersMs": 36.09999990463257,
+      "status": 200,
+      "bodyReadDecodeMs": 0.20000028610229492,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 7290902.299999714,
+      "headersMs": 17.700000286102295,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 7291733.8999996185,
+      "headersMs": 19.5,
+      "status": 200,
+      "bodyReadDecodeMs": 0.10000038146972656,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 7293418.299999714,
+      "headersMs": 22.300000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 132
+    },
+    {
+      "path": "/api/act",
+      "start": 7391327.299999714,
+      "headersMs": 18,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 83
+    }
+  ],
+  "remote": [
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2058.3999996185303,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 2058.5,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 2058.3999996185303,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 2058.5,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/ac4f3dcae0eb55b0db64.jpg",
+      "start": 2087.7999997138977,
+      "readyMs": 10.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "start": 2089.199999809265,
+      "readyMs": 20.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "start": 2114.5,
+      "readyMs": 8.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "start": 2128,
+      "readyMs": 4.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "start": 2132.5999999046326,
+      "readyMs": 6.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "start": 2139.699999809265,
+      "readyMs": 9.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2153.2999997138977,
+      "readyMs": 3.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "start": 212715.5,
+      "readyMs": 40.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 459036.2999997139,
+      "readyMs": 0.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 459045.5,
+      "readyMs": 10.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2f.png",
+      "start": 459049.09999990463,
+      "readyMs": 20.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21l.png",
+      "start": 459078.59999990463,
+      "readyMs": 6.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2g.png",
+      "start": 459085.89999961853,
+      "readyMs": 8.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2r.png",
+      "start": 459094.5,
+      "readyMs": 9.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt29.png",
+      "start": 459104,
+      "readyMs": 6.899999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21i.png",
+      "start": 459111.69999980927,
+      "readyMs": 7.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21k.png",
+      "start": 459120,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt28.png",
+      "start": 459128,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2c.png",
+      "start": 459136.89999961853,
+      "readyMs": 7.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2d.png",
+      "start": 459144.5,
+      "readyMs": 8.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2e.png",
+      "start": 459153,
+      "readyMs": 7.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21n.png",
+      "start": 459161.19999980927,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21o.png",
+      "start": 459169.59999990463,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor232.jpg",
+      "start": 544757.3999996185,
+      "readyMs": 15.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22q.png",
+      "start": 544777.0999999046,
+      "readyMs": 9.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22s.png",
+      "start": 544786.5999999046,
+      "readyMs": 6.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22u.png",
+      "start": 544793.6999998093,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22v.png",
+      "start": 544803.1999998093,
+      "readyMs": 7.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22w.png",
+      "start": 544811.2999997139,
+      "readyMs": 9.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22y.png",
+      "start": 544820.8999996185,
+      "readyMs": 6.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22r.png",
+      "start": 544827.7999997139,
+      "readyMs": 8.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22z.png",
+      "start": 544836.5999999046,
+      "readyMs": 7.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/66151644092267f3a487.mp3",
+      "start": 544756.0999999046,
+      "readyMs": 88.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor230.png",
+      "start": 544844.3999996185,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22x.png",
+      "start": 544853.5,
+      "readyMs": 7.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22t.png",
+      "start": 544861.2999997139,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22p.png",
+      "start": 544870,
+      "readyMs": 6.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24f.png",
+      "start": 544881.3999996185,
+      "readyMs": 4,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92x.png",
+      "start": 544885.7999997139,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24b.png",
+      "start": 544895,
+      "readyMs": 7.899999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24a.png",
+      "start": 544903.2999997139,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9211.png",
+      "start": 544911.3999996185,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921c.png",
+      "start": 544919.8999996185,
+      "readyMs": 7.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9214.png",
+      "start": 544928.0999999046,
+      "readyMs": 8.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24d.png",
+      "start": 544937,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/fhpg24v.png",
+      "start": 544944.6999998093,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24c.png",
+      "start": 544953.6999998093,
+      "readyMs": 6.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9221.png",
+      "start": 544960.6999998093,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9223.png",
+      "start": 544969.3999996185,
+      "readyMs": 8.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9227.png",
+      "start": 544978.7999997139,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb236.png",
+      "start": 544987.6999998093,
+      "readyMs": 6.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23h.png",
+      "start": 544994.8999996185,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb238.png",
+      "start": 545004.1999998093,
+      "readyMs": 6.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb239.png",
+      "start": 545012.5,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23b.png",
+      "start": 545020,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/t3cz24t.png",
+      "start": 545027.8999996185,
+      "readyMs": 8.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24g.png",
+      "start": 545036.5999999046,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921k.png",
+      "start": 545044.6999998093,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p247.png",
+      "start": 545053.1999998093,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z929.png",
+      "start": 545060.6999998093,
+      "readyMs": 9,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92a.png",
+      "start": 545070,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p249.png",
+      "start": 545078,
+      "readyMs": 8.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92r.png",
+      "start": 545086.7999997139,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92s.png",
+      "start": 545094.6999998093,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92w.png",
+      "start": 545103.2999997139,
+      "readyMs": 6.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92h.png",
+      "start": 545110.5,
+      "readyMs": 9.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92g.png",
+      "start": 545120.1999998093,
+      "readyMs": 7.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92f.png",
+      "start": 545128,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92e.png",
+      "start": 545136.5999999046,
+      "readyMs": 7.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92c.png",
+      "start": 545144.6999998093,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92b.png",
+      "start": 545153.2999997139,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z928.png",
+      "start": 545161.6999998093,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z927.png",
+      "start": 545170.0999999046,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92j.png",
+      "start": 545178.1999998093,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92k.png",
+      "start": 545187.1999998093,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92l.png",
+      "start": 545194.7999997139,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92m.png",
+      "start": 545203.2999997139,
+      "readyMs": 7.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24s.png",
+      "start": 545211.0999999046,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24r.png",
+      "start": 545219.8999996185,
+      "readyMs": 6.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkb.png",
+      "start": 545227,
+      "readyMs": 9.399999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk1.png",
+      "start": 545236.5999999046,
+      "readyMs": 7.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkc.png",
+      "start": 545245.1999998093,
+      "readyMs": 7.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk5.png",
+      "start": 545255.0999999046,
+      "readyMs": 5.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk6.png",
+      "start": 545261.1999998093,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk7.png",
+      "start": 545269.7999997139,
+      "readyMs": 7.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk8.png",
+      "start": 545278.1999998093,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk9.png",
+      "start": 545286.5,
+      "readyMs": 7.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fka.png",
+      "start": 545294.5,
+      "readyMs": 8.399999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk2.png",
+      "start": 545303.2999997139,
+      "readyMs": 7.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk3.png",
+      "start": 545311.1999998093,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk4.png",
+      "start": 545319.8999996185,
+      "readyMs": 7.100000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 545331.2999997139,
+      "readyMs": 30.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 910968.6999998093,
+      "readyMs": 40,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/panel-2eacf473ca05.png",
+      "start": 910966.7999997139,
+      "readyMs": 56.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "start": 910968.6999998093,
+      "readyMs": 55.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-1.png",
+      "start": 910969.0999999046,
+      "readyMs": 55.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-compact-normal-6aacda81f743.png",
+      "start": 910969.5,
+      "readyMs": 55.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-minus-6a7da52d2205.png",
+      "start": 910969.5,
+      "readyMs": 55.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/df552e565b0be398eee4.png",
+      "start": 910969.5999999046,
+      "readyMs": 55.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/1beaffff5775c94cc431.png",
+      "start": 910970.1999998093,
+      "readyMs": 55.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-locked-62ab65165d9f.png",
+      "start": 910971.5999999046,
+      "readyMs": 54.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/e00eb1cfdeacecc02b42.png",
+      "start": 910970.6999998093,
+      "readyMs": 55.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-compact-disabled-ed2373100a0e.png",
+      "start": 910971.5999999046,
+      "readyMs": 55.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-primary-normal-09f651df4458.png",
+      "start": 910973.2999997139,
+      "readyMs": 53.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/book-textless.png",
+      "start": 910966.5999999046,
+      "readyMs": 60.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 1102962.6999998093,
+      "readyMs": 29.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ckxiao-0.png",
+      "start": 1102957.8999996185,
+      "readyMs": 45.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/btrenwu-0.png",
+      "start": 1102958,
+      "readyMs": 47.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/guanbi-0.png",
+      "start": 1102958,
+      "readyMs": 47.89999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqbb_l-0.png",
+      "start": 1102958.299999714,
+      "readyMs": 47.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqzl-0.png",
+      "start": 1102958.3999996185,
+      "readyMs": 47.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/zbbj_1-0.png",
+      "start": 1102958.5999999046,
+      "readyMs": 48,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajda_1.png",
+      "start": 1102964.299999714,
+      "readyMs": 72.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajda_1.png",
+      "start": 1102964.6999998093,
+      "readyMs": 72.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/fuwengezi-0.png",
+      "start": 1102961.5999999046,
+      "readyMs": 75.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.1999998093,
+      "readyMs": 76,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.299999714,
+      "readyMs": 76,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.3999996185,
+      "readyMs": 75.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.5,
+      "readyMs": 75.7999997138977,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.6999998093,
+      "readyMs": 75.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.799999714,
+      "readyMs": 75.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102961.8999996185,
+      "readyMs": 75.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962,
+      "readyMs": 75.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962,
+      "readyMs": 75.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962.1999998093,
+      "readyMs": 75.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962.1999998093,
+      "readyMs": 75.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962.299999714,
+      "readyMs": 75.2000002861023,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962.299999714,
+      "readyMs": 75.2000002861023,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102962.8999996185,
+      "readyMs": 74.7000002861023,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963,
+      "readyMs": 74.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963,
+      "readyMs": 74.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963,
+      "readyMs": 74.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.0999999046,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.0999999046,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.0999999046,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.1999998093,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.299999714,
+      "readyMs": 74.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.299999714,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.299999714,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.299999714,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.3999996185,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.3999996185,
+      "readyMs": 74.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.5,
+      "readyMs": 74.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.5,
+      "readyMs": 74.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.5,
+      "readyMs": 74.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.5999999046,
+      "readyMs": 74.2999997138977,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.5999999046,
+      "readyMs": 74.2999997138977,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.6999998093,
+      "readyMs": 74.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.6999998093,
+      "readyMs": 74.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.799999714,
+      "readyMs": 74.2000002861023,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.799999714,
+      "readyMs": 74.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.799999714,
+      "readyMs": 74.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.799999714,
+      "readyMs": 74.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.799999714,
+      "readyMs": 74.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102963.8999996185,
+      "readyMs": 74.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964,
+      "readyMs": 74.2999997138977,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964.0999999046,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964.0999999046,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964.1999998093,
+      "readyMs": 74.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964.1999998093,
+      "readyMs": 74.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 1102964.299999714,
+      "readyMs": 74.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/rwjyt-0.png",
+      "start": 1102962.5,
+      "readyMs": 75.89999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_2-0.png",
+      "start": 1248787.799999714,
+      "readyMs": 27.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/worldmap-background-1.png",
+      "start": 1248788.0999999046,
+      "readyMs": 30.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-1-textless.png",
+      "start": 1248788.1999998093,
+      "readyMs": 33.5,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-2-textless.png",
+      "start": 1248788.3999996185,
+      "readyMs": 33.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-3-textless.png",
+      "start": 1248788.3999996185,
+      "readyMs": 34,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-4-textless.png",
+      "start": 1248788.5,
+      "readyMs": 34.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-5-textless.png",
+      "start": 1248788.5999999046,
+      "readyMs": 34.5,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-6-textless.png",
+      "start": 1248788.6999998093,
+      "readyMs": 34.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-7-textless.png",
+      "start": 1248788.8999996185,
+      "readyMs": 35,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-8-textless.png",
+      "start": 1248788.8999996185,
+      "readyMs": 35.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-9-textless.png",
+      "start": 1248789.0999999046,
+      "readyMs": 35.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-10-textless.png",
+      "start": 1248789.0999999046,
+      "readyMs": 35.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753126.199999809,
+      "readyMs": 472.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753126.3999996185,
+      "readyMs": 472.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753126.5,
+      "readyMs": 472.3999996185303,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753126.5,
+      "readyMs": 472.3999996185303,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753126.599999905,
+      "readyMs": 472.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753581,
+      "readyMs": 18,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753581.099999905,
+      "readyMs": 17.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753581.299999714,
+      "readyMs": 17.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753581.299999714,
+      "readyMs": 17.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 4753581.3999996185,
+      "readyMs": 17.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/scene-background-1-textless.jpg",
+      "start": 4753125.8999996185,
+      "readyMs": 473.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/scene-background-1-textless.jpg",
+      "start": 4753580.799999714,
+      "readyMs": 20.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajguanbixiao-0.png",
+      "start": 7200466,
+      "readyMs": 19.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/7633ecd013d262024524.png",
+      "start": 7200466.599999905,
+      "readyMs": 18.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/df552e565b0be398eee4.png",
+      "start": 7225092.699999809,
+      "readyMs": 5.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/1beaffff5775c94cc431.png",
+      "start": 7225092.699999809,
+      "readyMs": 6.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/e00eb1cfdeacecc02b42.png",
+      "start": 7225092.699999809,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "start": 7225093.299999714,
+      "readyMs": 7.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/forest-map-1-f28d50c907f0.jpg",
+      "start": 7225088,
+      "readyMs": 31.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 7225093.799999714,
+      "readyMs": 41.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 7225098.8999996185,
+      "readyMs": 36.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 7225100,
+      "readyMs": 35.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 7225100.8999996185,
+      "readyMs": 34.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-hand-276f28405742.png",
+      "start": 7225092.5,
+      "readyMs": 43.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-graveyard-b75fe1d66f7d.png",
+      "start": 7225092.5,
+      "readyMs": 43.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-draw-b9c13d8aa004.png",
+      "start": 7225092.299999714,
+      "readyMs": 43.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "start": 7225092.799999714,
+      "readyMs": 42.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "start": 7225089.3999996185,
+      "readyMs": 46.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-primary-disabled-ed2373100a0e.png",
+      "start": 7289660.299999714,
+      "readyMs": 16.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+      "start": 7290021.8999996185,
+      "readyMs": 17.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "start": 7290870.3999996185,
+      "readyMs": 17.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "start": 7291703.3999996185,
+      "readyMs": 19.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/60e2171e9be2770377cc.png",
+      "start": 7292157.199999809,
+      "readyMs": 13.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/wanglingbiaozhixiao-0.png",
+      "start": 7292171.599999905,
+      "readyMs": 17.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/4c99e3dc59b34cce5233.png",
+      "start": 7292571,
+      "readyMs": 5.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/jinglingbiaozhixiao-0.png",
+      "start": 7292577.8999996185,
+      "readyMs": 13,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/021e6267c8018bfdb961.png",
+      "start": 7292987.799999714,
+      "readyMs": 5.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/shourenbiaozhixiao-0.png",
+      "start": 7292994.299999714,
+      "readyMs": 13.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/victory-textless.png",
+      "start": 7296705.299999714,
+      "readyMs": 23.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-blue.png",
+      "start": 7391751.8999996185,
+      "readyMs": 36.10000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/49dddb1ba7629253b7f1.png",
+      "start": 7477672.699999809,
+      "readyMs": 23.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-plus-78492f22ff4d.png",
+      "start": 7477673,
+      "readyMs": 24,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/jinglingbiaozhixiao-1.png",
+      "start": 7477672.799999714,
+      "readyMs": 24.300000190734863,
+      "failed": false
+    }
+  ],
+  "mounts": [
+    {
+      "component": "Login/CreateActorWnd",
+      "start": 459048.69999980927,
+      "totalMs": 129.5,
+      "createdNodes": 27,
+      "createCpuMs": 0.3000006675720215
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 544757.1999998093,
+      "totalMs": 572.8000001907349,
+      "createdNodes": 301,
+      "createCpuMs": 2.200000762939453
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 910964.1999998093,
+      "totalMs": 28.40000009536743,
+      "createdNodes": 302,
+      "createCpuMs": 0.8000001907348633
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1102744.299999714,
+      "totalMs": 13.5,
+      "createdNodes": 301,
+      "createCpuMs": 0.20000028610229492
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1102957.5,
+      "totalMs": 16.399999618530273,
+      "createdNodes": 508,
+      "createCpuMs": 1.5999999046325684
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1248580.1999998093,
+      "totalMs": 8.699999809265137,
+      "createdNodes": 301,
+      "createCpuMs": 0.5999999046325684
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1248787.5999999046,
+      "totalMs": 8.799999713897705,
+      "createdNodes": 362,
+      "createCpuMs": 0.9999990463256836
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 4753572.5,
+      "totalMs": 18.799999713897705,
+      "createdNodes": 337,
+      "createCpuMs": 0.5
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 7391743.3999996185,
+      "totalMs": 20.300000190734863,
+      "createdNodes": 337,
+      "createCpuMs": 0.3000001907348633
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 7456462.299999714,
+      "totalMs": 8.099999904632568,
+      "createdNodes": 301,
+      "createCpuMs": 0.5
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 7477668.5,
+      "totalMs": 17.09999990463257,
+      "createdNodes": 302,
+      "createCpuMs": 0.40000009536743164
+    }
+  ],
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 464,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 3,
+      "x": 635,
+      "y": 571,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 4,
+      "x": 504,
+      "y": 568,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 5,
+      "x": 938,
+      "y": 393,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 6,
+      "x": 972,
+      "y": 545,
+      "firstUiMs": 1045.6999998092651,
+      "readyMs": 1644.5,
+      "createdNodes": 311,
+      "createCpuMs": 2.40000057220459,
+      "nodes": 91
+    },
+    {
+      "seq": 7,
+      "x": 728,
+      "y": 647,
+      "firstUiMs": 47,
+      "readyMs": 151.09999990463257,
+      "createdNodes": 312,
+      "createCpuMs": 1.0000004768371582,
+      "nodes": 271
+    },
+    {
+      "seq": 8,
+      "x": 1204,
+      "y": 68,
+      "firstUiMs": 24,
+      "readyMs": 50.40000009536743,
+      "createdNodes": 311,
+      "createCpuMs": 0.3000006675720215,
+      "nodes": 91
+    },
+    {
+      "seq": 9,
+      "x": 477,
+      "y": 646,
+      "firstUiMs": 35.799999713897705,
+      "readyMs": 113.69999980926514,
+      "createdNodes": 518,
+      "createCpuMs": 1.6999998092651367,
+      "nodes": 316
+    },
+    {
+      "seq": 10,
+      "x": 981,
+      "y": 111,
+      "firstUiMs": 17.5,
+      "readyMs": 48.09999990463257,
+      "createdNodes": 311,
+      "createCpuMs": 0.8000001907348633,
+      "nodes": 91
+    },
+    {
+      "seq": 11,
+      "x": 813,
+      "y": 647,
+      "firstUiMs": 19.799999713897705,
+      "readyMs": 57.5,
+      "createdNodes": 372,
+      "createCpuMs": 0.9999990463256836,
+      "nodes": 152
+    },
+    {
+      "seq": 12,
+      "x": 657,
+      "y": 245,
+      "firstUiMs": 23.299999713897705,
+      "readyMs": 510.69999980926514,
+      "createdNodes": 382,
+      "createCpuMs": 0.6999998092651367,
+      "nodes": 127
+    },
+    {
+      "seq": 13,
+      "x": 586,
+      "y": 594,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 14,
+      "x": 501,
+      "y": 315,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 15,
+      "x": 501,
+      "y": 259,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 16,
+      "x": 792,
+      "y": 456,
+      "firstUiMs": 461.5,
+      "readyMs": 497.5,
+      "createdNodes": 92,
+      "createCpuMs": 0.4999995231628418,
+      "nodes": 121
+    },
+    {
+      "seq": 17,
+      "x": 1092,
+      "y": 505,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 18,
+      "x": 642,
+      "y": 531,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 19,
+      "x": 1015,
+      "y": 120,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 20,
+      "x": 728,
+      "y": 647,
+      "firstUiMs": 51.39999961853027,
+      "readyMs": 73.5,
+      "createdNodes": 347,
+      "createCpuMs": 0.40000057220458984,
+      "nodes": 127
+    },
+    {
+      "seq": 21,
+      "x": 1015,
+      "y": 120,
+      "firstUiMs": 14.299999713897705,
+      "readyMs": 48.09999990463257,
+      "createdNodes": 311,
+      "createCpuMs": 0.5,
+      "nodes": 91
+    },
+    {
+      "seq": 22,
+      "x": 728,
+      "y": 647,
+      "firstUiMs": 27.300000190734863,
+      "readyMs": 87.90000009536743,
+      "createdNodes": 312,
+      "createCpuMs": 0.5999999046325684,
+      "nodes": 286
+    }
+  ],
+  "longTasks": [
+    {
+      "start": 543926.8999996185,
+      "ms": 53
+    },
+    {
+      "start": 543981,
+      "ms": 128
+    }
+  ],
+  "created": 5653,
+  "createMs": 17.100004196166992,
+  "resources": [
+    {
+      "path": "/style.css",
+      "start": 12.799999713897705,
+      "ttfbMs": 1.700000286102295,
+      "transferMs": 1,
+      "totalMs": 8.300000190734863,
+      "transferBytes": 991,
+      "decodedBytes": 691
+    },
+    {
+      "path": "/src/polyfills.bundle.js",
+      "start": 12.899999618530273,
+      "ttfbMs": 1.9000000953674316,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 8.800000190734863,
+      "transferBytes": 15050,
+      "decodedBytes": 14750
+    },
+    {
+      "path": "/src/system.bundle.js",
+      "start": 12.899999618530273,
+      "ttfbMs": 2.299999713897705,
+      "transferMs": 0.5,
+      "totalMs": 8.900000095367432,
+      "transferBytes": 37457,
+      "decodedBytes": 37157
+    },
+    {
+      "path": "/player-profile.js",
+      "start": 12.899999618530273,
+      "ttfbMs": 2.6999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 9.400000095367432,
+      "transferBytes": 5112,
+      "decodedBytes": 4812
+    },
+    {
+      "path": "/art-record.js",
+      "start": 13,
+      "ttfbMs": 2.9000000953674316,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.5,
+      "transferBytes": 1313,
+      "decodedBytes": 1013
+    },
+    {
+      "path": "/art-observe.js",
+      "start": 13,
+      "ttfbMs": 3.1000003814697266,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 9.899999618530273,
+      "transferBytes": 6307,
+      "decodedBytes": 6007
+    },
+    {
+      "path": "/src/import-map.json",
+      "start": 25.399999618530273,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 354,
+      "decodedBytes": 54
+    },
+    {
+      "path": "/index.js",
+      "start": 30.09999990463257,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 908,
+      "decodedBytes": 608
+    },
+    {
+      "path": "/cocos-js/cc.js",
+      "start": 30.09999990463257,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 3.1999998092651367,
+      "transferBytes": 12300,
+      "decodedBytes": 12000
+    },
+    {
+      "path": "/favicon.ico",
+      "start": 31.5,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2,
+      "transferBytes": 1450,
+      "decodedBytes": 1150
+    },
+    {
+      "path": "/application.js",
+      "start": 33.39999961853027,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 3600,
+      "decodedBytes": 3300
+    },
+    {
+      "path": "/cocos-js/_virtual_cc-Bblzxeqy.js",
+      "start": 33.5,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 24.699999809265137,
+      "totalMs": 26.399999618530273,
+      "transferBytes": 5932684,
+      "decodedBytes": 5932384
+    },
+    {
+      "path": "/src/settings.json",
+      "start": 111.7999997138977,
+      "ttfbMs": 0.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.8000001907348633,
+      "transferBytes": 22918,
+      "decodedBytes": 22618
+    },
+    {
+      "path": "/cocos-js/spine.wasm-DkA192N3.js",
+      "start": 121.59999990463257,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.8999996185302734,
+      "totalMs": 2.799999713897705,
+      "transferBytes": 45255,
+      "decodedBytes": 44955
+    },
+    {
+      "path": "/cocos-js/spine-DfhiCve8.js",
+      "start": 121.69999980926514,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 2.4000000953674316,
+      "transferBytes": 508,
+      "decodedBytes": 208
+    },
+    {
+      "path": "/cocos-js/assets/spine-CC34fKUR.wasm",
+      "start": 125.5,
+      "ttfbMs": 1,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 2.3999996185302734,
+      "transferBytes": 205475,
+      "decodedBytes": 205175
+    },
+    {
+      "path": "/src/effect.bin",
+      "start": 130.5,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.5,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 6055,
+      "decodedBytes": 5755
+    },
+    {
+      "path": "/src/chunks/bundle.js",
+      "start": 135.5,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.8999996185302734,
+      "transferBytes": 21227,
+      "decodedBytes": 20927
+    },
+    {
+      "path": "/assets/internal/config.json",
+      "start": 155.89999961853027,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 3.5,
+      "transferBytes": 6867,
+      "decodedBytes": 6567
+    },
+    {
+      "path": "/assets/internal/index.js",
+      "start": 156,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 3.3999996185302734,
+      "transferBytes": 103862,
+      "decodedBytes": 103562
+    },
+    {
+      "path": "/assets/internal/import/06/06c6d8283.json",
+      "start": 166.7999997138977,
+      "ttfbMs": 0.6000003814697266,
+      "transferMs": 1.299999713897705,
+      "totalMs": 2.5,
+      "transferBytes": 429869,
+      "decodedBytes": 429569
+    },
+    {
+      "path": "/assets/main/config.json",
+      "start": 175.89999961853027,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 2.1000003814697266,
+      "transferBytes": 1391,
+      "decodedBytes": 1091
+    },
+    {
+      "path": "/assets/main/index.js",
+      "start": 176.09999990463257,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 2.1000003814697266,
+      "totalMs": 3.9000000953674316,
+      "transferBytes": 801213,
+      "decodedBytes": 800913
+    },
+    {
+      "path": "/assets/main/import/ff/ffbb08e3-cb62-46d3-82aa-b2ac55763131.json",
+      "start": 2032.2999997138977,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 3,
+      "transferBytes": 1885,
+      "decodedBytes": 1585
+    },
+    {
+      "path": "/api/bootstrap",
+      "start": 2045.7999997138977,
+      "ttfbMs": 0.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 389,
+      "decodedBytes": 89
+    },
+    {
+      "path": "/art/v5/manifest.json",
+      "start": 2048.3999996185303,
+      "ttfbMs": 1,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 2.200000286102295,
+      "transferBytes": 31364,
+      "decodedBytes": 31064
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2058.5999999046326,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 3,
+      "transferBytes": 3869,
+      "decodedBytes": 3569
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 2058.5999999046326,
+      "ttfbMs": 1.3999996185302734,
+      "transferMs": 0.5,
+      "totalMs": 3.299999713897705,
+      "transferBytes": 2523,
+      "decodedBytes": 2223
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 2058.5999999046326,
+      "ttfbMs": 1.5,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 3.5,
+      "transferBytes": 4673,
+      "decodedBytes": 4373
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 2058.5999999046326,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.8000001907348633,
+      "totalMs": 3.5999999046325684,
+      "transferBytes": 4559,
+      "decodedBytes": 4259
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "start": 2067.3999996185303,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 7.699999809265137,
+      "totalMs": 9.800000190734863,
+      "transferBytes": 6653656,
+      "decodedBytes": 6653356
+    },
+    {
+      "path": "/recovered/images/ac4f3dcae0eb55b0db64.jpg",
+      "start": 2089.2999997138977,
+      "ttfbMs": 1.6000003814697266,
+      "transferMs": 2,
+      "totalMs": 4.200000286102295,
+      "transferBytes": 670685,
+      "decodedBytes": 670385
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "start": 2089.2999997138977,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 3.200000286102295,
+      "transferBytes": 224890,
+      "decodedBytes": 224590
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "start": 2114.5999999046326,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 93902,
+      "decodedBytes": 93602
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "start": 2128.0999999046326,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.5,
+      "transferBytes": 11675,
+      "decodedBytes": 11375
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "start": 2132.7999997138977,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.5,
+      "transferBytes": 3316,
+      "decodedBytes": 3016
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "start": 2139.7999997138977,
+      "ttfbMs": 0.6000003814697266,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 2061,
+      "decodedBytes": 1761
+    },
+    {
+      "path": "/api/login",
+      "start": 212666.7999997139,
+      "ttfbMs": 27.300000190734863,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 28.300000190734863,
+      "transferBytes": 406,
+      "decodedBytes": 106
+    },
+    {
+      "path": "/api/characters",
+      "start": 212695.89999961853,
+      "ttfbMs": 6.300000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 17.40000009536743,
+      "transferBytes": 317,
+      "decodedBytes": 17
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "start": 212716.19999980927,
+      "ttfbMs": 2,
+      "transferMs": 3.9000000953674316,
+      "totalMs": 6.599999904632568,
+      "transferBytes": 154325,
+      "decodedBytes": 154025
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2f.png",
+      "start": 459049.2999997139,
+      "ttfbMs": 10.900000095367432,
+      "transferMs": 2.4000000953674316,
+      "totalMs": 14.800000190734863,
+      "transferBytes": 976077,
+      "decodedBytes": 975777
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21l.png",
+      "start": 459078.69999980927,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 55281,
+      "decodedBytes": 54981
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2g.png",
+      "start": 459086,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.299999713897705,
+      "transferBytes": 3450,
+      "decodedBytes": 3150
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2r.png",
+      "start": 459094.59999990463,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.5,
+      "totalMs": 1.5,
+      "transferBytes": 4576,
+      "decodedBytes": 4276
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt29.png",
+      "start": 459104,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 2.6999998092651367,
+      "transferBytes": 2919,
+      "decodedBytes": 2619
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21i.png",
+      "start": 459111.69999980927,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.5,
+      "transferBytes": 33427,
+      "decodedBytes": 33127
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21k.png",
+      "start": 459120.09999990463,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 36869,
+      "decodedBytes": 36569
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt28.png",
+      "start": 459128,
+      "ttfbMs": 0.39999961853027344,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 2985,
+      "decodedBytes": 2685
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2c.png",
+      "start": 459137,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 1.9000000953674316,
+      "totalMs": 4,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2d.png",
+      "start": 459144.5,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 2,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2e.png",
+      "start": 459153.09999990463,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 1.5,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21n.png",
+      "start": 459161.2999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 9505,
+      "decodedBytes": 9205
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21o.png",
+      "start": 459169.7999997139,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.5,
+      "transferBytes": 10016,
+      "decodedBytes": 9716
+    },
+    {
+      "path": "/api/act",
+      "start": 543730.5999999046,
+      "ttfbMs": 46.299999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 47.59999990463257,
+      "transferBytes": 426,
+      "decodedBytes": 126
+    },
+    {
+      "path": "/api/characters",
+      "start": 543779.5999999046,
+      "ttfbMs": 7.400000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8.199999809265137,
+      "transferBytes": 412,
+      "decodedBytes": 112
+    },
+    {
+      "path": "/api/catalog",
+      "start": 543788.3999996185,
+      "ttfbMs": 2.1000003814697266,
+      "transferMs": 135.69999980926514,
+      "totalMs": 138.30000019073486,
+      "transferBytes": 9101088,
+      "decodedBytes": 67038251
+    },
+    {
+      "path": "/api/state",
+      "start": 544109.0999999046,
+      "ttfbMs": 641.2000002861023,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 643.2999997138977,
+      "transferBytes": 461085,
+      "decodedBytes": 460785
+    },
+    {
+      "path": "/recovered/images/66151644092267f3a487.mp3",
+      "start": 544756.2999997139,
+      "ttfbMs": 2.3000001907348633,
+      "transferMs": 2.5999999046325684,
+      "totalMs": 5.5,
+      "transferBytes": 564493,
+      "decodedBytes": 564193
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor232.jpg",
+      "start": 544757.3999996185,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 1.8000001907348633,
+      "totalMs": 3.8000001907348633,
+      "transferBytes": 490331,
+      "decodedBytes": 490031
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22q.png",
+      "start": 544777.0999999046,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.5,
+      "totalMs": 2.299999713897705,
+      "transferBytes": 20359,
+      "decodedBytes": 20059
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22s.png",
+      "start": 544786.6999998093,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 2,
+      "transferBytes": 26676,
+      "decodedBytes": 26376
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22u.png",
+      "start": 544793.7999997139,
+      "ttfbMs": 2.9000000953674316,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 3.8000001907348633,
+      "transferBytes": 50442,
+      "decodedBytes": 50142
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22v.png",
+      "start": 544803.2999997139,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.5,
+      "totalMs": 2,
+      "transferBytes": 23893,
+      "decodedBytes": 23593
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22w.png",
+      "start": 544811.2999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 23615,
+      "decodedBytes": 23315
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22y.png",
+      "start": 544820.8999996185,
+      "ttfbMs": 1,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 2,
+      "transferBytes": 26232,
+      "decodedBytes": 25932
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22r.png",
+      "start": 544827.8999996185,
+      "ttfbMs": 0.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 35846,
+      "decodedBytes": 35546
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22z.png",
+      "start": 544836.5999999046,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.1999998092651367,
+      "transferBytes": 48167,
+      "decodedBytes": 47867
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor230.png",
+      "start": 544844.5,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.5,
+      "totalMs": 1.799999713897705,
+      "transferBytes": 98020,
+      "decodedBytes": 97720
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22x.png",
+      "start": 544853.5999999046,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.5,
+      "totalMs": 1.799999713897705,
+      "transferBytes": 28157,
+      "decodedBytes": 27857
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22t.png",
+      "start": 544861.2999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 2.700000286102295,
+      "transferBytes": 49991,
+      "decodedBytes": 49691
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22p.png",
+      "start": 544870,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 1933,
+      "decodedBytes": 1633
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24f.png",
+      "start": 544881.5,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 2.299999713897705,
+      "transferBytes": 14071,
+      "decodedBytes": 13771
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92x.png",
+      "start": 544885.8999996185,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 2.1000003814697266,
+      "transferBytes": 13791,
+      "decodedBytes": 13491
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24b.png",
+      "start": 544895,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 14453,
+      "decodedBytes": 14153
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24a.png",
+      "start": 544903.3999996185,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.700000286102295,
+      "transferBytes": 13975,
+      "decodedBytes": 13675
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9211.png",
+      "start": 544911.5,
+      "ttfbMs": 1.9000000953674316,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.6999998092651367,
+      "transferBytes": 14374,
+      "decodedBytes": 14074
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921c.png",
+      "start": 544920,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.5,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 13561,
+      "decodedBytes": 13261
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9214.png",
+      "start": 544928.0999999046,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 14096,
+      "decodedBytes": 13796
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24d.png",
+      "start": 544937.0999999046,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.5,
+      "totalMs": 2.299999713897705,
+      "transferBytes": 14581,
+      "decodedBytes": 14281
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/fhpg24v.png",
+      "start": 544944.6999998093,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 13855,
+      "decodedBytes": 13555
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24c.png",
+      "start": 544953.6999998093,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.5,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 14948,
+      "decodedBytes": 14648
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9221.png",
+      "start": 544960.7999997139,
+      "ttfbMs": 1.8000001907348633,
+      "transferMs": 0.5,
+      "totalMs": 2.9000000953674316,
+      "transferBytes": 34716,
+      "decodedBytes": 34416
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9223.png",
+      "start": 544969.5,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 13731,
+      "decodedBytes": 13431
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9227.png",
+      "start": 544978.7999997139,
+      "ttfbMs": 0.6000003814697266,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 3343,
+      "decodedBytes": 3043
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb236.png",
+      "start": 544987.7999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 873,
+      "decodedBytes": 573
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23h.png",
+      "start": 544995,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.1999998092651367,
+      "transferBytes": 825,
+      "decodedBytes": 525
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb238.png",
+      "start": 545004.2999997139,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 1134,
+      "decodedBytes": 834
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb239.png",
+      "start": 545012.5999999046,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 1877,
+      "decodedBytes": 1577
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23b.png",
+      "start": 545020.0999999046,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.1999998092651367,
+      "transferBytes": 1838,
+      "decodedBytes": 1538
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/t3cz24t.png",
+      "start": 545027.8999996185,
+      "ttfbMs": 0.5,
+      "transferMs": 0,
+      "totalMs": 1.1000003814697266,
+      "transferBytes": 2676,
+      "decodedBytes": 2376
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24g.png",
+      "start": 545036.6999998093,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.5,
+      "transferBytes": 4921,
+      "decodedBytes": 4621
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921k.png",
+      "start": 545044.7999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 7752,
+      "decodedBytes": 7452
+    },
+    {
+      "path": "/api/state",
+      "start": 545046.2999997139,
+      "ttfbMs": 5.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 6.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p247.png",
+      "start": 545053.2999997139,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 10617,
+      "decodedBytes": 10317
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z929.png",
+      "start": 545060.7999997139,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 7211,
+      "decodedBytes": 6911
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92a.png",
+      "start": 545070.0999999046,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 8592,
+      "decodedBytes": 8292
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p249.png",
+      "start": 545078.0999999046,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.299999713897705,
+      "transferBytes": 8615,
+      "decodedBytes": 8315
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92r.png",
+      "start": 545086.7999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 8499,
+      "decodedBytes": 8199
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92s.png",
+      "start": 545094.7999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 7352,
+      "decodedBytes": 7052
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92w.png",
+      "start": 545103.3999996185,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.6000003814697266,
+      "transferBytes": 8225,
+      "decodedBytes": 7925
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92h.png",
+      "start": 545110.6999998093,
+      "ttfbMs": 0.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.1999998092651367,
+      "transferBytes": 11311,
+      "decodedBytes": 11011
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92g.png",
+      "start": 545120.1999998093,
+      "ttfbMs": 0.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 8197,
+      "decodedBytes": 7897
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92f.png",
+      "start": 545128.1999998093,
+      "ttfbMs": 0.5,
+      "transferMs": 1,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 7945,
+      "decodedBytes": 7645
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92e.png",
+      "start": 545136.7999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 7390,
+      "decodedBytes": 7090
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92c.png",
+      "start": 545144.7999997139,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 8291,
+      "decodedBytes": 7991
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92b.png",
+      "start": 545153.2999997139,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.700000286102295,
+      "transferBytes": 8250,
+      "decodedBytes": 7950
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z928.png",
+      "start": 545161.6999998093,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 7925,
+      "decodedBytes": 7625
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z927.png",
+      "start": 545170.0999999046,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 8604,
+      "decodedBytes": 8304
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92j.png",
+      "start": 545178.1999998093,
+      "ttfbMs": 0.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 7445,
+      "decodedBytes": 7145
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92k.png",
+      "start": 545187.1999998093,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 9874,
+      "decodedBytes": 9574
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92l.png",
+      "start": 545194.8999996185,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.5,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 6417,
+      "decodedBytes": 6117
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92m.png",
+      "start": 545203.2999997139,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 8618,
+      "decodedBytes": 8318
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24s.png",
+      "start": 545211.1999998093,
+      "ttfbMs": 0.5,
+      "transferMs": 0.5,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 18678,
+      "decodedBytes": 18378
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24r.png",
+      "start": 545219.8999996185,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 1.700000286102295,
+      "transferBytes": 23979,
+      "decodedBytes": 23679
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkb.png",
+      "start": 545227.0999999046,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.299999713897705,
+      "transferBytes": 9189,
+      "decodedBytes": 8889
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk1.png",
+      "start": 545236.6999998093,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.5,
+      "transferBytes": 5292,
+      "decodedBytes": 4992
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkc.png",
+      "start": 545245.2999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1,
+      "transferBytes": 1941,
+      "decodedBytes": 1641
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk5.png",
+      "start": 545255.1999998093,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 1325,
+      "decodedBytes": 1025
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk6.png",
+      "start": 545261.2999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 1453,
+      "decodedBytes": 1153
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk7.png",
+      "start": 545269.8999996185,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 1449,
+      "decodedBytes": 1149
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk8.png",
+      "start": 545278.1999998093,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 2072,
+      "decodedBytes": 1772
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk9.png",
+      "start": 545286.5,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.1999998092651367,
+      "transferBytes": 2174,
+      "decodedBytes": 1874
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fka.png",
+      "start": 545294.5,
+      "ttfbMs": 0.5,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 2130,
+      "decodedBytes": 1830
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk2.png",
+      "start": 545303.3999996185,
+      "ttfbMs": 0.6000003814697266,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 1605,
+      "decodedBytes": 1305
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk3.png",
+      "start": 545311.2999997139,
+      "ttfbMs": 0.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 1809,
+      "decodedBytes": 1509
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk4.png",
+      "start": 545320,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 1798,
+      "decodedBytes": 1498
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 545332.8999996185,
+      "ttfbMs": 2.200000286102295,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 3.700000286102295,
+      "transferBytes": 104525,
+      "decodedBytes": 104225
+    },
+    {
+      "path": "/api/state",
+      "start": 546046.0999999046,
+      "ttfbMs": 8,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 547046.7999997139,
+      "ttfbMs": 11.299999713897705,
+      "transferMs": 0.5,
+      "totalMs": 13,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 548047.0999999046,
+      "ttfbMs": 7.800000190734863,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 8.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 549047,
+      "ttfbMs": 10,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 550047.2999997139,
+      "ttfbMs": 8.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 551046.7999997139,
+      "ttfbMs": 6,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 552047,
+      "ttfbMs": 6.299999713897705,
+      "transferMs": 0.5,
+      "totalMs": 7.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 553046.8999996185,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 9.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 554046.0999999046,
+      "ttfbMs": 7.599999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 555046.8999996185,
+      "ttfbMs": 6.899999618530273,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 7.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 556047,
+      "ttfbMs": 8,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 557046.8999996185,
+      "ttfbMs": 7.800000190734863,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 8.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 558046.3999996185,
+      "ttfbMs": 9.100000381469727,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 559046.5999999046,
+      "ttfbMs": 5.199999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 6,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 560046.5999999046,
+      "ttfbMs": 11.300000190734863,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 561047.5,
+      "ttfbMs": 11.399999618530273,
+      "transferMs": 0.5,
+      "totalMs": 13.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 562047.0999999046,
+      "ttfbMs": 12.199999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 13.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 563047.2999997139,
+      "ttfbMs": 11.400000095367432,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 13.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 564047.1999998093,
+      "ttfbMs": 10.299999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 565047.0999999046,
+      "ttfbMs": 11.699999809265137,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 566046.6999998093,
+      "ttfbMs": 12.099999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 13.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 567047,
+      "ttfbMs": 11.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 568046.0999999046,
+      "ttfbMs": 9.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 10.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 569046.8999996185,
+      "ttfbMs": 9.799999713897705,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 11.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 570046.7999997139,
+      "ttfbMs": 11.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 571047.0999999046,
+      "ttfbMs": 9.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 572046.7999997139,
+      "ttfbMs": 13.600000381469727,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 15.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 573046.7999997139,
+      "ttfbMs": 9.199999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 574046.5999999046,
+      "ttfbMs": 5.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 17,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 575046.7999997139,
+      "ttfbMs": 11.800000190734863,
+      "transferMs": 0.5,
+      "totalMs": 13.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 576047.1999998093,
+      "ttfbMs": 11.699999809265137,
+      "transferMs": 0.5,
+      "totalMs": 13.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 577047,
+      "ttfbMs": 8.700000286102295,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 578047.0999999046,
+      "ttfbMs": 9.200000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 579046.7999997139,
+      "ttfbMs": 12.300000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 14,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 580046.5999999046,
+      "ttfbMs": 9.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 581046.7999997139,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 582046.5999999046,
+      "ttfbMs": 11,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 583046.6999998093,
+      "ttfbMs": 10.200000286102295,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 584046.8999996185,
+      "ttfbMs": 11.900000095367432,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 585046.5999999046,
+      "ttfbMs": 11.599999904632568,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 586046.2999997139,
+      "ttfbMs": 9.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 587046.3999996185,
+      "ttfbMs": 13.5,
+      "transferMs": 0.5,
+      "totalMs": 15.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 588046.8999996185,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.100000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 589046.5999999046,
+      "ttfbMs": 11,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 590046.2999997139,
+      "ttfbMs": 10.199999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 11.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 591046.5999999046,
+      "ttfbMs": 9.200000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 592047.2999997139,
+      "ttfbMs": 10.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 12,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 593046.7999997139,
+      "ttfbMs": 11.900000095367432,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 594046.5999999046,
+      "ttfbMs": 11.299999713897705,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 595047.0999999046,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.5,
+      "totalMs": 12.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 596046.5999999046,
+      "ttfbMs": 10.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 597046.7999997139,
+      "ttfbMs": 12.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 14.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 598047.2999997139,
+      "ttfbMs": 12.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 13.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 599046.5,
+      "ttfbMs": 9.900000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 600046.8999996185,
+      "ttfbMs": 11.900000095367432,
+      "transferMs": 0.5,
+      "totalMs": 13.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 601046.3999996185,
+      "ttfbMs": 10.300000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 602046.5,
+      "ttfbMs": 12.800000190734863,
+      "transferMs": 0.5,
+      "totalMs": 14.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 603047.2999997139,
+      "ttfbMs": 11.400000095367432,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 604047.2999997139,
+      "ttfbMs": 9.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 10.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 605046.6999998093,
+      "ttfbMs": 411.90000009536743,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 412.69999980926514,
+      "transferBytes": 461085,
+      "decodedBytes": 460785
+    },
+    {
+      "path": "/api/state",
+      "start": 606046.3999996185,
+      "ttfbMs": 11.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 607047.2999997139,
+      "ttfbMs": 11.400000095367432,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 608047.0999999046,
+      "ttfbMs": 9.5,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 609047.2999997139,
+      "ttfbMs": 9.600000381469727,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 610046.7999997139,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 611046.7999997139,
+      "ttfbMs": 12.899999618530273,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 14.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 612047.0999999046,
+      "ttfbMs": 9.199999809265137,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 613046.5999999046,
+      "ttfbMs": 11.099999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 614046.2999997139,
+      "ttfbMs": 11.5,
+      "transferMs": 0.5,
+      "totalMs": 13.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 615047.2999997139,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 616046.7999997139,
+      "ttfbMs": 10.900000095367432,
+      "transferMs": 0.5,
+      "totalMs": 12.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 617046.7999997139,
+      "ttfbMs": 9.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 11.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 618047.1999998093,
+      "ttfbMs": 12.700000286102295,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 14.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 619046.3999996185,
+      "ttfbMs": 7.699999809265137,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 9.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 620046.3999996185,
+      "ttfbMs": 9.900000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.100000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 621046.6999998093,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 622046.8999996185,
+      "ttfbMs": 9.599999904632568,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 623047.3999996185,
+      "ttfbMs": 11.800000190734863,
+      "transferMs": 0.5,
+      "totalMs": 13.600000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 624047.0999999046,
+      "ttfbMs": 12,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 13.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 625046.5,
+      "ttfbMs": 9.600000381469727,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 626046.6999998093,
+      "ttfbMs": 10,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 11.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 627046.5999999046,
+      "ttfbMs": 11,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 628046.7999997139,
+      "ttfbMs": 11.199999809265137,
+      "transferMs": 0.5,
+      "totalMs": 13,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 629046.7999997139,
+      "ttfbMs": 11,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 630047.5,
+      "ttfbMs": 11.400000095367432,
+      "transferMs": 0.5,
+      "totalMs": 13.299999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 631047.5,
+      "ttfbMs": 10.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 632046.3999996185,
+      "ttfbMs": 8.599999904632568,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 10.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 633047.0999999046,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 634047,
+      "ttfbMs": 11.599999904632568,
+      "transferMs": 0.5,
+      "totalMs": 13.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 635046.7999997139,
+      "ttfbMs": 9.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 636046.5999999046,
+      "ttfbMs": 8.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 637046.5999999046,
+      "ttfbMs": 8.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 638047,
+      "ttfbMs": 9.699999809265137,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 11.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 639046.6999998093,
+      "ttfbMs": 12.099999904632568,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 640046.5999999046,
+      "ttfbMs": 10.399999618530273,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 641047.1999998093,
+      "ttfbMs": 10.300000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 642047,
+      "ttfbMs": 8.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 643046.2999997139,
+      "ttfbMs": 10.800000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 644046.6999998093,
+      "ttfbMs": 11.300000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 12.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 645047,
+      "ttfbMs": 10.099999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 646046.6999998093,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 647046.3999996185,
+      "ttfbMs": 11.299999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 648046.5999999046,
+      "ttfbMs": 9.5,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 10.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 649046.1999998093,
+      "ttfbMs": 9,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 650047.1999998093,
+      "ttfbMs": 10.199999809265137,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 11.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 651046.5999999046,
+      "ttfbMs": 8,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 652047.2999997139,
+      "ttfbMs": 11.599999904632568,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 13.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 653046.8999996185,
+      "ttfbMs": 8.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 654047,
+      "ttfbMs": 9.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 11.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 655047,
+      "ttfbMs": 9.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 11,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 656046.7999997139,
+      "ttfbMs": 9.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 657047,
+      "ttfbMs": 10.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 12.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 658047.0999999046,
+      "ttfbMs": 8.800000190734863,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 10,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 659047.0999999046,
+      "ttfbMs": 9.099999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 10.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 660046.8999996185,
+      "ttfbMs": 9.900000095367432,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 661047.2999997139,
+      "ttfbMs": 9.800000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 11.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 662047.3999996185,
+      "ttfbMs": 10.199999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.600000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 663047.0999999046,
+      "ttfbMs": 9.400000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 664047,
+      "ttfbMs": 10.800000190734863,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 12.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 665047.1999998093,
+      "ttfbMs": 428.59999990463257,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 430.40000009536743,
+      "transferBytes": 461085,
+      "decodedBytes": 460785
+    },
+    {
+      "path": "/api/state",
+      "start": 666047,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 667047.2999997139,
+      "ttfbMs": 11.099999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 12.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 668047.0999999046,
+      "ttfbMs": 10.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 12,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    }
+  ],
+  "engine": {
+    "fullRenders": 16,
+    "pollRendersSkipped": 6947,
+    "homeMounts": 10,
+    "originalUi": {
+      "frameLoads": 85,
+      "frameCacheHits": 1330,
+      "sharedInflightLoads": 0
+    }
+  },
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-production-20261026",
+      "uiTextures": 17,
+      "loads": 17,
+      "failures": 0,
+      "maxPrepareMs": 57,
+      "unitAtlases": {
+        "atlasPoolEntries": 0,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 0,
+        "atlasPoolSpriteFrames": 0,
+        "atlasPoolEstimatedBytes": 0,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      }
+    }
+  },
+  "requestCounts": {
+    "/src/import-map.json": 1,
+    "/cocos-js/assets/spine-CC34fKUR.wasm": 1,
+    "/api/bootstrap": 1,
+    "/art/v5/manifest.json": 1,
+    "/recovered/original-ui.json": 1,
+    "/api/login": 1,
+    "/api/characters": 2,
+    "/api/act": 9,
+    "/api/catalog": 1,
+    "/api/state": 6956
+  },
+  "captureNote": "Idle /api/state samples trimmed after first three; original full capture kept locally. All clicks, mounts, resource timings and non-state requests retained."
+}

@@ -1,0 +1,53 @@
+{
+  "scope": "read-only HTTP after restarting local game service with final clean web",
+  "checks": {
+    "final-login": {
+      "level": 1,
+      "xp": 6,
+      "scene": 1,
+      "deck": [
+        "main:card:1",
+        "main:card:43",
+        "main:card:61",
+        "main:card:5019"
+      ],
+      "cards": {
+        "main:card:1": 1,
+        "main:card:19": 1,
+        "main:card:43": 1,
+        "main:card:61": 1,
+        "main:card:5019": 1
+      },
+      "silver": 330
+    },
+    "progress-session": {
+      "level": 5,
+      "xp": 0,
+      "scene": 2,
+      "deck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "cards": {
+        "main:card:1": 1,
+        "main:card:19": 2,
+        "main:card:43": 1,
+        "main:card:61": 1,
+        "main:card:5019": 1,
+        "main:card:2": 1,
+        "main:card:8": 1,
+        "main:card:41001": 3,
+        "main:card:75": 1
+      },
+      "silver": 360
+    },
+    "/api/health": 200,
+    "/art/rig-experiment/manifest.json": 404,
+    "/player-profile.js": 404,
+    "/art/v5/manifest.json": 200
+  }
+}

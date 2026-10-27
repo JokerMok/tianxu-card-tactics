@@ -1,0 +1,4102 @@
+{
+  "elapsed": 1712801.0999999046,
+  "page": "cards",
+  "busy": false,
+  "httpPending": 0,
+  "imagePending": 0,
+  "requests": [
+    {
+      "path": "/src/import-map.json",
+      "start": 18.300000190734863,
+      "headersMs": 11.699999809265137,
+      "status": 200
+    },
+    {
+      "path": "/cocos-js/assets/spine-CC34fKUR.wasm",
+      "start": 152.40000009536743,
+      "headersMs": 1.6999998092651367,
+      "status": 200
+    },
+    {
+      "path": "/api/bootstrap",
+      "start": 2045.7000002861023,
+      "headersMs": 3.1999998092651367,
+      "status": 200,
+      "bodyReadDecodeMs": 0.5,
+      "parseMs": 0,
+      "textChars": 75
+    },
+    {
+      "path": "/art/v5/manifest.json",
+      "start": 2049.800000190735,
+      "headersMs": 1.799999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 0.3000001907348633,
+      "parseMs": 0.19999980926513672,
+      "textChars": 31064
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "start": 2064,
+      "headersMs": 1.9000000953674316,
+      "status": 200,
+      "bodyReadDecodeMs": 8.300000190734863,
+      "parseMs": 8,
+      "textChars": 6652658
+    },
+    {
+      "path": "/api/login",
+      "start": 14411.5,
+      "headersMs": 26.5,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 106
+    },
+    {
+      "path": "/api/characters",
+      "start": 14438.200000286102,
+      "headersMs": 18.799999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 17
+    },
+    {
+      "path": "/api/act",
+      "start": 46908.09999990463,
+      "headersMs": 19.300000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 116
+    },
+    {
+      "path": "/api/characters",
+      "start": 46927.800000190735,
+      "headersMs": 6.199999809265137,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0.09999990463256836,
+      "textChars": 102
+    },
+    {
+      "path": "/api/catalog",
+      "start": 46934.09999990463,
+      "headersMs": 1.1000003814697266,
+      "status": 200,
+      "bodyReadDecodeMs": 98.39999961853027,
+      "parseMs": 90.5,
+      "textChars": 66201348
+    },
+    {
+      "path": "/api/state",
+      "start": 47124.59999990463,
+      "headersMs": 121.7000002861023,
+      "status": 200,
+      "bodyReadDecodeMs": 0.19999980926513672,
+      "parseMs": 0.7000002861022949,
+      "textChars": 450654
+    },
+    {
+      "path": "/api/state",
+      "start": 48047,
+      "headersMs": 8.099999904632568,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 49047.40000009537,
+      "headersMs": 11.599999904632568,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 110
+    },
+    {
+      "path": "/api/act",
+      "start": 295177.80000019073,
+      "headersMs": 34.299999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 83
+    },
+    {
+      "path": "/api/act",
+      "start": 380585.5,
+      "headersMs": 16.800000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 132
+    },
+    {
+      "path": "/api/act",
+      "start": 423422.59999990463,
+      "headersMs": 18.600000381469727,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 423890.09999990463,
+      "headersMs": 21.800000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 424341.5,
+      "headersMs": 20.5,
+      "status": 200,
+      "bodyReadDecodeMs": 0.20000028610229492,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 424820.59999990463,
+      "headersMs": 19.800000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 133
+    },
+    {
+      "path": "/api/act",
+      "start": 425740.30000019073,
+      "headersMs": 23.09999990463257,
+      "status": 200,
+      "bodyReadDecodeMs": 0.09999990463256836,
+      "parseMs": 0,
+      "textChars": 132
+    },
+    {
+      "path": "/api/act",
+      "start": 1112682.5999999046,
+      "headersMs": 22.300000190734863,
+      "status": 200,
+      "bodyReadDecodeMs": 0,
+      "parseMs": 0,
+      "textChars": 83
+    },
+    {
+      "path": "/api/act",
+      "start": 1656290.8000001907,
+      "headersMs": 20.799999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 0.10000038146972656,
+      "parseMs": 0,
+      "textChars": 154
+    }
+  ],
+  "remote": [
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 2052.4000000953674,
+      "readyMs": 10.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2052.300000190735,
+      "readyMs": 10.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 2052.4000000953674,
+      "readyMs": 10.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 2052.5,
+      "readyMs": 11.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "start": 2085.300000190735,
+      "readyMs": 11.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "start": 2085.4000000953674,
+      "readyMs": 16.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/ac4f3dcae0eb55b0db64.jpg",
+      "start": 2084.0999999046326,
+      "readyMs": 18,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "start": 2085.4000000953674,
+      "readyMs": 27.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "start": 2085.4000000953674,
+      "readyMs": 28.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "start": 2085.4000000953674,
+      "readyMs": 28.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02m.png",
+      "start": 2085.5,
+      "readyMs": 28.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2121.800000190735,
+      "readyMs": 13.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "start": 14458.300000190735,
+      "readyMs": 5.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 26047.300000190735,
+      "readyMs": 0.2999997138977051,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 26050.800000190735,
+      "readyMs": 5.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2r.png",
+      "start": 26052.099999904633,
+      "readyMs": 11.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2g.png",
+      "start": 26052.099999904633,
+      "readyMs": 12.100000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt29.png",
+      "start": 26052.099999904633,
+      "readyMs": 12.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21l.png",
+      "start": 26052.099999904633,
+      "readyMs": 12.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21i.png",
+      "start": 26052.099999904633,
+      "readyMs": 12.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2f.png",
+      "start": 26052,
+      "readyMs": 13.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21h.png",
+      "start": 26064.099999904633,
+      "readyMs": 16.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21k.png",
+      "start": 26064.200000286102,
+      "readyMs": 16.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21j.png",
+      "start": 26064.599999904633,
+      "readyMs": 16.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt28.png",
+      "start": 26065,
+      "readyMs": 16.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2c.png",
+      "start": 26065.300000190735,
+      "readyMs": 16.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2d.png",
+      "start": 26072.400000095367,
+      "readyMs": 9.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2e.png",
+      "start": 26080.800000190735,
+      "readyMs": 8.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21n.png",
+      "start": 26081.200000286102,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21o.png",
+      "start": 26081.5,
+      "readyMs": 7.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22s.png",
+      "start": 47250,
+      "readyMs": 13.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22q.png",
+      "start": 47250,
+      "readyMs": 14.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22v.png",
+      "start": 47250,
+      "readyMs": 14.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22u.png",
+      "start": 47250,
+      "readyMs": 14.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22w.png",
+      "start": 47250,
+      "readyMs": 15,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor232.jpg",
+      "start": 47250,
+      "readyMs": 15.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22y.png",
+      "start": 47264.2000002861,
+      "readyMs": 8.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22r.png",
+      "start": 47264.40000009537,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22z.png",
+      "start": 47264.59999990463,
+      "readyMs": 8.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor230.png",
+      "start": 47264.90000009537,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22x.png",
+      "start": 47265.09999990463,
+      "readyMs": 8.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22t.png",
+      "start": 47268.5,
+      "readyMs": 5.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22p.png",
+      "start": 47272.7000002861,
+      "readyMs": 7.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24f.png",
+      "start": 47273,
+      "readyMs": 7.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92x.png",
+      "start": 47273.40000009537,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24b.png",
+      "start": 47273.800000190735,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24a.png",
+      "start": 47274,
+      "readyMs": 7.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9211.png",
+      "start": 47274.300000190735,
+      "readyMs": 6.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921c.png",
+      "start": 47280.59999990463,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9214.png",
+      "start": 47280.800000190735,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24d.png",
+      "start": 47280.90000009537,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/fhpg24v.png",
+      "start": 47281,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24c.png",
+      "start": 47281.09999990463,
+      "readyMs": 8.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9221.png",
+      "start": 47281.2000002861,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9227.png",
+      "start": 47289.5,
+      "readyMs": 7.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9223.png",
+      "start": 47289.300000190735,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb236.png",
+      "start": 47289.59999990463,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb238.png",
+      "start": 47289.800000190735,
+      "readyMs": 7.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23h.png",
+      "start": 47289.7000002861,
+      "readyMs": 7.899999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb239.png",
+      "start": 47290,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23b.png",
+      "start": 47297.300000190735,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/t3cz24t.png",
+      "start": 47297.5,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24g.png",
+      "start": 47297.5,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/z0e324k.png",
+      "start": 47297.59999990463,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921k.png",
+      "start": 47297.59999990463,
+      "readyMs": 8.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p247.png",
+      "start": 47297.7000002861,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z929.png",
+      "start": 47305.90000009537,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92a.png",
+      "start": 47306,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p249.png",
+      "start": 47306.09999990463,
+      "readyMs": 8.100000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92r.png",
+      "start": 47306.2000002861,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92s.png",
+      "start": 47306.300000190735,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92w.png",
+      "start": 47306.40000009537,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92h.png",
+      "start": 47314,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92f.png",
+      "start": 47314.2000002861,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92g.png",
+      "start": 47314.09999990463,
+      "readyMs": 8.600000381469727,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92e.png",
+      "start": 47314.300000190735,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92c.png",
+      "start": 47314.40000009537,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92b.png",
+      "start": 47314.40000009537,
+      "readyMs": 8.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z928.png",
+      "start": 47322.59999990463,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z927.png",
+      "start": 47322.7000002861,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92j.png",
+      "start": 47322.800000190735,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92l.png",
+      "start": 47322.90000009537,
+      "readyMs": 8,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92m.png",
+      "start": 47323,
+      "readyMs": 7.900000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92k.png",
+      "start": 47322.800000190735,
+      "readyMs": 8.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/66151644092267f3a487.mp3",
+      "start": 47248.7000002861,
+      "readyMs": 90.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24s.png",
+      "start": 47330.59999990463,
+      "readyMs": 9,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24r.png",
+      "start": 47330.7000002861,
+      "readyMs": 9.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkb.png",
+      "start": 47330.800000190735,
+      "readyMs": 9.099999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk1.png",
+      "start": 47330.90000009537,
+      "readyMs": 9.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkc.png",
+      "start": 47330.90000009537,
+      "readyMs": 9.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk5.png",
+      "start": 47331,
+      "readyMs": 9.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk6.png",
+      "start": 47339.7000002861,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk7.png",
+      "start": 47339.90000009537,
+      "readyMs": 7.599999904632568,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk8.png",
+      "start": 47340.09999990463,
+      "readyMs": 7.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fka.png",
+      "start": 47340.300000190735,
+      "readyMs": 7.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk9.png",
+      "start": 47340.300000190735,
+      "readyMs": 7.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk2.png",
+      "start": 47340.40000009537,
+      "readyMs": 7.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk3.png",
+      "start": 47347.300000190735,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk4.png",
+      "start": 47347.5,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 47372.09999990463,
+      "readyMs": 25.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 77861.80000019073,
+      "readyMs": 32.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/panel-2eacf473ca05.png",
+      "start": 77860,
+      "readyMs": 41.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "start": 77861.90000009537,
+      "readyMs": 40.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-1.png",
+      "start": 77862.2000002861,
+      "readyMs": 40.5,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-compact-normal-6aacda81f743.png",
+      "start": 77862.40000009537,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-minus-6a7da52d2205.png",
+      "start": 77862.40000009537,
+      "readyMs": 40.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/df552e565b0be398eee4.png",
+      "start": 77862.59999990463,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/1beaffff5775c94cc431.png",
+      "start": 77863.09999990463,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-compact-disabled-ed2373100a0e.png",
+      "start": 77864.5,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-locked-62ab65165d9f.png",
+      "start": 77864.59999990463,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/e00eb1cfdeacecc02b42.png",
+      "start": 77863.5,
+      "readyMs": 40.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-primary-normal-09f651df4458.png",
+      "start": 77866.30000019073,
+      "readyMs": 38.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/book-textless.png",
+      "start": 77859.90000009537,
+      "readyMs": 62.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 130254.59999990463,
+      "readyMs": 24.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqzl-0.png",
+      "start": 130250.7000002861,
+      "readyMs": 34.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ckxiao-0.png",
+      "start": 130250.40000009537,
+      "readyMs": 34.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/btrenwu-0.png",
+      "start": 130250.40000009537,
+      "readyMs": 37,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/guanbi-0.png",
+      "start": 130250.40000009537,
+      "readyMs": 37,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqbb_l-0.png",
+      "start": 130250.7000002861,
+      "readyMs": 36.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/zbbj_1-0.png",
+      "start": 130250.80000019073,
+      "readyMs": 36.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajda_1.png",
+      "start": 130256,
+      "readyMs": 38.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajda_1.png",
+      "start": 130256.2000002861,
+      "readyMs": 38,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.30000019073,
+      "readyMs": 41,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.40000009537,
+      "readyMs": 40.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.5,
+      "readyMs": 40.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.5,
+      "readyMs": 40.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.7000002861,
+      "readyMs": 40.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.80000019073,
+      "readyMs": 40.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130253.90000009537,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254,
+      "readyMs": 40.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.2000002861,
+      "readyMs": 40.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.2000002861,
+      "readyMs": 40.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.2000002861,
+      "readyMs": 40.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.30000019073,
+      "readyMs": 40.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.7000002861,
+      "readyMs": 39.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.7000002861,
+      "readyMs": 39.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.7000002861,
+      "readyMs": 39.799999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.90000009537,
+      "readyMs": 39.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.90000009537,
+      "readyMs": 39.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.90000009537,
+      "readyMs": 39.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130254.90000009537,
+      "readyMs": 39.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255,
+      "readyMs": 39.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.09999990463,
+      "readyMs": 39.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.09999990463,
+      "readyMs": 39.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.09999990463,
+      "readyMs": 39.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.09999990463,
+      "readyMs": 39.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.09999990463,
+      "readyMs": 39.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.2000002861,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.2000002861,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.30000019073,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.30000019073,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.30000019073,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.30000019073,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.40000009537,
+      "readyMs": 39.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.5,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.5,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.5,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.5,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.5,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.59999990463,
+      "readyMs": 39.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.59999990463,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.59999990463,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.7000002861,
+      "readyMs": 39.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.7000002861,
+      "readyMs": 39.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.7000002861,
+      "readyMs": 39.39999961853027,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.7000002861,
+      "readyMs": 39.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.80000019073,
+      "readyMs": 39.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.80000019073,
+      "readyMs": 39.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.90000009537,
+      "readyMs": 39.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130255.90000009537,
+      "readyMs": 39.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/fuwengezi-0.png",
+      "start": 130253.59999990463,
+      "readyMs": 41.60000038146973,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/rwjyt-0.png",
+      "start": 130254.40000009537,
+      "readyMs": 40.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_2-0.png",
+      "start": 197399.5,
+      "readyMs": 27.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/worldmap-background-1.png",
+      "start": 197399.80000019073,
+      "readyMs": 30.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-1-textless.png",
+      "start": 197399.90000009537,
+      "readyMs": 33.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-2-textless.png",
+      "start": 197400,
+      "readyMs": 33.700000286102295,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-3-textless.png",
+      "start": 197400.09999990463,
+      "readyMs": 33.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-4-textless.png",
+      "start": 197400.30000019073,
+      "readyMs": 34.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-5-textless.png",
+      "start": 197400.30000019073,
+      "readyMs": 34.5,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-6-textless.png",
+      "start": 197400.40000009537,
+      "readyMs": 34.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-7-textless.png",
+      "start": 197400.5,
+      "readyMs": 34.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-9-textless.png",
+      "start": 197400.7000002861,
+      "readyMs": 35,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-8-textless.png",
+      "start": 197400.59999990463,
+      "readyMs": 35.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/worldmap-region-10-textless.png",
+      "start": 197400.80000019073,
+      "readyMs": 35.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 295189.59999990463,
+      "readyMs": 24.300000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 295189.7000002861,
+      "readyMs": 24.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 295189.90000009537,
+      "readyMs": 24.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 295189.90000009537,
+      "readyMs": 24.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-red.png",
+      "start": 295190,
+      "readyMs": 24.200000286102295,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/scene-background-1-textless.jpg",
+      "start": 295189.40000009537,
+      "readyMs": 24.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajguanbixiao-0.png",
+      "start": 334718.90000009537,
+      "readyMs": 11.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/7633ecd013d262024524.png",
+      "start": 334719.30000019073,
+      "readyMs": 11.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/1beaffff5775c94cc431.png",
+      "start": 380662.90000009537,
+      "readyMs": 6,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/df552e565b0be398eee4.png",
+      "start": 380662.90000009537,
+      "readyMs": 7.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/e00eb1cfdeacecc02b42.png",
+      "start": 380662.90000009537,
+      "readyMs": 8.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "start": 380663.5,
+      "readyMs": 9.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/forest-map-1-f28d50c907f0.jpg",
+      "start": 380658.80000019073,
+      "readyMs": 31.90000009536743,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 380663.90000009537,
+      "readyMs": 42.19999980926514,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 380670.2000002861,
+      "readyMs": 36,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 380671.2000002861,
+      "readyMs": 35,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "start": 380672.7000002861,
+      "readyMs": 33.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "start": 380663,
+      "readyMs": 43.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-hand-276f28405742.png",
+      "start": 380662.7000002861,
+      "readyMs": 43.59999990463257,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-graveyard-b75fe1d66f7d.png",
+      "start": 380662.7000002861,
+      "readyMs": 43.69999980926514,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/hud-draw-b9c13d8aa004.png",
+      "start": 380662.59999990463,
+      "readyMs": 43.80000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "start": 380660.09999990463,
+      "readyMs": 46.30000019073486,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-primary-disabled-ed2373100a0e.png",
+      "start": 423501.09999990463,
+      "readyMs": 7.400000095367432,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "start": 423858.30000019073,
+      "readyMs": 17.40000009536743,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "start": 424324.59999990463,
+      "readyMs": 6.100000381469727,
+      "failed": false
+    },
+    {
+      "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+      "start": 424794.30000019073,
+      "readyMs": 14.299999713897705,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/bd76116d3caf07ec8254.png",
+      "start": 424905.2000002861,
+      "readyMs": 8.699999809265137,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tianshibiaozhixiao-0.png",
+      "start": 424914.7000002861,
+      "readyMs": 10.899999618530273,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/fcf8214782cb7fe07181.png",
+      "start": 425316.59999990463,
+      "readyMs": 8.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/yeshoubiaozhixiao-0.png",
+      "start": 425326,
+      "readyMs": 4.800000190734863,
+      "failed": false
+    },
+    {
+      "path": "/ui-assets/victory-textless.png",
+      "start": 427843.90000009537,
+      "readyMs": 20.09999990463257,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/scene-trigger-blue.png",
+      "start": 1112773.700000286,
+      "readyMs": 31.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/images/49dddb1ba7629253b7f1.png",
+      "start": 1331669.200000286,
+      "readyMs": 23.5,
+      "failed": false
+    },
+    {
+      "path": "/recovered/original-ui/legacy/jinglingbiaozhixiao-1.png",
+      "start": 1331669.4000000954,
+      "readyMs": 24.199999809265137,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/control-plus-78492f22ff4d.png",
+      "start": 1331669.5999999046,
+      "readyMs": 24.100000381469727,
+      "failed": false
+    },
+    {
+      "path": "/art/v2/button-primary-pressed-f940dab50c82.png",
+      "start": 1656288.700000286,
+      "readyMs": 12.599999904632568,
+      "failed": false
+    }
+  ],
+  "mounts": [
+    {
+      "component": "Login/LoginWnd",
+      "start": 2085,
+      "totalMs": 34.700000286102295,
+      "createdNodes": 32,
+      "createCpuMs": 0.2999997138977051
+    },
+    {
+      "component": "Login/CreateActorWnd",
+      "start": 26051.900000095367,
+      "totalMs": 39.40000009536743,
+      "createdNodes": 27,
+      "createCpuMs": 0.19999980926513672
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 47249.800000190735,
+      "totalMs": 121.40000009536743,
+      "createdNodes": 301,
+      "createCpuMs": 1.4999995231628418
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 77857,
+      "totalMs": 24.700000286102295,
+      "createdNodes": 302,
+      "createCpuMs": 0.5999999046325684
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 96706.59999990463,
+      "totalMs": 7.800000190734863,
+      "createdNodes": 301,
+      "createCpuMs": 0.19999980926513672
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 130249.90000009537,
+      "totalMs": 14.599999904632568,
+      "createdNodes": 508,
+      "createCpuMs": 0.9000000953674316
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 167866,
+      "totalMs": 6.900000095367432,
+      "createdNodes": 301,
+      "createCpuMs": 0.39999961853027344
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 197399.09999990463,
+      "totalMs": 11.200000286102295,
+      "createdNodes": 362,
+      "createCpuMs": 0.39999961853027344
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 295270.30000019073,
+      "totalMs": 15.400000095367432,
+      "createdNodes": 337,
+      "createCpuMs": 0.5999994277954102
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1112765,
+      "totalMs": 20.5,
+      "createdNodes": 337,
+      "createCpuMs": 0.5
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1287204.5999999046,
+      "totalMs": 9.800000190734863,
+      "createdNodes": 301,
+      "createCpuMs": 0.19999980926513672
+    },
+    {
+      "component": "Home/HomeWnd",
+      "start": 1331665.0999999046,
+      "totalMs": 13.400000095367432,
+      "createdNodes": 302,
+      "createCpuMs": 0.09999990463256836
+    }
+  ],
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 464,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 3,
+      "x": 635,
+      "y": 571,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 4,
+      "x": 505,
+      "y": 568,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 5,
+      "x": 938,
+      "y": 393,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 6,
+      "x": 972,
+      "y": 545,
+      "firstUiMs": 356.6000003814697,
+      "readyMs": 507.2000002861023,
+      "createdNodes": 311,
+      "createCpuMs": 1.4999995231628418,
+      "nodes": 91
+    },
+    {
+      "seq": 7,
+      "x": 728,
+      "y": 647,
+      "firstUiMs": 39.40000009536743,
+      "readyMs": 96.40000009536743,
+      "createdNodes": 312,
+      "createCpuMs": 0.7000002861022949,
+      "nodes": 271
+    },
+    {
+      "seq": 8,
+      "x": 1204,
+      "y": 68,
+      "firstUiMs": 14.699999809265137,
+      "readyMs": 48.19999980926514,
+      "createdNodes": 311,
+      "createCpuMs": 0.19999980926513672,
+      "nodes": 91
+    },
+    {
+      "seq": 9,
+      "x": 477,
+      "y": 646,
+      "firstUiMs": 31,
+      "readyMs": 87.2999997138977,
+      "createdNodes": 518,
+      "createCpuMs": 1.200000286102295,
+      "nodes": 316
+    },
+    {
+      "seq": 10,
+      "x": 981,
+      "y": 111,
+      "firstUiMs": 13.799999713897705,
+      "readyMs": 48.59999990463257,
+      "createdNodes": 311,
+      "createCpuMs": 0.5,
+      "nodes": 91
+    },
+    {
+      "seq": 11,
+      "x": 813,
+      "y": 647,
+      "firstUiMs": 22.59999990463257,
+      "readyMs": 52.59999990463257,
+      "createdNodes": 372,
+      "createCpuMs": 0.5,
+      "nodes": 152
+    },
+    {
+      "seq": 12,
+      "x": 657,
+      "y": 245,
+      "firstUiMs": 19.699999809265137,
+      "readyMs": 143,
+      "createdNodes": 382,
+      "createCpuMs": 0.9999995231628418,
+      "nodes": 127
+    },
+    {
+      "seq": 13,
+      "x": 501,
+      "y": 259,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 14,
+      "x": 792,
+      "y": 456,
+      "firstUiMs": 103.2000002861023,
+      "readyMs": 138.7000002861023,
+      "createdNodes": 92,
+      "createCpuMs": 0.3000001907348633,
+      "nodes": 104
+    },
+    {
+      "seq": 15,
+      "x": 1092,
+      "y": 505,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 16,
+      "x": 642,
+      "y": 531,
+      "firstUiMs": 122.90000009536743,
+      "readyMs": 147.09999990463257,
+      "createdNodes": 347,
+      "createCpuMs": 0.5999999046325684,
+      "nodes": 127
+    },
+    {
+      "seq": 17,
+      "x": 1015,
+      "y": 120,
+      "firstUiMs": 15.5,
+      "readyMs": 46.59999990463257,
+      "createdNodes": 311,
+      "createCpuMs": 0.2999997138977051,
+      "nodes": 91
+    },
+    {
+      "seq": 18,
+      "x": 728,
+      "y": 647,
+      "firstUiMs": 22.800000190734863,
+      "readyMs": 95,
+      "createdNodes": 312,
+      "createCpuMs": 0.39999961853027344,
+      "nodes": 286
+    },
+    {
+      "seq": 19,
+      "x": 396,
+      "y": 253,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 20,
+      "x": 792,
+      "y": 432,
+      "firstUiMs": null,
+      "readyMs": null
+    },
+    {
+      "seq": 21,
+      "x": 89,
+      "y": 500,
+      "firstUiMs": null,
+      "readyMs": null
+    }
+  ],
+  "longTasks": [
+    {
+      "start": 68.09999990463257,
+      "ms": 64
+    },
+    {
+      "start": 47025.800000190735,
+      "ms": 98
+    }
+  ],
+  "created": 5368,
+  "createMs": 14.699995994567871,
+  "resources": [
+    {
+      "path": "/style.css",
+      "start": 6.300000190734863,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 6.599999904632568,
+      "transferBytes": 991,
+      "decodedBytes": 691
+    },
+    {
+      "path": "/src/polyfills.bundle.js",
+      "start": 6.400000095367432,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 7.199999809265137,
+      "transferBytes": 15050,
+      "decodedBytes": 14750
+    },
+    {
+      "path": "/src/system.bundle.js",
+      "start": 6.400000095367432,
+      "ttfbMs": 2.0999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 7.900000095367432,
+      "transferBytes": 37457,
+      "decodedBytes": 37157
+    },
+    {
+      "path": "/player-profile.js",
+      "start": 6.400000095367432,
+      "ttfbMs": 2.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.400000095367432,
+      "transferBytes": 5112,
+      "decodedBytes": 4812
+    },
+    {
+      "path": "/art-record.js",
+      "start": 6.5,
+      "ttfbMs": 3.1000003814697266,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 8.800000190734863,
+      "transferBytes": 1313,
+      "decodedBytes": 1013
+    },
+    {
+      "path": "/art-observe.js",
+      "start": 6.5,
+      "ttfbMs": 3.3000001907348633,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.200000286102295,
+      "transferBytes": 6307,
+      "decodedBytes": 6007
+    },
+    {
+      "path": "/src/import-map.json",
+      "start": 18.40000009536743,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 354,
+      "decodedBytes": 54
+    },
+    {
+      "path": "/cocos-js/cc.js",
+      "start": 31.300000190734863,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.5,
+      "totalMs": 2,
+      "transferBytes": 12300,
+      "decodedBytes": 12000
+    },
+    {
+      "path": "/index.js",
+      "start": 31.40000009536743,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 908,
+      "decodedBytes": 608
+    },
+    {
+      "path": "/favicon.ico",
+      "start": 31.5,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 1.700000286102295,
+      "transferBytes": 1450,
+      "decodedBytes": 1150
+    },
+    {
+      "path": "/application.js",
+      "start": 33.90000009536743,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 3600,
+      "decodedBytes": 3300
+    },
+    {
+      "path": "/cocos-js/_virtual_cc-Bblzxeqy.js",
+      "start": 33.90000009536743,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 14,
+      "totalMs": 15.099999904632568,
+      "transferBytes": 5932684,
+      "decodedBytes": 5932384
+    },
+    {
+      "path": "/src/settings.json",
+      "start": 132.80000019073486,
+      "ttfbMs": 0.5,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 22918,
+      "decodedBytes": 22618
+    },
+    {
+      "path": "/cocos-js/spine.wasm-DkA192N3.js",
+      "start": 147.90000009536743,
+      "ttfbMs": 0.5,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 1.8000001907348633,
+      "transferBytes": 45255,
+      "decodedBytes": 44955
+    },
+    {
+      "path": "/cocos-js/spine-DfhiCve8.js",
+      "start": 148,
+      "ttfbMs": 0.5,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 508,
+      "decodedBytes": 208
+    },
+    {
+      "path": "/cocos-js/assets/spine-CC34fKUR.wasm",
+      "start": 152.7000002861023,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 205475,
+      "decodedBytes": 205175
+    },
+    {
+      "path": "/src/effect.bin",
+      "start": 159.09999990463257,
+      "ttfbMs": 0.5,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.5,
+      "transferBytes": 6055,
+      "decodedBytes": 5755
+    },
+    {
+      "path": "/src/chunks/bundle.js",
+      "start": 165.59999990463257,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 21227,
+      "decodedBytes": 20927
+    },
+    {
+      "path": "/assets/internal/config.json",
+      "start": 176,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 6867,
+      "decodedBytes": 6567
+    },
+    {
+      "path": "/assets/internal/index.js",
+      "start": 176.09999990463257,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.200000286102295,
+      "transferBytes": 103862,
+      "decodedBytes": 103562
+    },
+    {
+      "path": "/assets/internal/import/06/06c6d8283.json",
+      "start": 181.80000019073486,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 1,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 429869,
+      "decodedBytes": 429569
+    },
+    {
+      "path": "/assets/main/config.json",
+      "start": 190.90000009536743,
+      "ttfbMs": 0.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.4000000953674316,
+      "transferBytes": 1391,
+      "decodedBytes": 1091
+    },
+    {
+      "path": "/assets/main/index.js",
+      "start": 191,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 1.4000000953674316,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 755099,
+      "decodedBytes": 754799
+    },
+    {
+      "path": "/assets/main/import/ff/ffbb08e3-cb62-46d3-82aa-b2ac55763131.json",
+      "start": 2023.5,
+      "ttfbMs": 1.6000003814697266,
+      "transferMs": 3.799999713897705,
+      "totalMs": 7,
+      "transferBytes": 1885,
+      "decodedBytes": 1585
+    },
+    {
+      "path": "/api/bootstrap",
+      "start": 2046.2000002861023,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.799999713897705,
+      "transferBytes": 389,
+      "decodedBytes": 89
+    },
+    {
+      "path": "/art/v5/manifest.json",
+      "start": 2049.800000190735,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 2,
+      "transferBytes": 31364,
+      "decodedBytes": 31064
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "start": 2052.5,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 3869,
+      "decodedBytes": 3569
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "start": 2052.5999999046326,
+      "ttfbMs": 0.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 1.700000286102295,
+      "transferBytes": 2523,
+      "decodedBytes": 2223
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "start": 2052.5999999046326,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 1,
+      "totalMs": 2.4000000953674316,
+      "transferBytes": 4673,
+      "decodedBytes": 4373
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "start": 2052.5999999046326,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 2.6000003814697266,
+      "transferBytes": 4559,
+      "decodedBytes": 4259
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "start": 2064,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 5.400000095367432,
+      "totalMs": 6.800000190734863,
+      "transferBytes": 6653656,
+      "decodedBytes": 6653356
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "start": 2085.5,
+      "ttfbMs": 1.200000286102295,
+      "transferMs": 1.799999713897705,
+      "totalMs": 4,
+      "transferBytes": 224890,
+      "decodedBytes": 224590
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "start": 2085.5,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 3,
+      "transferBytes": 11675,
+      "decodedBytes": 11375
+    },
+    {
+      "path": "/recovered/images/ac4f3dcae0eb55b0db64.jpg",
+      "start": 2085.5,
+      "ttfbMs": 1.5,
+      "transferMs": 2.9000000953674316,
+      "totalMs": 5.300000190734863,
+      "transferBytes": 670685,
+      "decodedBytes": 670385
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "start": 2085.5,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 0.8000001907348633,
+      "totalMs": 3.3000001907348633,
+      "transferBytes": 93902,
+      "decodedBytes": 93602
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "start": 2085.5,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 1.4000000953674316,
+      "totalMs": 4.300000190734863,
+      "transferBytes": 3316,
+      "decodedBytes": 3016
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "start": 2085.5999999046326,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 1.0999999046325684,
+      "totalMs": 3.8000001907348633,
+      "transferBytes": 2061,
+      "decodedBytes": 1761
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02m.png",
+      "start": 2085.5999999046326,
+      "ttfbMs": 0.5,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 5.100000381469727,
+      "transferBytes": 2040,
+      "decodedBytes": 1740
+    },
+    {
+      "path": "/api/login",
+      "start": 14411.800000190735,
+      "ttfbMs": 25,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 25.90000009536743,
+      "transferBytes": 406,
+      "decodedBytes": 106
+    },
+    {
+      "path": "/api/characters",
+      "start": 14438.400000095367,
+      "ttfbMs": 5.900000095367432,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 18.40000009536743,
+      "transferBytes": 317,
+      "decodedBytes": 17
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "start": 14458.700000286102,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 1.8999996185302734,
+      "transferBytes": 154325,
+      "decodedBytes": 154025
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21l.png",
+      "start": 26052.200000286102,
+      "ttfbMs": 2.6000003814697266,
+      "transferMs": 1,
+      "totalMs": 5,
+      "transferBytes": 55281,
+      "decodedBytes": 54981
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2f.png",
+      "start": 26052.200000286102,
+      "ttfbMs": 2.5,
+      "transferMs": 3.3000001907348633,
+      "totalMs": 6.699999809265137,
+      "transferBytes": 976077,
+      "decodedBytes": 975777
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2r.png",
+      "start": 26052.300000190735,
+      "ttfbMs": 2.1999998092651367,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 4.199999809265137,
+      "transferBytes": 4576,
+      "decodedBytes": 4276
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2g.png",
+      "start": 26052.300000190735,
+      "ttfbMs": 2.3000001907348633,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 3.799999713897705,
+      "transferBytes": 3450,
+      "decodedBytes": 3150
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt29.png",
+      "start": 26052.300000190735,
+      "ttfbMs": 2.5999999046325684,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 4.699999809265137,
+      "transferBytes": 2919,
+      "decodedBytes": 2619
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21i.png",
+      "start": 26052.300000190735,
+      "ttfbMs": 3.0999999046325684,
+      "transferMs": 1.3000001907348633,
+      "totalMs": 5.900000095367432,
+      "transferBytes": 33427,
+      "decodedBytes": 33127
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21h.png",
+      "start": 26064.200000286102,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 37924,
+      "decodedBytes": 37624
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21k.png",
+      "start": 26064.300000190735,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 2,
+      "transferBytes": 36869,
+      "decodedBytes": 36569
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21j.png",
+      "start": 26064.599999904633,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 1.8000001907348633,
+      "transferBytes": 39612,
+      "decodedBytes": 39312
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt28.png",
+      "start": 26065,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 2985,
+      "decodedBytes": 2685
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2c.png",
+      "start": 26065.300000190735,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1.299999713897705,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2d.png",
+      "start": 26072.400000095367,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt2e.png",
+      "start": 26080.900000095367,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 1.3000001907348633,
+      "transferBytes": 2186,
+      "decodedBytes": 1886
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21n.png",
+      "start": 26081.300000190735,
+      "ttfbMs": 0.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.1999998092651367,
+      "transferBytes": 9505,
+      "decodedBytes": 9205
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/kmt21o.png",
+      "start": 26081.5,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.0999999046325684,
+      "transferBytes": 10016,
+      "decodedBytes": 9716
+    },
+    {
+      "path": "/api/act",
+      "start": 46908.300000190735,
+      "ttfbMs": 17.90000009536743,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 18.799999713897705,
+      "transferBytes": 426,
+      "decodedBytes": 126
+    },
+    {
+      "path": "/api/characters",
+      "start": 46927.800000190735,
+      "ttfbMs": 5.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6,
+      "transferBytes": 412,
+      "decodedBytes": 112
+    },
+    {
+      "path": "/api/catalog",
+      "start": 46934.2000002861,
+      "ttfbMs": 0.3000001907348633,
+      "transferMs": 77.59999990463257,
+      "totalMs": 78.2999997138977,
+      "transferBytes": 9101088,
+      "decodedBytes": 67038251
+    },
+    {
+      "path": "/api/state",
+      "start": 47124.59999990463,
+      "ttfbMs": 120.40000009536743,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 121.40000009536743,
+      "transferBytes": 461789,
+      "decodedBytes": 461489
+    },
+    {
+      "path": "/recovered/images/66151644092267f3a487.mp3",
+      "start": 47248.800000190735,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 2.700000286102295,
+      "totalMs": 4,
+      "transferBytes": 564493,
+      "decodedBytes": 564193
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22q.png",
+      "start": 47250.09999990463,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.8000001907348633,
+      "totalMs": 4.300000190734863,
+      "transferBytes": 20359,
+      "decodedBytes": 20059
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor232.jpg",
+      "start": 47250.09999990463,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 2.200000286102295,
+      "totalMs": 5.600000381469727,
+      "transferBytes": 490331,
+      "decodedBytes": 490031
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22s.png",
+      "start": 47250.2000002861,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 4.299999713897705,
+      "transferBytes": 26676,
+      "decodedBytes": 26376
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22v.png",
+      "start": 47250.2000002861,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 1,
+      "totalMs": 5,
+      "transferBytes": 23893,
+      "decodedBytes": 23593
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22u.png",
+      "start": 47250.2000002861,
+      "ttfbMs": 1.6000003814697266,
+      "transferMs": 1.299999713897705,
+      "totalMs": 5.299999713897705,
+      "transferBytes": 50442,
+      "decodedBytes": 50142
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22w.png",
+      "start": 47250.2000002861,
+      "ttfbMs": 1.200000286102295,
+      "transferMs": 1.0999999046325684,
+      "totalMs": 5.199999809265137,
+      "transferBytes": 23615,
+      "decodedBytes": 23315
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22y.png",
+      "start": 47264.300000190735,
+      "ttfbMs": 3.0999999046325684,
+      "transferMs": 0.8000001907348633,
+      "totalMs": 4.400000095367432,
+      "transferBytes": 26232,
+      "decodedBytes": 25932
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22r.png",
+      "start": 47264.40000009537,
+      "ttfbMs": 3,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 4.300000190734863,
+      "transferBytes": 35846,
+      "decodedBytes": 35546
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22z.png",
+      "start": 47264.59999990463,
+      "ttfbMs": 3,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 4.300000190734863,
+      "transferBytes": 48167,
+      "decodedBytes": 47867
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor230.png",
+      "start": 47265,
+      "ttfbMs": 2.5,
+      "transferMs": 1,
+      "totalMs": 4,
+      "transferBytes": 98020,
+      "decodedBytes": 97720
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22x.png",
+      "start": 47265.09999990463,
+      "ttfbMs": 2.700000286102295,
+      "transferMs": 1.1999998092651367,
+      "totalMs": 4.400000095367432,
+      "transferBytes": 28157,
+      "decodedBytes": 27857
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22t.png",
+      "start": 47268.7000002861,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 49991,
+      "decodedBytes": 49691
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/pcor22p.png",
+      "start": 47272.800000190735,
+      "ttfbMs": 1,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.799999713897705,
+      "transferBytes": 1933,
+      "decodedBytes": 1633
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24f.png",
+      "start": 47273.09999990463,
+      "ttfbMs": 1,
+      "transferMs": 1.0999999046325684,
+      "totalMs": 2.5,
+      "transferBytes": 14071,
+      "decodedBytes": 13771
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92x.png",
+      "start": 47273.40000009537,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 1.1000003814697266,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 13791,
+      "decodedBytes": 13491
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24b.png",
+      "start": 47273.800000190735,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 1,
+      "totalMs": 3,
+      "transferBytes": 14453,
+      "decodedBytes": 14153
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24a.png",
+      "start": 47274,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 1,
+      "totalMs": 3,
+      "transferBytes": 13975,
+      "decodedBytes": 13675
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9211.png",
+      "start": 47274.300000190735,
+      "ttfbMs": 1,
+      "transferMs": 0.5,
+      "totalMs": 3.4000000953674316,
+      "transferBytes": 14374,
+      "decodedBytes": 14074
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921c.png",
+      "start": 47280.59999990463,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 13561,
+      "decodedBytes": 13261
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9214.png",
+      "start": 47280.800000190735,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.6999998092651367,
+      "transferBytes": 14096,
+      "decodedBytes": 13796
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24d.png",
+      "start": 47280.90000009537,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.5,
+      "totalMs": 1.8000001907348633,
+      "transferBytes": 14581,
+      "decodedBytes": 14281
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/fhpg24v.png",
+      "start": 47281.09999990463,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 0.5,
+      "totalMs": 1.8000001907348633,
+      "transferBytes": 13855,
+      "decodedBytes": 13555
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24c.png",
+      "start": 47281.09999990463,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 14948,
+      "decodedBytes": 14648
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9221.png",
+      "start": 47281.2000002861,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 2.3999996185302734,
+      "transferBytes": 34716,
+      "decodedBytes": 34416
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9223.png",
+      "start": 47289.40000009537,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.6000003814697266,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 13731,
+      "decodedBytes": 13431
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z9227.png",
+      "start": 47289.5,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 2,
+      "transferBytes": 3343,
+      "decodedBytes": 3043
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb236.png",
+      "start": 47289.59999990463,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 2,
+      "transferBytes": 873,
+      "decodedBytes": 573
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23h.png",
+      "start": 47289.7000002861,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 2.3999996185302734,
+      "transferBytes": 825,
+      "decodedBytes": 525
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb238.png",
+      "start": 47289.800000190735,
+      "ttfbMs": 1.200000286102295,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 2.5,
+      "transferBytes": 1134,
+      "decodedBytes": 834
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb239.png",
+      "start": 47290.09999990463,
+      "ttfbMs": 1,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 2.200000286102295,
+      "transferBytes": 1877,
+      "decodedBytes": 1577
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/udnb23b.png",
+      "start": 47297.40000009537,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.5999999046325684,
+      "transferBytes": 1838,
+      "decodedBytes": 1538
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/t3cz24t.png",
+      "start": 47297.5,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.5,
+      "transferBytes": 2676,
+      "decodedBytes": 2376
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p24g.png",
+      "start": 47297.5,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 4921,
+      "decodedBytes": 4621
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/z0e324k.png",
+      "start": 47297.59999990463,
+      "ttfbMs": 0.7999997138977051,
+      "transferMs": 0.6000003814697266,
+      "totalMs": 2.1000003814697266,
+      "transferBytes": 5108,
+      "decodedBytes": 4808
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z921k.png",
+      "start": 47297.59999990463,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 2.4000000953674316,
+      "transferBytes": 7752,
+      "decodedBytes": 7452
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p247.png",
+      "start": 47297.7000002861,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 2.3999996185302734,
+      "transferBytes": 10617,
+      "decodedBytes": 10317
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z929.png",
+      "start": 47306,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 2,
+      "transferBytes": 7211,
+      "decodedBytes": 6911
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92a.png",
+      "start": 47306,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.5,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 8592,
+      "decodedBytes": 8292
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/tx1p249.png",
+      "start": 47306.09999990463,
+      "ttfbMs": 1.200000286102295,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.6000003814697266,
+      "transferBytes": 8615,
+      "decodedBytes": 8315
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92r.png",
+      "start": 47306.2000002861,
+      "ttfbMs": 1,
+      "transferMs": 0.5,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 8499,
+      "decodedBytes": 8199
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92s.png",
+      "start": 47306.300000190735,
+      "ttfbMs": 1.5,
+      "transferMs": 0.7999997138977051,
+      "totalMs": 3.299999713897705,
+      "transferBytes": 7352,
+      "decodedBytes": 7052
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92w.png",
+      "start": 47306.40000009537,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 3.3000001907348633,
+      "transferBytes": 8225,
+      "decodedBytes": 7925
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92h.png",
+      "start": 47314.09999990463,
+      "ttfbMs": 0.6000003814697266,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 1.5,
+      "transferBytes": 11311,
+      "decodedBytes": 11011
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92g.png",
+      "start": 47314.2000002861,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 8197,
+      "decodedBytes": 7897
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92f.png",
+      "start": 47314.300000190735,
+      "ttfbMs": 1,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2,
+      "transferBytes": 7945,
+      "decodedBytes": 7645
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92e.png",
+      "start": 47314.300000190735,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 2,
+      "transferBytes": 7390,
+      "decodedBytes": 7090
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92c.png",
+      "start": 47314.40000009537,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.5,
+      "totalMs": 2.4000000953674316,
+      "transferBytes": 8291,
+      "decodedBytes": 7991
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92b.png",
+      "start": 47314.40000009537,
+      "ttfbMs": 1.200000286102295,
+      "transferMs": 0.5,
+      "totalMs": 2.4000000953674316,
+      "transferBytes": 8250,
+      "decodedBytes": 7950
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z928.png",
+      "start": 47322.59999990463,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 1.9000000953674316,
+      "transferBytes": 7925,
+      "decodedBytes": 7625
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z927.png",
+      "start": 47322.7000002861,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.5,
+      "totalMs": 2.3999996185302734,
+      "transferBytes": 8604,
+      "decodedBytes": 8304
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92j.png",
+      "start": 47322.800000190735,
+      "ttfbMs": 1,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 2.299999713897705,
+      "transferBytes": 7445,
+      "decodedBytes": 7145
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92l.png",
+      "start": 47322.90000009537,
+      "ttfbMs": 1,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 6417,
+      "decodedBytes": 6117
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92k.png",
+      "start": 47322.90000009537,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 3,
+      "transferBytes": 9874,
+      "decodedBytes": 9574
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/11z92m.png",
+      "start": 47323,
+      "ttfbMs": 1.0999999046325684,
+      "transferMs": 0.5,
+      "totalMs": 2.5999999046325684,
+      "transferBytes": 8618,
+      "decodedBytes": 8318
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24s.png",
+      "start": 47330.7000002861,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 1.799999713897705,
+      "transferBytes": 18678,
+      "decodedBytes": 18378
+    },
+    {
+      "path": "/recovered/original-ui/images/Home/v2gl24r.png",
+      "start": 47330.7000002861,
+      "ttfbMs": 1.1000003814697266,
+      "transferMs": 0.5,
+      "totalMs": 2,
+      "transferBytes": 23979,
+      "decodedBytes": 23679
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkb.png",
+      "start": 47330.800000190735,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 2.0999999046325684,
+      "transferBytes": 9189,
+      "decodedBytes": 8889
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk1.png",
+      "start": 47330.90000009537,
+      "ttfbMs": 1,
+      "transferMs": 0.5,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 5292,
+      "decodedBytes": 4992
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fkc.png",
+      "start": 47330.90000009537,
+      "ttfbMs": 1,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 2.1999998092651367,
+      "transferBytes": 1941,
+      "decodedBytes": 1641
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk5.png",
+      "start": 47331,
+      "ttfbMs": 1.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 2.3000001907348633,
+      "transferBytes": 1325,
+      "decodedBytes": 1025
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk6.png",
+      "start": 47339.800000190735,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 2.299999713897705,
+      "transferBytes": 1453,
+      "decodedBytes": 1153
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk7.png",
+      "start": 47339.90000009537,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 0.5,
+      "totalMs": 2.5,
+      "transferBytes": 1449,
+      "decodedBytes": 1149
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk8.png",
+      "start": 47340.09999990463,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.7000002861022949,
+      "totalMs": 2.6000003814697266,
+      "transferBytes": 2072,
+      "decodedBytes": 1772
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fka.png",
+      "start": 47340.300000190735,
+      "ttfbMs": 1.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 3.5,
+      "transferBytes": 2130,
+      "decodedBytes": 1830
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk9.png",
+      "start": 47340.300000190735,
+      "ttfbMs": 1.8999996185302734,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 3.4000000953674316,
+      "transferBytes": 2174,
+      "decodedBytes": 1874
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk2.png",
+      "start": 47340.40000009537,
+      "ttfbMs": 1.6999998092651367,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 3.4000000953674316,
+      "transferBytes": 1605,
+      "decodedBytes": 1305
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk3.png",
+      "start": 47347.5,
+      "ttfbMs": 0.5,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 0.9000000953674316,
+      "transferBytes": 1809,
+      "decodedBytes": 1509
+    },
+    {
+      "path": "/recovered/original-ui/images/Chat/m6fk4.png",
+      "start": 47347.5,
+      "ttfbMs": 0.40000009536743164,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 1,
+      "transferBytes": 1798,
+      "decodedBytes": 1498
+    },
+    {
+      "path": "/recovered/images/c679e00e31b86cb3d681.png",
+      "start": 47373.800000190735,
+      "ttfbMs": 0.7000002861022949,
+      "transferMs": 0.5,
+      "totalMs": 2,
+      "transferBytes": 104525,
+      "decodedBytes": 104225
+    },
+    {
+      "path": "/api/state",
+      "start": 48047.09999990463,
+      "ttfbMs": 6.799999713897705,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 7.600000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 49047.59999990463,
+      "ttfbMs": 9.300000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 11,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 50047.5,
+      "ttfbMs": 8.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 51047.09999990463,
+      "ttfbMs": 7.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 52047.800000190735,
+      "ttfbMs": 6.799999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 53047.59999990463,
+      "ttfbMs": 7.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 54047,
+      "ttfbMs": 7.099999904632568,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 55047.09999990463,
+      "ttfbMs": 8.5,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 9.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 56047.40000009537,
+      "ttfbMs": 6.199999809265137,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 7.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 57047.7000002861,
+      "ttfbMs": 9.300000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 10.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 58046.7000002861,
+      "ttfbMs": 8.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.899999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 59047.800000190735,
+      "ttfbMs": 8.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 60047.300000190735,
+      "ttfbMs": 11.799999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 13,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 61047.800000190735,
+      "ttfbMs": 7.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 62046.800000190735,
+      "ttfbMs": 9.300000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 10.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 63047,
+      "ttfbMs": 10,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 11.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 64047.2000002861,
+      "ttfbMs": 7.900000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 65047.40000009537,
+      "ttfbMs": 11,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 66047.2000002861,
+      "ttfbMs": 8.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 67047.80000019073,
+      "ttfbMs": 8.400000095367432,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 68047.59999990463,
+      "ttfbMs": 7.599999904632568,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 9,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 69047.5,
+      "ttfbMs": 8.399999618530273,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 70047.2000002861,
+      "ttfbMs": 9.400000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 71047.2000002861,
+      "ttfbMs": 8.299999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 72047.59999990463,
+      "ttfbMs": 11.5,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 12.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 73047.7000002861,
+      "ttfbMs": 8.900000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 74047.2000002861,
+      "ttfbMs": 9.5,
+      "transferMs": 0.39999961853027344,
+      "totalMs": 10.899999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 75047.5,
+      "ttfbMs": 10.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 12,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 76047.90000009537,
+      "ttfbMs": 8.900000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 77047.40000009537,
+      "ttfbMs": 8.700000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/art/v2/panel-2eacf473ca05.png",
+      "start": 77872.5,
+      "ttfbMs": 1.5,
+      "transferMs": 1.700000286102295,
+      "totalMs": 5.300000190734863,
+      "transferBytes": 165130,
+      "decodedBytes": 164830
+    },
+    {
+      "path": "/ui-assets/book-textless.png",
+      "start": 77872.5,
+      "ttfbMs": 2.700000286102295,
+      "transferMs": 25.09999990463257,
+      "totalMs": 29.300000190734863,
+      "transferBytes": 2690128,
+      "decodedBytes": 2689828
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 1.8000001907348633,
+      "transferMs": 1.6999998092651367,
+      "totalMs": 5.5,
+      "transferBytes": 9163,
+      "decodedBytes": 8863
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-1.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 2.5,
+      "transferMs": 1.0999999046325684,
+      "totalMs": 5.900000095367432,
+      "transferBytes": 1018,
+      "decodedBytes": 718
+    },
+    {
+      "path": "/art/v2/button-compact-normal-6aacda81f743.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 2.5999999046325684,
+      "transferMs": 1.3000001907348633,
+      "totalMs": 6.200000286102295,
+      "transferBytes": 4083,
+      "decodedBytes": 3783
+    },
+    {
+      "path": "/art/v2/control-minus-6a7da52d2205.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 2.5999999046325684,
+      "transferMs": 1.5,
+      "totalMs": 6.400000095367432,
+      "transferBytes": 1233,
+      "decodedBytes": 933
+    },
+    {
+      "path": "/recovered/images/df552e565b0be398eee4.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 9,
+      "transferBytes": 120294,
+      "decodedBytes": 119994
+    },
+    {
+      "path": "/recovered/images/1beaffff5775c94cc431.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 1.5,
+      "transferMs": 1.299999713897705,
+      "totalMs": 9.900000095367432,
+      "transferBytes": 102778,
+      "decodedBytes": 102478
+    },
+    {
+      "path": "/art/v2/button-compact-disabled-ed2373100a0e.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 1.299999713897705,
+      "totalMs": 10,
+      "transferBytes": 4559,
+      "decodedBytes": 4259
+    },
+    {
+      "path": "/art/v2/control-locked-62ab65165d9f.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.9000000953674316,
+      "totalMs": 9.700000286102295,
+      "transferBytes": 1568,
+      "decodedBytes": 1268
+    },
+    {
+      "path": "/recovered/images/e00eb1cfdeacecc02b42.png",
+      "start": 77872.59999990463,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 1.8000001907348633,
+      "totalMs": 10.600000381469727,
+      "transferBytes": 100927,
+      "decodedBytes": 100627
+    },
+    {
+      "path": "/art/v2/button-primary-normal-09f651df4458.png",
+      "start": 77872.7000002861,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 0.6000003814697266,
+      "totalMs": 12,
+      "transferBytes": 4059,
+      "decodedBytes": 3759
+    },
+    {
+      "path": "/api/state",
+      "start": 78047.7000002861,
+      "ttfbMs": 6.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 7.599999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 79047.09999990463,
+      "ttfbMs": 8.800000190734863,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.100000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 80047.5,
+      "ttfbMs": 8,
+      "transferMs": 0.10000038146972656,
+      "totalMs": 9.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 81047.59999990463,
+      "ttfbMs": 7.099999904632568,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 82047.5,
+      "ttfbMs": 8.799999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 83046.7000002861,
+      "ttfbMs": 7.699999809265137,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 8.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 84047.09999990463,
+      "ttfbMs": 8.699999809265137,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 85047.40000009537,
+      "ttfbMs": 6.800000190734863,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 7.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 86046.7000002861,
+      "ttfbMs": 6.900000095367432,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 7.899999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 87047.09999990463,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 88047.2000002861,
+      "ttfbMs": 8.700000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 89046.80000019073,
+      "ttfbMs": 9.700000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 90046.59999990463,
+      "ttfbMs": 9.300000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 91047.5,
+      "ttfbMs": 7.300000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 92046.7000002861,
+      "ttfbMs": 6.900000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 93047.59999990463,
+      "ttfbMs": 8.400000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 94047.7000002861,
+      "ttfbMs": 6.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 7.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 95047.2000002861,
+      "ttfbMs": 9.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 10.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 96046.90000009537,
+      "ttfbMs": 9,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 97046.80000019073,
+      "ttfbMs": 6.800000190734863,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 7.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 98047.59999990463,
+      "ttfbMs": 7.099999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.100000381469727,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 99046.7000002861,
+      "ttfbMs": 8.900000095367432,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 10.299999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 100047.30000019073,
+      "ttfbMs": 8.800000190734863,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 101047.80000019073,
+      "ttfbMs": 7.099999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 102047.40000009537,
+      "ttfbMs": 8.200000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 103047.7000002861,
+      "ttfbMs": 9.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 104047.5,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 9.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 105047.40000009537,
+      "ttfbMs": 7.5,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 8.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 106047.40000009537,
+      "ttfbMs": 7.900000095367432,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 107047.30000019073,
+      "ttfbMs": 8.099999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 9.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 108047.80000019073,
+      "ttfbMs": 95.90000009536743,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 97.40000009536743,
+      "transferBytes": 461789,
+      "decodedBytes": 461489
+    },
+    {
+      "path": "/api/state",
+      "start": 109047.5,
+      "ttfbMs": 7.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 110047.80000019073,
+      "ttfbMs": 9.599999904632568,
+      "transferMs": 0.40000009536743164,
+      "totalMs": 11.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 111047,
+      "ttfbMs": 8.599999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 9.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 112047.2000002861,
+      "ttfbMs": 9.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 10,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 113047.30000019073,
+      "ttfbMs": 6,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 6.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 114047.5,
+      "ttfbMs": 7.699999809265137,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 8.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 115047.80000019073,
+      "ttfbMs": 5.599999904632568,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 116047.09999990463,
+      "ttfbMs": 5.5,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 117047.40000009537,
+      "ttfbMs": 5.599999904632568,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 6.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 118047.5,
+      "ttfbMs": 6.400000095367432,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 7.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 119047.2000002861,
+      "ttfbMs": 5.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 120047.2000002861,
+      "ttfbMs": 5.699999809265137,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 6.5,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 121047.40000009537,
+      "ttfbMs": 6.400000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 7.199999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 122047.30000019073,
+      "ttfbMs": 5.400000095367432,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 6.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 123047.5,
+      "ttfbMs": 7.299999713897705,
+      "transferMs": 0.20000028610229492,
+      "totalMs": 8.200000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 124047,
+      "ttfbMs": 7.800000190734863,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 9,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 125047.09999990463,
+      "ttfbMs": 10.299999713897705,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.700000286102295,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 126046.7000002861,
+      "ttfbMs": 9.400000095367432,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 10.799999713897705,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 127047.5,
+      "ttfbMs": 8,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 9.099999904632568,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 128047.7000002861,
+      "ttfbMs": 7.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 8.399999618530273,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 129047.90000009537,
+      "ttfbMs": 7.5,
+      "transferMs": 0.2999997138977051,
+      "totalMs": 8.699999809265137,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 130047.40000009537,
+      "ttfbMs": 9.900000095367432,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 11.300000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ckxiao-0.png",
+      "start": 130256.5,
+      "ttfbMs": 3.0999999046325684,
+      "transferMs": 2.3000001907348633,
+      "totalMs": 6.700000286102295,
+      "transferBytes": 188127,
+      "decodedBytes": 187827
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqzl-0.png",
+      "start": 130256.59999990463,
+      "ttfbMs": 1.3000001907348633,
+      "transferMs": 0.8999996185302734,
+      "totalMs": 4.5,
+      "transferBytes": 1560,
+      "decodedBytes": 1260
+    },
+    {
+      "path": "/recovered/original-ui/legacy/btrenwu-0.png",
+      "start": 130256.59999990463,
+      "ttfbMs": 1.799999713897705,
+      "transferMs": 1.9000000953674316,
+      "totalMs": 5.300000190734863,
+      "transferBytes": 2126,
+      "decodedBytes": 1826
+    },
+    {
+      "path": "/recovered/original-ui/legacy/guanbi-0.png",
+      "start": 130256.59999990463,
+      "ttfbMs": 1.3999996185302734,
+      "transferMs": 2.6000003814697266,
+      "totalMs": 6.100000381469727,
+      "transferBytes": 4570,
+      "decodedBytes": 4270
+    },
+    {
+      "path": "/recovered/original-ui/legacy/bqbb_l-0.png",
+      "start": 130256.59999990463,
+      "ttfbMs": 2.0999999046325684,
+      "transferMs": 1.9000000953674316,
+      "totalMs": 6.200000286102295,
+      "transferBytes": 7063,
+      "decodedBytes": 6763
+    },
+    {
+      "path": "/recovered/original-ui/legacy/zbbj_1-0.png",
+      "start": 130256.59999990463,
+      "ttfbMs": 1.3999996185302734,
+      "transferMs": 4.600000381469727,
+      "totalMs": 8.600000381469727,
+      "transferBytes": 206246,
+      "decodedBytes": 205946
+    },
+    {
+      "path": "/recovered/images/d8ef534c0014376a8b20.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 0.9000000953674316,
+      "transferMs": 1.6999998092651367,
+      "totalMs": 7.399999618530273,
+      "transferBytes": 16698,
+      "decodedBytes": 16398
+    },
+    {
+      "path": "/recovered/images/4e0fa8041952498fbd5a.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 1.5,
+      "transferMs": 1.0999999046325684,
+      "totalMs": 9.299999713897705,
+      "transferBytes": 16804,
+      "decodedBytes": 16504
+    },
+    {
+      "path": "/recovered/images/2d8f526a024f8b708cf6.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 1.1000003814697266,
+      "totalMs": 9.5,
+      "transferBytes": 17311,
+      "decodedBytes": 17011
+    },
+    {
+      "path": "/recovered/images/a58d912f6e10c362f60c.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 1.5,
+      "transferMs": 1.4000000953674316,
+      "totalMs": 10.199999809265137,
+      "transferBytes": 17355,
+      "decodedBytes": 17055
+    },
+    {
+      "path": "/recovered/images/ebfd3b5cac5f10670398.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 1.1999998092651367,
+      "transferMs": 1.5,
+      "totalMs": 10.399999618530273,
+      "transferBytes": 17239,
+      "decodedBytes": 16939
+    },
+    {
+      "path": "/recovered/images/d12118f3e99e8b6770cf.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 1.4000000953674316,
+      "transferMs": 1.3000001907348633,
+      "totalMs": 10.599999904632568,
+      "transferBytes": 16811,
+      "decodedBytes": 16511
+    },
+    {
+      "path": "/recovered/images/0102d56f9fe0f73403a2.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 0.6999998092651367,
+      "transferMs": 1.8000001907348633,
+      "totalMs": 11.5,
+      "transferBytes": 4563,
+      "decodedBytes": 4263
+    },
+    {
+      "path": "/recovered/images/534f88a3f4a4898eaf7e.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 0.8999996185302734,
+      "transferMs": 1.1000003814697266,
+      "totalMs": 12,
+      "transferBytes": 4613,
+      "decodedBytes": 4313
+    },
+    {
+      "path": "/recovered/images/65a87febd43444c79b07.png",
+      "start": 130256.7000002861,
+      "ttfbMs": 0.8000001907348633,
+      "transferMs": 1,
+      "totalMs": 12,
+      "transferBytes": 4603,
+      "decodedBytes": 4303
+    },
+    {
+      "path": "/recovered/original-ui/legacy/ajda_1.png",
+      "start": 130285,
+      "ttfbMs": 1.6000003814697266,
+      "transferMs": 0.5999999046325684,
+      "totalMs": 3.3000001907348633,
+      "transferBytes": 6306,
+      "decodedBytes": 6006
+    },
+    {
+      "path": "/recovered/original-ui/legacy/qianghuagezi_1-0.png",
+      "start": 130285,
+      "ttfbMs": 1.5,
+      "transferMs": 0.3000001907348633,
+      "totalMs": 3.200000286102295,
+      "transferBytes": 2334,
+      "decodedBytes": 2034
+    },
+    {
+      "path": "/recovered/original-ui/legacy/fuwengezi-0.png",
+      "start": 130285,
+      "ttfbMs": 1.5999999046325684,
+      "transferMs": 0.6999998092651367,
+      "totalMs": 3.5999999046325684,
+      "transferBytes": 7683,
+      "decodedBytes": 7383
+    },
+    {
+      "path": "/recovered/original-ui/legacy/rwjyt-0.png",
+      "start": 130285,
+      "ttfbMs": 1.799999713897705,
+      "transferMs": 0.5,
+      "totalMs": 3.5,
+      "transferBytes": 1431,
+      "decodedBytes": 1131
+    },
+    {
+      "path": "/recovered/images/6574074dd6200f0c5b7f.png",
+      "start": 130285.09999990463,
+      "ttfbMs": 1.8000001907348633,
+      "transferMs": 0.8999996185302734,
+      "totalMs": 4,
+      "transferBytes": 4646,
+      "decodedBytes": 4346
+    },
+    {
+      "path": "/recovered/images/5c95ca19c33eeb16f677.png",
+      "start": 130285.09999990463,
+      "ttfbMs": 2,
+      "transferMs": 1,
+      "totalMs": 4.400000095367432,
+      "transferBytes": 4691,
+      "decodedBytes": 4391
+    },
+    {
+      "path": "/recovered/images/04561337a83923b72d33.png",
+      "start": 130285.09999990463,
+      "ttfbMs": 0.5999999046325684,
+      "transferMs": 0.5,
+      "totalMs": 5,
+      "transferBytes": 4639,
+      "decodedBytes": 4339
+    },
+    {
+      "path": "/api/state",
+      "start": 131047.5,
+      "ttfbMs": 8.900000095367432,
+      "transferMs": 0.09999990463256836,
+      "totalMs": 9.800000190734863,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 132046.80000019073,
+      "ttfbMs": 10.800000190734863,
+      "transferMs": 0.5,
+      "totalMs": 12.400000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    },
+    {
+      "path": "/api/state",
+      "start": 133047.59999990463,
+      "ttfbMs": 9.700000286102295,
+      "transferMs": 0.19999980926513672,
+      "totalMs": 10.900000095367432,
+      "transferBytes": 410,
+      "decodedBytes": 110
+    }
+  ],
+  "engine": {
+    "fullRenders": 16,
+    "pollRendersSkipped": 1619,
+    "homeMounts": 10,
+    "originalUi": {
+      "frameLoads": 89,
+      "frameCacheHits": 2027,
+      "sharedInflightLoads": 0
+    }
+  },
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-production-20261026",
+      "uiTextures": 18,
+      "loads": 18,
+      "failures": 0,
+      "maxPrepareMs": 43,
+      "unitAtlases": {
+        "atlasPoolEntries": 0,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 0,
+        "atlasPoolSpriteFrames": 0,
+        "atlasPoolEstimatedBytes": 0,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      }
+    }
+  },
+  "requestCounts": {
+    "/src/import-map.json": 1,
+    "/cocos-js/assets/spine-CC34fKUR.wasm": 1,
+    "/api/bootstrap": 1,
+    "/art/v5/manifest.json": 1,
+    "/recovered/original-ui.json": 1,
+    "/api/login": 1,
+    "/api/characters": 2,
+    "/api/act": 10,
+    "/api/catalog": 1,
+    "/api/state": 1628
+  },
+  "captureNote": "Idle /api/state samples trimmed after first three; original full capture kept locally. All clicks, mounts, resource timings and non-state requests retained."
+}

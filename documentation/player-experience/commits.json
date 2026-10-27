@@ -1,0 +1,7 @@
+{
+  "branch": "codex/player-experience-pve",
+  "base": "99b123a",
+  "implementation": "8390ef27941e8888f01c7db51b2105d38c507b33",
+  "formalBundle": "81f62802335263ef0f54f2dec2b81c756c0fd91f7dea6ff44403f4a949474c06",
+  "scope": "local only, accepted C; no push or server operation; docs commit follows implementation"
+}

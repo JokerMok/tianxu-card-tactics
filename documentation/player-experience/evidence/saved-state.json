@@ -1,0 +1,21 @@
+{
+  "scope": "new ordinary account, UI drag/drop and real save; no GM",
+  "level": 1,
+  "xp": 6,
+  "cards": {
+    "main:card:1": 1,
+    "main:card:19": 1,
+    "main:card:43": 1,
+    "main:card:61": 1,
+    "main:card:5019": 1
+  },
+  "deck": [
+    "main:card:1",
+    "main:card:43",
+    "main:card:61",
+    "main:card:5019"
+  ],
+  "silver": 330,
+  "deckEdits": 1,
+  "firstNodeCleared": true
+}

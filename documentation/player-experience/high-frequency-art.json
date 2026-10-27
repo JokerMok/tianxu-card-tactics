@@ -1,0 +1,1426 @@
+{
+  "scope": "actual ordinary-player PVE records only, no fixtures; historical normal107 account + two newly registered initial-player runs; includes six repeated101 leveling battles, so not a random-pool probability estimate",
+  "battleCount": 18,
+  "modelCount": 31,
+  "rows": [
+    {
+      "modelId": "model:b0e55c408ff64a7afef5",
+      "monsterIds": [
+        43
+      ],
+      "cardIds": [
+        "main:card:43"
+      ],
+      "names": [
+        "枪骑兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:105",
+        "main:scene:1:node:103",
+        "main:scene:1:node:107"
+      ],
+      "units": 17,
+      "newArt": true,
+      "battleCount": 17,
+      "battleIds": [
+        "06b26e33-3456-4ef6-841e-99c5b6089af9",
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e",
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+        "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+        "ef95f646-b608-452a-bbc6-b56a50984272",
+        "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+        "7574d921-9b3b-4688-bdf3-31a69db397be",
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124",
+        "533ad9d5-8d47-482d-b397-6d74ae5e9e0e",
+        "0303b787-8742-4806-8ee0-33b8193b1bd2",
+        "2db11e68-d889-49c0-bc64-4b1d93eba815",
+        "fdf95aeb-0519-4a9e-9aa7-f8e92ef000c5",
+        "f11859f6-8808-45e3-9a31-89d327624fb8",
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Lancer"
+      ]
+    },
+    {
+      "modelId": "model:084ab6a537029e5baa0a",
+      "monsterIds": [
+        61
+      ],
+      "cardIds": [
+        "main:card:61"
+      ],
+      "names": [
+        "骑兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:103",
+        "main:scene:1:node:105",
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:107"
+      ],
+      "units": 15,
+      "newArt": true,
+      "battleCount": 14,
+      "battleIds": [
+        "bd2ef0ee-ce02-4ba4-b459-63bff1f2dabb",
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+        "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+        "ef95f646-b608-452a-bbc6-b56a50984272",
+        "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+        "533ad9d5-8d47-482d-b397-6d74ae5e9e0e",
+        "0303b787-8742-4806-8ee0-33b8193b1bd2",
+        "2db11e68-d889-49c0-bc64-4b1d93eba815",
+        "fdf95aeb-0519-4a9e-9aa7-f8e92ef000c5",
+        "f11859f6-8808-45e3-9a31-89d327624fb8",
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Horseman"
+      ]
+    },
+    {
+      "modelId": "model:e1eec96444fbab197d3f",
+      "monsterIds": [
+        19
+      ],
+      "cardIds": [
+        "main:card:19"
+      ],
+      "names": [
+        "侍从"
+      ],
+      "nodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:105",
+        "main:scene:1:node:103",
+        "main:scene:1:node:107"
+      ],
+      "units": 10,
+      "newArt": true,
+      "battleCount": 10,
+      "battleIds": [
+        "06b26e33-3456-4ef6-841e-99c5b6089af9",
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e",
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+        "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+        "ef95f646-b608-452a-bbc6-b56a50984272",
+        "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+        "7574d921-9b3b-4688-bdf3-31a69db397be",
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Squire"
+      ]
+    },
+    {
+      "modelId": "model:37d68956aa077843b62b",
+      "monsterIds": [
+        1
+      ],
+      "cardIds": [
+        "main:card:1"
+      ],
+      "names": [
+        "卫兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:105"
+      ],
+      "units": 5,
+      "newArt": true,
+      "battleCount": 5,
+      "battleIds": [
+        "06b26e33-3456-4ef6-841e-99c5b6089af9",
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e",
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+        "7574d921-9b3b-4688-bdf3-31a69db397be",
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Guard"
+      ]
+    },
+    {
+      "modelId": "model:00fc2a2e0efd186fb8fa",
+      "monsterIds": [
+        5019
+      ],
+      "cardIds": [
+        "main:card:5019"
+      ],
+      "names": [
+        "精灵猎人"
+      ],
+      "nodes": [
+        "main:scene:1:node:105",
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": true,
+      "battleCount": 2,
+      "battleIds": [
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Elven Hunter"
+      ]
+    },
+    {
+      "modelId": "model:1881dec8ddbd6e5dff07",
+      "monsterIds": [
+        4079
+      ],
+      "cardIds": [
+        "main:card:4079"
+      ],
+      "names": [
+        "狂暴巨魔"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "Furious Troll"
+      ]
+    },
+    {
+      "modelId": "model:23c7b4e8289d6ab8e3c4",
+      "monsterIds": [
+        5043
+      ],
+      "cardIds": [
+        "main:card:5043"
+      ],
+      "names": [
+        "精灵女巫"
+      ],
+      "nodes": [
+        "main:scene:1:node:103",
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Elven Witch"
+      ]
+    },
+    {
+      "modelId": "model:570e9998485ef04e5b7f",
+      "monsterIds": [
+        6085
+      ],
+      "cardIds": [
+        "main:card:6085"
+      ],
+      "names": [
+        "天狗武士"
+      ],
+      "nodes": [
+        "main:scene:1:node:105",
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c"
+      ],
+      "originalNames": [
+        "Tengu Samurai"
+      ]
+    },
+    {
+      "modelId": "model:26b078148d1f7af2f252",
+      "monsterIds": [
+        8
+      ],
+      "cardIds": [
+        "main:card:8"
+      ],
+      "names": [
+        "哨卫"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": true,
+      "battleCount": 2,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c"
+      ],
+      "originalNames": [
+        "Sentinel"
+      ]
+    },
+    {
+      "modelId": "model:e11af58a635cdefbd0ed",
+      "monsterIds": [
+        20019
+      ],
+      "cardIds": [
+        "main:card:20019"
+      ],
+      "names": [
+        "ARK 忍者"
+      ],
+      "nodes": [
+        "main:scene:1:node:107",
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "ARK Ninja"
+      ]
+    },
+    {
+      "modelId": "model:2637907e22b0200b6973",
+      "monsterIds": [
+        5211
+      ],
+      "cardIds": [
+        "main:card:5211"
+      ],
+      "names": [
+        "精灵潜行者"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "2db11e68-d889-49c0-bc64-4b1d93eba815",
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Elf Prowler"
+      ]
+    },
+    {
+      "modelId": "model:90d3a36d146f0f3d73d4",
+      "monsterIds": [
+        2085
+      ],
+      "cardIds": [
+        "main:card:2085"
+      ],
+      "names": [
+        "蝙蝠"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "2db11e68-d889-49c0-bc64-4b1d93eba815"
+      ],
+      "originalNames": [
+        "Bat"
+      ]
+    },
+    {
+      "modelId": "model:097128e60ab9f7cd9325",
+      "monsterIds": [
+        3061
+      ],
+      "cardIds": [
+        "main:card:3061"
+      ],
+      "names": [
+        "小精灵术士"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "06b26e33-3456-4ef6-841e-99c5b6089af9"
+      ],
+      "originalNames": [
+        "Pixie Adept"
+      ]
+    },
+    {
+      "modelId": "model:9305dc7f8eae4def3286",
+      "monsterIds": [
+        2043
+      ],
+      "cardIds": [
+        "main:card:2043"
+      ],
+      "names": [
+        "蜥蜴"
+      ],
+      "nodes": [
+        "main:scene:1:node:102"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e"
+      ],
+      "originalNames": [
+        "Lizard"
+      ]
+    },
+    {
+      "modelId": "model:6d497c0eee05b7a27279",
+      "monsterIds": [
+        2169
+      ],
+      "cardIds": [
+        "main:card:2169"
+      ],
+      "names": [
+        "红宝石兽尼德"
+      ],
+      "nodes": [
+        "main:scene:1:node:102"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e"
+      ],
+      "originalNames": [
+        "Redstone Nid"
+      ]
+    },
+    {
+      "modelId": "model:74f19f6db4c1c51ba960",
+      "monsterIds": [
+        13073
+      ],
+      "cardIds": [
+        "main:card:13073"
+      ],
+      "names": [
+        "天矛"
+      ],
+      "nodes": [
+        "main:scene:1:node:105"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e"
+      ],
+      "originalNames": [
+        "Heavenly Spear"
+      ]
+    },
+    {
+      "modelId": "model:f0702757f1c1d0b134cd",
+      "monsterIds": [
+        12145
+      ],
+      "cardIds": [
+        "main:card:12145"
+      ],
+      "names": [
+        "圣幼兽"
+      ],
+      "nodes": [
+        "main:scene:1:node:105"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12"
+      ],
+      "originalNames": [
+        "Blessed Whelp"
+      ]
+    },
+    {
+      "modelId": "model:3215c2a7cedce189a29e",
+      "monsterIds": [
+        3079
+      ],
+      "cardIds": [
+        "main:card:3079"
+      ],
+      "names": [
+        "小精灵守护者"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Pixie Keeper"
+      ]
+    },
+    {
+      "modelId": "model:e49ba9fd542fa678f550",
+      "monsterIds": [
+        14097
+      ],
+      "cardIds": [
+        "main:card:14097"
+      ],
+      "names": [
+        "魅魔"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Succubus"
+      ]
+    },
+    {
+      "modelId": "model:23447e4fd7a82e9d187a",
+      "monsterIds": [
+        1277
+      ],
+      "cardIds": [
+        "main:card:1277"
+      ],
+      "names": [
+        "食尸鬼"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Ghoul"
+      ]
+    },
+    {
+      "modelId": "model:be1ff3c91eb508789cba",
+      "monsterIds": [
+        1187
+      ],
+      "cardIds": [
+        "main:card:1187"
+      ],
+      "names": [
+        "污秽骷髅"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c"
+      ],
+      "originalNames": [
+        "Foul Skeleton"
+      ]
+    },
+    {
+      "modelId": "model:e4c0d41319e04fc0008a",
+      "monsterIds": [
+        1001
+      ],
+      "cardIds": [
+        "main:card:1001"
+      ],
+      "names": [
+        "僵尸卫兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Zombie Guard"
+      ]
+    },
+    {
+      "modelId": "model:e9d9c34ba5991178258b",
+      "monsterIds": [
+        5061
+      ],
+      "cardIds": [
+        "main:card:5061"
+      ],
+      "names": [
+        "精灵火学徒"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Elven Fire Apprentice"
+      ]
+    },
+    {
+      "modelId": "model:69df8c5bf981bde2596d",
+      "monsterIds": [
+        6019
+      ],
+      "cardIds": [
+        "main:card:6019"
+      ],
+      "names": [
+        "猫人信使"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Feles Messenger"
+      ]
+    },
+    {
+      "modelId": "model:1204bf83dc3ec7bf698d",
+      "monsterIds": [
+        13169
+      ],
+      "cardIds": [
+        "main:card:13169"
+      ],
+      "names": [
+        "小天使游击兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Cherubic Skirmisher"
+      ]
+    },
+    {
+      "modelId": "model:d0ce29fea0ab52596521",
+      "monsterIds": [
+        2001
+      ],
+      "cardIds": [
+        "main:card:2001"
+      ],
+      "names": [
+        "狩猎犬"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Hunting Dog"
+      ]
+    },
+    {
+      "modelId": "model:ee601047ce8927fab117",
+      "monsterIds": [
+        2127
+      ],
+      "cardIds": [
+        "main:card:2127"
+      ],
+      "names": [
+        "奇美拉"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "533ad9d5-8d47-482d-b397-6d74ae5e9e0e"
+      ],
+      "originalNames": [
+        "Chimera"
+      ]
+    },
+    {
+      "modelId": "model:8560770dafe35ecee46f",
+      "monsterIds": [
+        5187
+      ],
+      "cardIds": [
+        "main:card:5187"
+      ],
+      "names": [
+        "精灵冰学徒"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "0303b787-8742-4806-8ee0-33b8193b1bd2"
+      ],
+      "originalNames": [
+        "Elven Frost Apprentice"
+      ]
+    },
+    {
+      "modelId": "model:8b1c69f6618c1d1f3f5f",
+      "monsterIds": [
+        9019
+      ],
+      "cardIds": [
+        "main:card:9019"
+      ],
+      "names": [
+        "哥布林盗贼"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": true,
+      "battleCount": 1,
+      "battleIds": [
+        "2db11e68-d889-49c0-bc64-4b1d93eba815"
+      ],
+      "originalNames": [
+        "Goblin Rogue"
+      ]
+    },
+    {
+      "modelId": "model:d0052a405f74753aca56",
+      "monsterIds": [
+        211
+      ],
+      "cardIds": [
+        "main:card:211"
+      ],
+      "names": [
+        "颂唱者"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "Chantress"
+      ]
+    },
+    {
+      "modelId": "model:88c342522feceea23da3",
+      "monsterIds": [
+        11356
+      ],
+      "cardIds": [
+        "main:card:11356"
+      ],
+      "names": [
+        "矮人"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Dwarf"
+      ]
+    }
+  ],
+  "remainingCandidates": [
+    {
+      "modelId": "model:1881dec8ddbd6e5dff07",
+      "monsterIds": [
+        4079
+      ],
+      "cardIds": [
+        "main:card:4079"
+      ],
+      "names": [
+        "狂暴巨魔"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "Furious Troll"
+      ]
+    },
+    {
+      "modelId": "model:23c7b4e8289d6ab8e3c4",
+      "monsterIds": [
+        5043
+      ],
+      "cardIds": [
+        "main:card:5043"
+      ],
+      "names": [
+        "精灵女巫"
+      ],
+      "nodes": [
+        "main:scene:1:node:103",
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Elven Witch"
+      ]
+    },
+    {
+      "modelId": "model:570e9998485ef04e5b7f",
+      "monsterIds": [
+        6085
+      ],
+      "cardIds": [
+        "main:card:6085"
+      ],
+      "names": [
+        "天狗武士"
+      ],
+      "nodes": [
+        "main:scene:1:node:105",
+        "main:scene:1:node:107"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c"
+      ],
+      "originalNames": [
+        "Tengu Samurai"
+      ]
+    },
+    {
+      "modelId": "model:e11af58a635cdefbd0ed",
+      "monsterIds": [
+        20019
+      ],
+      "cardIds": [
+        "main:card:20019"
+      ],
+      "names": [
+        "ARK 忍者"
+      ],
+      "nodes": [
+        "main:scene:1:node:107",
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "ARK Ninja"
+      ]
+    },
+    {
+      "modelId": "model:2637907e22b0200b6973",
+      "monsterIds": [
+        5211
+      ],
+      "cardIds": [
+        "main:card:5211"
+      ],
+      "names": [
+        "精灵潜行者"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 2,
+      "battleIds": [
+        "2db11e68-d889-49c0-bc64-4b1d93eba815",
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Elf Prowler"
+      ]
+    },
+    {
+      "modelId": "model:90d3a36d146f0f3d73d4",
+      "monsterIds": [
+        2085
+      ],
+      "cardIds": [
+        "main:card:2085"
+      ],
+      "names": [
+        "蝙蝠"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 2,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "2db11e68-d889-49c0-bc64-4b1d93eba815"
+      ],
+      "originalNames": [
+        "Bat"
+      ]
+    },
+    {
+      "modelId": "model:097128e60ab9f7cd9325",
+      "monsterIds": [
+        3061
+      ],
+      "cardIds": [
+        "main:card:3061"
+      ],
+      "names": [
+        "小精灵术士"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "06b26e33-3456-4ef6-841e-99c5b6089af9"
+      ],
+      "originalNames": [
+        "Pixie Adept"
+      ]
+    },
+    {
+      "modelId": "model:9305dc7f8eae4def3286",
+      "monsterIds": [
+        2043
+      ],
+      "cardIds": [
+        "main:card:2043"
+      ],
+      "names": [
+        "蜥蜴"
+      ],
+      "nodes": [
+        "main:scene:1:node:102"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e"
+      ],
+      "originalNames": [
+        "Lizard"
+      ]
+    },
+    {
+      "modelId": "model:6d497c0eee05b7a27279",
+      "monsterIds": [
+        2169
+      ],
+      "cardIds": [
+        "main:card:2169"
+      ],
+      "names": [
+        "红宝石兽尼德"
+      ],
+      "nodes": [
+        "main:scene:1:node:102"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "ebddb9ab-7749-429d-9ea6-91f1794fb23e"
+      ],
+      "originalNames": [
+        "Redstone Nid"
+      ]
+    },
+    {
+      "modelId": "model:74f19f6db4c1c51ba960",
+      "monsterIds": [
+        13073
+      ],
+      "cardIds": [
+        "main:card:13073"
+      ],
+      "names": [
+        "天矛"
+      ],
+      "nodes": [
+        "main:scene:1:node:105"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dd49c060-3332-43a7-8ab1-c863f5a97e5e"
+      ],
+      "originalNames": [
+        "Heavenly Spear"
+      ]
+    },
+    {
+      "modelId": "model:f0702757f1c1d0b134cd",
+      "monsterIds": [
+        12145
+      ],
+      "cardIds": [
+        "main:card:12145"
+      ],
+      "names": [
+        "圣幼兽"
+      ],
+      "nodes": [
+        "main:scene:1:node:105"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12"
+      ],
+      "originalNames": [
+        "Blessed Whelp"
+      ]
+    },
+    {
+      "modelId": "model:3215c2a7cedce189a29e",
+      "monsterIds": [
+        3079
+      ],
+      "cardIds": [
+        "main:card:3079"
+      ],
+      "names": [
+        "小精灵守护者"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Pixie Keeper"
+      ]
+    },
+    {
+      "modelId": "model:e49ba9fd542fa678f550",
+      "monsterIds": [
+        14097
+      ],
+      "cardIds": [
+        "main:card:14097"
+      ],
+      "names": [
+        "魅魔"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Succubus"
+      ]
+    },
+    {
+      "modelId": "model:23447e4fd7a82e9d187a",
+      "monsterIds": [
+        1277
+      ],
+      "cardIds": [
+        "main:card:1277"
+      ],
+      "names": [
+        "食尸鬼"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd"
+      ],
+      "originalNames": [
+        "Ghoul"
+      ]
+    },
+    {
+      "modelId": "model:be1ff3c91eb508789cba",
+      "monsterIds": [
+        1187
+      ],
+      "cardIds": [
+        "main:card:1187"
+      ],
+      "names": [
+        "污秽骷髅"
+      ],
+      "nodes": [
+        "main:scene:1:node:107"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "bc7f1bb3-b7fc-4068-8229-eee1dde3590c"
+      ],
+      "originalNames": [
+        "Foul Skeleton"
+      ]
+    },
+    {
+      "modelId": "model:e4c0d41319e04fc0008a",
+      "monsterIds": [
+        1001
+      ],
+      "cardIds": [
+        "main:card:1001"
+      ],
+      "names": [
+        "僵尸卫兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Zombie Guard"
+      ]
+    },
+    {
+      "modelId": "model:e9d9c34ba5991178258b",
+      "monsterIds": [
+        5061
+      ],
+      "cardIds": [
+        "main:card:5061"
+      ],
+      "names": [
+        "精灵火学徒"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Elven Fire Apprentice"
+      ]
+    },
+    {
+      "modelId": "model:69df8c5bf981bde2596d",
+      "monsterIds": [
+        6019
+      ],
+      "cardIds": [
+        "main:card:6019"
+      ],
+      "names": [
+        "猫人信使"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7574d921-9b3b-4688-bdf3-31a69db397be"
+      ],
+      "originalNames": [
+        "Feles Messenger"
+      ]
+    },
+    {
+      "modelId": "model:1204bf83dc3ec7bf698d",
+      "monsterIds": [
+        13169
+      ],
+      "cardIds": [
+        "main:card:13169"
+      ],
+      "names": [
+        "小天使游击兵"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Cherubic Skirmisher"
+      ]
+    },
+    {
+      "modelId": "model:d0ce29fea0ab52596521",
+      "monsterIds": [
+        2001
+      ],
+      "cardIds": [
+        "main:card:2001"
+      ],
+      "names": [
+        "狩猎犬"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "5a1ffebf-156a-4b20-bf9c-750f1eeef124"
+      ],
+      "originalNames": [
+        "Hunting Dog"
+      ]
+    },
+    {
+      "modelId": "model:ee601047ce8927fab117",
+      "monsterIds": [
+        2127
+      ],
+      "cardIds": [
+        "main:card:2127"
+      ],
+      "names": [
+        "奇美拉"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "533ad9d5-8d47-482d-b397-6d74ae5e9e0e"
+      ],
+      "originalNames": [
+        "Chimera"
+      ]
+    },
+    {
+      "modelId": "model:8560770dafe35ecee46f",
+      "monsterIds": [
+        5187
+      ],
+      "cardIds": [
+        "main:card:5187"
+      ],
+      "names": [
+        "精灵冰学徒"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "0303b787-8742-4806-8ee0-33b8193b1bd2"
+      ],
+      "originalNames": [
+        "Elven Frost Apprentice"
+      ]
+    },
+    {
+      "modelId": "model:d0052a405f74753aca56",
+      "monsterIds": [
+        211
+      ],
+      "cardIds": [
+        "main:card:211"
+      ],
+      "names": [
+        "颂唱者"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "f11859f6-8808-45e3-9a31-89d327624fb8"
+      ],
+      "originalNames": [
+        "Chantress"
+      ]
+    },
+    {
+      "modelId": "model:88c342522feceea23da3",
+      "monsterIds": [
+        11356
+      ],
+      "cardIds": [
+        "main:card:11356"
+      ],
+      "names": [
+        "矮人"
+      ],
+      "nodes": [
+        "main:scene:1:node:101"
+      ],
+      "units": 1,
+      "newArt": false,
+      "battleCount": 1,
+      "battleIds": [
+        "7659474d-f013-42da-9115-f2fd36df5245"
+      ],
+      "originalNames": [
+        "Dwarf"
+      ]
+    }
+  ],
+  "playerHero": {
+    "name": "战士玩家英雄",
+    "profession": 1,
+    "observedBattles": 18,
+    "actorModelLink": {
+      "profession": 1,
+      "sex": 1,
+      "sexName": "male",
+      "layerNames": [
+        "man_warrior_body",
+        "man_warrior_weapon"
+      ],
+      "modelIds": [
+        "model:9723e32531971491ab57",
+        "model:c4ea5cb03ea67bb50612"
+      ],
+      "resolution": "actor_xml_exact",
+      "unresolvedLayers": []
+    },
+    "status": "original actor layers; not one of the nineteen replacement unit atlases",
+    "priority": "highest repeated presence; keep as a separate hero-layer production specification, no production authorized this round"
+  }
+}
