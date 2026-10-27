@@ -1,0 +1,313 @@
+{
+  "version": 1,
+  "id": "rig-reuse-experiment",
+  "atlas": "trial-parts-ffc9276ad18d.webp",
+  "atlasSize": [
+    1024,
+    256
+  ],
+  "costumes": {
+    "trial": {
+      "parts": {
+        "head": {
+          "rect": [
+            3,
+            3,
+            50,
+            58
+          ],
+          "size": [
+            20,
+            23
+          ],
+          "anchor": [
+            0.5,
+            0.14
+          ]
+        },
+        "torso": {
+          "rect": [
+            131,
+            3,
+            82,
+            78
+          ],
+          "size": [
+            33,
+            31
+          ],
+          "anchor": [
+            0.5,
+            0.12
+          ]
+        },
+        "pelvis": {
+          "rect": [
+            259,
+            3,
+            65,
+            30
+          ],
+          "size": [
+            26,
+            12
+          ],
+          "anchor": [
+            0.5,
+            0.65
+          ]
+        },
+        "cloth": {
+          "rect": [
+            387,
+            3,
+            62,
+            32
+          ],
+          "size": [
+            25,
+            13
+          ],
+          "anchor": [
+            0.5,
+            1
+          ]
+        },
+        "swordUpper": {
+          "rect": [
+            515,
+            3,
+            38,
+            45
+          ],
+          "size": [
+            15,
+            18
+          ],
+          "anchor": [
+            0.5,
+            0.9
+          ]
+        },
+        "swordFore": {
+          "rect": [
+            643,
+            3,
+            32,
+            42
+          ],
+          "size": [
+            13,
+            17
+          ],
+          "anchor": [
+            0.5,
+            0.9
+          ]
+        },
+        "shieldUpper": {
+          "rect": [
+            771,
+            3,
+            38,
+            45
+          ],
+          "size": [
+            15,
+            18
+          ],
+          "anchor": [
+            0.5,
+            0.9
+          ]
+        },
+        "shieldFore": {
+          "rect": [
+            899,
+            3,
+            32,
+            42
+          ],
+          "size": [
+            13,
+            17
+          ],
+          "anchor": [
+            0.5,
+            0.9
+          ]
+        },
+        "backThigh": {
+          "rect": [
+            3,
+            131,
+            40,
+            45
+          ],
+          "size": [
+            16,
+            18
+          ],
+          "anchor": [
+            0.5,
+            0.94
+          ]
+        },
+        "backShin": {
+          "rect": [
+            131,
+            131,
+            42,
+            48
+          ],
+          "size": [
+            17,
+            19
+          ],
+          "anchor": [
+            0.36,
+            0.94
+          ]
+        },
+        "frontThigh": {
+          "rect": [
+            259,
+            131,
+            40,
+            45
+          ],
+          "size": [
+            16,
+            18
+          ],
+          "anchor": [
+            0.5,
+            0.94
+          ]
+        },
+        "frontShin": {
+          "rect": [
+            387,
+            131,
+            42,
+            48
+          ],
+          "size": [
+            17,
+            19
+          ],
+          "anchor": [
+            0.36,
+            0.94
+          ]
+        },
+        "weapon": {
+          "rect": [
+            515,
+            131,
+            28,
+            95
+          ],
+          "size": [
+            11,
+            38
+          ],
+          "anchor": [
+            0.5,
+            0.15
+          ]
+        },
+        "shield": {
+          "rect": [
+            643,
+            131,
+            68,
+            75
+          ],
+          "size": [
+            27,
+            30
+          ],
+          "anchor": [
+            0.5,
+            0.5
+          ]
+        },
+        "shieldEdge": {
+          "rect": [
+            771,
+            131,
+            30,
+            75
+          ],
+          "size": [
+            12,
+            30
+          ],
+          "anchor": [
+            0.5,
+            0.5
+          ]
+        },
+        "bowedHead": {
+          "rect": [
+            899,
+            131,
+            50,
+            52
+          ],
+          "size": [
+            20,
+            21
+          ],
+          "anchor": [
+            0.5,
+            0.14
+          ]
+        }
+      },
+      "origin": [
+        0,
+        -32
+      ],
+      "nameOffsetY": 56,
+      "height": 81,
+      "sourceMonsterId": 19,
+      "clips": {
+        "stand": {
+          "start": 0,
+          "count": 6,
+          "fps": 8,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 13.333333333333334,
+          "loop": true
+        },
+        "atk": {
+          "start": 12,
+          "count": 6,
+          "fps": 12,
+          "loop": false,
+          "cueFrame": 3
+        },
+        "hit": {
+          "start": 18,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "die": {
+          "start": 24,
+          "count": 6,
+          "fps": 7.5,
+          "loop": false
+        }
+      }
+    }
+  },
+  "motion": "shared-humanoid-v1",
+  "resolution": "2.5 texels/design px; no GPU residency claim"
+}

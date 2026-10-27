@@ -1,0 +1,297 @@
+{
+  "method": "Connected alpha silhouettes from COMPLETE GENERATED PARTS, not rectangular limb crops from poses. Bounding boxes trim transparent margins only.",
+  "parts": [
+    {
+      "costume": "trial",
+      "part": "head",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        80,
+        24,
+        293,
+        272
+      ],
+      "runtimeRect": [
+        3,
+        3,
+        50,
+        58
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "torso",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        400,
+        14,
+        677,
+        291
+      ],
+      "runtimeRect": [
+        131,
+        3,
+        82,
+        78
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "pelvis",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        749,
+        80,
+        1031,
+        276
+      ],
+      "runtimeRect": [
+        259,
+        3,
+        65,
+        30
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "cloth",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        1076,
+        92,
+        1353,
+        276
+      ],
+      "runtimeRect": [
+        387,
+        3,
+        62,
+        32
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "swordUpper",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        84,
+        292,
+        272,
+        553
+      ],
+      "runtimeRect": [
+        515,
+        3,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "swordFore",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        455,
+        306,
+        635,
+        575
+      ],
+      "runtimeRect": [
+        643,
+        3,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "shieldUpper",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        793,
+        290,
+        1006,
+        557
+      ],
+      "runtimeRect": [
+        771,
+        3,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "shieldFore",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        1139,
+        299,
+        1283,
+        574
+      ],
+      "runtimeRect": [
+        899,
+        3,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "backThigh",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        98,
+        566,
+        287,
+        797
+      ],
+      "runtimeRect": [
+        3,
+        131,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "backShin",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        437,
+        576,
+        652,
+        824
+      ],
+      "runtimeRect": [
+        131,
+        131,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "frontThigh",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        801,
+        578,
+        995,
+        817
+      ],
+      "runtimeRect": [
+        259,
+        131,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "frontShin",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        1127,
+        579,
+        1334,
+        831
+      ],
+      "runtimeRect": [
+        387,
+        131,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "weapon",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        132,
+        794,
+        254,
+        1125
+      ],
+      "runtimeRect": [
+        515,
+        131,
+        28,
+        95
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "shield",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        405,
+        834,
+        668,
+        1119
+      ],
+      "runtimeRect": [
+        643,
+        131,
+        68,
+        75
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "shieldEdge",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        838,
+        833,
+        966,
+        1118
+      ],
+      "runtimeRect": [
+        771,
+        131,
+        30,
+        75
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "trial",
+      "part": "bowedHead",
+      "source": "art-source/rig-experiment/trial-parts-source.png",
+      "sourceBounds": [
+        1104,
+        879,
+        1341,
+        1102
+      ],
+      "runtimeRect": [
+        899,
+        131,
+        50,
+        52
+      ],
+      "fullyRepainted": true
+    }
+  ],
+  "sourceHashes": {
+    "trial-parts-source.png": "2a806f00cb25454f3f7ccdc87de34f48d06f0211a77b8244bf049b1c8086b212"
+  },
+  "buildSeconds": 0.5698780003003776
+}

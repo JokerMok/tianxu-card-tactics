@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-27",
+  "tool": "built-in image_gen; no CLI/API key or external stock download",
+  "records": [
+    {
+      "file": "guard-parts-source.png",
+      "sha256": "963ed0140ff515609468b594e2e5c2363b3f694e941982d545f70fc3e9b3fbad",
+      "generatedFile": "exec-1eb16c05-22d1-4cba-85d6-9f6b40147cc2.png",
+      "prompt": "guard-prompt.txt",
+      "identityReference": "existing v5 Guard/Squire runtime sheets; trial is unbound Squire training outfit",
+      "classification": "new AI-generated derivative complete cutout kit, not original-game recovered art",
+      "hiddenSurfaces": "Complete neck, shoulder/elbow/knee overlap caps and shield/weapon-occluded arms repainted in source; connected-alpha trim only at packing"
+    },
+    {
+      "file": "squire-parts-source.png",
+      "sha256": "ec9caa7e754a0fbdcdda2ba934e6a1bf04f9113358dcd4ef2b8f1d0b39ef63dc",
+      "generatedFile": "exec-19918513-c5a9-413f-b73d-06ef765f55ab.png",
+      "prompt": "squire-prompt.txt",
+      "identityReference": "existing v5 Guard/Squire runtime sheets; trial is unbound Squire training outfit",
+      "classification": "new AI-generated derivative complete cutout kit, not original-game recovered art",
+      "hiddenSurfaces": "Complete neck, shoulder/elbow/knee overlap caps and shield/weapon-occluded arms repainted in source; connected-alpha trim only at packing"
+    },
+    {
+      "file": "trial-parts-source.png",
+      "sha256": "2a806f00cb25454f3f7ccdc87de34f48d06f0211a77b8244bf049b1c8086b212",
+      "generatedFile": "exec-098a6987-0dad-4b34-9047-6fe4ce81a32c.png",
+      "prompt": "trial-prompt.txt",
+      "identityReference": "existing v5 Guard/Squire runtime sheets; trial is unbound Squire training outfit",
+      "classification": "new AI-generated derivative complete cutout kit, not original-game recovered art",
+      "hiddenSurfaces": "Complete neck, shoulder/elbow/knee overlap caps and shield/weapon-occluded arms repainted in source; connected-alpha trim only at packing"
+    }
+  ],
+  "originalAssets": "read-only; existing nineteen units/default manifest not replaced",
+  "rights": "No external stock license was acquired. Existing game-art references retain their original provenance; generated derivatives do not establish clearance for commercial distribution.",
+  "processing": "tools/art-samples/build-rig-experiment.py; alpha components isolate full generated parts, fixed design sizes/anchors, lossless WebP. No rectangle slicing of limbs from whole-pose sheets.",
+  "iteration": "first narrow-body packed atlas retained locally outside runtime directory, not active or counted as current payload"
+}

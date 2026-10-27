@@ -1,0 +1,586 @@
+{
+  "method": "Connected alpha silhouettes from COMPLETE GENERATED PARTS, not rectangular limb crops from poses. Bounding boxes trim transparent margins only.",
+  "parts": [
+    {
+      "costume": "guard",
+      "part": "head",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        90,
+        33,
+        287,
+        269
+      ],
+      "runtimeRect": [
+        3,
+        3,
+        50,
+        58
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "torso",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        417,
+        14,
+        671,
+        281
+      ],
+      "runtimeRect": [
+        131,
+        3,
+        82,
+        78
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "pelvis",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        769,
+        67,
+        1048,
+        268
+      ],
+      "runtimeRect": [
+        259,
+        3,
+        65,
+        30
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "cloth",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        1109,
+        84,
+        1331,
+        247
+      ],
+      "runtimeRect": [
+        387,
+        3,
+        62,
+        32
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "swordUpper",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        77,
+        289,
+        237,
+        565
+      ],
+      "runtimeRect": [
+        515,
+        3,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "swordFore",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        459,
+        304,
+        622,
+        571
+      ],
+      "runtimeRect": [
+        643,
+        3,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "shieldUpper",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        809,
+        299,
+        996,
+        569
+      ],
+      "runtimeRect": [
+        771,
+        3,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "shieldFore",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        1156,
+        303,
+        1298,
+        575
+      ],
+      "runtimeRect": [
+        899,
+        3,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "backThigh",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        122,
+        575,
+        278,
+        799
+      ],
+      "runtimeRect": [
+        3,
+        131,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "backShin",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        437,
+        589,
+        637,
+        825
+      ],
+      "runtimeRect": [
+        131,
+        131,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "frontThigh",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        809,
+        587,
+        974,
+        825
+      ],
+      "runtimeRect": [
+        259,
+        131,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "frontShin",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        1129,
+        596,
+        1307,
+        829
+      ],
+      "runtimeRect": [
+        387,
+        131,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "weapon",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        144,
+        805,
+        248,
+        1136
+      ],
+      "runtimeRect": [
+        515,
+        131,
+        28,
+        95
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "shield",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        444,
+        842,
+        630,
+        1128
+      ],
+      "runtimeRect": [
+        643,
+        131,
+        62,
+        85
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "shieldEdge",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        848,
+        834,
+        945,
+        1120
+      ],
+      "runtimeRect": [
+        771,
+        131,
+        30,
+        85
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "guard",
+      "part": "bowedHead",
+      "source": "art-source/rig-experiment/guard-parts-source.png",
+      "sourceBounds": [
+        1117,
+        889,
+        1320,
+        1091
+      ],
+      "runtimeRect": [
+        899,
+        131,
+        50,
+        52
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "head",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        86,
+        26,
+        293,
+        269
+      ],
+      "runtimeRect": [
+        3,
+        259,
+        50,
+        58
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "torso",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        399,
+        16,
+        681,
+        290
+      ],
+      "runtimeRect": [
+        131,
+        259,
+        82,
+        78
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "pelvis",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        744,
+        83,
+        1034,
+        280
+      ],
+      "runtimeRect": [
+        259,
+        259,
+        65,
+        30
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "cloth",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        1073,
+        96,
+        1340,
+        271
+      ],
+      "runtimeRect": [
+        387,
+        259,
+        62,
+        32
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "swordUpper",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        91,
+        293,
+        275,
+        554
+      ],
+      "runtimeRect": [
+        515,
+        259,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "swordFore",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        456,
+        308,
+        629,
+        570
+      ],
+      "runtimeRect": [
+        643,
+        259,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "shieldUpper",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        796,
+        297,
+        991,
+        556
+      ],
+      "runtimeRect": [
+        771,
+        259,
+        38,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "shieldFore",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        1141,
+        300,
+        1278,
+        571
+      ],
+      "runtimeRect": [
+        899,
+        259,
+        32,
+        42
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "backThigh",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        100,
+        574,
+        289,
+        793
+      ],
+      "runtimeRect": [
+        3,
+        387,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "backShin",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        436,
+        578,
+        645,
+        825
+      ],
+      "runtimeRect": [
+        131,
+        387,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "frontThigh",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        801,
+        578,
+        976,
+        821
+      ],
+      "runtimeRect": [
+        259,
+        387,
+        40,
+        45
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "frontShin",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        1116,
+        583,
+        1310,
+        829
+      ],
+      "runtimeRect": [
+        387,
+        387,
+        42,
+        48
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "weapon",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        138,
+        792,
+        254,
+        1129
+      ],
+      "runtimeRect": [
+        515,
+        387,
+        28,
+        95
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "shield",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        405,
+        836,
+        665,
+        1118
+      ],
+      "runtimeRect": [
+        643,
+        387,
+        68,
+        75
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "shieldEdge",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        827,
+        834,
+        969,
+        1118
+      ],
+      "runtimeRect": [
+        771,
+        387,
+        30,
+        75
+      ],
+      "fullyRepainted": true
+    },
+    {
+      "costume": "squire",
+      "part": "bowedHead",
+      "source": "art-source/rig-experiment/squire-parts-source.png",
+      "sourceBounds": [
+        1102,
+        883,
+        1332,
+        1097
+      ],
+      "runtimeRect": [
+        899,
+        387,
+        50,
+        52
+      ],
+      "fullyRepainted": true
+    }
+  ],
+  "sourceHashes": {
+    "guard-parts-source.png": "963ed0140ff515609468b594e2e5c2363b3f694e941982d545f70fc3e9b3fbad",
+    "squire-parts-source.png": "ec9caa7e754a0fbdcdda2ba934e6a1bf04f9113358dcd4ef2b8f1d0b39ef63dc"
+  },
+  "buildSeconds": 1.3043204173445702
+}

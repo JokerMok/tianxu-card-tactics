@@ -85,7 +85,7 @@ export function rejectNext(){const request=pending.shift();request.callback(new 
     atlasPoolEntries: 1, atlasPoolPendingEntries: 0, atlasPoolLiveReferences: 2, atlasPoolSpriteFrames: 54,
     atlasPoolEstimatedBytes: 9 * 256 * 6 * 256 * 4,
     atlasPoolMaxEntries: 19, atlasPoolMaxEstimatedBytes: 128 * 1024 * 1024,
-    instanceLoaded: true, instancePlaying: false, instanceFrame: -1,
+    instanceLoaded: true, instancePlaying: false, instanceFrame: -1, playbackElapsedSeconds: 0,
     plays: 0, frameChanges: 0, cues: 0, completions: 0, cancellations: 0,
   });
 

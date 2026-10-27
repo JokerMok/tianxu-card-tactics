@@ -1,0 +1,39 @@
+{
+  "scope": "actual wall clock by phase; includes tool wait and implementation, not pure manual drawing hours",
+  "startedAt": "2026-10-27T00:36:08.539558+00:00",
+  "milestones": [
+    {
+      "phase": "guard component generation started",
+      "at": "2026-10-27T00:37:24.709326+00:00"
+    },
+    {
+      "phase": "two complete component sheets available; includes hidden-surface repaint",
+      "at": "2026-10-27T00:42:33.653655+00:00"
+    },
+    {
+      "phase": "shared motion, two skins, packed comparator and native bench implemented; before first build",
+      "at": "2026-10-27T00:50:08.614683+00:00"
+    },
+    {
+      "phase": "base rig and two appearances native Cocos visible; begin marginal third training-outfit trial (no new gameplay ID)",
+      "at": "2026-10-27T00:55:05.731003+00:00"
+    },
+    {
+      "phase": "third training outfit generated and registered by same tool, no skeleton or motion edits",
+      "at": "2026-10-27T00:56:04.876307+00:00"
+    },
+    {
+      "phase": "third outfit visible and all five shared actions exercised in native Cocos; no per-outfit motion edits",
+      "at": "2026-10-27T00:58:22.231718+00:00",
+      "limitation": "same-proportion alternate outfit, not independent new species; benchmark callback reporting had one-frame clock-origin bias, fixed as common setup instrumentation"
+    }
+  ],
+  "thirdGeneratorWallMs": 43766,
+  "trialSteps": [
+    "prepare same-proportion outfit identity and 16-part prompt",
+    "generate complete detached parts including hidden surfaces",
+    "run existing --trial registration/atlas packer",
+    "open third-outfit native Cocos control and exercise five unchanged tracks"
+  ],
+  "repackSeconds": 0.5698780003003776
+}

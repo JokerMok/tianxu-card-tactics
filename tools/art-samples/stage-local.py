@@ -1,8 +1,8 @@
 """Stage an already completed native Cocos build. Local QA only; never packages a DB."""
 from pathlib import Path
 import argparse, hashlib, json, shutil, subprocess
-p=argparse.ArgumentParser();p.add_argument('--build-root',required=True);opt=p.parse_args()
-root=Path(__file__).resolve().parents[2];b=Path(opt.build_root).resolve();w=root/'.local/art-samples/web';w.mkdir(parents=True,exist_ok=True)
+p=argparse.ArgumentParser();p.add_argument('--build-root',required=True);p.add_argument('--output',help='Optional isolated local preview directory');opt=p.parse_args()
+root=Path(__file__).resolve().parents[2];b=Path(opt.build_root).resolve();w=Path(opt.output).resolve() if opt.output else root/'.local/art-samples/web';w.mkdir(parents=True,exist_ok=True)
 web=b/'project/build/web-desktop'
 settings=json.loads((web/'src/settings.json').read_text())
 assert settings.get('scripting',{}).get('scriptPackages') and settings.get('launch',{}).get('launchScene'),'Incomplete Cocos build: missing scene/script package'

@@ -12,14 +12,15 @@ const chapterThree=process.argv.includes('--chapter-three');
 const production=process.argv.includes('--production');
 const mechanics=process.argv.includes('--mechanics');
 const budget=process.argv.includes('--budget');
+const rigExperiment=process.argv.includes('--rig-experiment');
 if(budget&&!mechanics)throw new Error('--budget requires --mechanics');
 const reverseSides=process.argv.includes('--reverse-sides');
 if(reverseSides&&!chapterThree&&!production)throw new Error('--reverse-sides requires a chapter-three or production fixture');
 const emptyHand=process.argv.includes('--empty-hand');
 const root=path.resolve(import.meta.dirname,'../..');
-const folder=path.join(root,'.local/art-samples');mkdirSync(folder,{recursive:true});
+const folder=path.join(root,rigExperiment?'.local/rig-experiment':'.local/art-samples');mkdirSync(folder,{recursive:true});mkdirSync(path.join(folder,'evidence'),{recursive:true});
 // No database CLI override: impossible to point this fixture at a personal/production DB.
-const store=new GameStore(path.join(folder,'game.sqlite'));
+const store=new GameStore(path.join(folder,rigExperiment?'data/game.sqlite':'game.sqlite'));
 try {
 const content=new ServerContent(path.join(root,'cocos-client/assets/resources/recovered')),service=new GameService(store,content);
 const username='art_motion_'+Date.now(),password=randomBytes(12).toString('hex');
@@ -34,7 +35,11 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  const productionIds=production||budget?[1,19,43,61,5019,60001,60002,60003,60005,...JSON.parse(readFileSync(path.join(root,'art-source/chapter1-production/batch.json'),'utf8')).models.map(m=>m.monsterId)]:[];
  const mechanismUnits=[{monsterId:1127,playerId:actorId,row:1,col:4},{monsterId:1,playerId:enemy,row:1,col:5},
   {monsterId:12025,playerId:actorId,row:2,col:4},{monsterId:11043,playerId:actorId,row:3,col:4}];
- const initialUnits=mechanics?[...mechanismUnits,...(budget?productionIds.map((monsterId,i)=>{const col=[1,2,8,9,10][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<4?actorId:enemy}}):[])]:production?productionIds.map((monsterId,i)=>{const col=[2,4,5,7,9][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<=5?actorId:enemy}}):chapterThree?[
+ const initialUnits=rigExperiment?[
+ {monsterId:1,playerId:actorId,row:0,col:3},{monsterId:1,playerId:enemy,row:0,col:5},
+ {monsterId:19,playerId:actorId,row:1,col:4},{monsterId:19,playerId:enemy,row:1,col:6},
+ {monsterId:1,playerId:actorId,row:2,col:4},{monsterId:19,playerId:enemy,row:2,col:5},
+ {monsterId:19,playerId:actorId,row:3,col:5},{monsterId:1,playerId:enemy,row:3,col:6}]:mechanics?[...mechanismUnits,...(budget?productionIds.map((monsterId,i)=>{const col=[1,2,8,9,10][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<4?actorId:enemy}}):[])]:production?productionIds.map((monsterId,i)=>{const col=[2,4,5,7,9][Math.floor(i/4)];return{monsterId,row:i%4,col,playerId:col<=5?actorId:enemy}}):chapterThree?[
  {monsterId:19,playerId:actorId,row:0,col:3},{monsterId:60001,playerId:enemy,row:0,col:5},
  {monsterId:61,playerId:actorId,row:1,col:4},{monsterId:60003,playerId:enemy,row:1,col:6},{monsterId:5019,playerId:actorId,row:1,col:2},
  {monsterId:1,playerId:actorId,row:2,col:3},{monsterId:60005,playerId:enemy,row:2,col:5},{monsterId:43,playerId:actorId,row:2,col:1},
@@ -58,6 +63,6 @@ store.transaction(accountId,randomUUID(),'local.art-fixture',{id},world=>{
  return {message:'Local animation fixture only'};
 });
 writeFileSync(path.join(folder,'fixture-login.json'),JSON.stringify({username,password,characterId:actorId}),{mode:0o600});
-writeFileSync(path.join(folder,mechanics?`evidence/chapter-1-mechanics${budget?'-budget':''}-fixture-contract.json`:production?`evidence/chapter-1-production${reverseSides?'-reverse':''}-fixture-contract.json`:chapterThree?`evidence/chapter-1-batch3${reverseSides?'-reverse':''}-fixture-contract.json`:batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:initialUnitCount,initialHeroUnits:2,reverseSides,source:'createBattle using original monster configuration, including chapter-1 IDs. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:'isolated .local/art-samples/game.sqlite'},null,2));
+writeFileSync(path.join(folder,rigExperiment?'evidence/rig-fixture-contract.json':mechanics?`evidence/chapter-1-mechanics${budget?'-budget':''}-fixture-contract.json`:production?`evidence/chapter-1-production${reverseSides?'-reverse':''}-fixture-contract.json`:chapterThree?`evidence/chapter-1-batch3${reverseSides?'-reverse':''}-fixture-contract.json`:batchTwo?'evidence/batch-2-fixture-contract.json':death?'evidence/death-fixture-contract.json':'evidence/fixture-contract.json'),JSON.stringify({id,mapId:1,seed:1024,initialUnits:initialUnitCount,initialHeroUnits:2,reverseSides,source:'createBattle using original monster configuration, including chapter-1 IDs. Only starting positions/owners are QA fixtures; normal starter deck opens with real hand cards unless --empty-hand. No stat/rule override.',account:'dedicated local QA account; credentials excluded',liveDatabase:rigExperiment?'isolated .local/rig-experiment/data/game.sqlite':'isolated .local/art-samples/game.sqlite'},null,2));
 console.log('Created isolated authoritative animation fixture; private login stored locally.');
 } finally{store.close();}
