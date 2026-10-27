@@ -1,6 +1,5 @@
 import { ArtSkin } from './ArtSkin.ts';
 import { SampleUnitAnimation } from './SampleUnitAnimation.ts';
-import {SharedRigAnimation,rigExperimentMode,rigManifest} from './SharedRigAnimation.ts';
 import {
   assetManager,
   Color,
@@ -152,7 +151,6 @@ export class RecoveredAnimation {
   private readonly performance = { frameTreesBuilt: 0, frameTreesReused: 0, frameTreesEvicted: 0 };
   private disposed = false;
   private sample?: SampleUnitAnimation;
-  private rig?: SharedRigAnimation;
 
   constructor(parent: Node, catalog: RecoveredCatalog, assetBaseUrl: string) {
     this.catalog = catalog as unknown as RuntimeCatalog;
@@ -172,16 +170,6 @@ export class RecoveredAnimation {
   async setMonster(monsterId: number, scope: DataScope = 'main'): Promise<void> {
     if (this.disposed) throw new Error('RecoveredAnimation has been destroyed');
     const link = this.catalog.scopes[scope]?.monsterModels?.[String(monsterId)];
-    this.rig?.destroy();this.rig=undefined;
-    if(ArtSkin.enabled('unit')&&scope==='main'&&[1,19].includes(monsterId)&&rigExperimentMode()==='shared'){
-      this.sample?.destroy();this.sample=undefined;this.clearDisplay();
-      this.rig=new SharedRigAnimation(this.node,monsterId===1?'guard':'squire');await this.rig.load();return;
-    }
-    if(ArtSkin.enabled('unit')&&scope==='main'&&[1,19].includes(monsterId)&&rigExperimentMode()==='packed'){
-      const spec=(await rigManifest()).packed![monsterId===1?'guard':'squire'];
-      if(this.disposed)return;
-      this.sample?.destroy();this.clearDisplay();this.sample=new SampleUnitAnimation(this.node,location.origin+'/art/rig-experiment/',spec);await this.sample.load();this.play('stand','east');return;
-    }
     const replacement=ArtSkin.unit(scope,monsterId,link?.modelId??undefined);
     if(replacement){this.sample?.destroy();this.clearDisplay();this.sample=new SampleUnitAnimation(this.node,ArtSkin.unitBase(),replacement);await this.sample.load();this.play('stand','east');return;}
     this.sample?.destroy();this.sample=undefined;
@@ -203,7 +191,6 @@ export class RecoveredAnimation {
 
   /** Load exact recovered model layers without replacing them with fallback art. */
   async setModels(modelIds: string[], standOnly = false): Promise<void> {
-    this.rig?.destroy();this.rig=undefined;
     this.sample?.destroy();this.sample=undefined;
     if (this.disposed) throw new Error('RecoveredAnimation has been destroyed');
     if (modelIds.length === 0) throw new Error('Recovered model list is empty');
@@ -219,11 +206,10 @@ export class RecoveredAnimation {
   }
 
   /** No fallback to injury for an absorbed hit on legacy models. */
-  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {return this.rig?.playBlock(direction)??this.sample?.playBlock(direction)??null;}
+  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {return this.sample?.playBlock(direction)??null;}
 
   play(status: RecoveredAnimationStatus, direction: RecoveredAnimationDirection,
        onAttack?: () => void, onComplete?: () => void): RecoveredPlaybackHandle {
-    if(this.rig){this.currentDirection=direction;const handle=this.rig.play(status,direction,onAttack,onComplete);this.syncRigMount();return handle;}
     if(this.sample){
       this.currentDirection=direction;const handle=this.sample.play(status,direction,onAttack,onComplete);
       const p=this.sample.mountNode.position,o=this.sample.node.position;this.mountNode.setPosition(p.x+o.x,p.y+o.y);return handle;
@@ -332,7 +318,6 @@ export class RecoveredAnimation {
   }
 
   update(dt: number): void {
-    if(this.rig){this.rig.update(dt);this.syncRigMount();return;}
     if(this.sample){this.sample.update(dt);return;}
     if (!this.current?.timeline_id || this.disposed || dt <= 0) return;
     const playbackGeneration = this.playbackGeneration;
@@ -374,7 +359,6 @@ export class RecoveredAnimation {
   }
 
   destroy(): void {
-    this.rig?.destroy();this.rig=undefined;
     if (this.disposed) return;
     this.disposed = true;
     this.sample?.destroy(); this.sample=undefined;
@@ -391,11 +375,8 @@ export class RecoveredAnimation {
     this.completionResolve = undefined;
   }
 
-  private syncRigMount(){if(this.rig){const p=this.rig.mountNode.position,o=this.rig.node.position;this.mountNode.setPosition(p.x*(this.currentDirection==='west'?-1:1)+o.x,p.y+o.y);}}
-
   /** Bounded, identity-free counters used by local performance comparison. */
   getPerformanceStats() {
-    if(this.rig)return this.rig.getPerformanceStats();
     if(this.sample)return {kind:"sample",...this.sample.getPerformanceStats()};
     const entries = Array.from(this.frameCache.values()).filter(entry => entry.node.isValid);
     const retained = this.node.children.filter(child => child !== this.mountNode && child.isValid);
@@ -432,7 +413,6 @@ export class RecoveredAnimation {
 
   /** Nominal source envelope, not measured opaque pixels or a foot marker. */
   getSourceLayoutMetrics(direction: RecoveredAnimationDirection = this.currentDirection) {
-    if(this.rig)return this.rig.getSourceLayoutMetrics(direction);
     if(this.sample)return this.sample.getSourceLayoutMetrics(direction);
     if (!this.model) return undefined;
     const raw = this.model.raw, scale = finite(raw.scale, 1) || 1;

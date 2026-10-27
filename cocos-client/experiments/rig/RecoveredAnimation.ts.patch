@@ -1,0 +1,35 @@
+--- a/RecoveredAnimation.ts
++++ b/RecoveredAnimation.ts
+@@ -2,0 +3 @@
++import {SharedRigAnimation,rigExperimentMode,rigManifest} from './SharedRigAnimation.ts';
+@@ -153,0 +155 @@
++  private rig?: SharedRigAnimation;
+@@ -172,0 +175,10 @@
++    this.rig?.destroy();this.rig=undefined;
++    if(ArtSkin.enabled('unit')&&scope==='main'&&[1,19].includes(monsterId)&&rigExperimentMode()==='shared'){
++      this.sample?.destroy();this.sample=undefined;this.clearDisplay();
++      this.rig=new SharedRigAnimation(this.node,monsterId===1?'guard':'squire');await this.rig.load();return;
++    }
++    if(ArtSkin.enabled('unit')&&scope==='main'&&[1,19].includes(monsterId)&&rigExperimentMode()==='packed'){
++      const spec=(await rigManifest()).packed![monsterId===1?'guard':'squire'];
++      if(this.disposed)return;
++      this.sample?.destroy();this.clearDisplay();this.sample=new SampleUnitAnimation(this.node,location.origin+'/art/rig-experiment/',spec);await this.sample.load();this.play('stand','east');return;
++    }
+@@ -193,0 +206 @@
++    this.rig?.destroy();this.rig=undefined;
+@@ -209 +222 @@
+-  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {return this.sample?.playBlock(direction)??null;}
++  playBlock(direction:RecoveredAnimationDirection):RecoveredPlaybackHandle|null {return this.rig?.playBlock(direction)??this.sample?.playBlock(direction)??null;}
+@@ -212,0 +226 @@
++    if(this.rig){this.currentDirection=direction;const handle=this.rig.play(status,direction,onAttack,onComplete);this.syncRigMount();return handle;}
+@@ -320,0 +335 @@
++    if(this.rig){this.rig.update(dt);this.syncRigMount();return;}
+@@ -361,0 +377 @@
++    this.rig?.destroy();this.rig=undefined;
+@@ -377,0 +394,2 @@
++  private syncRigMount(){if(this.rig){const p=this.rig.mountNode.position,o=this.rig.node.position;this.mountNode.setPosition(p.x*(this.currentDirection==='west'?-1:1)+o.x,p.y+o.y);}}
++
+@@ -379,0 +398 @@
++    if(this.rig)return this.rig.getPerformanceStats();
+@@ -415,0 +435 @@
++    if(this.rig)return this.rig.getSourceLayoutMetrics(direction);

@@ -444,7 +444,6 @@ export class SampleUnitAnimation {
       instanceLoaded: this.entry?.state === 'ready',
       instancePlaying: Boolean(this.playback && !this.playback.finished),
       instanceFrame: this.playback?.displayedFrame ?? -1,
-      playbackElapsedSeconds: this.playback?.elapsed ?? 0,
       ...this.performance,
     };
   }

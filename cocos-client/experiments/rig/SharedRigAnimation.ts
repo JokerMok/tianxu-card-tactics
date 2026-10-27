@@ -1,7 +1,7 @@
 import {assetManager,ImageAsset,Texture2D,SpriteFrame,Sprite,Node,UITransform,Layers,Rect,Size,Graphics,Color} from 'cc';
-import type {RecoveredAnimationStatus,RecoveredAnimationDirection,RecoveredPlaybackHandle} from './RecoveredAnimation.ts';
+import type {RecoveredAnimationStatus,RecoveredAnimationDirection,RecoveredPlaybackHandle} from '../../assets/scripts/game/RecoveredAnimation.ts';
 import {evaluateRigPose} from './SharedRigMotion.ts';
-import type {SampleUnitSpec} from './SampleUnitAnimation.ts';
+import type {SampleUnitSpec} from '../../assets/scripts/game/SampleUnitAnimation.ts';
 interface Part {rect:[number,number,number,number];size:[number,number];anchor:[number,number]}
 interface Costume {parts:Record<string,Part>;origin:[number,number];nameOffsetY:number;height:number;clips:SampleUnitSpec['clips'];reactions?:SampleUnitSpec['reactions']}
 interface RigManifest {atlas:string;atlasSize:[number,number];costumes:Record<string,Costume>;packed?:Record<string,SampleUnitSpec>}

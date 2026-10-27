@@ -120,7 +120,14 @@ export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative 
 
   const webEntry = path.posix.join(policy.web.directory, policy.web.requiredEntry);
   await regularFileWithin(sourceRoot, webEntry);
-  for (const relative of await walkFiles(sourceRoot, policy.web.directory)) paths.add(relative);
+  for (const relative of await walkFiles(sourceRoot, policy.web.directory)) {
+    if (/\/(?:art-observe|art-record|player-profile)\.js$/.test(relative)) throw new Error(`Local diagnostics in release web: ${relative}`);
+    if (/\.(?:js|html)$/.test(relative)) {
+      const text = await readFile(path.resolve(sourceRoot,relative),'utf8');
+      if (/(?:SharedRigAnimation|RigComparisonScene|rigExperimentMode|rigbench|art-observe\.js|art-record\.js|player-profile\.js)/.test(text)) throw new Error(`Experimental build cannot be released: ${relative}`);
+    }
+    paths.add(relative);
+  }
 
   const contentDir = safeRelative(policy.content.directory);
   const catalogRelative = path.posix.join(contentDir, safeRelative(policy.content.catalog));
@@ -148,6 +155,7 @@ export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative 
   let bytes = 0;
   for (const relative of [...paths].sort()) {
     rejectSensitivePath(relative);
+    if (/\/(?:experiments|rig-experiment)\//.test(relative)) throw new Error(`Experiment forbidden in runtime: ${relative}`);
     const file = await regularFileWithin(sourceRoot, relative);
     files.push(file);
     bytes += file.size;

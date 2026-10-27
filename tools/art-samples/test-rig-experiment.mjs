@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import{readFileSync}from'node:fs';
 import{stripTypeScriptTypes}from'node:module';
-import{evaluateRigPose,HUMANOID_BONES}from'../../cocos-client/assets/scripts/game/SharedRigMotion.ts';
-const manifest=JSON.parse(readFileSync('cocos-client/assets/resources/art-samples/rig-experiment/manifest.json'));
-const source=readFileSync('cocos-client/assets/scripts/game/SharedRigAnimation.ts','utf8');
+import{evaluateRigPose,HUMANOID_BONES}from'../../cocos-client/experiments/rig/SharedRigMotion.ts';
+const manifest=JSON.parse(readFileSync('cocos-client/experiments/rig/resources/manifest.json'));
+const source=readFileSync('cocos-client/experiments/rig/SharedRigAnimation.ts','utf8');
 let code=stripTypeScriptTypes(source,{mode:'transform'}).replace(/^import .*;\n/gm,'').replaceAll('export ','');
 const pending=[],metrics={textures:0,frames:0,released:0};
 class Node{constructor(name=''){this.name=name;this.children=[];this.position={x:0,y:0};this.worldPosition={x:0,y:0};this.worldScale={x:1,y:1};this.isValid=true;}addChild(n){this.children.push(n);n.parent=this;}setPosition(x,y){this.position={x,y};}setScale(){}addComponent(C){return new C();}destroy(){this.isValid=false;this.children.forEach(n=>n.destroy());}}

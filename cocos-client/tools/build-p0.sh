@@ -6,10 +6,14 @@ CREATOR_BIN="${COCOS_CREATOR_BIN:-/Applications/Cocos/Creator/3.8.8/CocosCreator
 stage_project() {
 mkdir -p "$BUILD_ROOT/project"
 rsync -a --exclude 'assets/' --exclude 'assets/resources/recovered/' --exclude 'assets/resources/recovered.meta' --exclude 'assets/scripts/' --exclude library --exclude temp --exclude build --exclude node_modules --exclude '*.mjs' --exclude '*.mjs.meta' --exclude 'validate-*.ts' --exclude 'validate-*.ts.meta' --exclude 'assets/scripts/battle/runner/' --exclude 'assets/scripts/battle/testsupport/' --exclude 'assets/scripts/battle/performance/' --exclude '*.test.ts' --exclude '*.test.ts.meta' "$SOURCE_PROJECT/" "$BUILD_ROOT/project/"
-python3 - "$SOURCE_PROJECT" "$BUILD_ROOT" <<'PYGRAPH'
+python3 - "$SOURCE_PROJECT" "$BUILD_ROOT" "${P0_SOURCE_OVERLAY:-}" <<'PYGRAPH'
 from pathlib import Path
 import re,sys,shutil,json,time
-source,root=map(Path,sys.argv[1:]);target=root/'project'
+source,root=map(Path,sys.argv[1:3]);target=root/'project'
+overlay=Path(sys.argv[3]).resolve() if sys.argv[3] else None
+def actual(file):
+ candidate=overlay/file.relative_to(source) if overlay else file
+ return candidate if candidate.is_file() else file
 old=target/'assets'
 if old.exists(): shutil.move(str(old),str(root/('previous-assets-'+str(time.time_ns()))))
 for relative in ['assets/scenes.meta', 'assets/scripts.meta', 'assets/scenes/BattleA0.scene', 'assets/scenes/BattleA0.scene.meta']:
@@ -22,17 +26,17 @@ while queue:
  if file in seen:continue
  seen.add(file)
  relative=file.relative_to(source)
- dest=target/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(file,dest)
- meta=Path(str(file)+'.meta')
+ dest=target/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(actual(file),dest)
+ meta=actual(Path(str(file)+'.meta'))
  if meta.exists():shutil.copy2(meta,Path(str(dest)+'.meta'))
  if file.suffix not in ['.ts','.js']:continue
- text=file.read_text()
+ text=actual(file).read_text()
  for spec in re.findall(r"(?:from\s*|import\s*\()['\"]([^'\"]+)['\"]",text):
   if spec.startswith('node:'):raise RuntimeError('Node dependency in formal entry: '+str(file))
   if not spec.startswith('.'):continue
   base=file.parent/spec
   choices=[base,Path(str(base)+'.ts'),base/'index.ts']
-  dependency=next((v for v in choices if v.is_file()),None)
+  dependency=next((v for v in choices if actual(v).is_file()),None)
   if dependency is None:raise RuntimeError('Missing dependency '+spec+' from '+str(file))
   queue.append(dependency)
 (root/'entry-dependencies.json').write_text(json.dumps(sorted(str(f.relative_to(source))for f in seen),ensure_ascii=False,indent=2))

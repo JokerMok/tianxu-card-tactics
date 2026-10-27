@@ -1,4 +1,4 @@
-import type {RecoveredAnimationStatus} from './RecoveredAnimation.ts';
+import type {RecoveredAnimationStatus} from '../../assets/scripts/game/RecoveredAnimation.ts';
 export interface RigTransform {x:number;y:number;angle:number}
 export interface RigPose {slots:Record<string,RigTransform>;bowed:boolean;edge:boolean}
 /** Shared hierarchy. Render slots are flattened only for deterministic painter order. */

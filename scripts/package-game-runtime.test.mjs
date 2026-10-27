@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { materializeRuntime, safeRelative } from './package-game-runtime.mjs';
+import { buildRuntimePlan, materializeRuntime, safeRelative } from './package-game-runtime.mjs';
 
 test('runtime paths reject traversal and platform-specific escapes', () => {
   for (const value of ['../secret', 'files/../../secret', '/absolute', 'windows\\secret']) {
@@ -29,4 +29,17 @@ test('small runtime fixture is copied and manifested without overwriting output'
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test('release planning rejects diagnostic files and compiled rig experiment code', async()=>{
+ const root=await realpath(await mkdtemp(path.join(os.tmpdir(),'tianxu-release-boundary-')));
+ try{
+  await mkdir(path.join(root,'backend'),{recursive:true});await mkdir(path.join(root,'web'),{recursive:true});
+  await writeFile(path.join(root,'policy.json'),JSON.stringify({version:1,fixedFiles:[],backend:{directory:'backend',extension:'.mjs',excludeSuffix:'.test.mjs'},web:{directory:'web',requiredEntry:'index.html'}}));
+  for(const source of ['<script src="art-observe.js"></script>','System.register("SharedRigAnimation")','rigbench=1']){
+   await writeFile(path.join(root,'web/index.html'),source);await assert.rejects(()=>buildRuntimePlan(root,'policy.json'),/Experimental build/);
+  }
+  await writeFile(path.join(root,'web/index.html'),'ordinary game');await writeFile(path.join(root,'web/art-record.js'),'');
+  await assert.rejects(()=>buildRuntimePlan(root,'policy.json'),/Local diagnostics/);
+ }finally{await rm(root,{recursive:true,force:true});}
 });

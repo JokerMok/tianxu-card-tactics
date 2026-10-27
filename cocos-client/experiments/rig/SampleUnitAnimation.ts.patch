@@ -1,0 +1,4 @@
+--- a/SampleUnitAnimation.ts
++++ b/SampleUnitAnimation.ts
+@@ -446,0 +447 @@
++      playbackElapsedSeconds: this.playback?.elapsed ?? 0,

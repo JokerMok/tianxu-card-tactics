@@ -1,9 +1,9 @@
 import {Node,Label,Color,Graphics,director,Director,view,ResolutionPolicy,profiler} from 'cc';
-import {CocosUi,Theme} from './CocosUi.ts';
-import {ArtSkin} from './ArtSkin.ts';
-import {SampleUnitAnimation} from './SampleUnitAnimation.ts';
+import {CocosUi,Theme} from '../../assets/scripts/game/CocosUi.ts';
+import {ArtSkin} from '../../assets/scripts/game/ArtSkin.ts';
+import {SampleUnitAnimation} from '../../assets/scripts/game/SampleUnitAnimation.ts';
 import {SharedRigAnimation,rigManifest} from './SharedRigAnimation.ts';
-import type {RecoveredAnimationStatus,RecoveredAnimationDirection} from './RecoveredAnimation.ts';
+import type {RecoveredAnimationStatus,RecoveredAnimationDirection} from '../../assets/scripts/game/RecoveredAnimation.ts';
 type Mode='side'|'frames'|'packed'|'rig';
 interface Actor {host:Node;animation:SampleUnitAnimation|SharedRigAnimation;label:Label;costume:'guard'|'squire'|'trial';x:number;y:number;cycle:number;playAt:number;cueCount:number}
 const summary=(values:number[])=>{const v=[...values].sort((a,b)=>a-b);return v.length?{samples:v.length,min:v[0],p50:v[Math.floor(v.length*.5)],p95:v[Math.floor(v.length*.95)],max:v.at(-1)}:null;};

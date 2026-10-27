@@ -48,4 +48,6 @@ docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml ps
 
 当前为无需邀请码的玩家注册版本，账号 Bearer 鉴权继续生效。GM 后台和首次管理员初始化见 [gm.md](gm.md)。生产必须设置准确的 `TIANXU_PUBLIC_ORIGIN` 与可信反代 socket 地址 `TIANXU_TRUSTED_PROXY`；Caddy 覆盖 X-Real-IP。旧 [tencent.md](tencent.md) 的邀请码要求仅保留为历史记录，已被本轮替代。
 
-本地首批美术样板的运行白名单仅包含 `art-samples/v1` 的9个显式文件；生成母图、Blender源、截图与录像不进入运行包。本轮只维护打包兼容，不执行部署。
+当前正式美术白名单为v5及其实际引用的47个文件，包含19张角色图集及复用的v2基础UI。原资源回退保留。母图、Blender源、录像和`cocos-client/experiments/rig/`不进入运行包。
+
+正式Creator入口不导入共享骨架实验。`stage-local.py`默认不注入本地诊断，`--diagnostics`只用于隔离QA构建；正式打包器会拒绝混入实验模块或本地录屏/测量脚本的Web输出。请选择干净的正式暂存目录，保留原QA构建，不将其直接用作发布前端。本轮仅本机验证发布边界，不执行部署。

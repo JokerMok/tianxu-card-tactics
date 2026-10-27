@@ -69,7 +69,16 @@ function numericField(row, names, fallback = 0) {
   const n = Number(field(row, names, fallback));
   return Number.isFinite(n) ? n : fallback;
 }
-function dataRows(tables, path) { return rows(tables, path).filter(row => row && Object.values(row).some(v => typeof v === 'number')); }
+// Imported configuration is read-only during a server lifetime. Share only filtered
+// row references, never actor data; an appended/replaced table gets a fresh view.
+const numericRows = new WeakMap();
+function dataRows(tables, path) {
+  const source = rows(tables, path), cached = numericRows.get(source);
+  if (cached?.length === source.length) return cached.rows;
+  const filtered = source.filter(row => row && Object.values(row).some(v => typeof v === 'number'));
+  numericRows.set(source, { length: source.length, rows: filtered });
+  return filtered;
+}
 function findBy(tables, path, names, id) { return dataRows(tables, path).find(row => numericField(row, names, -1) === Number(id)); }
 function equipmentDef(tables, id) { return findBy(tables, 'embeddata/scp/equipment.xml', ['物品ID\n', '物品ID', 'ID'], id); }
 function warrantDef(tables, id) { return findBy(tables, 'embeddata/scp/warrant.xml', ['物品ID', 'ID'], id); }

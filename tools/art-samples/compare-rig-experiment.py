@@ -13,8 +13,8 @@ rig=json.loads((ART/'rig-experiment/manifest.json').read_text())
 base={key:old['units'][key] for key in ['main:monster:1','main:monster:19']}
 groups={
  'frames':(ART/'v5',list({s['atlas'] for s in base.values()}),{'units':base}),
- 'packed':(ART/'rig-experiment',list({s['atlas'] for s in rig['packed'].values()}),{'units':rig['packed']}),
- 'rig':(ART/'rig-experiment',[rig['atlas']],{k:v for k,v in rig.items() if k!='packed'})}
+ 'packed':(ROOT/'cocos-client/experiments/rig/resources',list({s['atlas'] for s in rig['packed'].values()}),{'units':rig['packed']}),
+ 'rig':(ROOT/'cocos-client/experiments/rig/resources',[rig['atlas']],{k:v for k,v in rig.items() if k!='packed'})}
 data={'scope':'two appearances only; same background/engine/UI excluded from all payloads; ZIPs contain resources, not the complete game',
       'environment':{'date':'2026-10-27','machine':'Apple M5 Pro / 48 GiB / macOS 26.6.2','engine':'Cocos Creator 3.8.8 web-desktop','browser':'ChatGPT in-app Chromium','viewport':[1280,720],'canvasBacking':[2560,1440],'design':[1200,600],'designScale':1280/1200,'devicePixelRatio':2,'sample':'one warm 18-second run per mode, 24 actors, first 0.8 s excluded; no recording during timing; not a stress test'},'variants':{}}
 for mode,(folder,names,manifest) in groups.items():
@@ -39,7 +39,7 @@ for label,names in [('rigAdapterAndMotion',['SharedRigAnimation','SharedRigMotio
   start=bundle.index('System.register("chunks:///_virtual/'+name+'.ts"');end=bundle.find('\nSystem.register(',start+1)
   chunks.append(bundle[start:end if end>=0 else None].encode())
  raw=b'\n'.join(chunks);data['compiledCode'][label]={'debugModuleBytes':len(raw),'gzipBytes':len(gzip.compress(raw,mtime=0)),'scope':'actual built modules; existing shared helpers and small integration call sites excluded; diagnostic scene is not needed by a future production rig'}
-data['thirdAppearance']={'scope':'same-proportion Squire training outfit, no new gameplay ID or other 17 model changes','sourcePNGBytes':(ROOT/'art-source/rig-experiment/trial-parts-source.png').stat().st_size,'runtimeTextureBytes':(ART/'rig-experiment'/json.loads((ART/'rig-experiment/trial.json').read_text())['atlas']).stat().st_size,'baseRGBABytes':1024*256*4,'newMotionTracks':0,'generatorWallMs':json.loads((ROOT/'art-source/rig-experiment/cost-log.json').read_text())['thirdGeneratorWallMs']}
+data['thirdAppearance']={'scope':'same-proportion Squire training outfit, no new gameplay ID or other 17 model changes','sourcePNGBytes':(ROOT/'art-source/rig-experiment/trial-parts-source.png').stat().st_size,'runtimeTextureBytes':(ROOT/'cocos-client/experiments/rig/resources'/json.loads((ART/'rig-experiment/trial.json').read_text())['atlas']).stat().st_size,'baseRGBABytes':1024*256*4,'newMotionTracks':0,'generatorWallMs':json.loads((ROOT/'art-source/rig-experiment/cost-log.json').read_text())['thirdGeneratorWallMs']}
 (DOC/'comparison.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
 for k,v in data['variants'].items():print(k,{f:v[f] for f in ['textureDownloadBytes','baseRGBABytes','resourceZipBytes','nativeNodes']})
 print('code',data['compiledCode']);print('sources',data['sourceArt'])

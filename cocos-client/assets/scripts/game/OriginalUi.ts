@@ -175,10 +175,42 @@ export class OriginalUi {
 
   async mount(componentIdOrAlias: string, parent: Node): Promise<OriginalUiMount> {
     const sourceKey = this.resolveComponent(componentIdOrAlias);
+    await this.prepareComponentFrames(sourceKey, parent);
     const context: MountContext = { parent, scopes: [] };
     const node = await this.buildComponent(sourceKey, parent, undefined, context);
     if (node.isValid) node.active = true;
     return this.handle(node, sourceKey);
+  }
+
+  /** Warm only this component's existing image dependencies. Build order stays serial. */
+  private async prepareComponentFrames(sourceKey: string, parent: Node): Promise<void> {
+    const seen = new Set<string>(), images = new Map<string, OriginalUiImage>();
+    const uri = (value: string | undefined) => {
+      const match = value && URI.exec(value);
+      if (match) { const image = this.catalog.fairygui.images[`${match[1]}:${match[2]}`]; if (image) images.set(image.id + ':' + image.file, image); }
+    };
+    const element = (source: OriginalUiElement, pkg: string) => {
+      if (source.kind === 'image' && source.attributes.src) uri(`ui://${source.attributes.pkg || pkg}${source.attributes.src}`);
+      for (const value of Object.values(source.attributes)) uri(value);
+      if (source.kind === 'component') component(`${source.attributes.pkg || pkg}:${source.attributes.src}`);
+      for (const child of source.children ?? []) element(child, pkg);
+      const item = URI.exec(source.attributes.defaultItem || '');
+      if (item && source.children?.some(child => child.kind === 'item')) component(`${item[1]}:${item[2]}`);
+    };
+    const component = (key: string) => {
+      if (seen.has(key)) return; seen.add(key);
+      const source = this.catalog.fairygui.components[key]; if (!source) return;
+      for (const child of source.children) element(child, source.packageId);
+      for (const setting of source.settings) element(setting, source.packageId);
+    };
+    component(sourceKey); const queue = Array.from(images.values()); let cursor = 0;
+    const worker = async () => { while (parent.isValid && cursor < queue.length) {
+      const image = queue[cursor++];
+      // Original build/applySkin reports a required-image failure. Speculative
+      // button-state preparation must neither hide it nor reject an unused state.
+      await this.loadFrame(image.resourcePath, image.file).catch(() => undefined);
+    } };
+    await Promise.all(Array.from({ length: Math.min(6, queue.length) }, worker));
   }
 
   skin(name: string, containerVariant?: string): { path: string; file?: string; width?: number; height?: number } {

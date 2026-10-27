@@ -6,7 +6,7 @@ from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[2]
 SRC=ROOT/'art-source/rig-experiment'
-OUT=ROOT/'cocos-client/assets/resources/art-samples/rig-experiment'
+OUT=ROOT/'cocos-client/experiments/rig/resources'
 loader=importlib.util.spec_from_file_location('batch',ROOT/'tools/art-samples/produce-batch.py')
 module=importlib.util.module_from_spec(loader);loader.loader.exec_module(module)
 NAMES=['head','torso','pelvis','cloth','swordUpper','swordFore','shieldUpper','shieldFore','backThigh','backShin','frontThigh','frontShin','weapon','shield','shieldEdge','bowedHead']
