@@ -1,0 +1,23 @@
+{
+  "scope": "Actual chapter102 claim clicked in native task window. Exact same successful request retried, then a new request to claim same business task.",
+  "taskId": 102,
+  "claimed": true,
+  "sameRequestStatus": 200,
+  "sameRequestReplayed": true,
+  "newRequestStatus": 400,
+  "newRequestReason": "任务未完成或已领取",
+  "assetsUnchangedOnRetries": true,
+  "after": {
+    "level": 7,
+    "xp": 46,
+    "currencies": {
+      "silver": 1140,
+      "gold": 20,
+      "crystal": 0
+    },
+    "inventory": {
+      "main:item:10203": 1
+    }
+  },
+  "sourceTaskMarkerCount": 1
+}

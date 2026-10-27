@@ -1,0 +1,1937 @@
+{
+  "scope": "Actual ordinary chapter-two battles in one isolated continuation; no GM, fixtures, forced seeds or level edits. Counts are observations, not random-pool probabilities.",
+  "battleCount": 8,
+  "rows": [
+    {
+      "modelId": "model:084ab6a537029e5baa0a",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+          "d5169192-486e-4b45-a0e5-e55bb0786825",
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 8
+      },
+      "monsterIds": [
+        61
+      ],
+      "cardIds": [
+        "main:card:61"
+      ],
+      "names": [
+        "骑兵"
+      ],
+      "originalNames": [
+        "Horseman"
+      ],
+      "nodes": [
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+        "d5169192-486e-4b45-a0e5-e55bb0786825",
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 8,
+      "newArt": true,
+      "battleCount": 8
+    },
+    {
+      "modelId": "model:26b078148d1f7af2f252",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+          "d5169192-486e-4b45-a0e5-e55bb0786825",
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 8
+      },
+      "monsterIds": [
+        8
+      ],
+      "cardIds": [
+        "main:card:8"
+      ],
+      "names": [
+        "哨卫"
+      ],
+      "originalNames": [
+        "Sentinel"
+      ],
+      "nodes": [
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+        "d5169192-486e-4b45-a0e5-e55bb0786825",
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 8,
+      "newArt": true,
+      "battleCount": 8
+    },
+    {
+      "modelId": "model:b0e55c408ff64a7afef5",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+          "d5169192-486e-4b45-a0e5-e55bb0786825",
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 8
+      },
+      "monsterIds": [
+        43
+      ],
+      "cardIds": [
+        "main:card:43"
+      ],
+      "names": [
+        "枪骑兵"
+      ],
+      "originalNames": [
+        "Lancer"
+      ],
+      "nodes": [
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+        "d5169192-486e-4b45-a0e5-e55bb0786825",
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 8,
+      "newArt": true,
+      "battleCount": 8
+    },
+    {
+      "modelId": "model:7a7dc5ef5a3f994d26a6",
+      "roles": [
+        "fixed-enemy-hero",
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+          "d5169192-486e-4b45-a0e5-e55bb0786825",
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ],
+        "fixed-enemy-hero": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 7,
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        50,
+        60013
+      ],
+      "cardIds": [
+        "main:card:50"
+      ],
+      "names": [
+        "Stronghold Guard",
+        "枪骑士"
+      ],
+      "originalNames": [
+        "Lance Knight",
+        "Stronghold Guard"
+      ],
+      "nodes": [
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+        "d5169192-486e-4b45-a0e5-e55bb0786825",
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 8,
+      "newArt": false,
+      "battleCount": 7
+    },
+    {
+      "modelId": "model:2eeb36e35a5da5253278",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+        ]
+      },
+      "roleInstances": {
+        "unit": 2
+      },
+      "monsterIds": [
+        11091
+      ],
+      "cardIds": [
+        "main:card:11091"
+      ],
+      "names": [
+        "萨满·艾利门斯"
+      ],
+      "originalNames": [
+        "Shaman Elimence"
+      ],
+      "nodes": [
+        "main:scene:2:node:201",
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+      ],
+      "instances": 2,
+      "newArt": false,
+      "battleCount": 2
+    },
+    {
+      "modelId": "model:0d666e654103978eeeea",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 3
+      },
+      "monsterIds": [
+        1127
+      ],
+      "cardIds": [
+        "main:card:21992"
+      ],
+      "names": [
+        "骷髅仆从"
+      ],
+      "originalNames": [
+        "Vile Skeleton"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 3,
+      "newArt": true,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:47e0ec7e26e307dcb83f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 3
+      },
+      "monsterIds": [
+        1169
+      ],
+      "cardIds": [
+        "main:card:21992"
+      ],
+      "names": [
+        "骷髅仆从"
+      ],
+      "originalNames": [
+        "Vile Skeleton"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 3,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:ab9a41182897315d5264",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 2
+      },
+      "monsterIds": [
+        5269
+      ],
+      "cardIds": [
+        "main:card:5269"
+      ],
+      "names": [
+        "精灵剑士"
+      ],
+      "originalNames": [
+        "Elf Swordsman"
+      ],
+      "nodes": [
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 2,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:0468ec0a935e8c0aaafa",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21091
+      ],
+      "cardIds": [
+        "main:card:21091"
+      ],
+      "names": [
+        "先锋·劳伦斯"
+      ],
+      "originalNames": [
+        "Vanguard Lawrence"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:0df57cc09535e694bf3f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        9017
+      ],
+      "cardIds": [
+        "main:card:9017"
+      ],
+      "names": [
+        "精灵"
+      ],
+      "originalNames": [
+        "Elfin"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 1,
+      "newArt": true,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:158ff9d61d1185a44c32",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60009
+      ],
+      "cardIds": [],
+      "names": [
+        "Goblin Chieftain"
+      ],
+      "originalNames": [
+        "Goblin Chieftain"
+      ],
+      "nodes": [
+        "main:scene:2:node:202"
+      ],
+      "battles": [
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:1881dec8ddbd6e5dff07",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        4079
+      ],
+      "cardIds": [
+        "main:card:4079"
+      ],
+      "names": [
+        "狂暴巨魔"
+      ],
+      "originalNames": [
+        "Furious Troll"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:1909c8c53750d0438430",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21457
+      ],
+      "cardIds": [
+        "main:card:21457"
+      ],
+      "names": [
+        "九号 BB"
+      ],
+      "originalNames": [
+        "Ajiu BB"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:223d3073c8169b91f08a",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        12073
+      ],
+      "cardIds": [
+        "main:card:12073"
+      ],
+      "names": [
+        "冷傲者"
+      ],
+      "originalNames": [
+        "Chilled Adept"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:23447e4fd7a82e9d187a",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        1277
+      ],
+      "cardIds": [
+        "main:card:1277"
+      ],
+      "names": [
+        "食尸鬼"
+      ],
+      "originalNames": [
+        "Ghoul"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:2725ae9b1034f0613c53",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60010
+      ],
+      "cardIds": [],
+      "names": [
+        "Ogre Berserker"
+      ],
+      "originalNames": [
+        "Ogre Berserker"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:2eb096e6eb349d5a1366",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        2211
+      ],
+      "cardIds": [
+        "main:card:2211"
+      ],
+      "names": [
+        "白虎"
+      ],
+      "originalNames": [
+        "White Tiger"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:2ee23798f4e72f55af9a",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        2235
+      ],
+      "cardIds": [
+        "main:card:2235"
+      ],
+      "names": [
+        "耳廓狐入门者"
+      ],
+      "originalNames": [
+        "Fennec Initiate"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:4323868b230133647b45",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        1145
+      ],
+      "cardIds": [
+        "main:card:1145"
+      ],
+      "names": [
+        "污秽骷髅"
+      ],
+      "originalNames": [
+        "Foul Skeleton"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:4ce9a04aa37de7b57148",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        5103
+      ],
+      "cardIds": [
+        "main:card:5103"
+      ],
+      "names": [
+        "天马骑士"
+      ],
+      "originalNames": [
+        "Pegasus Rider"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:599259fa99efce78777d",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        20013
+      ],
+      "cardIds": [
+        "main:card:20013"
+      ],
+      "names": [
+        "ARK 粉碎者"
+      ],
+      "originalNames": [
+        "ARK Smasher"
+      ],
+      "nodes": [
+        "main:scene:2:node:206"
+      ],
+      "battles": [
+        "d5169192-486e-4b45-a0e5-e55bb0786825"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:5fb64869e82145b0f815",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60014
+      ],
+      "cardIds": [],
+      "names": [
+        "Stronghold Sentry"
+      ],
+      "originalNames": [
+        "Stronghold Sentry"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:6392e4629f8d90f3e590",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        4061
+      ],
+      "cardIds": [
+        "main:card:4061"
+      ],
+      "names": [
+        "巨魔"
+      ],
+      "originalNames": [
+        "Troll"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:67cd1a8a2e3245df264e",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        9001
+      ],
+      "cardIds": [
+        "main:card:9001"
+      ],
+      "names": [
+        "僵尸"
+      ],
+      "originalNames": [
+        "Zombie"
+      ],
+      "nodes": [
+        "main:scene:2:node:202"
+      ],
+      "battles": [
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:69df8c5bf981bde2596d",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        6019
+      ],
+      "cardIds": [
+        "main:card:6019"
+      ],
+      "names": [
+        "猫人信使"
+      ],
+      "originalNames": [
+        "Feles Messenger"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:7299c799931581623960",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        11097
+      ],
+      "cardIds": [
+        "main:card:11097"
+      ],
+      "names": [
+        "洛基"
+      ],
+      "originalNames": [
+        "Loki"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:74f19f6db4c1c51ba960",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        13073
+      ],
+      "cardIds": [
+        "main:card:13073"
+      ],
+      "names": [
+        "天矛"
+      ],
+      "originalNames": [
+        "Heavenly Spear"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:75d4de652d50a9b5acca",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        6241
+      ],
+      "cardIds": [
+        "main:card:6241"
+      ],
+      "names": [
+        "猫人入门者"
+      ],
+      "originalNames": [
+        "Feles Initiate"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:78e6b3835cdcd3dd4e8b",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60015
+      ],
+      "cardIds": [],
+      "names": [
+        "Commander Claude"
+      ],
+      "originalNames": [
+        "Commander Claude"
+      ],
+      "nodes": [
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:825e833cc0b5a5b48da3",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        11362
+      ],
+      "cardIds": [
+        "main:card:11362"
+      ],
+      "names": [
+        "维京人"
+      ],
+      "originalNames": [
+        "Viking"
+      ],
+      "nodes": [
+        "main:scene:2:node:201"
+      ],
+      "battles": [
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:83907200726d6c21b54f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        259
+      ],
+      "cardIds": [
+        "main:card:259"
+      ],
+      "names": [
+        "流浪诗人"
+      ],
+      "originalNames": [
+        "Travelling Poet"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:8b1c69f6618c1d1f3f5f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        9019
+      ],
+      "cardIds": [
+        "main:card:9019"
+      ],
+      "names": [
+        "哥布林盗贼"
+      ],
+      "originalNames": [
+        "Goblin Rogue"
+      ],
+      "nodes": [
+        "main:scene:2:node:202"
+      ],
+      "battles": [
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+      ],
+      "instances": 1,
+      "newArt": true,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:b050882e0d4824b4d82f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        1043
+      ],
+      "cardIds": [
+        "main:card:1043"
+      ],
+      "names": [
+        "吸血鬼"
+      ],
+      "originalNames": [
+        "Vampire"
+      ],
+      "nodes": [
+        "main:scene:2:node:202"
+      ],
+      "battles": [
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:bc2e74218a56a3904fb1",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        2145
+      ],
+      "cardIds": [
+        "main:card:2145"
+      ],
+      "names": [
+        "狮鹫"
+      ],
+      "originalNames": [
+        "Griffyn"
+      ],
+      "nodes": [
+        "main:scene:2:node:201"
+      ],
+      "battles": [
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:c029e48bc34d2c130435",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60012
+      ],
+      "cardIds": [],
+      "names": [
+        "Frenzied Hound"
+      ],
+      "originalNames": [
+        "Frenzied Hound"
+      ],
+      "nodes": [
+        "main:scene:2:node:205"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:c8b78fa3ef16c9271514",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        2061
+      ],
+      "cardIds": [
+        "main:card:2061"
+      ],
+      "names": [
+        "雷蜥"
+      ],
+      "originalNames": [
+        "Thunder Lizard"
+      ],
+      "nodes": [
+        "main:scene:2:node:206"
+      ],
+      "battles": [
+        "d5169192-486e-4b45-a0e5-e55bb0786825"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:cf590383464b8420ff63",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        4127
+      ],
+      "cardIds": [
+        "main:card:4127"
+      ],
+      "names": [
+        "战锤食人魔"
+      ],
+      "originalNames": [
+        "Hammer Ogre"
+      ],
+      "nodes": [
+        "main:scene:2:node:203"
+      ],
+      "battles": [
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:d0ce29fea0ab52596521",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        2001
+      ],
+      "cardIds": [
+        "main:card:2001"
+      ],
+      "names": [
+        "狩猎犬"
+      ],
+      "originalNames": [
+        "Hunting Dog"
+      ],
+      "nodes": [
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:d2fb49e5a06aa1675d53",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21049
+      ],
+      "cardIds": [
+        "main:card:21049"
+      ],
+      "names": [
+        "沙加丝"
+      ],
+      "originalNames": [
+        "Shargase"
+      ],
+      "nodes": [
+        "main:scene:2:node:206"
+      ],
+      "battles": [
+        "d5169192-486e-4b45-a0e5-e55bb0786825"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:d7cb43afb2564e9f225c",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21115
+      ],
+      "cardIds": [
+        "main:card:21115"
+      ],
+      "names": [
+        "沐浴斯菲拉"
+      ],
+      "originalNames": [
+        "Basking Siphra"
+      ],
+      "nodes": [
+        "main:scene:2:node:202"
+      ],
+      "battles": [
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:de3161d106f5a5971a7b",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        13001
+      ],
+      "cardIds": [
+        "main:card:13001"
+      ],
+      "names": [
+        "天使"
+      ],
+      "originalNames": [
+        "Angel"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:e0ed7ba4910943f04517",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21259
+      ],
+      "cardIds": [
+        "main:card:21259"
+      ],
+      "names": [
+        "迅星"
+      ],
+      "originalNames": [
+        "Swift Astral"
+      ],
+      "nodes": [
+        "main:scene:2:node:206"
+      ],
+      "battles": [
+        "d5169192-486e-4b45-a0e5-e55bb0786825"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:e374380ea1cdf20a6cdd",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60008
+      ],
+      "cardIds": [],
+      "names": [
+        "Ogre Bandit"
+      ],
+      "originalNames": [
+        "Ogre Bandit"
+      ],
+      "nodes": [
+        "main:scene:2:node:201"
+      ],
+      "battles": [
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:e8bb6ccf320429229844",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        5085
+      ],
+      "cardIds": [
+        "main:card:5085"
+      ],
+      "names": [
+        "天马侦察兵"
+      ],
+      "originalNames": [
+        "Pegasus Scout"
+      ],
+      "nodes": [
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:f3da6c4354da1f7d6173",
+      "roles": [
+        "fixed-enemy-hero"
+      ],
+      "roleBattles": {
+        "fixed-enemy-hero": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        60011
+      ],
+      "cardIds": [],
+      "names": [
+        "Goblin Clan Leader"
+      ],
+      "originalNames": [
+        "Goblin Clan Leader"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": true,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:f6d127c2da9a5e160080",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21139
+      ],
+      "cardIds": [
+        "main:card:21139"
+      ],
+      "names": [
+        "拉维妮亚"
+      ],
+      "originalNames": [
+        "Lavinia"
+      ],
+      "nodes": [
+        "main:scene:2:node:206"
+      ],
+      "battles": [
+        "d5169192-486e-4b45-a0e5-e55bb0786825"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    }
+  ],
+  "unresolvedMappings": [],
+  "nextPriority": [
+    {
+      "modelId": "model:7a7dc5ef5a3f994d26a6",
+      "roles": [
+        "fixed-enemy-hero",
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+          "d5169192-486e-4b45-a0e5-e55bb0786825",
+          "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ],
+        "fixed-enemy-hero": [
+          "d5169192-486e-4b45-a0e5-e55bb0786825"
+        ]
+      },
+      "roleInstances": {
+        "unit": 7,
+        "fixed-enemy-hero": 1
+      },
+      "monsterIds": [
+        50,
+        60013
+      ],
+      "cardIds": [
+        "main:card:50"
+      ],
+      "names": [
+        "Stronghold Guard",
+        "枪骑士"
+      ],
+      "originalNames": [
+        "Lance Knight",
+        "Stronghold Guard"
+      ],
+      "nodes": [
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+        "d5169192-486e-4b45-a0e5-e55bb0786825",
+        "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 8,
+      "newArt": false,
+      "battleCount": 7
+    },
+    {
+      "modelId": "model:2eeb36e35a5da5253278",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+          "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+        ]
+      },
+      "roleInstances": {
+        "unit": 2
+      },
+      "monsterIds": [
+        11091
+      ],
+      "cardIds": [
+        "main:card:11091"
+      ],
+      "names": [
+        "萨满·艾利门斯"
+      ],
+      "originalNames": [
+        "Shaman Elimence"
+      ],
+      "nodes": [
+        "main:scene:2:node:201",
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+        "7e0ea4a6-245a-4882-acba-3c0b4c171987"
+      ],
+      "instances": 2,
+      "newArt": false,
+      "battleCount": 2
+    },
+    {
+      "modelId": "model:47e0ec7e26e307dcb83f",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+        ]
+      },
+      "roleInstances": {
+        "unit": 3
+      },
+      "monsterIds": [
+        1169
+      ],
+      "cardIds": [
+        "main:card:21992"
+      ],
+      "names": [
+        "骷髅仆从"
+      ],
+      "originalNames": [
+        "Vile Skeleton"
+      ],
+      "nodes": [
+        "main:scene:2:node:207"
+      ],
+      "battles": [
+        "e1003cdd-f04f-4d1d-9b7f-b148f4551870"
+      ],
+      "instances": 3,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:ab9a41182897315d5264",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "ec56efef-2270-4510-8264-c32cacf9adcd"
+        ]
+      },
+      "roleInstances": {
+        "unit": 2
+      },
+      "monsterIds": [
+        5269
+      ],
+      "cardIds": [
+        "main:card:5269"
+      ],
+      "names": [
+        "精灵剑士"
+      ],
+      "originalNames": [
+        "Elf Swordsman"
+      ],
+      "nodes": [
+        "main:scene:2:node:208"
+      ],
+      "battles": [
+        "ec56efef-2270-4510-8264-c32cacf9adcd"
+      ],
+      "instances": 2,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:0468ec0a935e8c0aaafa",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        21091
+      ],
+      "cardIds": [
+        "main:card:21091"
+      ],
+      "names": [
+        "先锋·劳伦斯"
+      ],
+      "originalNames": [
+        "Vanguard Lawrence"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    },
+    {
+      "modelId": "model:1881dec8ddbd6e5dff07",
+      "roles": [
+        "unit"
+      ],
+      "roleBattles": {
+        "unit": [
+          "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+        ]
+      },
+      "roleInstances": {
+        "unit": 1
+      },
+      "monsterIds": [
+        4079
+      ],
+      "cardIds": [
+        "main:card:4079"
+      ],
+      "names": [
+        "狂暴巨魔"
+      ],
+      "originalNames": [
+        "Furious Troll"
+      ],
+      "nodes": [
+        "main:scene:2:node:204"
+      ],
+      "battles": [
+        "69f09efa-7da4-4b8b-b1b7-1d7260e38801"
+      ],
+      "instances": 1,
+      "newArt": false,
+      "battleCount": 1
+    }
+  ],
+  "fixedHeroBoundary": "Fixed enemy heroes are reported separately from random troops; original player hero layers occur throughout and were already shortlisted."
+}

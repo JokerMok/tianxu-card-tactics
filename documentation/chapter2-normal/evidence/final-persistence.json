@@ -1,0 +1,28 @@
+{
+  "scope": "Real local service restart after chapter2 complete and source task102 reward claim",
+  "same": {
+    "cards": true,
+    "deck": true,
+    "currencies": true,
+    "level": true,
+    "xp": true,
+    "inventory": true,
+    "claimed": true,
+    "progress": true
+  },
+  "chapterTaskClaimed": true,
+  "level": 7,
+  "xp": 46,
+  "silver": 1140,
+  "clearedChapter2Nodes": [
+    "main:scene:2:node:201",
+    "main:scene:2:node:202",
+    "main:scene:2:node:203",
+    "main:scene:2:node:204",
+    "main:scene:2:node:205",
+    "main:scene:2:node:206",
+    "main:scene:2:node:207",
+    "main:scene:2:node:208"
+  ],
+  "equipmentRewardInInventory": 1
+}

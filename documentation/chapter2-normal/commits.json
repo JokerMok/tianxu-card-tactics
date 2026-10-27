@@ -1,0 +1,9 @@
+{
+  "branch": "codex/chapter2-normal-pve",
+  "baseCommit": "3844c14c274be4859c38ab6a1640609b5822fbaf",
+  "implementation": "9052f350a1d49e543c3a447e31b36df28d937acc",
+  "deliveryNote": "Evidence and project-state commit follows; local only, no push/merge/deployment.",
+  "frontend": "Reused verified native 25-source formal build; frontend files unchanged",
+  "sourceCheckpoint": ".local/chapter2-normal/checkpoint.json",
+  "databaseBackup": ".local/chapter2-normal/before-game.sqlite"
+}

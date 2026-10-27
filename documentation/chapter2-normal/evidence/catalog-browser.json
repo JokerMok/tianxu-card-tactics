@@ -1,0 +1,51 @@
+{
+  "scope": "Native Cocos client on local HTTP, new origin first visit versus document reload. Resource transfer includes HTTP headers; bodyReadDecode combines browser delivery/decompression/UTF8. Not a browser decompressor-only measurement.",
+  "first": {
+    "requests": [
+      {
+        "path": "/api/catalog",
+        "start": 28604.400000095367,
+        "headersMs": 1.4000000953674316,
+        "status": 200,
+        "bodyReadDecodeMs": 93,
+        "parseMs": 95.59999990463257,
+        "textChars": 66201348
+      }
+    ],
+    "resources": [
+      {
+        "path": "/api/catalog",
+        "start": 28604.5,
+        "ttfbMs": 0.5,
+        "transferMs": 67.10000038146973,
+        "totalMs": 68.10000038146973,
+        "transferBytes": 9101088,
+        "decodedBytes": 67038251
+      }
+    ]
+  },
+  "reload": {
+    "requests": [
+      {
+        "path": "/api/catalog",
+        "start": 2091.0999999046326,
+        "headersMs": 1.5,
+        "status": 200,
+        "bodyReadDecodeMs": 84.69999980926514,
+        "parseMs": 92.2000002861023,
+        "textChars": 66201348
+      }
+    ],
+    "resources": [
+      {
+        "path": "/api/catalog",
+        "start": 2091.199999809265,
+        "ttfbMs": 0.6999998092651367,
+        "transferMs": 62.59999990463257,
+        "totalMs": 63.69999980926514,
+        "transferBytes": 0,
+        "decodedBytes": 67038251
+      }
+    ]
+  }
+}

@@ -1,0 +1,628 @@
+{
+  "scope": "Actual ordinary chapter-two battles in one isolated continuation; no GM, fixtures, forced seeds or level edits. Counts are observations, not random-pool probabilities.",
+  "before": {
+    "level": 5,
+    "xp": 0,
+    "cards": {
+      "main:card:1": 1,
+      "main:card:19": 2,
+      "main:card:43": 1,
+      "main:card:61": 1,
+      "main:card:5019": 1,
+      "main:card:2": 1,
+      "main:card:8": 1,
+      "main:card:41001": 3,
+      "main:card:75": 1
+    },
+    "deck": [
+      "main:card:43",
+      "main:card:61",
+      "main:card:8",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:41001"
+    ],
+    "currencies": {
+      "silver": 360,
+      "gold": 20,
+      "crystal": 0
+    },
+    "progress": {
+      "sceneId": 2,
+      "clearedNodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:103",
+        "main:scene:1:node:105",
+        "main:scene:1:node:107",
+        "main:scene:1:node:108"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001",
+        "main:scene:1:node:102:trigger:102001",
+        "main:scene:1:node:103:trigger:103001",
+        "main:scene:1:node:105:trigger:105001",
+        "main:scene:1:node:101:trigger:101002",
+        "main:scene:1:node:102:trigger:102002",
+        "main:scene:1:node:103:trigger:103002",
+        "main:scene:1:node:105:trigger:105002",
+        "main:scene:1:node:107:trigger:107001"
+      ],
+      "unlockedScenes": [
+        1,
+        2
+      ],
+      "positionByScene": {}
+    }
+  },
+  "after": {
+    "level": 7,
+    "xp": 46,
+    "cards": {
+      "main:card:1": 1,
+      "main:card:19": 2,
+      "main:card:43": 1,
+      "main:card:61": 3,
+      "main:card:5019": 1,
+      "main:card:2": 2,
+      "main:card:8": 1,
+      "main:card:41001": 3,
+      "main:card:75": 1,
+      "main:card:50": 2,
+      "main:card:5020": 1,
+      "main:card:26": 1,
+      "main:card:5001": 2,
+      "main:card:33": 1,
+      "main:card:5057": 1
+    },
+    "deck": [
+      "main:card:43",
+      "main:card:61",
+      "main:card:8",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:50"
+    ],
+    "currencies": {
+      "silver": 1140,
+      "gold": 20,
+      "crystal": 0
+    },
+    "progress": {
+      "sceneId": 2,
+      "clearedNodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:103",
+        "main:scene:1:node:105",
+        "main:scene:1:node:107",
+        "main:scene:1:node:108",
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001",
+        "main:scene:1:node:102:trigger:102001",
+        "main:scene:1:node:103:trigger:103001",
+        "main:scene:1:node:105:trigger:105001",
+        "main:scene:1:node:101:trigger:101002",
+        "main:scene:1:node:102:trigger:102002",
+        "main:scene:1:node:103:trigger:103002",
+        "main:scene:1:node:105:trigger:105002",
+        "main:scene:1:node:107:trigger:107001",
+        "main:scene:2:node:201:trigger:201001",
+        "main:scene:2:node:202:trigger:202001",
+        "main:scene:2:node:203:trigger:203001",
+        "main:scene:2:node:204:trigger:204001",
+        "main:scene:2:node:205:trigger:205001",
+        "main:scene:2:node:206:trigger:206001",
+        "main:scene:2:node:207:trigger:207001",
+        "main:scene:2:node:208:trigger:208001"
+      ],
+      "unlockedScenes": [
+        1,
+        2
+      ],
+      "positionByScene": {}
+    }
+  },
+  "battles": [
+    {
+      "id": "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+      "node": "main:scene:2:node:201",
+      "trigger": "main:scene:2:node:201:trigger:201001",
+      "settled": true,
+      "turn": 8,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60008,
+          "name": "Ogre Bandit",
+          "hp": 9,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:50",
+            "count": 2
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 11,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 9,
+        "summon": 6,
+        "turn-end": 7,
+        "damage": 10,
+        "fatigue": 6,
+        "death": 4,
+        "move": 7,
+        "attack": 1,
+        "settled": 1
+      }
+    },
+    {
+      "id": "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+      "node": "main:scene:2:node:202",
+      "trigger": "main:scene:2:node:202:trigger:202001",
+      "settled": true,
+      "turn": 8,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60009,
+          "name": "Goblin Chieftain",
+          "hp": 10,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:5020",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 11,
+        "summon": 8,
+        "turn-end": 7,
+        "damage": 9,
+        "fatigue": 5,
+        "death": 4,
+        "move": 8,
+        "attack": 1,
+        "settled": 1
+      }
+    },
+    {
+      "id": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "node": "main:scene:2:node:203",
+      "trigger": "main:scene:2:node:203:trigger:203001",
+      "settled": true,
+      "turn": 11,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60010,
+          "name": "Ogre Berserker",
+          "hp": 10,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:26",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 10,
+        "damage": 17,
+        "fatigue": 8,
+        "effect": 7,
+        "move": 14,
+        "death": 5,
+        "attack": 6,
+        "status": 7,
+        "settled": 1
+      }
+    },
+    {
+      "id": "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+      "node": "main:scene:2:node:204",
+      "trigger": "main:scene:2:node:204:trigger:204001",
+      "settled": true,
+      "turn": 11,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60011,
+          "name": "Goblin Clan Leader",
+          "hp": 10,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:5001",
+            "count": 2
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 10,
+        "damage": 17,
+        "fatigue": 8,
+        "heal": 1,
+        "effect": 1,
+        "move": 12,
+        "death": 5,
+        "attack": 6,
+        "settled": 1
+      }
+    },
+    {
+      "id": "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+      "node": "main:scene:2:node:205",
+      "trigger": "main:scene:2:node:205:trigger:205001",
+      "settled": true,
+      "turn": 10,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60012,
+          "name": "Frenzied Hound",
+          "hp": 11,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:61",
+            "count": 2
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 10,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 9,
+        "damage": 16,
+        "fatigue": 7,
+        "move": 11,
+        "death": 5,
+        "attack": 6,
+        "settled": 1
+      }
+    },
+    {
+      "id": "d5169192-486e-4b45-a0e5-e55bb0786825",
+      "node": "main:scene:2:node:206",
+      "trigger": "main:scene:2:node:206:trigger:206001",
+      "settled": true,
+      "turn": 11,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60013,
+          "name": "Stronghold Guard",
+          "hp": 11,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:2",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "turn-end": 10,
+        "play": 12,
+        "summon": 9,
+        "damage": 14,
+        "fatigue": 8,
+        "death": 4,
+        "move": 8,
+        "attack": 3,
+        "settled": 1
+      }
+    },
+    {
+      "id": "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+      "node": "main:scene:2:node:207",
+      "trigger": "main:scene:2:node:207:trigger:207001",
+      "settled": true,
+      "turn": 10,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60014,
+          "name": "Stronghold Sentry",
+          "hp": 11,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:33",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 10,
+        "play": 12,
+        "summon": 12,
+        "turn-end": 9,
+        "damage": 15,
+        "fatigue": 7,
+        "death": 7,
+        "move": 9,
+        "effect": 6,
+        "attack": 4,
+        "status": 4,
+        "settled": 1
+      }
+    },
+    {
+      "id": "ec56efef-2270-4510-8264-c32cacf9adcd",
+      "node": "main:scene:2:node:208",
+      "trigger": "main:scene:2:node:208:trigger:208001",
+      "settled": true,
+      "turn": 8,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60015,
+          "name": "Commander Claude",
+          "hp": 12,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 35,
+        "xp": 7,
+        "cards": [
+          {
+            "id": "main:card:5057",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [
+            {
+              "type": 11,
+              "value": 11000
+            }
+          ],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 11,
+        "summon": 8,
+        "turn-end": 7,
+        "damage": 10,
+        "fatigue": 5,
+        "death": 5,
+        "move": 6,
+        "attack": 2,
+        "settled": 1
+      }
+    }
+  ]
+}

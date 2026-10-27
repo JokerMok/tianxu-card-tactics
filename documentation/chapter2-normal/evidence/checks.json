@@ -1,0 +1,18 @@
+{
+  "scope": "Only changed chapter-text and source-task projection plus retained slim-PVE boundary. Native frontend unchanged and source hashes checked; no new engine compile needed.",
+  "passed": [
+    "content.test.mjs: source identities/raw rows and eight story translations, stale-source fallback",
+    "player-ui.test.mjs: unlocked chapter task projection, source IDs, reward summary, claim status, event/future chapter exclusion and no mutation",
+    "stage-scope.test.mjs: retained stage boundaries, old rights and invalid deck protection",
+    "Real Cocos: eight normal chapter-two wins, UI card drag/save/deployment, skill target, reward and task claim",
+    "Real service restart during node205 and after chapter task claim; identical persisted state/assets",
+    "Exact successful UI claim retry returns receipt; new request duplicate business claim rejected; each battle settlement has one record"
+  ],
+  "notRun": [
+    "All nineteen model/action matrix",
+    "Full historical suite",
+    "Natural battle-defeat branch in this run (eight attempts won)",
+    "Third chapter combat and level-ten grind",
+    "Public network or server tests"
+  ]
+}

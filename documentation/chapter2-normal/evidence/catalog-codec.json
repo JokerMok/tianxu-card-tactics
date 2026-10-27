@@ -1,0 +1,16 @@
+{
+  "method": "Node local raw HTTP gzip + synchronous gunzip, UTF8 and JSON.parse; codec sample not browser decompressor timing",
+  "compressedBytes": 9100788,
+  "decodedBytes": 67038251,
+  "headersMs": 3.1822499999999962,
+  "transferMs": 3.4013750000000016,
+  "decompressionMs": 48.32424999999999,
+  "utf8Ms": 15.907333999999992,
+  "parseMs": 141.393542,
+  "encoding": "gzip",
+  "cacheControl": "private, max-age=3600",
+  "conditional": {
+    "status": 304,
+    "bytes": 0
+  }
+}

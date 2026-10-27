@@ -1,0 +1,12 @@
+{
+  "scope": "actual local game service stopped and restarted during normal node205, after client reload",
+  "battleId": "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+  "turn": 1,
+  "revision": 1,
+  "events": 14,
+  "stateBefore": "4fbb9c60e6a2d598c5b30c1b70d0a1d98b5a9139bea269dac9f64549bd786fbf",
+  "stateAfter": "4fbb9c60e6a2d598c5b30c1b70d0a1d98b5a9139bea269dac9f64549bd786fbf",
+  "stateUnchanged": true,
+  "assetsUnchanged": true,
+  "serverInstanceChanged": true
+}

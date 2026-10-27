@@ -1,0 +1,8 @@
+{
+  "scope": "Retry the exact successful UI battle.dismiss request for real node208; assets were already granted by authoritative settlement, not the dismiss button.",
+  "status": 200,
+  "replayed": true,
+  "assetsUnchanged": true,
+  "requestId": "6bdd9182-d026-4748-84d7-dc3a1d8b0b4a",
+  "battleId": "ec56efef-2270-4510-8264-c32cacf9adcd"
+}
