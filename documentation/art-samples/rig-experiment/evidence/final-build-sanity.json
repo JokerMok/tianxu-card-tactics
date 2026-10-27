@@ -1,0 +1,93 @@
+{
+  "ready": true,
+  "mode": "side",
+  "action": "stand",
+  "direction": "east",
+  "count": 4,
+  "nodes": 51,
+  "measuring": false,
+  "elapsed": 0,
+  "drawCalls": 11,
+  "engineTextureAllocationBytes": 15451536,
+  "rigBank": {
+    "atlases": 1,
+    "references": 2
+  },
+  "frameBank": {
+    "atlasPoolEntries": 2,
+    "atlasPoolPendingEntries": 0,
+    "atlasPoolLiveReferences": 2,
+    "atlasPoolSpriteFrames": 65,
+    "atlasPoolEstimatedBytes": 7742304,
+    "atlasPoolMaxEntries": 19,
+    "atlasPoolMaxEstimatedBytes": 134217728
+  },
+  "actors": [
+    {
+      "atlasPoolEntries": 2,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 2,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 7742304,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 3,
+      "playbackElapsedSeconds": 68.68509999990415,
+      "plays": 1,
+      "frameChanges": 550,
+      "cues": 0,
+      "completions": 0,
+      "cancellations": 0
+    },
+    {
+      "atlasPoolEntries": 2,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 2,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 7742304,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 3,
+      "playbackElapsedSeconds": 68.68509999990415,
+      "plays": 1,
+      "frameChanges": 550,
+      "cues": 0,
+      "completions": 0,
+      "cancellations": 0
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 2,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 68.68509999990415,
+      "plays": 2,
+      "cues": 0,
+      "lastPoseMs": 0.10000038146972656,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 2,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 68.68509999990415,
+      "plays": 2,
+      "cues": 0,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    }
+  ]
+}

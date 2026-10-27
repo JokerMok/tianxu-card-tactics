@@ -1,0 +1,204 @@
+{
+  "ready": false,
+  "mode": "rig",
+  "action": "stand",
+  "direction": "east",
+  "count": 0,
+  "nodes": 3,
+  "measuring": false,
+  "elapsed": 18.01239999961854,
+  "drawCalls": 1,
+  "engineTextureAllocationBytes": 5376560,
+  "rigBank": {
+    "atlases": 0,
+    "references": 0
+  },
+  "frameBank": {
+    "atlasPoolEntries": 0,
+    "atlasPoolPendingEntries": 0,
+    "atlasPoolLiveReferences": 0,
+    "atlasPoolSpriteFrames": 0,
+    "atlasPoolEstimatedBytes": 0,
+    "atlasPoolMaxEntries": 19,
+    "atlasPoolMaxEstimatedBytes": 134217728
+  },
+  "actors": [],
+  "result": {
+    "mode": "rig",
+    "count": 4,
+    "seconds": 18.01239999961854,
+    "frameIntervalMs": {
+      "samples": 1034,
+      "min": 14.699999809265137,
+      "p50": 16.699999809265137,
+      "p95": 17.600000381469727,
+      "max": 18.700000286102295
+    },
+    "animationUpdateMs": {
+      "samples": 1034,
+      "min": 0,
+      "p50": 0.09999990463256836,
+      "p95": 0.20000028610229492,
+      "max": 0.40000009536743164
+    },
+    "drawCalls": {
+      "samples": 1033,
+      "min": 13,
+      "p50": 13,
+      "p95": 13,
+      "max": 13
+    },
+    "engineTextureAllocationBytes": {
+      "samples": 1033,
+      "min": 6660656,
+      "p50": 6660656,
+      "p95": 6660656,
+      "max": 6660656
+    },
+    "cues": [
+      {
+        "costume": "trial",
+        "seconds": 0.2503000001907349,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2503000001907349,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2503000001907349,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2503000001907349,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2500999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2500999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2500999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.2500999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25089999961853027,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25089999961853027,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25089999961853027,
+        "expected": 0.25
+      },
+      {
+        "costume": "trial",
+        "seconds": 0.25089999961853027,
+        "expected": 0.25
+      }
+    ],
+    "actors": [
+      {
+        "kind": "shared-rig",
+        "costume": "trial",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 4,
+        "sharedAtlasFrames": 16,
+        "decodedBytes": 1048576,
+        "playbackElapsedSeconds": 0.016599999904632567,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "trial",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 4,
+        "sharedAtlasFrames": 16,
+        "decodedBytes": 1048576,
+        "playbackElapsedSeconds": 0.016599999904632567,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "trial",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 4,
+        "sharedAtlasFrames": 16,
+        "decodedBytes": 1048576,
+        "playbackElapsedSeconds": 0.016599999904632567,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "trial",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 4,
+        "sharedAtlasFrames": 16,
+        "decodedBytes": 1048576,
+        "playbackElapsedSeconds": 0.016599999904632567,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      }
+    ],
+    "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+  }
+}

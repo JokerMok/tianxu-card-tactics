@@ -1,0 +1,2877 @@
+{
+  "scope": "two appearances only; same background/engine/UI excluded from all payloads; ZIPs contain resources, not the complete game",
+  "environment": {
+    "date": "2026-10-27",
+    "machine": "Apple M5 Pro / 48 GiB / macOS 26.6.2",
+    "engine": "Cocos Creator 3.8.8 web-desktop",
+    "browser": "ChatGPT in-app Chromium",
+    "viewport": [
+      1280,
+      720
+    ],
+    "canvasBacking": [
+      2560,
+      1440
+    ],
+    "design": [
+      1200,
+      600
+    ],
+    "designScale": 1.0666666666666667,
+    "devicePixelRatio": 2,
+    "sample": "one warm 18-second run per mode, 24 actors, first 0.8 s excluded; no recording during timing; not a stress test"
+  },
+  "variants": {
+    "frames": {
+      "atlasFiles": [
+        "cocos-client/assets/resources/art-samples/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+        "cocos-client/assets/resources/art-samples/v5/squire-10c34cd8249a-b65536e9c577.webp"
+      ],
+      "atlasCount": 2,
+      "textureDownloadBytes": 1187270,
+      "baseRGBABytes": 7742304,
+      "resourceZipBytes": 1188469,
+      "zipSha256": "b8aab7c23377a185562d0c0fa5fbe48fdc57b1cff82f7742e7a9b69239c07e27",
+      "nativeNodes": 123,
+      "native": {
+        "mode": "frames",
+        "count": 24,
+        "seconds": 18.00000000000003,
+        "frameIntervalMs": {
+          "samples": 1033,
+          "min": 14.5,
+          "p50": 16.699999809265137,
+          "p95": 17.59999990463257,
+          "max": 18.5
+        },
+        "animationUpdateMs": {
+          "samples": 1033,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.10000038146972656,
+          "max": 0.20000028610229492
+        },
+        "drawCalls": {
+          "samples": 1032,
+          "min": 49,
+          "p50": 49,
+          "p95": 49,
+          "max": 49
+        },
+        "engineTextureAllocationBytes": {
+          "samples": 1032,
+          "min": 14531984,
+          "p50": 14531984,
+          "p95": 14531984,
+          "max": 14531984
+        },
+        "cues": [
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25079999971389777,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2673999996185303,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25090000009536745,
+            "expected": 0.25
+          }
+        ],
+        "actors": [
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 2,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 7742304,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 275,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          }
+        ],
+        "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+      }
+    },
+    "packed": {
+      "atlasFiles": [
+        "cocos-client/assets/resources/art-samples/rig-experiment/packed-0934d1d9bea5.webp"
+      ],
+      "atlasCount": 1,
+      "textureDownloadBytes": 1197766,
+      "baseRGBABytes": 8040912,
+      "resourceZipBytes": 1198720,
+      "zipSha256": "f0cfef0296120376bcc234f9335c09d6daf5bd095580d3c4c48fc1817af73dbc",
+      "nativeNodes": 123,
+      "native": {
+        "mode": "packed",
+        "count": 24,
+        "seconds": 18.000099999904627,
+        "frameIntervalMs": {
+          "samples": 1032,
+          "min": 14.699999809265137,
+          "p50": 16.699999809265137,
+          "p95": 17.699999809265137,
+          "max": 18.800000190734863
+        },
+        "animationUpdateMs": {
+          "samples": 1032,
+          "min": 0,
+          "p50": 0,
+          "p95": 0.09999990463256836,
+          "max": 0.2999997138977051
+        },
+        "drawCalls": {
+          "samples": 1031,
+          "min": 49,
+          "p50": 49,
+          "p95": 49,
+          "max": 49
+        },
+        "engineTextureAllocationBytes": {
+          "samples": 1031,
+          "min": 14830592,
+          "p50": 14830592,
+          "p95": 14830592,
+          "max": 14830592
+        },
+        "cues": [
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25009999990463255,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2510999999046326,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.26660000038146975,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25000000000000006,
+            "expected": 0.25
+          }
+        ],
+        "actors": [
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          },
+          {
+            "atlasPoolEntries": 1,
+            "atlasPoolPendingEntries": 0,
+            "atlasPoolLiveReferences": 24,
+            "atlasPoolSpriteFrames": 65,
+            "atlasPoolEstimatedBytes": 8040912,
+            "atlasPoolMaxEntries": 19,
+            "atlasPoolMaxEstimatedBytes": 134217728,
+            "instanceLoaded": true,
+            "instancePlaying": true,
+            "instanceFrame": 0,
+            "playbackElapsedSeconds": 0.016699999809265138,
+            "plays": 20,
+            "frameChanges": 231,
+            "cues": 4,
+            "completions": 11,
+            "cancellations": 8
+          }
+        ],
+        "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+      }
+    },
+    "rig": {
+      "atlasFiles": [
+        "cocos-client/assets/resources/art-samples/rig-experiment/parts-38fbfb0d9c62.webp"
+      ],
+      "atlasCount": 1,
+      "textureDownloadBytes": 143014,
+      "baseRGBABytes": 2097152,
+      "resourceZipBytes": 144085,
+      "zipSha256": "1cb0093ee65cdb0470adc81962e8c0edb93c3607297e96d441b1526433f2a954",
+      "nativeNodes": 459,
+      "native": {
+        "mode": "rig",
+        "count": 24,
+        "seconds": 18.000199999809286,
+        "frameIntervalMs": {
+          "samples": 1033,
+          "min": 7.900000095367432,
+          "p50": 16.699999809265137,
+          "p95": 17.699999809265137,
+          "max": 25.40000009536743
+        },
+        "animationUpdateMs": {
+          "samples": 1033,
+          "min": 0,
+          "p50": 0.40000009536743164,
+          "p95": 0.7000002861022949,
+          "max": 1.6999998092651367
+        },
+        "drawCalls": {
+          "samples": 1032,
+          "min": 73,
+          "p50": 73,
+          "p95": 73,
+          "max": 73
+        },
+        "engineTextureAllocationBytes": {
+          "samples": 1032,
+          "min": 8886832,
+          "p50": 8886832,
+          "p95": 8886832,
+          "max": 8886832
+        },
+        "cues": [
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2665999999046325,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.25,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "guard",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          },
+          {
+            "costume": "squire",
+            "seconds": 0.2501999998092651,
+            "expected": 0.25
+          }
+        ],
+        "actors": [
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0.09999990463256836,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "guard",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          },
+          {
+            "kind": "shared-rig",
+            "costume": "squire",
+            "slots": 14,
+            "nodeCount": 17,
+            "sharedAtlasRefs": 24,
+            "sharedAtlasFrames": 32,
+            "decodedBytes": 2097152,
+            "playbackElapsedSeconds": 0.016799999713897704,
+            "plays": 21,
+            "cues": 4,
+            "lastPoseMs": 0,
+            "instanceLoaded": true,
+            "instancePlaying": true
+          }
+        ],
+        "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+      }
+    }
+  },
+  "sourceArt": {
+    "frames": {
+      "files": [
+        "art-source/revision-2/guard-painted-sheet.png",
+        "art-source/revision-2/guard-walk-sheet.png",
+        "art-source/batch-2/squire-poses.png"
+      ],
+      "bytes": 5998402,
+      "scope": "input PNG art only; derived atlases and older rejected iterations not counted twice"
+    },
+    "rig": {
+      "files": [
+        "art-source/rig-experiment/guard-parts-source.png",
+        "art-source/rig-experiment/squire-parts-source.png"
+      ],
+      "bytes": 2830048,
+      "scope": "input PNG art only; derived atlases and older rejected iterations not counted twice"
+    }
+  },
+  "compiledCode": {
+    "rigAdapterAndMotion": {
+      "debugModuleBytes": 26875,
+      "gzipBytes": 6770,
+      "scope": "actual built modules; existing shared helpers and small integration call sites excluded; diagnostic scene is not needed by a future production rig"
+    },
+    "diagnosticScene": {
+      "debugModuleBytes": 19927,
+      "gzipBytes": 5291,
+      "scope": "actual built modules; existing shared helpers and small integration call sites excluded; diagnostic scene is not needed by a future production rig"
+    }
+  },
+  "thirdAppearance": {
+    "scope": "same-proportion Squire training outfit, no new gameplay ID or other 17 model changes",
+    "sourcePNGBytes": 1544567,
+    "runtimeTextureBytes": 66384,
+    "baseRGBABytes": 1048576,
+    "newMotionTracks": 0,
+    "generatorWallMs": 43766
+  }
+}

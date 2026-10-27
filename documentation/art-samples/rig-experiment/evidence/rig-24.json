@@ -1,0 +1,1252 @@
+{
+  "ready": true,
+  "mode": "rig",
+  "action": "stand",
+  "direction": "east",
+  "count": 24,
+  "nodes": 459,
+  "measuring": false,
+  "elapsed": 18.000199999809286,
+  "drawCalls": 73,
+  "engineTextureAllocationBytes": 8886832,
+  "actors": [
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0.09999990463256836,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "guard",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    },
+    {
+      "kind": "shared-rig",
+      "costume": "squire",
+      "slots": 14,
+      "nodeCount": 17,
+      "sharedAtlasRefs": 24,
+      "sharedAtlasFrames": 32,
+      "decodedBytes": 2097152,
+      "playbackElapsedSeconds": 13.133199999809273,
+      "plays": 21,
+      "cues": 4,
+      "lastPoseMs": 0,
+      "instanceLoaded": true,
+      "instancePlaying": true
+    }
+  ],
+  "result": {
+    "mode": "rig",
+    "count": 24,
+    "seconds": 18.000199999809286,
+    "frameIntervalMs": {
+      "samples": 1033,
+      "min": 7.900000095367432,
+      "p50": 16.699999809265137,
+      "p95": 17.699999809265137,
+      "max": 25.40000009536743
+    },
+    "animationUpdateMs": {
+      "samples": 1033,
+      "min": 0,
+      "p50": 0.40000009536743164,
+      "p95": 0.7000002861022949,
+      "max": 1.6999998092651367
+    },
+    "drawCalls": {
+      "samples": 1032,
+      "min": 73,
+      "p50": 73,
+      "p95": 73,
+      "max": 73
+    },
+    "engineTextureAllocationBytes": {
+      "samples": 1032,
+      "min": 8886832,
+      "p50": 8886832,
+      "p95": 8886832,
+      "max": 8886832
+    },
+    "cues": [
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2665999999046325,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2501999998092651,
+        "expected": 0.25
+      }
+    ],
+    "actors": [
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0.09999990463256836,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "guard",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      },
+      {
+        "kind": "shared-rig",
+        "costume": "squire",
+        "slots": 14,
+        "nodeCount": 17,
+        "sharedAtlasRefs": 24,
+        "sharedAtlasFrames": 32,
+        "decodedBytes": 2097152,
+        "playbackElapsedSeconds": 0.016799999713897704,
+        "plays": 21,
+        "cues": 4,
+        "lastPoseMs": 0,
+        "instanceLoaded": true,
+        "instancePlaying": true
+      }
+    ],
+    "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+  }
+}

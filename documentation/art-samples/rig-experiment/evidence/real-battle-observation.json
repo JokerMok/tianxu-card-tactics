@@ -1,0 +1,505 @@
+{
+  "elapsedMs": 153311.4,
+  "page": "home",
+  "ready": true,
+  "busy": false,
+  "nodes": 363,
+  "sprites": 141,
+  "missing": 0,
+  "emptyNames": [],
+  "sampleGeometry": [
+    {
+      "size": {
+        "width": 149.375,
+        "height": 116.875
+      },
+      "anchor": {
+        "x": 0.3514644351464435,
+        "y": 0.0267379679144385
+      },
+      "pos": {
+        "x": 645,
+        "y": 475.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 956,
+        "y": 0,
+        "width": 239,
+        "height": 187
+      },
+      "original": {
+        "width": 239,
+        "height": 187
+      }
+    },
+    {
+      "size": {
+        "width": 158.125,
+        "height": 121.875
+      },
+      "anchor": {
+        "x": 0.4782608695652174,
+        "y": 0.06666666666666665
+      },
+      "pos": {
+        "x": 735,
+        "y": 380.50000000000006,
+        "z": 0
+      },
+      "frame": {
+        "x": 1012,
+        "y": 0,
+        "width": 253,
+        "height": 195
+      },
+      "original": {
+        "width": 253,
+        "height": 195
+      }
+    }
+  ],
+  "units": 12,
+  "maxUnits": 14,
+  "animations": 12,
+  "blankSamples": 46,
+  "warmBlankSamples": 0,
+  "animationSamples": 150247,
+  "blankClassification": {
+    "initialUnrendered": 46,
+    "currentInitialUnrendered": 0,
+    "expectedOpacityZero": 0,
+    "zeroHpSourceEmpty": 0,
+    "unexpected": 0,
+    "currentExpectedOpacityZero": 0,
+    "currentZeroHpSourceEmpty": 0,
+    "currentUnexpected": 0,
+    "rule": "Only opacity-zero empty animation is expected. Never-yet-rendered initial samples are separate, not called proven loading. HP zero without transparent ownership is ambiguous; unowned/effect/source blanks remain unexpected."
+  },
+  "opacityDiagnostics": {
+    "transparentAnimations": 140,
+    "fadingAnimations": 140,
+    "currentTransparent": 0,
+    "currentFading": 0
+  },
+  "spriteChanges": 748729,
+  "homeBuilds": 0,
+  "p95": 9.299999999988358,
+  "clicks": [
+    {
+      "seq": 1,
+      "x": 645,
+      "y": 397,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 2,
+      "x": 645,
+      "y": 464,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 3,
+      "x": 635,
+      "y": 571,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 4,
+      "x": 639,
+      "y": 226,
+      "firstMs": 818.9000000953674,
+      "usableMs": 927.2000000953703
+    },
+    {
+      "seq": 5,
+      "x": 56,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 6,
+      "x": 1200,
+      "y": 505,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 7,
+      "x": 1200,
+      "y": 505,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 8,
+      "x": 139,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    },
+    {
+      "seq": 9,
+      "x": 221,
+      "y": 707,
+      "firstMs": null,
+      "usableMs": null
+    }
+  ],
+  "startup": [
+    {
+      "path": "/api/bootstrap",
+      "ms": 1.5,
+      "encoded": 89,
+      "decoded": 89,
+      "transfer": 389
+    },
+    {
+      "path": "/recovered/original-ui.json",
+      "ms": 6.900000095367432,
+      "encoded": 6653356,
+      "decoded": 6653356,
+      "transfer": 6653656
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh22.jpg",
+      "ms": 3,
+      "encoded": 224590,
+      "decoded": 224590,
+      "transfer": 224890
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh26.png",
+      "ms": 1.4000000953674316,
+      "encoded": 93602,
+      "decoded": 93602,
+      "transfer": 93902
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh21.png",
+      "ms": 1.5,
+      "encoded": 11375,
+      "decoded": 11375,
+      "transfer": 11675
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/mamh29.png",
+      "ms": 1.5,
+      "encoded": 3016,
+      "decoded": 3016,
+      "transfer": 3316
+    },
+    {
+      "path": "/recovered/original-ui/images/Login/c1i02n.png",
+      "ms": 1,
+      "encoded": 1761,
+      "decoded": 1761,
+      "transfer": 2061
+    },
+    {
+      "path": "/recovered/original-ui/legacy/kphcbj_1_3-0.png",
+      "ms": 3,
+      "encoded": 154025,
+      "decoded": 154025,
+      "transfer": 154325
+    },
+    {
+      "path": "/api/catalog",
+      "ms": 98.80000019073486,
+      "encoded": 9100788,
+      "decoded": 67038251,
+      "transfer": 9101088
+    },
+    {
+      "path": "/recovered/original-ui/legacy/tx_1-0.png",
+      "ms": 3.8000001907348633,
+      "encoded": 5623,
+      "decoded": 5623,
+      "transfer": 5923
+    },
+    {
+      "path": "/recovered/original-ui/legacy/renleizhongzuxiao-0.png",
+      "ms": 3.8999996185302734,
+      "encoded": 795,
+      "decoded": 795,
+      "transfer": 1095
+    }
+  ],
+  "atlasResources": [
+    {
+      "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "ms": 7.299999713897705,
+      "encoded": 848696,
+      "decoded": 848696,
+      "transfer": 848996
+    },
+    {
+      "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+      "ms": 4.699999809265137,
+      "encoded": 1103918,
+      "decoded": 1103918,
+      "transfer": 1104218
+    }
+  ],
+  "lastResources": [
+    {
+      "path": "/api/state",
+      "ms": 2.200000286102295,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 2.5,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 2.299999713897705,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 2.9000000953674316,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 1.5,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 2.6000003814697266,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 3.1000003814697266,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    },
+    {
+      "path": "/api/state",
+      "ms": 3,
+      "encoded": 107,
+      "decoded": 107,
+      "transfer": 407
+    }
+  ],
+  "art": {
+    "skin": {
+      "pack": "steelwood-chapter1-production-20261026",
+      "uiTextures": 13,
+      "loads": 13,
+      "failures": 0,
+      "maxPrepareMs": 53,
+      "unitAtlases": {
+        "atlasPoolEntries": 2,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 2,
+        "atlasPoolSpriteFrames": 60,
+        "atlasPoolEstimatedBytes": 11283360,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728
+      }
+    },
+    "battle": {
+      "liveDisplays": 12,
+      "animations": [
+        {
+          "frameTreesBuilt": 6,
+          "frameTreesReused": 767,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "frameTreesBuilt": 7,
+          "frameTreesReused": 767,
+          "frameTreesEvicted": 0,
+          "frameCacheSize": 6,
+          "retainedFrameTrees": 6,
+          "activeFrameTrees": 1,
+          "pendingFrameTrees": 0
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "guard",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 47.34980000019072,
+          "plays": 10,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "guard",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 43.29949999999995,
+          "plays": 12,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "squire",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 41.2995,
+          "plays": 6,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "guard",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 46.33319999980924,
+          "plays": 6,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "squire",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 38.21690000009537,
+          "plays": 10,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "guard",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 38.283300000190735,
+          "plays": 8,
+          "cues": 2,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 2,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 2,
+          "atlasPoolSpriteFrames": 60,
+          "atlasPoolEstimatedBytes": 11283360,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 4,
+          "playbackElapsedSeconds": 42.549999999999976,
+          "plays": 4,
+          "frameChanges": 620,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 3
+        },
+        {
+          "kind": "sample",
+          "atlasPoolEntries": 2,
+          "atlasPoolPendingEntries": 0,
+          "atlasPoolLiveReferences": 2,
+          "atlasPoolSpriteFrames": 60,
+          "atlasPoolEstimatedBytes": 11283360,
+          "atlasPoolMaxEntries": 19,
+          "atlasPoolMaxEstimatedBytes": 134217728,
+          "instanceLoaded": true,
+          "instancePlaying": true,
+          "instanceFrame": 4,
+          "playbackElapsedSeconds": 41.799900000095356,
+          "plays": 4,
+          "frameChanges": 617,
+          "cues": 0,
+          "completions": 0,
+          "cancellations": 3
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "squire",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 75.96649999999937,
+          "plays": 2,
+          "cues": 0,
+          "lastPoseMs": 0,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        },
+        {
+          "kind": "shared-rig",
+          "costume": "guard",
+          "slots": 14,
+          "nodeCount": 17,
+          "sharedAtlasRefs": 8,
+          "sharedAtlasFrames": 32,
+          "decodedBytes": 2097152,
+          "playbackElapsedSeconds": 38.783400000095355,
+          "plays": 4,
+          "cues": 0,
+          "lastPoseMs": 0.09999990463256836,
+          "instanceLoaded": true,
+          "instancePlaying": true
+        }
+      ]
+    }
+  }
+}

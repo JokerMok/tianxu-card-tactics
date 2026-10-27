@@ -1,0 +1,1396 @@
+{
+  "ready": true,
+  "mode": "packed",
+  "action": "stand",
+  "direction": "east",
+  "count": 24,
+  "nodes": 123,
+  "measuring": false,
+  "elapsed": 18.000099999904627,
+  "drawCalls": 49,
+  "engineTextureAllocationBytes": 14830592,
+  "actors": [
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    },
+    {
+      "atlasPoolEntries": 1,
+      "atlasPoolPendingEntries": 0,
+      "atlasPoolLiveReferences": 24,
+      "atlasPoolSpriteFrames": 65,
+      "atlasPoolEstimatedBytes": 8040912,
+      "atlasPoolMaxEntries": 19,
+      "atlasPoolMaxEstimatedBytes": 134217728,
+      "instanceLoaded": true,
+      "instancePlaying": true,
+      "instanceFrame": 1,
+      "playbackElapsedSeconds": 16.667199999809306,
+      "plays": 20,
+      "frameChanges": 364,
+      "cues": 4,
+      "completions": 11,
+      "cancellations": 8
+    }
+  ],
+  "result": {
+    "mode": "packed",
+    "count": 24,
+    "seconds": 18.000099999904627,
+    "frameIntervalMs": {
+      "samples": 1032,
+      "min": 14.699999809265137,
+      "p50": 16.699999809265137,
+      "p95": 17.699999809265137,
+      "max": 18.800000190734863
+    },
+    "animationUpdateMs": {
+      "samples": 1032,
+      "min": 0,
+      "p50": 0,
+      "p95": 0.09999990463256836,
+      "max": 0.2999997138977051
+    },
+    "drawCalls": {
+      "samples": 1031,
+      "min": 49,
+      "p50": 49,
+      "p95": 49,
+      "max": 49
+    },
+    "engineTextureAllocationBytes": {
+      "samples": 1031,
+      "min": 14830592,
+      "p50": 14830592,
+      "p95": 14830592,
+      "max": 14830592
+    },
+    "cues": [
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25009999990463255,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.2510999999046326,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.26660000038146975,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "guard",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      },
+      {
+        "costume": "squire",
+        "seconds": 0.25000000000000006,
+        "expected": 0.25
+      }
+    ],
+    "actors": [
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      },
+      {
+        "atlasPoolEntries": 1,
+        "atlasPoolPendingEntries": 0,
+        "atlasPoolLiveReferences": 24,
+        "atlasPoolSpriteFrames": 65,
+        "atlasPoolEstimatedBytes": 8040912,
+        "atlasPoolMaxEntries": 19,
+        "atlasPoolMaxEstimatedBytes": 134217728,
+        "instanceLoaded": true,
+        "instancePlaying": true,
+        "instanceFrame": 0,
+        "playbackElapsedSeconds": 0.016699999809265138,
+        "plays": 20,
+        "frameChanges": 231,
+        "cues": 4,
+        "completions": 11,
+        "cancellations": 8
+      }
+    ],
+    "scope": "same native Cocos scene, warm interval, engine counters not driver GPU residency; no DB or battle rules"
+  }
+}

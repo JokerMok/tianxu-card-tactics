@@ -1,0 +1,26 @@
+{
+  "ready": false,
+  "mode": "side",
+  "action": "stand",
+  "direction": "east",
+  "count": 0,
+  "nodes": 3,
+  "measuring": false,
+  "elapsed": 0,
+  "drawCalls": 1,
+  "engineTextureAllocationBytes": 5376560,
+  "rigBank": {
+    "atlases": 0,
+    "references": 0
+  },
+  "frameBank": {
+    "atlasPoolEntries": 0,
+    "atlasPoolPendingEntries": 0,
+    "atlasPoolLiveReferences": 0,
+    "atlasPoolSpriteFrames": 0,
+    "atlasPoolEstimatedBytes": 0,
+    "atlasPoolMaxEntries": 19,
+    "atlasPoolMaxEstimatedBytes": 134217728
+  },
+  "actors": []
+}

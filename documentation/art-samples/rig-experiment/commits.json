@@ -1,0 +1,26 @@
+{
+  "baselineCommit": "760c56e9a82c81bfc50af1880e7a3182d7424e66",
+  "implementationCommit": "501713dffb06483086c2b9f766d700e3fb6e08db",
+  "nativeBundleSha256": "4359022bc3759899c50c9f681a1919a1d0824d1ed431383ce465f994b39e6c8e",
+  "sourceHashMatch": true,
+  "sourceFilesVerified": 28,
+  "priorArtPackHashesUnchanged": true,
+  "experimentAssetHashes": {
+    "cocos-client/assets/resources/art-samples/rig-experiment/manifest.json": "87aaf79f50724d25820a5a2ed6b865947febf5dfe8cfef338559c9d6e8b5ce46",
+    "cocos-client/assets/resources/art-samples/rig-experiment/packed-0934d1d9bea5.webp": "0934d1d9bea5bc949527ba82f17ea55634ef8a57cd8f875ae36d441bc64e000e",
+    "cocos-client/assets/resources/art-samples/rig-experiment/parts-38fbfb0d9c62.webp": "38fbfb0d9c62bf96ecdd357ce66bd6b4cc93274a37876dcd5d95eda35fe9b551",
+    "cocos-client/assets/resources/art-samples/rig-experiment/trial-parts-ffc9276ad18d.webp": "ffc9276ad18dd8382f0230edf371885bb7fc4fdd3c3266be6cf39ec0c1c150c4",
+    "cocos-client/assets/resources/art-samples/rig-experiment/trial.json": "a682bd151275ec88619a7ec5a8d33e6451584b979f27c2bff18035dbe30e8a33"
+  },
+  "build": "Creator 3.8.8 native web-desktop; before commit, source hashes match implementation commit",
+  "targetedChecks": {
+    "strictEntryTypecheck": "passed",
+    "sharedRigLifecycleAndCue": "passed; mock lifecycle, not visual proof",
+    "existingSampleClockAndRefcount": "passed; mock runtime",
+    "nativeSameSceneAndRealBattle": "recorded; dedicated fixture, not progression acceptance",
+    "finalRelease": "native actors0/nodes3, both banks0"
+  },
+  "releaseDifference": "Final build adds post-destroy diagnostics, disposed packed-load check and source-defined block-reaction guard only; warm 24-actor timing was not rerun, unchanged measured five-state curves/atlas sizes/node structure.",
+  "production": "not connected; no push, merge or deployment",
+  "personalDatabase": "not opened or copied; only new .local/rig-experiment/data/game.sqlite used"
+}
