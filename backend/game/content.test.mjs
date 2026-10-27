@@ -25,3 +25,24 @@ test('explicit missing enemy adapters and optional source orphan routes retain o
   const raw = content.data.scenes.find(scene => scene.id === graph.id);
   assert.equal(raw.nodes.some(row => row._tag === 'GraphEdge' && row.to === '70301'), false);
 });
+
+test('chapter-two story display keeps raw configuration and rejects stale source translations', () => {
+  const graph = content.graph('main:scene:2');
+  const before = JSON.stringify(graph);
+  const nodes = graph.nodes.filter(node => node.triggers.some(trigger => Number(trigger.raw.type) === 2));
+  assert.equal(nodes.length, 8);
+  for (const node of nodes) {
+    assert.match(content.sceneStory(node), /[\u4e00-\u9fff]/);
+    const translation = content.catalog.localization.stories[node.id];
+    const original = content.descriptions.get(Number(node.raw.backgrounddesid));
+    assert.equal(translation.originalText, original);
+    assert.equal(translation.status, 'candidate-translation');
+  }
+  const node = nodes[0], translation = content.catalog.localization.stories[node.id];
+  const source = translation.originalText;
+  try {
+    translation.originalText = 'different source';
+    assert.equal(content.sceneStory(node), source);
+  } finally { translation.originalText = source; }
+  assert.equal(JSON.stringify(graph), before);
+});

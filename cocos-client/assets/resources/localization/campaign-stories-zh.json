@@ -1,0 +1,53 @@
+{
+  "scope": "Chapter 2 actual enabled ordinary nodes only; translated display, not recovered official Chinese. IDs, raw config and rules unchanged.",
+  "stories": {
+    "main:scene:2:node:201": {
+      "text": "2—1 大道要塞\n\n侦察兵报告，哥布林与食人魔的袭击来自西面的冰封要塞。精灵还带来消息：你的儿时伙伴艾蕾莱公主已被劫为人质。必须尽快救出她！",
+      "originalText": "<p align=\"center\"><b>2-1 Highway Fort</b></p><br>Scouts report that the Goblin & Ogre raids came from the icy fortresses to the west. You've also heard from the Elves that your childhood companion, Princess Erelei has been taken hostage. You must rescue her quickly!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 201001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:202": {
+      "text": "2—2 山腰哨塔\n\n哨塔已被哥布林占领，空气中弥漫着血腥与污秽的气息。拿起武器，夺回哨塔！",
+      "originalText": "<p align=\"center\"><b>2-2 Hillside Sentry Tower</b></p><br>The sentry tower has been captured by Goblins, and reeks of blood and filth. Grab your weapons and take it back!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 202001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:203": {
+      "text": "2—3 丘陵山路\n\n食人魔挡住了去路。冲上结冰的山坡时务必小心，失足滑落与食人魔的钉锤同样致命！",
+      "originalText": "<p align=\"center\"><b>2-3 Hilly Mountain Road</b></p><br>Ogres bar your path, take care as you charge on the icy slope, a fall here is just as deadly as an Ogre's Mace!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 203001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:204": {
+      "text": "2—4 石砌废墟\n\n哥布林在这片古老废墟中筑起了巢穴。净化此地，摧毁它们的污秽巢穴！",
+      "originalText": "<p align=\"center\"><b>2-4 Stone Ruins</b></p><br>The Goblins have made a lair in these ancient ruins. Purify this site and destroy their filthy nest!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 204001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:205": {
+      "text": "2—5 安息之地\n\n这里是袭击者的集结地。敞开的空围栏里，堆满了不幸俘虏被啃食后的残骨。狂暴猎犬虽已饱食腐尸，也不会放过新鲜的猎物。",
+      "originalText": "<p align=\"center\"><b>2-5 Resting Grounds</b></p><br>A staging ground for raids, empty pens stand open, filled with the gnawed bones of unlucky captives. Even though the frenzied hounds have been feasting on rotting corpses, they won't pass up the chance to eat a fresh kill.",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 205001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:206": {
+      "text": "2—6 覆雪山坡\n\n一队卫兵突然袭击了你的武装护卫队。他们似乎乐于相信这里正在发生武装叛乱。也许只有一次彻底的失败，才能让他们今后传递准确的情报。",
+      "originalText": "<p align=\"center\"><b>2-6 Snow-covered Slope</b></p><br>A party of Guardsmen unexpectedly assaults your armed escort. They seem happy with the illusion of an armed rebellion. Perhaps a decisive defeat will make them supply correct information in the future. ",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 206001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:207": {
+      "text": "2—7 刃脊山道\n\n哨兵奉命不许任何人通过。看来，只能用武力闯过去了……",
+      "originalText": "<p align=\"center\"><b>2-7 Knifes-Edge Mountain Path</b></p><br>Sentries have been instructed not to let anyone pass. Looks like you're going to have to go through them the hard way...",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 207001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:2:node:208": {
+      "text": "2—8 雪原要塞\n\n雪原要塞的大门紧闭，克劳德指挥官满怀敌意。想救出精灵公主艾蕾莱，唯有彻底击败他。",
+      "originalText": "<p align=\"center\"><b>2-8 Snowy Fort</b></p><br>The gates of the Snowy Fort are locked tight. Commander Claude is seething with enmity. The only way to rescue the elven princess, Erelei, is by soundly defeating him.",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 208001; English source in current imported configuration; display translation only"
+    }
+  }
+}

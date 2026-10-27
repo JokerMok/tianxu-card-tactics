@@ -66,7 +66,7 @@ export class ServerContent extends RecoveredContent {
         unlocked: actor.progress.unlockedScenes.includes(Number(scene.header.id)),
         nodes: graph.nodes.map(node => ({ id: node.id, originalId: node.originalId,
           name: String(node.triggers[0]?.raw.des ?? (node.id === graph.startNodeId ? '起点' : '道路')),
-          story: this.descriptions.get(numeric(node.raw, 'backgrounddesid')) ?? '',
+          story: this.sceneStory(node),
           x: numeric(node.raw, 'x'), y: numeric(node.raw, 'y'),
           cleared: actor.progress.clearedNodes.includes(node.id),
           accessible: this.nodeAccessible(actor, graph, node),
@@ -74,6 +74,12 @@ export class ServerContent extends RecoveredContent {
           transitions: node.triggers.filter(trigger => numeric(trigger.raw, 'type') === 3).map(trigger => numeric(trigger.raw, 'nextsenceid')),
           triggers: node.triggers.map(trigger => ({ id: trigger.id, name: String(trigger.raw.des ?? ''), repeat: numeric(trigger.raw, 'repeat') })) })) };
     });
+  }
+  sceneStory(node) {
+    const original = this.descriptions.get(numeric(node.raw, 'backgrounddesid')) ?? '';
+    const display = this.catalog.localization?.stories?.[node.id];
+    // A changed source must be reviewed, never silently shown under a stale translation.
+    return display?.originalText === original && typeof display.text === 'string' ? display.text : original;
   }
   nodeAccessible(actor, graph, node) {
     if (!actor.progress.unlockedScenes.includes(Number(graph.id.split(':').at(-1)))) return false;

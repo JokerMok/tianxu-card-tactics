@@ -9,7 +9,7 @@ import { competitionActions, operateCompetition, competitionView, tournamentDeck
 import { leagueActions, operateLeague, leagueView, tickLeague, validateLeagueRoom, onLeagueSettled } from './league-systems.mjs';
 import { grantCampaignExtras } from './campaign-rewards.mjs';
 import { presentationNames, presentSections } from './presentation.mjs';
-import { playerUi } from './player-ui.mjs';
+import { playerUi, mainlineTaskCards } from './player-ui.mjs';
 import { requireText, requireCount, conflict, stable } from './store.mjs';
 
 const nowDay = now => new Date(now + 8 * 3600000).toISOString().slice(0, 10);
@@ -474,7 +474,7 @@ export class GameService {
     const assetNames = Object.fromEntries(Array.from(assets, id => [id, names[id] ?? (id.includes(':item:') ? `物品 #${id.split(':').at(-1)}` : `卡牌 #${id.split(':').at(-1)}`)]));
     return { stageScope:STAGE_SCOPE,serverInstance:this.instanceId,revision: world.revision, now: this.clock(), day: nowDay(this.clock()), actor: { ...actor, tutorialReady:[true,actor.stats.deckEdits>0,actor.stats.battles>0,actor.stats.pveWins>0][actor.tutorialStep]===true,deckIssues:stageDeckIssues(actor,this.content.tables), deckCapacity: Number(actorLevel.DeckCapacity) }, battle, league, assetNames, ...playerUi(this.content, assets),
       story: String(this.content.table('stringres').find(row => row.ID === 10100)?.des ?? ''),
-      scenes: this.content.sceneSummary(actor).filter(scene=>stageSceneAllowed(this.content.tables,scene.id)), tasks: this.tasks(actor), growth, pve, social,
+      scenes: this.content.sceneSummary(actor).filter(scene=>stageSceneAllowed(this.content.tables,scene.id)), tasks: [...this.tasks(actor),...mainlineTaskCards(this.content,actor,pve)], growth, pve, social,
       roomInvites: Object.values(world.roomInvites ?? {}).filter(invite => invite.to === actor.id && invite.expires > this.clock() && world.rooms[invite.roomId]?.status === 'waiting'),
       rooms: Object.values(world.rooms).filter(room => room.status === 'waiting' || (room.members.includes(actor.id) && !world.battles[room.battleId]?.dismissed.includes(actor.id))),
       rankings: Object.values(world.characters).map(char => ({ id: char.id, name: char.name, level: char.level, rating: char.rating, wins: char.wins, losses: char.losses }))

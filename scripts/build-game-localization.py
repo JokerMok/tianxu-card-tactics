@@ -10,7 +10,7 @@ names=read('card-names.json','names');effects=read('effects-zh.json','effects');
 for e in preview['effects'] if isinstance(preview['effects'],list) else preview['effects'].values():
  effects.setdefault(e['id'],dict(e,source='reviewed preview; English source translation'))
 active=[c for c in d['cards'].values()if not re.search(r'废弃|\(Abandoned\)',str(c['raw'].get('Name','')),re.I)and((c['raw'].get('Type')==1 and str(c['raw'].get('MonsterID'))in d['monsters'])or(c['raw'].get('Type')==2 and str(c['raw'].get('SkillID'))in d['skills']))]
-result={'version':1,'sourceManifest':cat['sourceManifest'],'note':'Chinese display candidates remain distinct from recovered official text. Original IDs/raw fields/rules unchanged.','cards':{},'effects':{},'skills':{}};missing={'cardNames':[],'effects':[],'skillDescriptions':[]}
+result={'version':1,'sourceManifest':cat['sourceManifest'],'note':'Chinese display candidates remain distinct from recovered official text. Original IDs/raw fields/rules unchanged.','cards':{},'effects':{},'skills':{},'stories':read('campaign-stories-zh.json','stories')};missing={'cardNames':[],'effects':[],'skillDescriptions':[]}
 for c in active:
  r=c['raw'];name=str(r.get('Name',''));p=pnames.get(name);n=names.get(name)
  if n: shown={'name':n['name'],'status':n['status'],'source':n['source']}
