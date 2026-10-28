@@ -1,0 +1,10 @@
+{
+  "branch": "codex/chapter3-normal-pve",
+  "baseline": "4c15f3acf6af0be2f1893eb807f29918aa83c1b9",
+  "implementation": "2ed9900b54b655a826f65508ebe01f29817e379f",
+  "documentationCommit": "Resolve with git log -1 -- documentation/chapter3-normal; no self-referential commit hash",
+  "push": false,
+  "mergeMain": false,
+  "serverUpdate": false,
+  "pending": "Final native build and actual client checks for information pagination and delayed portrait guard"
+}

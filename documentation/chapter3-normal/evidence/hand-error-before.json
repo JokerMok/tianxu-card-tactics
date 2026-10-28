@@ -1,0 +1,17 @@
+{
+  "scope": "Actual Cocos console before the late-portrait lifetime guard; duplicate entries share the same timestamp.",
+  "errors": [
+    {
+      "level": "error",
+      "message": "TypeError: Cannot read properties of null (reading 'push')\n    at Node.addComponent (http://127.0.0.1:7469/cocos-js/_virtual_cc-Bblzxeqy.js:28205:28)\n    at BattleSceneView._callee2$ (http://127.0.0.1:7469/assets/main/index.js:3436:55)\n    at tryCatch (http://127.0.0.1:7469/src/chunks/bundle.js:66:22)\n    at Generator.<anonymous> (http://127.0.0.1:7469/src/chunks/bundle.js:154:23)\n    at Generator.next (http://127.0.0.1:7469/src/chunks/bundle.js:95:27)\n    at asyncGeneratorStep (http://127.0.0.1:7469/src/chunks/bundle.js:327:30)\n    at _next (http://127.0.0.1:7469/src/chunks/bundle.js:346:15)",
+      "timestamp": "2026-10-28T09:58:09.116Z",
+      "url": "http://127.0.0.1:7469/cocos-js/_virtual_cc-Bblzxeqy.js"
+    },
+    {
+      "level": "error",
+      "message": "TypeError: Cannot read properties of null (reading 'push')\n    at Node.addComponent (http://127.0.0.1:7469/cocos-js/_virtual_cc-Bblzxeqy.js:28205:28)\n    at BattleSceneView._callee2$ (http://127.0.0.1:7469/assets/main/index.js:3436:55)\n    at tryCatch (http://127.0.0.1:7469/src/chunks/bundle.js:66:22)\n    at Generator.<anonymous> (http://127.0.0.1:7469/src/chunks/bundle.js:154:23)\n    at Generator.next (http://127.0.0.1:7469/src/chunks/bundle.js:95:27)\n    at asyncGeneratorStep (http://127.0.0.1:7469/src/chunks/bundle.js:327:30)\n    at _next (http://127.0.0.1:7469/src/chunks/bundle.js:346:15)",
+      "timestamp": "2026-10-28T09:58:09.116Z",
+      "url": "http://127.0.0.1:7469/cocos-js/_virtual_cc-Bblzxeqy.js"
+    }
+  ]
+}

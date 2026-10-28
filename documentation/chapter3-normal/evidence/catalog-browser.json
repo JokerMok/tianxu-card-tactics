@@ -1,0 +1,36 @@
+{
+  "scope": "First catalog request in this reloaded Cocos document; browser cache already warm. It is not a cold-network measurement.",
+  "requests": [
+    {
+      "path": "/api/catalog",
+      "start": 2083.5,
+      "headersMs": 1.0999999046325684,
+      "status": 200,
+      "bodyReadDecodeMs": 74.60000038146973,
+      "parseMs": 89.39999961853027,
+      "textChars": 66205076
+    }
+  ],
+  "resources": [
+    {
+      "path": "/api/catalog",
+      "start": 2083.5999999046326,
+      "ttfbMs": 0.5,
+      "transferMs": 56.200000286102295,
+      "totalMs": 57.10000038146973,
+      "transferBytes": 0,
+      "decodedBytes": 67042759
+    }
+  ],
+  "viewport": {
+    "css": [
+      1280,
+      720
+    ],
+    "design": [
+      1200,
+      600
+    ]
+  },
+  "note": "response body delivery includes decompression and text decoding; not separate browser gunzip timing"
+}

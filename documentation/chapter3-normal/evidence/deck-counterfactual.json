@@ -1,0 +1,40 @@
+{
+  "scope": "Two bounded offline runs from failed 302 seed; same enemy decks and actor stats; deck size also changes shuffle order. Not actual progression, not proof of general win rate.",
+  "id": "1f040239-c5a3-443b-ae3c-4dedd1a2dfd3",
+  "results": [
+    {
+      "deck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "turn": 14,
+      "winner": 1,
+      "playerHp": 0,
+      "firstPlayerFatigueTurn": 6
+    },
+    {
+      "deck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "turn": 15,
+      "winner": 0,
+      "playerHp": 10,
+      "firstPlayerFatigueTurn": 14
+    }
+  ]
+}

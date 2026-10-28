@@ -1,0 +1,124 @@
+{
+  "sameAssetsDeckProgressAndClaims": true,
+  "serverInstanceChanged": true,
+  "snapshot": {
+    "actor": {
+      "id": "6136cc1e-c2c1-402f-9e29-134690cc94b5",
+      "level": 11,
+      "xp": 151,
+      "deck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "cards": {
+        "main:card:1": 1,
+        "main:card:19": 2,
+        "main:card:43": 1,
+        "main:card:61": 3,
+        "main:card:5019": 1,
+        "main:card:2": 2,
+        "main:card:8": 1,
+        "main:card:41001": 3,
+        "main:card:75": 1,
+        "main:card:50": 2,
+        "main:card:5020": 1,
+        "main:card:26": 1,
+        "main:card:5001": 2,
+        "main:card:33": 1,
+        "main:card:5057": 1,
+        "main:card:5061": 4,
+        "main:card:5117": 1
+      },
+      "inventory": {
+        "main:item:10203": 1,
+        "main:item:10202": 1,
+        "main:item:10102": 1,
+        "main:item:10103": 1
+      },
+      "currencies": {
+        "silver": 4240,
+        "gold": 20,
+        "crystal": 0
+      },
+      "progress": {
+        "sceneId": 3,
+        "clearedNodes": [
+          "main:scene:1:node:101",
+          "main:scene:1:node:102",
+          "main:scene:1:node:103",
+          "main:scene:1:node:105",
+          "main:scene:1:node:107",
+          "main:scene:1:node:108",
+          "main:scene:2:node:201",
+          "main:scene:2:node:202",
+          "main:scene:2:node:203",
+          "main:scene:2:node:204",
+          "main:scene:2:node:205",
+          "main:scene:2:node:206",
+          "main:scene:2:node:207",
+          "main:scene:2:node:208",
+          "main:scene:2:node:209",
+          "main:scene:3:node:301",
+          "main:scene:3:node:302",
+          "main:scene:3:node:303",
+          "main:scene:3:node:304",
+          "main:scene:3:node:305",
+          "main:scene:3:node:306",
+          "main:scene:3:node:307",
+          "main:scene:3:node:308"
+        ],
+        "clearedTriggers": [
+          "main:scene:1:node:101:trigger:101001",
+          "main:scene:1:node:102:trigger:102001",
+          "main:scene:1:node:103:trigger:103001",
+          "main:scene:1:node:105:trigger:105001",
+          "main:scene:1:node:101:trigger:101002",
+          "main:scene:1:node:102:trigger:102002",
+          "main:scene:1:node:103:trigger:103002",
+          "main:scene:1:node:105:trigger:105002",
+          "main:scene:1:node:107:trigger:107001",
+          "main:scene:2:node:201:trigger:201001",
+          "main:scene:2:node:202:trigger:202001",
+          "main:scene:2:node:203:trigger:203001",
+          "main:scene:2:node:204:trigger:204001",
+          "main:scene:2:node:205:trigger:205001",
+          "main:scene:2:node:206:trigger:206001",
+          "main:scene:2:node:207:trigger:207001",
+          "main:scene:2:node:208:trigger:208001",
+          "main:scene:2:node:201:trigger:201002",
+          "main:scene:3:node:301:trigger:301001",
+          "main:scene:3:node:302:trigger:302001",
+          "main:scene:3:node:303:trigger:303001",
+          "main:scene:3:node:301:trigger:301002",
+          "main:scene:3:node:304:trigger:304001",
+          "main:scene:3:node:305:trigger:305001",
+          "main:scene:3:node:306:trigger:306001",
+          "main:scene:3:node:307:trigger:307001",
+          "main:scene:3:node:308:trigger:308001",
+          "main:scene:3:node:308:trigger:308002"
+        ],
+        "unlockedScenes": [
+          1,
+          2,
+          3
+        ],
+        "positionByScene": {}
+      }
+    },
+    "sourceTaskClaims": [
+      102,
+      1,
+      101,
+      103
+    ]
+  }
+}

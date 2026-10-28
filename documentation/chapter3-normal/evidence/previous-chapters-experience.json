@@ -1,0 +1,1689 @@
+{
+  "scope": "Existing isolated ordinary character battle logs only. Wall times include manual thinking, pauses and restarts; subsecond HTTP samples do not measure Cocos time. Empty enemy phases can be caused by preparation or conservative movement and are not automatically bugs.",
+  "records": [
+    {
+      "id": "06b26e33-3456-4ef6-841e-99c5b6089af9",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101001",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 5,
+      "wallSeconds": 643.453,
+      "eventTypes": {
+        "draw": 8,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 4,
+        "summon": 4,
+        "turn-end": 3,
+        "damage": 3,
+        "fatigue": 3,
+        "move": 2,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:187",
+            "main:card:3061",
+            "main:card:11145",
+            "main:card:14073"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:9",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 3061,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 418.029,
+        "largestGapSeconds": 181.92
+      }
+    },
+    {
+      "id": "ebddb9ab-7749-429d-9ea6-91f1794fb23e",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:102",
+      "trigger": "main:scene:1:node:102:trigger:102001",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 5,
+      "wallSeconds": 2022.555,
+      "eventTypes": {
+        "draw": 8,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 5,
+        "summon": 5,
+        "turn-end": 3,
+        "damage": 3,
+        "fatigue": 3,
+        "move": 1,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60002,
+          "hp": 2,
+          "name": "Goblin Maurader",
+          "deck": [
+            "main:card:3079",
+            "main:card:2043",
+            "main:card:2169",
+            "main:card:6241"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:9",
+          "monsterId": 1,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:10",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 2043,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:13",
+          "monsterId": 2169,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 3.564,
+        "largestGapSeconds": 1.212
+      }
+    },
+    {
+      "id": "bd2ef0ee-ce02-4ba4-b459-63bff1f2dabb",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:103",
+      "trigger": "main:scene:1:node:103:trigger:103001",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 3,
+      "wallSeconds": 2363.952,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 1,
+        "summon": 1,
+        "turn-end": 3,
+        "damage": 3,
+        "fatigue": 3,
+        "move": 1,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60003,
+          "hp": 2,
+          "name": "Ogre Destroyer",
+          "deck": [
+            "main:card:5269",
+            "main:card:145",
+            "main:card:11133",
+            "main:card:5269"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [],
+      "successfulCommandTiming": {
+        "count": 3,
+        "firstToSettlementSeconds": 576.529,
+        "largestGapSeconds": 550.976
+      }
+    },
+    {
+      "id": "dd49c060-3332-43a7-8ab1-c863f5a97e5e",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:105",
+      "trigger": "main:scene:1:node:105:trigger:105001",
+      "won": true,
+      "turnCounter": 6,
+      "turnStarts": 6,
+      "playerCommands": 8,
+      "wallSeconds": 48.947,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 6,
+        "play": 6,
+        "summon": 6,
+        "turn-end": 5,
+        "damage": 6,
+        "fatigue": 5,
+        "move": 3,
+        "attack": 1,
+        "death": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60005,
+          "hp": 2,
+          "name": "Ogre Marauder",
+          "deck": [
+            "main:card:13073",
+            "main:card:21247",
+            "main:card:18259",
+            "main:card:4145"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:10",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:11",
+          "monsterId": 1,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:15",
+          "monsterId": 5019,
+          "aiType": 1,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 8,
+        "firstToSettlementSeconds": 8.168,
+        "largestGapSeconds": 1.943
+      }
+    },
+    {
+      "id": "5d43c221-db7c-4779-b90c-573b3a9d0d87",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 5,
+      "wallSeconds": 35.97,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 5,
+        "play": 4,
+        "summon": 4,
+        "turn-end": 4,
+        "damage": 4,
+        "fatigue": 4,
+        "move": 1,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:4079",
+            "main:card:18169",
+            "main:card:11067",
+            "main:card:21307"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:11",
+          "monsterId": 43,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:13",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 3.203,
+        "largestGapSeconds": 0.876
+      }
+    },
+    {
+      "id": "ef95f646-b608-452a-bbc6-b56a50984272",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:102",
+      "trigger": "main:scene:1:node:102:trigger:102002",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 5,
+      "wallSeconds": 131.337,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 3,
+        "summon": 3,
+        "turn-end": 3,
+        "damage": 3,
+        "fatigue": 3,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60002,
+          "hp": 2,
+          "name": "Goblin Maurader",
+          "deck": [
+            "main:card:12217",
+            "main:card:12073",
+            "main:card:259",
+            "main:card:4103"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:10",
+          "monsterId": 43,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:11",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 3.283,
+        "largestGapSeconds": 1.011
+      }
+    },
+    {
+      "id": "3ba78b52-6b14-4064-9fb9-0ea7a31ca168",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:103",
+      "trigger": "main:scene:1:node:103:trigger:103002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 5,
+      "wallSeconds": 219.86,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 5,
+        "turn-end": 4,
+        "damage": 4,
+        "fatigue": 4,
+        "play": 4,
+        "summon": 4,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60003,
+          "hp": 2,
+          "name": "Ogre Destroyer",
+          "deck": [
+            "main:card:5043",
+            "main:card:21451",
+            "main:card:1277",
+            "main:card:21253"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:10",
+          "monsterId": 5043,
+          "aiType": 1,
+          "team": 1
+        },
+        {
+          "id": "unit:11",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:13",
+          "monsterId": 43,
+          "aiType": 0,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 135.769,
+        "largestGapSeconds": 132.852
+      }
+    },
+    {
+      "id": "696a5ca0-c4c8-4dab-9b22-7f41d9d49e12",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:105",
+      "trigger": "main:scene:1:node:105:trigger:105002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 5,
+      "wallSeconds": 44.242,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 5,
+        "play": 5,
+        "summon": 5,
+        "turn-end": 4,
+        "damage": 5,
+        "fatigue": 4,
+        "move": 2,
+        "attack": 1,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60005,
+          "hp": 2,
+          "name": "Ogre Marauder",
+          "deck": [
+            "main:card:12145",
+            "main:card:6085",
+            "main:card:21181",
+            "main:card:21169"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:11",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:14",
+          "monsterId": 12145,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 4.218,
+        "largestGapSeconds": 1.507
+      }
+    },
+    {
+      "id": "dde82ddb-05ab-4fa0-bd28-1dd64d088ddd",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:107",
+      "trigger": "main:scene:1:node:107:trigger:107001",
+      "won": false,
+      "turnCounter": 8,
+      "turnStarts": 8,
+      "playerCommands": 8,
+      "wallSeconds": 107.97,
+      "eventTypes": {
+        "draw": 9,
+        "battle-start": 1,
+        "turn-start": 8,
+        "turn-end": 7,
+        "damage": 10,
+        "fatigue": 7,
+        "play": 9,
+        "summon": 9,
+        "move": 3,
+        "attack": 3,
+        "effect": 2,
+        "status": 1,
+        "death": 3,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60007,
+          "hp": 16,
+          "name": "Goblin Captain",
+          "deck": [
+            "main:card:3079",
+            "main:card:14097",
+            "main:card:5043",
+            "main:card:1277"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "enemyHeroLastHit": [],
+      "enemyPhases": 4,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:10",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:11",
+          "monsterId": 19,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:15",
+          "monsterId": 14097,
+          "aiType": 1,
+          "team": 1
+        },
+        {
+          "id": "unit:17",
+          "monsterId": 5019,
+          "aiType": 1,
+          "team": 0
+        },
+        {
+          "id": "unit:18",
+          "monsterId": 8,
+          "aiType": 0,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 8,
+        "firstToSettlementSeconds": 13.084,
+        "largestGapSeconds": 6.216
+      }
+    },
+    {
+      "id": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:107",
+      "trigger": "main:scene:1:node:107:trigger:107001",
+      "won": true,
+      "turnCounter": 10,
+      "turnStarts": 10,
+      "playerCommands": 11,
+      "wallSeconds": 532.274,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 10,
+        "play": 10,
+        "summon": 7,
+        "turn-end": 9,
+        "damage": 13,
+        "fatigue": 8,
+        "death": 5,
+        "move": 11,
+        "attack": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60007,
+          "hp": 16,
+          "name": "Goblin Captain",
+          "deck": [
+            "main:card:6085",
+            "main:card:20019",
+            "main:card:61",
+            "main:card:1187"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 2,
+        "fatigue": 14
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 5,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:13",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:14",
+          "monsterId": 20019,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:17",
+          "monsterId": 1187,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 11,
+        "firstToSettlementSeconds": 482.375,
+        "largestGapSeconds": 85.489
+      }
+    },
+    {
+      "id": "533ad9d5-8d47-482d-b397-6d74ae5e9e0e",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 5,
+      "wallSeconds": 0.448,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 5,
+        "play": 4,
+        "summon": 3,
+        "turn-end": 4,
+        "damage": 4,
+        "fatigue": 3,
+        "status": 1,
+        "effect": 1,
+        "death": 2,
+        "move": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:4145",
+            "main:card:2127",
+            "main:card:11115",
+            "main:card:21205"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:10",
+          "monsterId": 2127,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 0.379,
+        "largestGapSeconds": 0.151
+      }
+    },
+    {
+      "id": "0303b787-8742-4806-8ee0-33b8193b1bd2",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 5,
+      "wallSeconds": 0.35,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 4,
+        "summon": 3,
+        "turn-end": 3,
+        "damage": 3,
+        "fatigue": 2,
+        "death": 2,
+        "move": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:5187",
+            "main:card:2061",
+            "main:card:2187",
+            "main:card:21205"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:12",
+          "monsterId": 5187,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 5,
+        "firstToSettlementSeconds": 0.283,
+        "largestGapSeconds": 0.08
+      }
+    },
+    {
+      "id": "2db11e68-d889-49c0-bc64-4b1d93eba815",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 7,
+      "wallSeconds": 0.52,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 5,
+        "play": 9,
+        "summon": 6,
+        "turn-end": 4,
+        "damage": 6,
+        "fatigue": 3,
+        "move": 6,
+        "death": 4,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:2085",
+            "main:card:9019",
+            "main:card:5211",
+            "main:card:2085"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [],
+      "successfulCommandTiming": {
+        "count": 7,
+        "firstToSettlementSeconds": 0.445,
+        "largestGapSeconds": 0.083
+      }
+    },
+    {
+      "id": "fdf95aeb-0519-4a9e-9aa7-f8e92ef000c5",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 4,
+      "wallSeconds": 0.344,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 2,
+        "summon": 2,
+        "turn-end": 3,
+        "damage": 2,
+        "fatigue": 2,
+        "move": 2,
+        "death": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:283",
+            "main:card:4127",
+            "main:card:3127",
+            "main:card:21439"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [],
+      "successfulCommandTiming": {
+        "count": 4,
+        "firstToSettlementSeconds": 0.271,
+        "largestGapSeconds": 0.131
+      }
+    },
+    {
+      "id": "f11859f6-8808-45e3-9a31-89d327624fb8",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 4,
+      "turnStarts": 4,
+      "playerCommands": 7,
+      "wallSeconds": 0.502,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 4,
+        "play": 8,
+        "summon": 5,
+        "turn-end": 3,
+        "damage": 5,
+        "fatigue": 2,
+        "death": 3,
+        "move": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:4079",
+            "main:card:21319",
+            "main:card:20019",
+            "main:card:211"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 2,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:11",
+          "monsterId": 4079,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:12",
+          "monsterId": 20019,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:13",
+          "monsterId": 211,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:15",
+          "monsterId": 61,
+          "aiType": 0,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 7,
+        "firstToSettlementSeconds": 0.423,
+        "largestGapSeconds": 0.078
+      }
+    },
+    {
+      "id": "7659474d-f013-42da-9115-f2fd36df5245",
+      "scene": "main:scene:1",
+      "node": "main:scene:1:node:101",
+      "trigger": "main:scene:1:node:101:trigger:101002",
+      "won": true,
+      "turnCounter": 5,
+      "turnStarts": 5,
+      "playerCommands": 6,
+      "wallSeconds": 0.512,
+      "eventTypes": {
+        "draw": 10,
+        "battle-start": 1,
+        "turn-start": 5,
+        "play": 6,
+        "summon": 4,
+        "turn-end": 4,
+        "damage": 5,
+        "fatigue": 3,
+        "move": 3,
+        "death": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60001,
+          "hp": 2,
+          "name": "Goblin Bandit",
+          "deck": [
+            "main:card:5211",
+            "main:card:12217",
+            "main:card:11356",
+            "main:card:14145"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 3,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:14",
+          "monsterId": 11356,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 6,
+        "firstToSettlementSeconds": 0.442,
+        "largestGapSeconds": 0.145
+      }
+    },
+    {
+      "id": "7e0ea4a6-245a-4882-acba-3c0b4c171987",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:201",
+      "trigger": "main:scene:2:node:201:trigger:201001",
+      "won": true,
+      "turnCounter": 8,
+      "turnStarts": 8,
+      "playerCommands": 10,
+      "wallSeconds": 54.825,
+      "eventTypes": {
+        "draw": 11,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 9,
+        "summon": 6,
+        "turn-end": 7,
+        "damage": 10,
+        "fatigue": 6,
+        "death": 4,
+        "move": 7,
+        "attack": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60008,
+          "hp": 9,
+          "name": "Ogre Bandit",
+          "deck": [
+            "main:card:11091",
+            "main:card:21331",
+            "main:card:2145",
+            "main:card:11362",
+            "main:card:4145"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 8
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 4,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:13",
+          "monsterId": 2145,
+          "aiType": 1,
+          "team": 1
+        },
+        {
+          "id": "unit:15",
+          "monsterId": 11091,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:16",
+          "monsterId": 11362,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 10,
+        "firstToSettlementSeconds": 22.761,
+        "largestGapSeconds": 8.394
+      }
+    },
+    {
+      "id": "b7327acb-cc3a-4da9-9640-ad17ae08a40c",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:202",
+      "trigger": "main:scene:2:node:202:trigger:202001",
+      "won": true,
+      "turnCounter": 8,
+      "turnStarts": 8,
+      "playerCommands": 11,
+      "wallSeconds": 52.349,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 11,
+        "summon": 8,
+        "turn-end": 7,
+        "damage": 9,
+        "fatigue": 5,
+        "death": 4,
+        "move": 8,
+        "attack": 1,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60009,
+          "hp": 10,
+          "name": "Goblin Chieftain",
+          "deck": [
+            "main:card:1043",
+            "main:card:9019",
+            "main:card:21115",
+            "main:card:9001",
+            "main:card:11067"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 4,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:13",
+          "monsterId": 9001,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:19",
+          "monsterId": 21115,
+          "aiType": 1,
+          "team": 1
+        },
+        {
+          "id": "unit:20",
+          "monsterId": 1043,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 11,
+        "firstToSettlementSeconds": 13.065,
+        "largestGapSeconds": 4.216
+      }
+    },
+    {
+      "id": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:203",
+      "trigger": "main:scene:2:node:203:trigger:203001",
+      "won": true,
+      "turnCounter": 11,
+      "turnStarts": 11,
+      "playerCommands": 12,
+      "wallSeconds": 111.516,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 10,
+        "damage": 17,
+        "fatigue": 8,
+        "effect": 7,
+        "move": 14,
+        "death": 5,
+        "attack": 6,
+        "status": 7,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60010,
+          "hp": 10,
+          "name": "Ogre Berserker",
+          "deck": [
+            "main:card:259",
+            "main:card:13073",
+            "main:card:4127",
+            "main:card:6241",
+            "main:card:6019"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 6,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [],
+      "successfulCommandTiming": {
+        "count": 12,
+        "firstToSettlementSeconds": 95.692,
+        "largestGapSeconds": 43.329
+      }
+    },
+    {
+      "id": "69f09efa-7da4-4b8b-b1b7-1d7260e38801",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:204",
+      "trigger": "main:scene:2:node:204:trigger:204001",
+      "won": true,
+      "turnCounter": 11,
+      "turnStarts": 11,
+      "playerCommands": 12,
+      "wallSeconds": 31.272,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 10,
+        "damage": 17,
+        "fatigue": 8,
+        "heal": 1,
+        "effect": 1,
+        "move": 12,
+        "death": 5,
+        "attack": 6,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60011,
+          "hp": 10,
+          "name": "Goblin Clan Leader",
+          "deck": [
+            "main:card:11091",
+            "main:card:1145",
+            "main:card:4079",
+            "main:card:13001",
+            "main:card:21091"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 11
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 6,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:14",
+          "monsterId": 11091,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 12,
+        "firstToSettlementSeconds": 23.751,
+        "largestGapSeconds": 8.397
+      }
+    },
+    {
+      "id": "5762b3bc-29b2-4c2f-8a78-a2ab12fa5665",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:205",
+      "trigger": "main:scene:2:node:205:trigger:205001",
+      "won": true,
+      "turnCounter": 10,
+      "turnStarts": 10,
+      "playerCommands": 12,
+      "wallSeconds": 119.651,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 10,
+        "play": 12,
+        "summon": 9,
+        "turn-end": 9,
+        "damage": 16,
+        "fatigue": 7,
+        "move": 11,
+        "death": 5,
+        "attack": 6,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60012,
+          "hp": 11,
+          "name": "Frenzied Hound",
+          "deck": [
+            "main:card:12073",
+            "main:card:11097",
+            "main:card:2211",
+            "main:card:5103",
+            "main:card:4061"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 11
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 5,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:14",
+          "monsterId": 4061,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:15",
+          "monsterId": 2211,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:16",
+          "monsterId": 5103,
+          "aiType": 0,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 12,
+        "firstToSettlementSeconds": 110.685,
+        "largestGapSeconds": 88.586
+      }
+    },
+    {
+      "id": "d5169192-486e-4b45-a0e5-e55bb0786825",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:206",
+      "trigger": "main:scene:2:node:206:trigger:206001",
+      "won": true,
+      "turnCounter": 11,
+      "turnStarts": 11,
+      "playerCommands": 12,
+      "wallSeconds": 33.962,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 11,
+        "turn-end": 10,
+        "play": 12,
+        "summon": 9,
+        "damage": 14,
+        "fatigue": 8,
+        "death": 4,
+        "move": 8,
+        "attack": 3,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60013,
+          "hp": 11,
+          "name": "Stronghold Guard",
+          "deck": [
+            "main:card:2061",
+            "main:card:21259",
+            "main:card:21049",
+            "main:card:20013",
+            "main:card:21139"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 11
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 6,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:14",
+          "monsterId": 2061,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:17",
+          "monsterId": 20013,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:18",
+          "monsterId": 21259,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:21",
+          "monsterId": 21139,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 12,
+        "firstToSettlementSeconds": 18.366,
+        "largestGapSeconds": 3.798
+      }
+    },
+    {
+      "id": "e1003cdd-f04f-4d1d-9b7f-b148f4551870",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:207",
+      "trigger": "main:scene:2:node:207:trigger:207001",
+      "won": true,
+      "turnCounter": 10,
+      "turnStarts": 10,
+      "playerCommands": 12,
+      "wallSeconds": 32.054,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 10,
+        "play": 12,
+        "summon": 12,
+        "turn-end": 9,
+        "damage": 15,
+        "fatigue": 7,
+        "death": 7,
+        "move": 9,
+        "effect": 6,
+        "attack": 4,
+        "status": 4,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60014,
+          "hp": 11,
+          "name": "Stronghold Sentry",
+          "deck": [
+            "main:card:21992",
+            "main:card:2235",
+            "main:card:1277",
+            "main:card:9017",
+            "main:card:21457"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 11
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 5,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 1,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:13",
+          "monsterId": 1127,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:14",
+          "monsterId": 9017,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:16",
+          "monsterId": 1127,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:21",
+          "monsterId": 1127,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:23",
+          "monsterId": 1277,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:25",
+          "monsterId": 1169,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:26",
+          "monsterId": 21457,
+          "aiType": 1,
+          "team": 1
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 12,
+        "firstToSettlementSeconds": 24.268,
+        "largestGapSeconds": 5.618
+      }
+    },
+    {
+      "id": "ec56efef-2270-4510-8264-c32cacf9adcd",
+      "scene": "main:scene:2",
+      "node": "main:scene:2:node:208",
+      "trigger": "main:scene:2:node:208:trigger:208001",
+      "won": true,
+      "turnCounter": 8,
+      "turnStarts": 8,
+      "playerCommands": 11,
+      "wallSeconds": 174.112,
+      "eventTypes": {
+        "draw": 12,
+        "battle-start": 1,
+        "turn-start": 8,
+        "play": 11,
+        "summon": 8,
+        "turn-end": 7,
+        "damage": 10,
+        "fatigue": 5,
+        "death": 5,
+        "move": 6,
+        "attack": 2,
+        "settled": 1
+      },
+      "enemyHeroes": [
+        {
+          "monsterId": 60015,
+          "hp": 12,
+          "name": "Commander Claude",
+          "deck": [
+            "main:card:5269",
+            "main:card:11133",
+            "main:card:5269",
+            "main:card:2001",
+            "main:card:5085"
+          ]
+        }
+      ],
+      "enemyHeroDamage": {
+        "combat": 2,
+        "fatigue": 10
+      },
+      "enemyHeroLastHit": [
+        "fatigue"
+      ],
+      "enemyPhases": 4,
+      "enemyPhasesWithoutPlayMoveAttackEffect": 2,
+      "unitsWithNoMoveOrAttack": [
+        {
+          "id": "unit:13",
+          "monsterId": 5085,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:14",
+          "monsterId": 2001,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:16",
+          "monsterId": 5269,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:17",
+          "monsterId": 5269,
+          "aiType": 0,
+          "team": 1
+        },
+        {
+          "id": "unit:19",
+          "monsterId": 8,
+          "aiType": 0,
+          "team": 0
+        },
+        {
+          "id": "unit:20",
+          "monsterId": 50,
+          "aiType": 0,
+          "team": 0
+        }
+      ],
+      "successfulCommandTiming": {
+        "count": 11,
+        "firstToSettlementSeconds": 18.451,
+        "largestGapSeconds": 5.082
+      }
+    }
+  ]
+}

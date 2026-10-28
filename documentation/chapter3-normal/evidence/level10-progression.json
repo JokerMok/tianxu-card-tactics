@@ -1,0 +1,630 @@
+{
+  "scope": "Ordinary formal HTTP actions, not 28 Cocos visual tests. Existing character, no GM, seed edits, level edits or clock changes.",
+  "sourceTasks": {
+    "before": {
+      "level": 7,
+      "xp": 46
+    },
+    "claimed": [
+      1,
+      101
+    ],
+    "xp": 115,
+    "silver": 900,
+    "after": {
+      "level": 8,
+      "xp": 81
+    }
+  },
+  "repeatWins": 28,
+  "gainedXp": 140,
+  "gainedSilver": 700,
+  "after": {
+    "level": 10,
+    "xp": 1,
+    "currencies": {
+      "silver": 2740,
+      "gold": 20,
+      "crystal": 0
+    },
+    "deck": [
+      "main:card:43",
+      "main:card:61",
+      "main:card:8",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:50"
+    ]
+  },
+  "records": [
+    {
+      "id": "e6095fd7-dd6d-43e2-ac10-55d7c8b64faf",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "58617159-5b9b-495c-8724-a9774f9d1ea4",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "6ff84102-29da-4edd-a1f0-dcb98e89e64c",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "be51d598-7c33-4bd5-9c9a-5764658d4644",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "df8356e6-a24b-4082-acf1-54cbdc07e69a",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "dbcea4d6-3905-48a8-bc73-fa8280c3e554",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "e506df73-a861-4372-b989-0b3fd02f2892",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "107278ae-7915-43ef-beb8-365aadcebc5f",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "518ba60d-a5a7-45c6-a2ff-db33b9405d2e",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "9fcf0a9f-5909-4c34-9ded-02dec520be84",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "8803cd00-f2cc-4555-a504-9468bc34ec37",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "e455fa0a-2344-4e2a-8c0d-12706dafc43b",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "5296f323-6990-4cc6-a5ed-9fa76cf12e2f",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "e4089020-26ee-4456-bc63-cf7c3f3ecfec",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "1f6343d9-9353-4835-aa33-981dc5e21a1b",
+      "node": 201,
+      "turn": 10,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "67fe8103-c97f-4d5c-97c2-60a3b0f913aa",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "b855ac76-7d21-4455-ad32-711163c97f64",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "21414e1b-58d7-4ad7-a874-0ca7ab43e43a",
+      "node": 201,
+      "turn": 10,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "663f4102-67a7-4f19-9dc5-769ac1fe14b6",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "0b7905df-949d-49c2-a48e-3a0070b46271",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "4e0a8d32-4857-45c6-ad32-2805b7d4f06a",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "1e0c95d8-f476-47d2-bf2e-d094fd28d539",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "3adf8922-dae8-45b7-b8f8-899f89274de3",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "e1474fe7-58f1-4820-abe0-57d6c46ad406",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "f8a7703c-fda6-4818-81b2-9c24c922e259",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "c7e3f03a-a367-4085-b3ed-7bb0e097d36a",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "443bb902-a4d6-4017-808a-e08c7eff9f75",
+      "node": 201,
+      "turn": 8,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    },
+    {
+      "id": "f218911b-d5a5-441f-969e-82e34450303d",
+      "node": 201,
+      "turn": 9,
+      "reward": {
+        "won": true,
+        "silver": 25,
+        "xp": 5,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      }
+    }
+  ]
+}

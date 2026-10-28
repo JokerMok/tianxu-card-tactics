@@ -1,0 +1,12 @@
+{
+  "scope": "Changed content selection, source task display, candidate localization, information page line capacity and delayed portrait teardown only. Not a full suite or visual acceptance substitute.",
+  "targetedSourceChecks": {
+    "contentTests": "passed (5)",
+    "playerUiTests": "passed (2)",
+    "displayAndPaginationTests": "passed (3)",
+    "delayedPortraitLifetime": "passed (2, actual method with delayed boundary stub)",
+    "sourceTaskSelection": "passed (3 matched existing task tests)"
+  },
+  "actualCocos": "Eleven ordinary chapter-three attempts: 10 wins and one natural 302 defeat; save, claims and screenshots recorded. Final pagination and portrait guard still awaiting native rebuild.",
+  "storage": "Exact request replay, duplicate claims, request-content collision and completed source-trigger rejection leave assets unchanged; actual server restart persisted snapshot."
+}

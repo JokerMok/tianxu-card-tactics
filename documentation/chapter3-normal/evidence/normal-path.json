@@ -1,0 +1,892 @@
+{
+  "scope": "Actual ordinary chapters 1-3 in one isolated continuation, including formal HTTP repeat progression. No GM, fixtures, forced seeds or level edits. Counts are observations, not probabilities; HTTP and Cocos evidence are distinguished in README.",
+  "before": {
+    "level": 7,
+    "xp": 46,
+    "cards": {
+      "main:card:1": 1,
+      "main:card:19": 2,
+      "main:card:43": 1,
+      "main:card:61": 3,
+      "main:card:5019": 1,
+      "main:card:2": 2,
+      "main:card:8": 1,
+      "main:card:41001": 3,
+      "main:card:75": 1,
+      "main:card:50": 2,
+      "main:card:5020": 1,
+      "main:card:26": 1,
+      "main:card:5001": 2,
+      "main:card:33": 1,
+      "main:card:5057": 1
+    },
+    "deck": [
+      "main:card:43",
+      "main:card:61",
+      "main:card:8",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:50"
+    ],
+    "currencies": {
+      "silver": 1140,
+      "gold": 20,
+      "crystal": 0
+    },
+    "progress": {
+      "sceneId": 2,
+      "clearedNodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:103",
+        "main:scene:1:node:105",
+        "main:scene:1:node:107",
+        "main:scene:1:node:108",
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001",
+        "main:scene:1:node:102:trigger:102001",
+        "main:scene:1:node:103:trigger:103001",
+        "main:scene:1:node:105:trigger:105001",
+        "main:scene:1:node:101:trigger:101002",
+        "main:scene:1:node:102:trigger:102002",
+        "main:scene:1:node:103:trigger:103002",
+        "main:scene:1:node:105:trigger:105002",
+        "main:scene:1:node:107:trigger:107001",
+        "main:scene:2:node:201:trigger:201001",
+        "main:scene:2:node:202:trigger:202001",
+        "main:scene:2:node:203:trigger:203001",
+        "main:scene:2:node:204:trigger:204001",
+        "main:scene:2:node:205:trigger:205001",
+        "main:scene:2:node:206:trigger:206001",
+        "main:scene:2:node:207:trigger:207001",
+        "main:scene:2:node:208:trigger:208001"
+      ],
+      "unlockedScenes": [
+        1,
+        2
+      ],
+      "positionByScene": {}
+    },
+    "inventory": {
+      "main:item:10203": 1
+    }
+  },
+  "after": {
+    "level": 11,
+    "xp": 151,
+    "cards": {
+      "main:card:1": 1,
+      "main:card:19": 2,
+      "main:card:43": 1,
+      "main:card:61": 3,
+      "main:card:5019": 1,
+      "main:card:2": 2,
+      "main:card:8": 1,
+      "main:card:41001": 3,
+      "main:card:75": 1,
+      "main:card:50": 2,
+      "main:card:5020": 1,
+      "main:card:26": 1,
+      "main:card:5001": 2,
+      "main:card:33": 1,
+      "main:card:5057": 1,
+      "main:card:5061": 4,
+      "main:card:5117": 1
+    },
+    "deck": [
+      "main:card:43",
+      "main:card:61",
+      "main:card:8",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:41001",
+      "main:card:50",
+      "main:card:61",
+      "main:card:61",
+      "main:card:50",
+      "main:card:5057"
+    ],
+    "currencies": {
+      "silver": 4240,
+      "gold": 20,
+      "crystal": 0
+    },
+    "progress": {
+      "sceneId": 3,
+      "clearedNodes": [
+        "main:scene:1:node:101",
+        "main:scene:1:node:102",
+        "main:scene:1:node:103",
+        "main:scene:1:node:105",
+        "main:scene:1:node:107",
+        "main:scene:1:node:108",
+        "main:scene:2:node:201",
+        "main:scene:2:node:202",
+        "main:scene:2:node:203",
+        "main:scene:2:node:204",
+        "main:scene:2:node:205",
+        "main:scene:2:node:206",
+        "main:scene:2:node:207",
+        "main:scene:2:node:208",
+        "main:scene:2:node:209",
+        "main:scene:3:node:301",
+        "main:scene:3:node:302",
+        "main:scene:3:node:303",
+        "main:scene:3:node:304",
+        "main:scene:3:node:305",
+        "main:scene:3:node:306",
+        "main:scene:3:node:307",
+        "main:scene:3:node:308"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001",
+        "main:scene:1:node:102:trigger:102001",
+        "main:scene:1:node:103:trigger:103001",
+        "main:scene:1:node:105:trigger:105001",
+        "main:scene:1:node:101:trigger:101002",
+        "main:scene:1:node:102:trigger:102002",
+        "main:scene:1:node:103:trigger:103002",
+        "main:scene:1:node:105:trigger:105002",
+        "main:scene:1:node:107:trigger:107001",
+        "main:scene:2:node:201:trigger:201001",
+        "main:scene:2:node:202:trigger:202001",
+        "main:scene:2:node:203:trigger:203001",
+        "main:scene:2:node:204:trigger:204001",
+        "main:scene:2:node:205:trigger:205001",
+        "main:scene:2:node:206:trigger:206001",
+        "main:scene:2:node:207:trigger:207001",
+        "main:scene:2:node:208:trigger:208001",
+        "main:scene:2:node:201:trigger:201002",
+        "main:scene:3:node:301:trigger:301001",
+        "main:scene:3:node:302:trigger:302001",
+        "main:scene:3:node:303:trigger:303001",
+        "main:scene:3:node:301:trigger:301002",
+        "main:scene:3:node:304:trigger:304001",
+        "main:scene:3:node:305:trigger:305001",
+        "main:scene:3:node:306:trigger:306001",
+        "main:scene:3:node:307:trigger:307001",
+        "main:scene:3:node:308:trigger:308001",
+        "main:scene:3:node:308:trigger:308002"
+      ],
+      "unlockedScenes": [
+        1,
+        2,
+        3
+      ],
+      "positionByScene": {}
+    },
+    "inventory": {
+      "main:item:10203": 1,
+      "main:item:10202": 1,
+      "main:item:10102": 1,
+      "main:item:10103": 1
+    }
+  },
+  "battles": [
+    {
+      "id": "4e87ffb7-e4fe-48f0-993b-969ad28276fc",
+      "node": "main:scene:3:node:301",
+      "trigger": "main:scene:3:node:301:trigger:301001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 21,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60016,
+          "name": "Irritable Lizard",
+          "hp": 12,
+          "attack": 0
+        },
+        {
+          "monsterId": 61016,
+          "name": "Huge Hunting Dog",
+          "hp": 11,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 21,
+        "battle-start": 1,
+        "turn-start": 21,
+        "play": 21,
+        "summon": 18,
+        "turn-end": 19,
+        "damage": 33,
+        "death": 12,
+        "move": 19,
+        "heal": 1,
+        "effect": 3,
+        "status": 1,
+        "attack": 15,
+        "fatigue": 14,
+        "settled": 1
+      }
+    },
+    {
+      "id": "1f040239-c5a3-443b-ae3c-4dedd1a2dfd3",
+      "node": "main:scene:3:node:302",
+      "trigger": "main:scene:3:node:302:trigger:302001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60017,
+          "name": "Poisonous Cave Bats",
+          "hp": 12,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": false,
+        "silver": 0,
+        "xp": 0,
+        "cards": []
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 14,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 14,
+        "summon": 11,
+        "turn-end": 13,
+        "damage": 19,
+        "death": 4,
+        "fatigue": 9,
+        "move": 9,
+        "attack": 7,
+        "settled": 1
+      }
+    },
+    {
+      "id": "c612cccb-06ac-4ec5-a8b1-4168a922a801",
+      "node": "main:scene:3:node:302",
+      "trigger": "main:scene:3:node:302:trigger:302001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 15,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60017,
+          "name": "Poisonous Cave Bats",
+          "hp": 12,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 15,
+        "play": 18,
+        "summon": 15,
+        "turn-end": 14,
+        "damage": 23,
+        "death": 5,
+        "move": 14,
+        "fatigue": 6,
+        "attack": 12,
+        "status": 3,
+        "heal": 4,
+        "effect": 1,
+        "settled": 1
+      }
+    },
+    {
+      "id": "6ddd8e17-a02b-409c-ba0b-4501af1aaeb9",
+      "node": "main:scene:3:node:303",
+      "trigger": "main:scene:3:node:303:trigger:303001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60018,
+          "name": "Unyielding Lizard",
+          "hp": 13,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 18,
+        "summon": 15,
+        "turn-end": 13,
+        "damage": 16,
+        "death": 6,
+        "move": 15,
+        "fatigue": 5,
+        "attack": 8,
+        "heal": 1,
+        "settled": 1
+      }
+    },
+    {
+      "id": "6c424b4a-31c7-4eac-bae6-87b2e92e5de2",
+      "node": "main:scene:3:node:301",
+      "trigger": "main:scene:3:node:301:trigger:301002",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 21,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60016,
+          "name": "Irritable Lizard",
+          "hp": 12,
+          "attack": 0
+        },
+        {
+          "monsterId": 61016,
+          "name": "Huge Hunting Dog",
+          "hp": 11,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [
+          {
+            "id": "main:card:5061",
+            "count": 4
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 25,
+        "battle-start": 1,
+        "turn-start": 21,
+        "play": 24,
+        "summon": 21,
+        "turn-end": 19,
+        "damage": 30,
+        "death": 8,
+        "move": 20,
+        "attack": 16,
+        "fatigue": 10,
+        "status": 4,
+        "settled": 1
+      }
+    },
+    {
+      "id": "c2ffbaaa-d00b-412c-9b2d-42d00363a52c",
+      "node": "main:scene:3:node:304",
+      "trigger": "main:scene:3:node:304:trigger:304001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60019,
+          "name": "Roaming Undead",
+          "hp": 13,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 17,
+        "summon": 15,
+        "turn-end": 13,
+        "damage": 27,
+        "death": 9,
+        "move": 15,
+        "attack": 18,
+        "fatigue": 5,
+        "heal": 2,
+        "status": 1,
+        "settled": 1
+      }
+    },
+    {
+      "id": "3730d4bb-b320-4c8e-8576-5ac07d41502a",
+      "node": "main:scene:3:node:305",
+      "trigger": "main:scene:3:node:305:trigger:305001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60020,
+          "name": "Roaming Spirits",
+          "hp": 13,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 17,
+        "summon": 14,
+        "turn-end": 13,
+        "damage": 19,
+        "death": 4,
+        "move": 14,
+        "fatigue": 5,
+        "attack": 11,
+        "heal": 2,
+        "settled": 1
+      }
+    },
+    {
+      "id": "23897ece-d317-4e44-a169-7075df40ab8e",
+      "node": "main:scene:3:node:306",
+      "trigger": "main:scene:3:node:306:trigger:306001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60021,
+          "name": "Pestilence Spreaders",
+          "hp": 14,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 18,
+        "summon": 15,
+        "turn-end": 13,
+        "damage": 20,
+        "death": 6,
+        "fatigue": 5,
+        "effect": 3,
+        "move": 20,
+        "attack": 7,
+        "heal": 2,
+        "settled": 1
+      }
+    },
+    {
+      "id": "fca1cf1a-a65e-4a27-a4c1-8bd633211629",
+      "node": "main:scene:3:node:307",
+      "trigger": "main:scene:3:node:307:trigger:307001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 22,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60022,
+          "name": "Demonic Seducers",
+          "hp": 14,
+          "attack": 0
+        },
+        {
+          "monsterId": 61022,
+          "name": "Elven Fire Mage",
+          "hp": 13,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 25,
+        "battle-start": 1,
+        "turn-start": 22,
+        "play": 25,
+        "summon": 22,
+        "turn-end": 20,
+        "move": 29,
+        "attack": 16,
+        "damage": 30,
+        "fatigue": 11,
+        "heal": 4,
+        "effect": 7,
+        "death": 10,
+        "status": 5,
+        "settled": 1
+      }
+    },
+    {
+      "id": "6aa29e8a-3256-4d59-b315-5b137ddb6a52",
+      "node": "main:scene:3:node:308",
+      "trigger": "main:scene:3:node:308:trigger:308001",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 15,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60023,
+          "name": "Northern Wind Commander",
+          "hp": 14,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 15,
+        "play": 19,
+        "summon": 17,
+        "turn-end": 14,
+        "move": 21,
+        "damage": 18,
+        "death": 8,
+        "fatigue": 6,
+        "effect": 2,
+        "attack": 9,
+        "heal": 3,
+        "settled": 1
+      }
+    },
+    {
+      "id": "9cf0da09-77ee-4247-9440-dbb47cc750e6",
+      "node": "main:scene:3:node:308",
+      "trigger": "main:scene:3:node:308:trigger:308002",
+      "scene": "main:scene:3",
+      "settled": true,
+      "turn": 14,
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyHeroes": [
+        {
+          "monsterId": 60023,
+          "name": "Northern Wind Commander",
+          "hp": 14,
+          "attack": 0
+        }
+      ],
+      "rewards": {
+        "won": true,
+        "silver": 40,
+        "xp": 8,
+        "cards": [
+          {
+            "id": "main:card:5117",
+            "count": 1
+          }
+        ],
+        "extras": {
+          "items": [],
+          "cards": [],
+          "currencies": {},
+          "reputation": [
+            {
+              "type": 16,
+              "value": 11000
+            }
+          ],
+          "growth": {},
+          "xp": 0,
+          "randomGroups": [],
+          "preview": null
+        }
+      },
+      "settlementCount": 1,
+      "eventTypes": {
+        "draw": 18,
+        "battle-start": 1,
+        "turn-start": 14,
+        "play": 18,
+        "summon": 16,
+        "turn-end": 13,
+        "damage": 21,
+        "death": 7,
+        "move": 15,
+        "fatigue": 5,
+        "attack": 15,
+        "status": 3,
+        "heal": 1,
+        "settled": 1
+      }
+    }
+  ]
+}

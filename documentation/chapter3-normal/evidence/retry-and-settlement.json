@@ -1,0 +1,87 @@
+{
+  "originalTaskRequestReplayed": {
+    "status": 200,
+    "replayed": true
+  },
+  "newDuplicateTaskRejected": {
+    "status": 400,
+    "error": "任务未完成或已领取"
+  },
+  "sameIdDifferentContentRejected": {
+    "status": 409,
+    "code": "REQUEST_REUSE"
+  },
+  "alreadyClaimedSourceTriggerRejected": {
+    "status": 400,
+    "error": "此关奖励已领取，请选择重复挑战或重置副本"
+  },
+  "assetsUnchanged": true,
+  "settlements": [
+    {
+      "battleId": "4e87ffb7-e4fe-48f0-993b-969ad28276fc",
+      "trigger": "main:scene:3:node:301:trigger:301001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "1f040239-c5a3-443b-ae3c-4dedd1a2dfd3",
+      "trigger": "main:scene:3:node:302:trigger:302001",
+      "settlements": 1,
+      "won": false
+    },
+    {
+      "battleId": "c612cccb-06ac-4ec5-a8b1-4168a922a801",
+      "trigger": "main:scene:3:node:302:trigger:302001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "6ddd8e17-a02b-409c-ba0b-4501af1aaeb9",
+      "trigger": "main:scene:3:node:303:trigger:303001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "6c424b4a-31c7-4eac-bae6-87b2e92e5de2",
+      "trigger": "main:scene:3:node:301:trigger:301002",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "c2ffbaaa-d00b-412c-9b2d-42d00363a52c",
+      "trigger": "main:scene:3:node:304:trigger:304001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "3730d4bb-b320-4c8e-8576-5ac07d41502a",
+      "trigger": "main:scene:3:node:305:trigger:305001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "23897ece-d317-4e44-a169-7075df40ab8e",
+      "trigger": "main:scene:3:node:306:trigger:306001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "fca1cf1a-a65e-4a27-a4c1-8bd633211629",
+      "trigger": "main:scene:3:node:307:trigger:307001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "6aa29e8a-3256-4d59-b315-5b137ddb6a52",
+      "trigger": "main:scene:3:node:308:trigger:308001",
+      "settlements": 1,
+      "won": true
+    },
+    {
+      "battleId": "9cf0da09-77ee-4247-9440-dbb47cc750e6",
+      "trigger": "main:scene:3:node:308:trigger:308002",
+      "settlements": 1,
+      "won": true
+    }
+  ]
+}

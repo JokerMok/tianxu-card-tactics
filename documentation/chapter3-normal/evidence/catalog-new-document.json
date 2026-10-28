@@ -1,0 +1,25 @@
+{
+  "scope": "First request of reopened current Cocos document",
+  "catalog": [
+    {
+      "path": "/api/catalog",
+      "start": 2092.7000002861023,
+      "headersMs": 2.299999713897705,
+      "status": 200,
+      "bodyReadDecodeMs": 153.40000009536743,
+      "parseMs": 89.40000009536743,
+      "textChars": 66209109
+    }
+  ],
+  "resources": [
+    {
+      "path": "/api/catalog",
+      "start": 2092.800000190735,
+      "ttfbMs": 0.39999961853027344,
+      "transferMs": 135.40000009536743,
+      "totalMs": 137.19999980926514,
+      "transferBytes": 9105024,
+      "decodedBytes": 67047678
+    }
+  ]
+}
