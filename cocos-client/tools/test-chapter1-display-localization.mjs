@@ -31,3 +31,25 @@ test('Chapter 1 fixed enemy display names are candidate Chinese without changing
     assert.equal(sourceDisplayName(catalog, monster.Name), displayName);
   }
 });
+
+test('Chapter 3 encountered fixed enemies use Chinese while source monster identities remain intact', () => {
+  const ids = [60016,61016,60017,60018,60019,60020,60021,60022,61022,60023];
+  for (const id of ids) {
+    const monster = catalog.scopes.main.monsters[String(id)];
+    const before = JSON.stringify(monster);
+    assert.match(sourceDisplayName(catalog, monster.Name), /[\u4e00-\u9fff]/);
+    assert.equal(JSON.stringify(monster), before);
+  }
+});
+
+test('information panels paginate short event lines and long Chinese without shrinking', async () => {
+  const {informationPages}=await import('../assets/scripts/game/GameText.ts');
+  const events=Array.from({length:35},(_,i)=>`${i+1} 牌库耗尽：疲劳 敌方 4`);
+  const pages=informationPages(events.join('\n'));
+  assert.equal(pages.length,3);
+  assert.deepEqual(pages.flatMap(p=>p.split('\n')),events);
+  const long='完整技能条件与数值'.repeat(70);
+  const wrapped=informationPages(long);
+  assert.equal(wrapped.join('').replaceAll('\n',''),long);
+  assert.ok(wrapped.every(p=>p.split('\n').length<=12&&p.split('\n').every(l=>Array.from(l).length<=30)));
+});

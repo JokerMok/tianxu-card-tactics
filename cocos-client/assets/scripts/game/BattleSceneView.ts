@@ -315,7 +315,7 @@ export class BattleSceneView {
       const display = this.displays.get(change.unitId); if (!display) continue;
       const delta = change.after - change.before;
       const hit = this.ui.label(display.node, 'Damage:' + change.eventSeq,
-        delta > 0 ? `+${delta}` : delta<0?`−${Math.abs(delta)}`:change.message==='blocked'?'格挡':'未受伤', 0, 38, 110, 30, 24, delta > 0 ? Theme.green : delta<0?Theme.red:Theme.gold);
+        delta > 0 ? `+${delta}` : delta<0?`${change.message==='fatigue'?'疲劳':''}−${Math.abs(delta)}`:change.message==='blocked'?'格挡':'未受伤', 0, 38, 110, 30, change.message==='fatigue'?20:24, delta > 0 ? Theme.green : delta<0?Theme.red:Theme.gold);
       tween(hit.node).by(.5 / this.speed, { position: new Vec3(0, 40, 0) }).call(() => { if (hit.node.isValid) hit.node.destroy(); }).start();
       if (!display.dying && change.unitId !== step.actorId && change.after > 0 && delta<=0) {
         const handle = delta<0?display.animation.play('hit', this.direction(display)):change.message==='blocked'?display.animation.playBlock(this.direction(display)):null;
@@ -473,8 +473,14 @@ export class BattleSceneView {
   private async drawSmallCard(parent: Node, card: RecoveredCatalog['scopes']['main']['cards'][string], wait: number,
       selected: boolean, showStats = true): Promise<void> {
     const art = this.catalog.assets[card.art[0]];
-    if (art?.path) {const portrait=await this.ui.image(parent, 'Portrait', this.base + '/recovered/' + art.path, 85, 116);if(wait>0&&showStats)portrait.addComponent(UIOpacity).opacity=150;}
-    if (!parent.isValid) return;
+    if (art?.path) {
+      const portrait = await this.ui.image(parent, 'Portrait', this.base + '/recovered/' + art.path, 85, 116);
+      // A newer hand revision can destroy this HUD while its portrait loads.
+      // The resolved image must never attach components to that released node.
+      if (this.disposed || !parent.isValid || !portrait.isValid) return;
+      if (wait > 0 && showStats) portrait.addComponent(UIOpacity).opacity = 150;
+    }
+    if (this.disposed || !parent.isValid) return;
     // CardBackgroundPane places the original race/skill frame over raw art.
     const quality = Math.max(0, Math.min(6, Number(card.raw.Quality ?? 0)));
     const qualityKey=ArtSkin.qualityFrame(quality);let frame:Node|undefined;
@@ -512,7 +518,7 @@ export class BattleSceneView {
       BATTLE_TOP_HUD_Y, 156, BATTLE_TOP_HUD_HEIGHT, BATTLE_TOP_HUD_FONT_SIZE);
     turnName.overflow = Label.Overflow.CLAMP; turnName.enableWrapText = false; turnName.lineHeight = 14;
     this.skinButton(hud, 'Battle:Menu', 'ajbangzhu', '', '设置', 551, 274, 75, 27, () => this.hooks.hide());
-    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${({move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','terrain-add':'地形生效','terrain-update':'地形变化','terrain-remove':'地形结束','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.amount ?? ''}`).join('\n')));
+    this.skinButton(hud, 'Battle:Log', 'ajbangzhu', '', '战报', 462, 274, 75, 27, () => this.hooks.log(state.events.slice(-35).map(event => `${event.seq} ${event.message==='fatigue'?'疲劳伤害':({fatigue:'牌库耗尽：疲劳',move:'移动',attack:'攻击',damage:'伤害',heal:'治疗',summon:'召唤',death:'死亡',play:'出牌',skill:'技能',status:'状态',effect:'效果',settled:'结算',surrender:'认输',draw:'抽牌',terrain:'地形','terrain-add':'地形生效','terrain-update':'地形变化','terrain-remove':'地形结束','return-hand':'返回手牌'} as Record<string,string>)[event.type]??'战斗事件'} ${event.type==='fatigue'?(event.actor===this.me?'己方':'敌方'):''} ${event.amount ?? ''}`).join('\n')));
     // BattleWnd rightContent is aligned EAST, not a full-width replacement panel.
     const skin = this.original.catalog.skins.zdjm_1;
     if (skin?.path) this.ui.skin(hud, 'HandPane:source-zdjm_1', 'zdjm_1', 173, -228, 854, 144);

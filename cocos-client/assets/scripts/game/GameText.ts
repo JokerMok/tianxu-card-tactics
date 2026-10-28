@@ -7,6 +7,11 @@ export const PROFESSIONS=['不限','战士','游侠','法师','牧师'];
 
 // Presentation-only localization. Raw scene IDs and source names remain unchanged.
 const PRESENTATION_ZH: Record<string, string> = {
+  // Chapter-three source names: candidate display translations, never rule keys.
+  'Irritable Lizard':'暴躁蜥蜴','Huge Hunting Dog':'巨型猎犬','Poisonous Cave Bats':'洞窟毒蝙蝠',
+  'Unyielding Lizard':'顽强蜥蜴','Roaming Undead':'游荡亡灵','Roaming Spirits':'游荡幽魂',
+  'Pestilence Spreaders':'疫病传播者','Demonic Seducers':'恶魔诱惑者','Elven Fire Mage':'精灵火法师',
+  'Northern Wind Commander':'北风指挥官',
   'Shimmering Cave':'微光洞窟','Dark Forest':'昏暗森林','Sanguine Tribe':'血腥部落','Windy Cliff':'狂风悬崖',
   'Desert Fortress':'沙漠要塞','Castle of Bones':'白骨城堡',"King's Mausoleum":'地下王陵','Ancient Den':'远古兽穴',
   "Dragon's Lair":'红龙洞窟',"Heaven's Rapture":'云中神殿',"Hell's Realm":'地狱边境','Human Gate Pass':'人类关隘',
@@ -180,3 +185,16 @@ export function cardDisplay(catalog:RecoveredCatalog,c:RecoveredCard,base:string
 
 const sourceNameMaps=new WeakMap<RecoveredCatalog,Map<string,string>>();
 export function sourceDisplayName(catalog:RecoveredCatalog,name:string){let names=sourceNameMaps.get(catalog);if(!names){names=new Map();for(const c of Object.values(catalog.scopes.main.cards)){const shown=catalog.localization?.cards[c.id];if(shown)names.set(String(c.raw.Name),shown.name);}sourceNameMaps.set(catalog,names);}return names.get(name)??presentationName(name);}
+
+/** The original message panel has 214px of body height. Count lines as well as
+ * characters so many short battle events cannot shrink into unreadable text. */
+export function informationPages(text: string): string[] {
+  const lines = text.split('\n').flatMap(line => {
+    const characters = Array.from(line), wrapped: string[] = [];
+    for (let i = 0; i < characters.length; i += 30) wrapped.push(characters.slice(i, i + 30).join(''));
+    return wrapped.length ? wrapped : [''];
+  });
+  const pages: string[] = [];
+  for (let i = 0; i < lines.length; i += 12) pages.push(lines.slice(i, i + 12).join('\n'));
+  return pages;
+}

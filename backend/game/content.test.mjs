@@ -46,3 +46,38 @@ test('chapter-two story display keeps raw configuration and rejects stale source
   } finally { translation.originalText = source; }
   assert.equal(JSON.stringify(graph), before);
 });
+
+ test('chapter-three display stories preserve source and use existing identity terms', () => {
+  const graph = content.graph(3), raw = JSON.stringify(graph);
+  const nodes = graph.nodes.filter(n => n.triggers.some(t => Number(t.raw.type) === 2));
+  assert.equal(nodes.length, 8);
+  for (const node of nodes) {
+    const translation = content.catalog.localization.stories[node.id];
+    assert.equal(translation.originalText, content.descriptions.get(Number(node.raw.backgrounddesid)));
+    assert.match(content.sceneStory(node), /[\u4e00-\u9fff]/);
+    assert.equal(translation.status, 'candidate-translation');
+  }
+  assert.match(content.sceneStory(nodes[0]), /半精灵/);
+  assert.match(content.sceneStory(nodes[6]), /萨里亚/);
+  assert.equal(JSON.stringify(graph), raw);
+});
+
+test('multi-encounter nodes expose remaining one-time source rewards before repeat play', () => {
+  const graph = content.graph(3), node = graph.nodes.find(n => n.originalId === '301');
+  const actor = {level:10, progress:{unlockedScenes:[3],clearedNodes:[],clearedTriggers:[]}};
+  const first=content.level(actor,node.id);
+  assert.equal(first.trigger.raw.id,'301001');
+  actor.progress.clearedNodes.push(node.id);actor.progress.clearedTriggers.push(first.trigger.id);
+  const second=content.level(actor,node.id);
+  assert.equal(second.trigger.raw.id,'301002');
+  assert.equal(second.trigger.raw.cardidprize,'5061');
+  assert.equal(second.trigger.raw.cardnumprize,'4');
+  actor.progress.clearedTriggers.push(second.trigger.id);
+  assert.equal(content.level(actor,node.id).trigger.raw.id,'301003');
+  assert.throws(()=>content.level(actor,node.id,first.trigger.id),/此关奖励已领取/);
+  assert.throws(()=>content.level({...actor,level:9},node.id),/需要角色等级10/);
+  const other=content.graph(2).nodes.find(n=>n.originalId==='201');
+  actor.progress.unlockedScenes.push(2);actor.progress.clearedNodes.push(other.id);
+  actor.progress.clearedTriggers.push(other.triggers[0].id);
+  assert.equal(content.level(actor,other.id).trigger.raw.id,'201002');
+});

@@ -80616,6 +80616,54 @@
       "originalText": "<p align=\"center\"><b>2-8 Snowy Fort</b></p><br>The gates of the Snowy Fort are locked tight. Commander Claude is seething with enmity. The only way to rescue the elven princess, Erelei, is by soundly defeating him.",
       "status": "candidate-translation",
       "source": "main taskdes.ID 208001; English source in current imported configuration; display translation only"
+    },
+    "main:scene:3:node:301": {
+      "text": "3—1 雪山道路\n\n艾蕾莱是精灵改革派的领袖，希望改善人类与精灵的关系。为表支持，你答应护送她返回族人身边。这条路漫长而危险，还要穿过半精灵的领地。",
+      "originalText": "<p align=\"center\"><b>3-1 Snowy Mountain Road</b></p><br>Erelei is the leader of the Elven reformists and wants good relations between Humans and Elves and to support that, you've offered to escort her back to her people. The road is a long and dangerous one, through Halfblood lands.",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 301001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:302": {
+      "text": "3—2 洞窟隧道\n\n途中，艾蕾莱告诉你，绑架是反对她理念的人策划的阴谋之一……前方洞穴里回荡着毒蝙蝠的尖啸，小心！",
+      "originalText": "<p align=\"center\"><b>3-2 Cavern Tunnel </b></p><br>On the road, Erelei tells you that her kidnapping is part of a plot from those who oppose her ideals... The caverns up ahead are alive with the whistling of poisonous Bats, take care!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 302001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:303": {
+      "text": "3—3 洞口\n\n艾蕾莱刚提到，她的妹妹与其他精灵驻守在一座要塞，却不认同她的政治主张。刺耳的蜥蜴叫声突然响起，伏兵来了！击退袭击车队的装甲蜥蜴！",
+      "originalText": "<p align=\"center\"><b>3-3 Cave Mouth</b></p><br>Erelei has just mentioned that her younger sister is garrisoned at a fort with other Elves but doesn't share her political views, when all of a sudden the piercing Lizard screeches announce an ambush! Drive off the Armoured Lizards attacking the convoy!",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 303001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:304": {
+      "text": "3—4 雾山\n\n浓雾笼罩着精灵圣山的山脚。蹒跚的身影从雾中出现，发出骇人的嚎叫。亡灵挡住了去路——这些可怕的生物为何突然出现在这里？",
+      "originalText": "<p align=\"center\"><b>3-4 Foggy Mountain</b></p><br>Dense fog covers the feet of the holy Elven mountains. Shambling figures emerge from the fog, screaming terrifying howls. The Undead block the way - why have these dreadful creatures suddenly appeared?",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 304001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:305": {
+      "text": "3—5 小松林\n\n阴暗的树林里闪烁着令人畏缩的光芒。潜伏的幽魂冲出来发动袭击，你必须坚守阵地……",
+      "originalText": "<p align=\"center\"><b>3-5 Lesser Pine Forest</b></p><br>Lights flicker inside the gloomy forest that makes people flinch, but you must stand your ground as hidden Spirits rush forth to attack...",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 305001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:306": {
+      "text": "3—6 温泉林地\n\n一群食尸鬼与幽魂出现在温泉林间。这场凶险的伏击似乎是冲着艾蕾莱公主来的……",
+      "originalText": "<p align=\"center\"><b>3-6 Hot Spring Woodlands</b></p><br> A throng of Ghouls and Spirits appear in the hot spring glades, this menacing ambush seems directed at princess Erelei...",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 306001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:307": {
+      "text": "3—7 艾尔河浅滩\n\n获救的精灵告诉你，精灵族正在内战。艾蕾莱离开部族后，妹妹萨里亚发动政变，反对王室。如今，艾蕾莱的生命正受到威胁……",
+      "originalText": "<p align=\"center\"><b>3-7 Aire River Ford</b></p><br>A rescued Elf tells you of the civil war among the Elven Nation. After Pricess Erelei left the tribes, her younger sister Sarya led a coup against the crown. At present, Erelei's life is in peril...",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 307001; current imported English text; display only, not recovered official Chinese"
+    },
+    "main:scene:3:node:308": {
+      "text": "3—8 森林入口\n\n前方是著名的北风飞马骑兵！他们是精灵保守派主力的先锋，显然是来阻止精灵公主返回的。",
+      "originalText": "<p align=\"center\"><b>3-8 Forest Entrance</b></p><br>Up ahead stand the famous North Wind Pegasi riders! They're the vanguard for the main forces of the conservative Elven tribes. They must be here to obstruct the Elven princess from returning.",
+      "status": "candidate-translation",
+      "source": "main taskdes.ID 308001; current imported English text; display only, not recovered official Chinese"
     }
   }
 }

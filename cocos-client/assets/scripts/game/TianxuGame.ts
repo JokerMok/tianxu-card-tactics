@@ -7,7 +7,7 @@ import type { RecoveredCatalog, RecoveredCard } from './RecoveredContent.ts';
 import type { BattleState, LegalPlay, BattleAction } from './GameContracts.ts';
 import { OriginalUi, type OriginalUiCatalog, type OriginalUiMount } from './OriginalUi.ts';
 import { BattleSceneView } from './BattleSceneView.ts';
-import { cardName, cardDisplay, presentationError, presentationName, presentationText } from './GameText.ts';
+import { cardName, cardDisplay, presentationError, presentationName, presentationText, informationPages } from './GameText.ts';
 import { CardDeckWindow } from './CardDeckWindow.ts';
 import { GrowthWindows } from './GrowthWindows.ts';
 import { WorldMapWindow } from './WorldMapWindow.ts';
@@ -799,8 +799,9 @@ export class TianxuGame extends Component {
   }
   private sourceInformation(title: string, text: string, actions: ActionItem[], callback?: () => void, offset = 0) {
     const plain = text.replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '');
-    const pages = plain.match(/[\s\S]{1,420}/g) ?? ['']; const panel = this.sourcePanel(title);
-    this.ui.label(panel, 'MessageText', pages[offset] ?? '', 0, 12, 422, 214, 13, Theme.text, true);
+    const pages = informationPages(plain); const panel = this.sourcePanel(title);
+    const body = this.ui.label(panel, 'MessageText', pages[offset] ?? '', 0, 12, 422, 214, 13, Theme.text, true);
+    body.overflow = Label.Overflow.CLAMP; body.enableWrapText = false; body.lineHeight = 16;
     actions.forEach((item, index) => this.ui.button(panel, 'MessageAction:' + index, item.label,
       (index - (actions.length - 1) / 2) * Math.min(210, 420 / actions.length), -132,
       Math.min(200, 410 / actions.length), 29, () => callback ? callback() : this.action(item), item.disabled));

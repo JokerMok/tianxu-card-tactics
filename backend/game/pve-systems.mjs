@@ -816,7 +816,9 @@ function enabledStageTasks(ctx) {
 }
 
 function taskView(ctx, task) {
-  const progress = task.targets.map(target => ({ detail: target.detail, type: target.type, ...targetProgress(ctx, target, task) }));
+  const progress = task.targets.map(target => ({ detail: target.detail, type: target.type,
+    ...([2,3].includes(target.type) ? {triggerId:target.params.triggerid} : {}),
+    ...targetProgress(ctx, target, task) }));
   const eligible = task.conditions.every(condition => conditionMet(ctx, condition));
   const claimed = ctx.actor.pve.tasks.claimed.includes(task.id);
   const ready = eligible && progress.length > 0 && progress.every(item => item.supported && item.met);

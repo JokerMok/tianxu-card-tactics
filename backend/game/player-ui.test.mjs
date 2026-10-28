@@ -25,3 +25,13 @@ test('original task contract exposes unlocked chapter claims, not future chapter
   task.claimed = true;
   assert.equal(mainlineTaskCards(content,actor,pve)[0].claimed,true);
 });
+
+test('chapter task explains an unfinished source encounter on an already-cleared node', () => {
+  const task={id:103,name:'Snowy Hillside',eligible:true,ready:false,claimed:false,
+    progress:[{detail:'Conquer Region 3: Snowy Hillside',triggerId:308002,type:2,value:0,required:1,met:false}],reward:{xp:220}};
+  const actor={progress:{unlockedScenes:[1,2,3],clearedNodes:['main:scene:3:node:308']}};
+  const detail=mainlineTaskCards(content,actor,{groups:[{tasks:[task]}]})[0].detail;
+  assert.match(detail,/森林入口：继续剩余首通挑战 0\/1/);
+  task.progress[0].met=true;task.progress[0].value=1;task.ready=true;
+  assert.doesNotMatch(mainlineTaskCards(content,actor,{groups:[{tasks:[task]}]})[0].detail,/剩余首通/);
+});

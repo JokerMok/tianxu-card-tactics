@@ -125,9 +125,13 @@ export class ServerContent extends RecoveredContent {
     if (!node || !this.nodeAccessible(actor, graph, node)) throw new Error('请先完成前置关卡');
     const minLevel = this.sceneLevels.get(sceneId.split(':').at(-1)) ?? 1;
     if (actor.level < minLevel) throw new Error(`需要角色等级${minLevel}`);
-    const repeats = actor.progress.clearedNodes.includes(nodeId);
+    // A node can contain several distinct one-time encounters. Clearing its
+    // first encounter unlocks the path, but must not strand later source rewards.
+    // Select each unclaimed source trigger before falling back to repeat play.
+    const unfinished = node.triggers.find(trigger => numeric(trigger.raw, 'type') === 2
+      && numeric(trigger.raw, 'repeat') === 0 && !actor.progress.clearedTriggers.includes(trigger.id));
     const trigger = triggerId ? node.triggers.find(trigger => trigger.id === triggerId)
-      : node.triggers.find(trigger => numeric(trigger.raw, 'type') === 2 && numeric(trigger.raw, 'repeat') === (repeats ? 1 : 0))
+      : unfinished ?? node.triggers.find(trigger => numeric(trigger.raw, 'type') === 2 && numeric(trigger.raw, 'repeat') === 1)
         ?? node.triggers.find(trigger => numeric(trigger.raw, 'type') === 2);
     if (!trigger || numeric(trigger.raw, 'type') !== 2) throw new Error('此节点不是战斗关卡');
     if (!allowCleared && actor.progress.clearedTriggers.includes(trigger.id) && numeric(trigger.raw, 'repeat') === 0) throw new Error('此关奖励已领取，请选择重复挑战或重置副本');

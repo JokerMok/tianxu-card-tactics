@@ -25,7 +25,18 @@ export function mainlineTaskCards(content, actor, pve) {
     for (const item of reward.items ?? []) if (Number(item.count) > 0 && (legacy || stageRewardAllowed(content.tables,'item',item.id))) {
       parts.push(`${names['main:item:'+item.id] ?? '物品 #'+item.id}×${item.count}`);
     }
-    const objective = task.progress.map(item => `${presentationText(item.detail)} ${Math.min(item.value,item.required)}/${item.required}`).join('\n');
+    const objective = task.progress.map(item => {
+      let detail = presentationText(item.detail);
+      if (item.triggerId && !item.met) {
+        const graph = content.graph(Number(task.id) === 1 ? 1 : Number(task.id) - 100);
+        const node = graph.nodes.find(node => node.triggers.some(t => Number(t.raw.id) === Number(item.triggerId)));
+        if (node && actor.progress.clearedNodes?.includes(node.id)
+          && node.triggers.filter(t => Number(t.raw.type) === 2 && Number(t.raw.repeat) === 0).length > 1) {
+          detail += `\n${presentationText(node.triggers[0].raw.des)}：继续剩余首通挑战`;
+        }
+      }
+      return `${detail} ${Math.min(item.value,item.required)}/${item.required}`;
+    }).join('\n');
     return {id:String(task.id),name:presentationText(task.name),detail:objective+(parts.length?'\n'+parts.join(' · '):''),
       ready:Boolean(task.ready),claimed:Boolean(task.claimed),reward:Number(reward.silver ?? 0)};
   });
