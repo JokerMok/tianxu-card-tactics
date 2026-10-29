@@ -203,7 +203,8 @@ export class SecondaryWindows {
     this.ui.label(parent, 'TaskDescription', String(task.detail ?? ''), 0, 48, 380, 130, 16, Theme.text, true);
     this.ui.label(parent, 'TaskPrizeTitle', '任务奖励', -130, -63, 120, 24, 15, Theme.gold, true);
     this.ui.panel(parent, 'TaskPrizeBox', 92, 64, -113, -112, new Color(20, 35, 36), Theme.gold);
-    this.ui.label(parent, 'TaskReward', `${Number(task.reward ?? 0)} 银币`, -113, -112, 86, 24, 13, Theme.text);
+    this.ui.label(parent, 'TaskReward', Number(task.xp) > 0 && !Number(task.reward)
+      ? `${Number(task.xp)} 经验` : `${Number(task.reward ?? 0)} 银币`, -113, -112, 86, 24, 13, Theme.text);
     const action = task.tutorial ? 'tutorial.advance' : 'task.claim';
     const payload = task.tutorial ? {} : { taskId: task.id };
     this.ui.button(parent, 'Task:Claim', task.claimed ? '已完成' : task.ready ? '领取奖励' : '尚未完成', 110, -125, 155, 38,

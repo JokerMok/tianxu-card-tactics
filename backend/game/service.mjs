@@ -11,6 +11,7 @@ import { grantCampaignExtras } from './campaign-rewards.mjs';
 import { presentationNames, presentSections } from './presentation.mjs';
 import { playerUi, mainlineTaskCards } from './player-ui.mjs';
 import { requireText, requireCount, conflict, stable } from './store.mjs';
+import { tacticsForNode, explorationTasks } from './pve-experience.mjs';
 
 const nowDay = now => new Date(now + 8 * 3600000).toISOString().slice(0, 10);
 function grantSilver(actor, amount, reason, now) {
@@ -198,14 +199,17 @@ export class GameService {
       { id: 'three-wins', name: '主线先锋', detail: '取得三场PVE胜利', ready: actor.stats.pveWins >= 3, reward: 100 },
       { id: 'cooperation', name: '并肩作战', detail: '与真实玩家合作取胜', ready: actor.stats.coopWins > 0, reward: 100 },
       { id: 'arena', name: '竞技新秀', detail: '完成一场真实PVP', ready: actor.stats.pvpMatches > 0, reward: 100 },
+      ...explorationTasks(actor),
     ].filter(task=>includePaused||!['cooperation','arena'].includes(task.id)).map(task => ({ ...task, claimed: actor.claimed.includes('task:' + task.id) }));
   }
   claimTask(actor, payload, now) {
     const task = this.tasks(actor,true).find(task => task.id === payload.taskId);
     if(['cooperation','arena'].includes(payload.taskId)&&!actor.stageScope?.claims?.[legacyClaimKey('task.claim',payload)])throw stageError();
     if (!task || !task.ready || task.claimed) throw new Error('任务未完成或已领取');
-    actor.claimed.push('task:' + task.id); grantSilver(actor, task.reward, '任务奖励', now);
-    this.content.grantExperience(actor, 10); return { message: `领取${task.reward}银币与10经验` };
+    actor.claimed.push('task:' + task.id);
+    if (task.reward > 0) grantSilver(actor, task.reward, '任务奖励', now);
+    const xp = task.xp ?? 10;
+    this.content.grantExperience(actor, xp); return { message: `领取${task.reward > 0 ? task.reward + '银币与' : ''}${xp}经验` };
   }
   activeBattle(world, actorId) { return Object.values(world.battles).find(record => record.participants.includes(actorId) && !record.settled); }
   playerSpec(world, actor, team) {
@@ -228,7 +232,7 @@ export class GameService {
       if (!hero) throw new Error('敌方英雄配置缺失');
       players.push({ id: `ai:${id}:${index}`, name: String(hero.Name), team: 1, hp: Math.max(1, Math.floor(numeric(hero, 'HP') * numeric(param, 'hpMultiplier', 1))),
         attack: Math.floor(numeric(hero, 'Attack') * numeric(param, 'attackMultiplier', 1)), monsterId, ai: true,
-        deck: this.content.enemyDeck(hero, level, seed + index) });
+        deck: this.content.enemyDeck(hero, mode === 'pve' ? level : { minLevel: level.minLevel }, seed + index) });
     }
     const initialUnits = [];
     if (level.board) {
@@ -242,7 +246,8 @@ export class GameService {
         initialUnits.push({ playerId: defenderId, monsterId: level.board.monsterId + index % 3, ...cell });
       }
     }
-    const entryState = createBattle(this.content, { id, seed, mapId: level.mapId, players, firstPlayer: numeric(level.trigger.raw, 'firstteam') === 1 ? 0 : undefined, rows: Math.max(level.rows ?? 4, ...[0, 1].map(team => players.filter(player => player.team === team).length)),
+    const tactics = mode === 'pve' && tacticsForNode(level.node);
+    const entryState = createBattle(this.content, { id, seed, mapId: level.mapId, players, ...(tactics ? {tacticsVersion: 2} : {}), firstPlayer: numeric(level.trigger.raw, 'firstteam') === 1 ? 0 : undefined, rows: Math.max(level.rows ?? 4, ...[0, 1].map(team => players.filter(player => player.team === team).length)),
       ...(level.board ? { boardClearTeam: 1, turnLimit: 48, initialUnits } : {}) });
     const state = advanceAI(this.content, entryState);
     const record = { id, entryState, state, mode, roomId, participants: actors.map(actor => actor.id),

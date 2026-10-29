@@ -14,6 +14,8 @@ export interface BattlePlayerSpec {
   effects?: number[];
 }
 export interface BattleSpec {
+  /** Opt-in version of local PVE tactics; absent persisted battles keep legacy behavior. */
+  tacticsVersion?: 2;
   id: string;
   seed: number;
   mapId: number;
@@ -102,6 +104,7 @@ export interface BattleEvent {
 }
 export interface BattleState {
   version: 1;
+  tacticsVersion?: 2;
   id: string;
   seed: number;
   rng: number;

@@ -808,8 +808,13 @@ function draw(content: RecoveredContent, state: MutableState, owner: BattlePlaye
     if (cardId === undefined) {
       owner.fatigue += 1;
       const hero = heroFor(state, owner.id);
-      if (hero && hero.hp > 0) damage(content, state, undefined, hero, owner.fatigue, true, 'fatigue');
-      emit(state, { type: 'fatigue', actor: owner.id, amount: owner.fatigue });
+      // Local PVE v2: a five-draw supply buffer, then one damage per empty
+      // draw. Legacy escalation ended short-deck fights before infantry could
+      // traverse the 12-column board. This is symmetric and snapshot-versioned.
+      const amount = state.tacticsVersion === 2 ? (owner.fatigue > 5 ? 1 : 0) : owner.fatigue;
+      if (hero && hero.hp > 0 && amount > 0) damage(content, state, undefined, hero, amount, true, 'fatigue');
+      emit(state, { type: 'fatigue', actor: owner.id, amount,
+        ...(amount === 0 ? { message: 'supply-buffer' } : {}) });
       continue;
     }
     const switcheroo = state.units.filter(unit => unit.team !== owner.team && unit.hp > 0).flatMap(unit => activeEffectRows(content, unit, 222).map(effect => ({ unit, effect })))
@@ -2418,7 +2423,10 @@ function chooseTarget(content: RecoveredContent, state: BattleState, unit: Battl
 
 function moveUnit(content: RecoveredContent, state: MutableState, unit: BattleUnit, target: BattleUnit): void {
   if (unit.movement <= 0 || unit.flags.noMove === 1 || (unit.flags.statusNoMove ?? 0) > 0 || unit.flags.hero === 1) return;
-  if ((unit.flags.aiType ?? 0) === 1 && distance(unit, target) > effectiveRange(content, unit) + 1) return;
+  // AIType has no recovered server algorithm. The legacy conservative gate
+  // stranded mobile melee/casters indefinitely outside range. New PVE snapshots
+  // advance to their existing range; explicit noMove/status restrictions still win.
+  if (state.tacticsVersion !== 2 && (unit.flags.aiType ?? 0) === 1 && distance(unit, target) > effectiveRange(content, unit) + 1) return;
   let remaining = unit.movement;
   const fromRow = unit.row;
   const fromCol = unit.col;
@@ -3384,6 +3392,7 @@ export function createBattle(content: RecoveredContent, spec: BattleSpec): Battl
   const normalizedSeed = spec.seed >>> 0 || 1;
   const state: MutableState = {
     version: 1,
+    ...(spec.tacticsVersion === 2 ? { tacticsVersion: 2 as const } : {}),
     id: spec.id,
     seed: normalizedSeed,
     rng: normalizedSeed,
@@ -3524,9 +3533,21 @@ export function chooseAIAction(content: RecoveredContent, state: BattleState, ac
     const hand = owner.hand.find(card => card.instanceId === play.instanceId)!;
     const card = content.card(hand.cardId);
     const target = play.targetId ? state.units.find(unit => unit.id === play.targetId) : undefined;
-    const score = numeric(card.raw, 'Type') === 1
+    let score = numeric(card.raw, 'Type') === 1
       ? 100 + numeric(content.data.monsters[String(numeric(card.raw, 'MonsterID'))] ?? {}, 'Attack') * 4 + numeric(content.data.monsters[String(numeric(card.raw, 'MonsterID'))] ?? {}, 'HP')
       : 200 + (target && target.team !== owner.team ? 50 - target.hp : target ? target.maxHp - target.hp : 0);
+    if (state.tacticsVersion === 2 && numeric(card.raw, 'Type') === 1) {
+      const raw = content.monsterForCard(hand.cardId) ?? {};
+      const ranged = numeric(raw, 'AttackType') > 0;
+      const front = owner.team === 0 ? 3 : 8;
+      const preferredCol = front + (ranged ? (owner.team === 0 ? -1 : 1) : 0);
+      const allies = state.units.filter(u => u.hp > 0 && u.team === owner.team && !u.flags.hero && u.row === play.row);
+      const threats = state.units.filter(u => u.hp > 0 && u.team !== owner.team && !u.flags.hero && u.row === play.row);
+      // Use public board state only. Cover advancing threats, keep ranged support
+      // behind the front, and avoid filling one lane without a reason.
+      score += threats.reduce((sum, u) => sum + Math.max(0, 5 - Math.abs(u.col - front)) * Math.max(1, u.attack), 0)
+        - allies.length * 5 - Math.abs(play.col - preferredCol) * 3;
+    }
     return { play, score, cardId: hand.cardId };
   }).sort((a, b) => b.score - a.score || a.cardId.localeCompare(b.cardId) || a.play.row - b.play.row || a.play.col - b.play.col || (a.play.targetId ?? '').localeCompare(b.play.targetId ?? ''));
   const choice = scored[0]!.play;

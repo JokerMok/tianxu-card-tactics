@@ -17,7 +17,7 @@ import { STAGE_SCOPE, stageActionReason, stagePageAllowed, stageSectionAllowed }
 interface FormField { key: string; label: string; type?: string; value?: unknown; min?: number; max?: number; options?: {label: string; value: string}[] }
 interface ActionItem { label: string; detail?: string; action: string; payload?: Record<string, unknown>; disabled?: boolean; fields?: FormField[] }
 interface Section { id: string; title: string; items: ActionItem[] }
-interface SceneNodeView { id: string; originalId: string; name: string; story?: string; x: number; y: number; cleared: boolean; accessible: boolean;
+interface SceneNodeView { id: string; originalId: string; name: string; story?: string; battleRules?: string; x: number; y: number; cleared: boolean; accessible: boolean;
   battle: boolean; transitions: number[]; triggers: { id: string; name: string; repeat: number }[] }
 interface SceneView { id: string; name: string; unlocked: boolean; minLevel: number; nodes: SceneNodeView[] }
 interface ActorView { id: string; name: string; profession: number; level: number; xp: number; tutorialStep: number;
@@ -26,7 +26,7 @@ interface ActorView { id: string; name: string; profession: number; level: numbe
 type Row = Record<string, unknown>;
 interface Snapshot { unchanged?:boolean; serverInstance:string; assetNames: Record<string, string>; story: string; revision: number; now: number; actor: ActorView; scenes: SceneView[];
   stageScope: typeof STAGE_SCOPE;
-  tasks: { id: string; name: string; detail: string; ready: boolean; claimed: boolean; reward: number }[];
+  tasks: { id: string; name: string; detail: string; ready: boolean; claimed: boolean; reward: number; xp?: number }[];
   growth: { profile: { avatarAssetId: string | null }; summary: {energy: number}; sections: Section[] }; social: { people: Row[]; friends: Row[]; friendRequests: Row[]; chat: Row[]; mail: Row[]; guilds: Row[]; trades: Row[]; auctions: Row[] };
   rooms: Row[]; roomInvites: Row[]; rankings: Row[]; dungeons: Row[];
   battle: { id: string; mode: string; state: BattleState; entryState?: BattleState; settled: boolean; rewards?: { won: boolean; silver: number; xp: number; cards: {id: string; count: number}[] }; legalPlays: LegalPlay[] } | null }
@@ -514,7 +514,7 @@ export class TianxuGame extends Component {
     this.ui.label(panel, 'Title', presentationName(node.name), 0, 154, 380, 26, 18, Theme.gold);
     this.ui.sourceButton(panel, 'PathPoint:Close', 'ajguanbixiao', '', '', 218, 155, 24, 24, () => this.closeModal());
     const story = (node.name === 'Cathedral of the Goddess' ? '1—1 女神大教堂\n\n教堂钟声急促响起，既是警报，也是集结号。哥布林强盗正在袭击这座庄严的教堂，卫兵已快要抵挡不住。请尽快前去支援！' : node.story || presentationName(node.name)).replace(/<br\s*\/?\s*>|<\/p>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&'); const chunks = story.match(/[\s\S]{1,300}/g) ?? [story];
-    this.ui.label(panel, 'Description', chunks[page] ?? '', -83, 37, 256, 200, 13, Theme.text, true);
+    this.ui.label(panel, 'Description', (chunks[page] ?? '') + (node.battleRules ? '\n\n' + node.battleRules : ''), -83, 37, 256, 200, 13, Theme.text, true);
     this.ui.label(panel, 'DeckName', `当前卡组 ${this.state!.actor.deck.length} 张`, -63, -94, 210, 26, 14, Theme.gold);
     this.ui.button(panel, 'PathPoint:Deck', '更换卡组', -39, -133, 114, 36, () => { this.closeModal(); this.navigate('cards'); });
     const scene = this.catalog!.scopes.main.scenes.find(scene => scene.id === node.id.split(':node:')[0]);
@@ -806,6 +806,7 @@ export class TianxuGame extends Component {
       (index - (actions.length - 1) / 2) * Math.min(210, 420 / actions.length), -132,
       Math.min(200, 410 / actions.length), 29, () => callback ? callback() : this.action(item), item.disabled));
     if (pages.length > 1) {
+      this.ui.label(panel, 'MessagePage', `${offset + 1} / ${pages.length}`, 0, -99, 110, 22, 13, Theme.text);
       this.ui.button(panel, 'MessagePrevious', '‹', -197, -99, 26, 22,
         () => this.sourceInformation(title, text, actions, callback, offset - 1), offset === 0);
       this.ui.button(panel, 'MessageNext', '›', 197, -99, 26, 22,

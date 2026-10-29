@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { MISSING_MONSTERS, BOARD_SCENES, FALLBACK_MAP } from './compatibility.mjs';
 import { reconstructMissingScenes } from './scene-compatibility.mjs';
+import { tacticsForNode } from './pve-experience.mjs';
 import { RecoveredContent, numeric } from '../../cocos-client/assets/scripts/game/RecoveredContent.ts';
 
 export class ServerContent extends RecoveredContent {
@@ -67,6 +68,7 @@ export class ServerContent extends RecoveredContent {
         nodes: graph.nodes.map(node => ({ id: node.id, originalId: node.originalId,
           name: String(node.triggers[0]?.raw.des ?? (node.id === graph.startNodeId ? '起点' : '道路')),
           story: this.sceneStory(node),
+          ...(tacticsForNode(node) ? {battleRules: '本场补给：空抽前5次不扣血，此后每次1点（双方相同）。'} : {}),
           x: numeric(node.raw, 'x'), y: numeric(node.raw, 'y'),
           cleared: actor.progress.clearedNodes.includes(node.id),
           accessible: this.nodeAccessible(actor, graph, node),
@@ -144,6 +146,8 @@ export class ServerContent extends RecoveredContent {
     return { board, rows: numeric(trigger.raw, 'battleheight') || undefined, sceneId, graph, node, trigger, params, mapId, minLevel };
   }
   enemyDeck(hero, level, seed) {
+    const themed = tacticsForNode(level.node);
+    if (themed) return themed.cards.map(id => this.card(id).id);
     const pool = this.commonCards.filter(card => {
       const monster = this.monsterForCard(card.id);
       return numeric(monster, 'Type') === 1 && numeric(monster, 'HP') <= 4 + level.minLevel * 3
