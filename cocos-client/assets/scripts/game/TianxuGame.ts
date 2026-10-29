@@ -103,7 +103,7 @@ export class TianxuGame extends Component {
   }
   private async api<T>(route: string, payload?: unknown, characterId = this.characterId): Promise<T> {
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),route==='/api/catalog'?60000:15000);try{
-    const response = await fetch(this.apiBase + route, { signal:controller.signal,method: payload === undefined ? 'GET' : 'POST',
+    const response = await fetch(this.apiBase + route, { signal:controller.signal,method: payload === undefined ? 'GET' : 'POST', cache: route === '/api/catalog' ? 'no-cache' : 'default',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}`, 'X-Character-Id': characterId },
       ...(payload === undefined ? {} : { body: JSON.stringify(payload) }) });
     const value = await response.json(); if (!response.ok) { const error = new Error(value.error ?? `请求失败 ${response.status}`) as Error & {definitive:boolean;status:number;code:string;currentDeck?:string[]}; error.definitive=response.status>=400&&response.status<500&&response.status!==401;error.status=response.status;error.code=value.code;error.currentDeck=value.currentDeck; throw error; } return value as T;
