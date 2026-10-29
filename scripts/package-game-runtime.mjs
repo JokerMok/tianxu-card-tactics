@@ -109,7 +109,7 @@ function rejectSensitivePath(relative) {
   }
 }
 
-export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative = DEFAULT_POLICY) {
+export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative = DEFAULT_POLICY, { webDirectory } = {}) {
   sourceRoot = path.resolve(sourceRoot);
   const policy = await loadPolicy(sourceRoot, policyRelative);
   const paths = new Set(policy.fixedFiles.map(safeRelative));
@@ -118,15 +118,19 @@ export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative 
     if (relative.endsWith(policy.backend.extension) && !relative.endsWith(policy.backend.excludeSuffix)) paths.add(relative);
   }
 
-  const webEntry = path.posix.join(policy.web.directory, policy.web.requiredEntry);
+  const webSource = safeRelative(webDirectory ?? policy.web.directory);
+  const sourceOverrides = new Map();
+  const webEntry = path.posix.join(webSource, policy.web.requiredEntry);
   await regularFileWithin(sourceRoot, webEntry);
-  for (const relative of await walkFiles(sourceRoot, policy.web.directory)) {
+  for (const relative of await walkFiles(sourceRoot, webSource)) {
     if (/\/(?:art-observe|art-record|player-profile)\.js$/.test(relative)) throw new Error(`Local diagnostics in release web: ${relative}`);
     if (/\.(?:js|html)$/.test(relative)) {
       const text = await readFile(path.resolve(sourceRoot,relative),'utf8');
       if (/(?:SharedRigAnimation|RigComparisonScene|rigExperimentMode|rigbench|art-observe\.js|art-record\.js|player-profile\.js)/.test(text)) throw new Error(`Experimental build cannot be released: ${relative}`);
     }
-    paths.add(relative);
+    const destination = path.posix.join(policy.web.directory, path.posix.relative(webSource, relative));
+    paths.add(destination);
+    sourceOverrides.set(destination, relative);
   }
 
   const contentDir = safeRelative(policy.content.directory);
@@ -156,8 +160,8 @@ export async function buildRuntimePlan(sourceRoot = SCRIPT_ROOT, policyRelative 
   for (const relative of [...paths].sort()) {
     rejectSensitivePath(relative);
     if (/\/(?:experiments|rig-experiment)\//.test(relative)) throw new Error(`Experiment forbidden in runtime: ${relative}`);
-    const file = await regularFileWithin(sourceRoot, relative);
-    files.push(file);
+    const file = await regularFileWithin(sourceRoot, sourceOverrides.get(relative) ?? relative);
+    files.push({ ...file, relative });
     bytes += file.size;
   }
   return { sourceRoot, files, bytes, policyVersion: policy.version };
@@ -228,6 +232,7 @@ function parseArguments(argv) {
       if (!value) throw new Error('--source-root requires a directory');
       options.sourceRoot = path.resolve(value);
     }
+    else if (argument === '--web-root') options.webDirectory = safeRelative(argv[++index]);
     else throw new Error(`Unknown argument: ${argument}`);
   }
   return options;
@@ -235,7 +240,7 @@ function parseArguments(argv) {
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
-  const plan = await buildRuntimePlan(options.sourceRoot);
+  const plan = await buildRuntimePlan(options.sourceRoot, DEFAULT_POLICY, { webDirectory: options.webDirectory });
   const summary = { files: plan.files.length, bytes: plan.bytes, mebibytes: Number((plan.bytes / 1048576).toFixed(1)) };
   if (options.dryRun) {
     console.log(JSON.stringify({ dryRun: true, ...summary }, null, 2));

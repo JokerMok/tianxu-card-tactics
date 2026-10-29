@@ -43,3 +43,18 @@ test('release planning rejects diagnostic files and compiled rig experiment code
   await assert.rejects(()=>buildRuntimePlan(root,'policy.json'),/Local diagnostics/);
  }finally{await rm(root,{recursive:true,force:true});}
 });
+
+test('explicit current frontend is packaged under the normal runtime path without changing old build',async()=>{
+ const root=await realpath(await mkdtemp(path.join(os.tmpdir(),'tianxu-current-web-')));
+ try{
+  for(const dir of ['backend','web','current-web','content','ui'])await mkdir(path.join(root,dir));
+  await writeFile(path.join(root,'web/index.html'),'old build');await writeFile(path.join(root,'current-web/index.html'),'current native build');
+  await writeFile(path.join(root,'content/catalog.json'),'{}');
+  await writeFile(path.join(root,'policy.json'),JSON.stringify({version:1,fixedFiles:[],backend:{directory:'backend',extension:'.mjs',excludeSuffix:'.test.mjs'},web:{directory:'web',requiredEntry:'index.html'},content:{directory:'content',catalog:'catalog.json',metadata:[],tableScope:'main:',assetScope:'main'},localization:{directory:'localization',files:[]},ui:{directory:'ui'}}));
+  const plan=await buildRuntimePlan(root,'policy.json',{webDirectory:'current-web'});const out=path.join(root,'out');await materializeRuntime(plan,out);
+  assert.equal(await readFile(path.join(out,'web/index.html'),'utf8'),'current native build');
+  assert.equal(await readFile(path.join(root,'web/index.html'),'utf8'),'old build');
+  assert.ok(!plan.files.some(f=>f.relative.startsWith('current-web/')));
+  await assert.rejects(()=>buildRuntimePlan(root,'policy.json',{webDirectory:'../outside'}),/escapes/);
+ }finally{await rm(root,{recursive:true,force:true});}
+});

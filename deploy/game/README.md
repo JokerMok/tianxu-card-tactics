@@ -11,6 +11,8 @@ node scripts/package-game-runtime.mjs --dry-run
 node scripts/package-game-runtime.mjs --output .local/game-runtime
 ```
 
+前端保存在独立的正式暂存目录时，显式使用 `--web-root .local/chapter3-normal/web-formal`。运行包中仍写入标准 `.local/web`，不会覆盖本机旧构建，也不改变服务器路径。切勿省略参数而误用过期的默认构建。
+
 第二条命令要求输出目录不存在，不会覆盖旧包。完成后的 `runtime-manifest.json` 逐文件记录字节数和 SHA-256。数据库、日志、备份、凭据、缓存和整个客户端逆向研究目录不在白名单中。
 
 ## 直接运行
