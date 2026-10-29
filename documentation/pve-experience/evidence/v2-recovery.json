@@ -1,0 +1,17 @@
+{
+  "scope": "Real formal HTTP isolated ordinary character; recovery/dedup check, not Cocos play or win-rate estimate",
+  "battleId": "bb5607e9-be54-44e5-acec-4b370aca5751",
+  "samePublicSnapshotAfterActualRestart": true,
+  "historicalCommandReplayedOnce": true,
+  "staleNewCommandRejected": 409,
+  "tacticsVersion": 2,
+  "turn": 32,
+  "reward": {
+    "won": false,
+    "silver": 0,
+    "xp": 0,
+    "cards": []
+  },
+  "eventCount": 282,
+  "dismissDidNotRegrant": true
+}

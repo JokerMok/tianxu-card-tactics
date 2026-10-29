@@ -1,0 +1,24 @@
+{
+  "baseline": "9373a3e",
+  "scope": "Exact old-kernel vs new-kernel replay of three persisted v1 entries; no database mutation",
+  "records": [
+    {
+      "id": "4e87ffb7-e4fe-48f0-993b-969ad28276fc",
+      "node": "main:scene:3:node:301",
+      "commands": 14,
+      "exactLegacyStateMatch": true
+    },
+    {
+      "id": "1f040239-c5a3-443b-ae3c-4dedd1a2dfd3",
+      "node": "main:scene:3:node:302",
+      "commands": 13,
+      "exactLegacyStateMatch": true
+    },
+    {
+      "id": "c612cccb-06ac-4ec5-a8b1-4168a922a801",
+      "node": "main:scene:3:node:302",
+      "commands": 18,
+      "exactLegacyStateMatch": true
+    }
+  ]
+}

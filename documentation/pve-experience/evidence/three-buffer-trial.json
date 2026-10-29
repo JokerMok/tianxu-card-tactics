@@ -1,0 +1,2467 @@
+{
+  "scope": "Offline authoritative-kernel counterfactuals. Same node, seed, actor, and deck within each version/policy pair. Legitimate level-11 ordinary holdings; not a new-player win-rate estimate or real Cocos operations.",
+  "profiles": {
+    "107": {
+      "theme": "哥布林弓手与前排推进",
+      "sourceDeckId": "107001",
+      "cards": [
+        3001,
+        3001,
+        3019,
+        3019,
+        3037,
+        3037,
+        3001,
+        3037
+      ]
+    },
+    "203": {
+      "theme": "巨魔防线与重装推进",
+      "sourceDeckId": "203001",
+      "cards": [
+        4001,
+        4001,
+        4019,
+        4019,
+        4061,
+        4061,
+        4079,
+        4079,
+        4019,
+        4103
+      ]
+    },
+    "304": {
+      "theme": "亡灵重组与灵体输出",
+      "sourceDeckId": "304001",
+      "cards": [
+        1001,
+        1001,
+        1019,
+        1019,
+        1127,
+        1127,
+        1379,
+        1379,
+        1103,
+        1103,
+        1001,
+        1019
+      ]
+    }
+  },
+  "results": [
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:13145",
+        "main:card:2085",
+        "main:card:11145",
+        "main:card:9000"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 12,
+      "commands": 16,
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 15
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 19,
+      "attacks": 3,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:13145",
+        "main:card:2085",
+        "main:card:11145",
+        "main:card:9000"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 11,
+      "commands": 14,
+      "enemyHeroDamage": {
+        "combat": 2,
+        "fatigue": 14
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 21,
+      "attacks": 8,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:13145",
+        "main:card:2085",
+        "main:card:11145",
+        "main:card:9000"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 13,
+      "commands": 17,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 16
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 21,
+      "attacks": 18,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 32,
+      "commands": 27,
+      "enemyHeroDamage": {
+        "combat": 7,
+        "fatigue": 9
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "moves": 47,
+      "attacks": 41,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 24,
+      "commands": 23,
+      "enemyHeroDamage": {
+        "combat": 11,
+        "fatigue": 5
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 3
+      },
+      "moves": 37,
+      "attacks": 37,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 21,
+      "commands": 21,
+      "enemyHeroDamage": {
+        "combat": 12,
+        "fatigue": 4
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 45,
+      "attacks": 47,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:13193",
+        "main:card:6085",
+        "main:card:13169",
+        "main:card:3001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 13,
+      "commands": 15,
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 18
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 26,
+      "attacks": 13,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:13193",
+        "main:card:6085",
+        "main:card:13169",
+        "main:card:3001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 13,
+      "commands": 14,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 19
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 22,
+      "attacks": 13,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:13193",
+        "main:card:6085",
+        "main:card:13169",
+        "main:card:3001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 13,
+      "commands": 16,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 19
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 16,
+      "attacks": 19,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 29,
+      "commands": 25,
+      "enemyHeroDamage": {
+        "combat": 8,
+        "fatigue": 8
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 5
+      },
+      "moves": 52,
+      "attacks": 42,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 31,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 7,
+        "fatigue": 9
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "moves": 41,
+      "attacks": 50,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 30,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 8,
+        "fatigue": 8
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "moves": 43,
+      "attacks": 59,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1187",
+        "main:card:235",
+        "main:card:5293",
+        "main:card:235"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 11,
+      "commands": 14,
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 15
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 19,
+      "attacks": 6,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1187",
+        "main:card:235",
+        "main:card:5293",
+        "main:card:235"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 11,
+      "commands": 13,
+      "enemyHeroDamage": {
+        "combat": 2,
+        "fatigue": 14
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 15,
+      "attacks": 7,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:1187",
+        "main:card:235",
+        "main:card:5293",
+        "main:card:235"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 12,
+      "commands": 17,
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 15
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 14,
+      "attacks": 11,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 30,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 8,
+        "fatigue": 8
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "moves": 50,
+      "attacks": 47,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 32,
+      "commands": 27,
+      "enemyHeroDamage": {
+        "combat": 7,
+        "fatigue": 9
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "moves": 32,
+      "attacks": 62,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 107,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:3001",
+        "main:card:3001",
+        "main:card:3019",
+        "main:card:3019",
+        "main:card:3037",
+        "main:card:3037",
+        "main:card:3001",
+        "main:card:3037"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 22,
+      "commands": 22,
+      "enemyHeroDamage": {
+        "combat": 12,
+        "fatigue": 4
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 2
+      },
+      "moves": 36,
+      "attacks": 49,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:211",
+        "main:card:11145",
+        "main:card:13097",
+        "main:card:5061",
+        "main:card:127"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 13,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 9,
+      "attacks": 2,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:211",
+        "main:card:11145",
+        "main:card:13097",
+        "main:card:5061",
+        "main:card:127"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 13,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 11,
+      "attacks": 7,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:211",
+        "main:card:11145",
+        "main:card:13097",
+        "main:card:5061",
+        "main:card:127"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 12,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 8,
+      "attacks": 10,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 1,
+      "turn": 31,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "playerHeroDamage": {
+        "combat": 8,
+        "fatigue": 6
+      },
+      "moves": 56,
+      "attacks": 44,
+      "skills": 0,
+      "effects": 3
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 37,
+      "commands": 29,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 2,
+        "fatigue": 9
+      },
+      "moves": 49,
+      "attacks": 56,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 203,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 30,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 4,
+        "fatigue": 6
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "moves": 34,
+      "attacks": 69,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:2235",
+        "main:card:20025",
+        "main:card:3103",
+        "main:card:9021",
+        "main:card:169"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 12,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 14,
+      "attacks": 4,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:2235",
+        "main:card:20025",
+        "main:card:3103",
+        "main:card:9021",
+        "main:card:169"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 12,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 11,
+      "attacks": 6,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:2235",
+        "main:card:20025",
+        "main:card:3103",
+        "main:card:9021",
+        "main:card:169"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 12,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 9,
+      "attacks": 6,
+      "skills": 0,
+      "effects": 2
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 37,
+      "commands": 29,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 2,
+        "fatigue": 9
+      },
+      "moves": 50,
+      "attacks": 75,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 32,
+      "commands": 27,
+      "enemyHeroDamage": {
+        "combat": 3,
+        "fatigue": 7
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "moves": 38,
+      "attacks": 69,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 30,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 4,
+        "fatigue": 6
+      },
+      "playerHeroDamage": {
+        "combat": 2,
+        "fatigue": 6
+      },
+      "moves": 39,
+      "attacks": 65,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:5187",
+        "main:card:20013",
+        "main:card:3019",
+        "main:card:21145",
+        "main:card:5187"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 11,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 12,
+      "attacks": 7,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:5187",
+        "main:card:20013",
+        "main:card:3019",
+        "main:card:21145",
+        "main:card:5187"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 11,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 10,
+      "attacks": 10,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:5187",
+        "main:card:20013",
+        "main:card:3019",
+        "main:card:21145",
+        "main:card:5187"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 9,
+      "commands": 12,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 0
+      },
+      "moves": 6,
+      "attacks": 11,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 37,
+      "commands": 29,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 6,
+        "fatigue": 9
+      },
+      "moves": 42,
+      "attacks": 66,
+      "skills": 0,
+      "effects": 3
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 27,
+      "commands": 24,
+      "enemyHeroDamage": {
+        "combat": 5,
+        "fatigue": 5
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 4
+      },
+      "moves": 37,
+      "attacks": 51,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 203,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:4001",
+        "main:card:4001",
+        "main:card:4019",
+        "main:card:4019",
+        "main:card:4061",
+        "main:card:4061",
+        "main:card:4079",
+        "main:card:4079",
+        "main:card:4019",
+        "main:card:4103"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 29,
+      "commands": 25,
+      "enemyHeroDamage": {
+        "combat": 4,
+        "fatigue": 6
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 5
+      },
+      "moves": 44,
+      "attacks": 71,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:21109",
+        "main:card:7269",
+        "main:card:20091",
+        "main:card:12049",
+        "main:card:4145",
+        "main:card:21259",
+        "main:card:20091"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 17,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 17,
+      "attacks": 14,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:21109",
+        "main:card:7269",
+        "main:card:20091",
+        "main:card:12049",
+        "main:card:4145",
+        "main:card:21259",
+        "main:card:20091"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 17,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 19,
+      "attacks": 23,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:21109",
+        "main:card:7269",
+        "main:card:20091",
+        "main:card:12049",
+        "main:card:4145",
+        "main:card:21259",
+        "main:card:20091"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 21,
+      "attacks": 21,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 41,
+      "commands": 31,
+      "enemyHeroDamage": {
+        "combat": 3,
+        "fatigue": 10
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 11
+      },
+      "moves": 53,
+      "attacks": 74,
+      "skills": 0,
+      "effects": 16
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 32,
+      "commands": 27,
+      "enemyHeroDamage": {
+        "combat": 8,
+        "fatigue": 5
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "moves": 40,
+      "attacks": 54,
+      "skills": 0,
+      "effects": 5
+    },
+    {
+      "node": 304,
+      "seed": 7,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 25,
+      "commands": 23,
+      "enemyHeroDamage": {
+        "combat": 11,
+        "fatigue": 2
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 3
+      },
+      "moves": 47,
+      "attacks": 50,
+      "skills": 0,
+      "effects": 1
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:14169",
+        "main:card:18277",
+        "main:card:11073",
+        "main:card:3103",
+        "main:card:11073",
+        "main:card:2019",
+        "main:card:2085"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 22,
+      "attacks": 20,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:14169",
+        "main:card:18277",
+        "main:card:11073",
+        "main:card:3103",
+        "main:card:11073",
+        "main:card:2019",
+        "main:card:2085"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 1,
+        "fatigue": 12
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 25,
+      "attacks": 22,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:14169",
+        "main:card:18277",
+        "main:card:11073",
+        "main:card:3103",
+        "main:card:11073",
+        "main:card:2019",
+        "main:card:2085"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 17,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 15,
+      "attacks": 22,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 47,
+      "commands": 34,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 14
+      },
+      "moves": 48,
+      "attacks": 77,
+      "skills": 0,
+      "effects": 5
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 33,
+      "commands": 27,
+      "enemyHeroDamage": {
+        "combat": 7,
+        "fatigue": 6
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 7
+      },
+      "moves": 48,
+      "attacks": 45,
+      "skills": 0,
+      "effects": 10
+    },
+    {
+      "node": 304,
+      "seed": 41,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 24,
+      "commands": 23,
+      "enemyHeroDamage": {
+        "combat": 12,
+        "fatigue": 1
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 3
+      },
+      "moves": 50,
+      "attacks": 60,
+      "skills": 0,
+      "effects": 7
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:21403",
+        "main:card:2019",
+        "main:card:21121",
+        "main:card:21313",
+        "main:card:21445",
+        "main:card:61",
+        "main:card:2001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 22,
+      "attacks": 12,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:21403",
+        "main:card:2019",
+        "main:card:21121",
+        "main:card:21313",
+        "main:card:21445",
+        "main:card:61",
+        "main:card:2001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 20,
+      "attacks": 16,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "legacy",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:21403",
+        "main:card:2019",
+        "main:card:21121",
+        "main:card:21313",
+        "main:card:21445",
+        "main:card:61",
+        "main:card:2001"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 15,
+      "commands": 18,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 13
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 1
+      },
+      "moves": 18,
+      "attacks": 21,
+      "skills": 0,
+      "effects": 0
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "basic-auto",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 1,
+      "turn": 37,
+      "commands": 29,
+      "enemyHeroDamage": {
+        "combat": 0,
+        "fatigue": 8
+      },
+      "playerHeroDamage": {
+        "combat": 5,
+        "fatigue": 9
+      },
+      "moves": 85,
+      "attacks": 56,
+      "skills": 0,
+      "effects": 10
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "manual-placement",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:5057"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 38,
+      "commands": 30,
+      "enemyHeroDamage": {
+        "combat": 5,
+        "fatigue": 8
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 10
+      },
+      "moves": 43,
+      "attacks": 81,
+      "skills": 0,
+      "effects": 15
+    },
+    {
+      "node": 304,
+      "seed": 83,
+      "version": "candidate",
+      "policy": "alternate-deck",
+      "playerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:61",
+        "main:card:61",
+        "main:card:50",
+        "main:card:50",
+        "main:card:5061",
+        "main:card:5061",
+        "main:card:5001",
+        "main:card:5117",
+        "main:card:41001"
+      ],
+      "enemyDeck": [
+        "main:card:1001",
+        "main:card:1001",
+        "main:card:1019",
+        "main:card:1019",
+        "main:card:1127",
+        "main:card:1127",
+        "main:card:1379",
+        "main:card:1379",
+        "main:card:1103",
+        "main:card:1103",
+        "main:card:1001",
+        "main:card:1019"
+      ],
+      "status": "settled",
+      "winner": 0,
+      "turn": 30,
+      "commands": 26,
+      "enemyHeroDamage": {
+        "combat": 9,
+        "fatigue": 4
+      },
+      "playerHeroDamage": {
+        "combat": 0,
+        "fatigue": 6
+      },
+      "moves": 55,
+      "attacks": 53,
+      "skills": 0,
+      "effects": 2
+    }
+  ]
+}

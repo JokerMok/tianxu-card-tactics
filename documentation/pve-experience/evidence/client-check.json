@@ -1,0 +1,21 @@
+{
+  "metrics": {
+    "canvas": {
+      "css": {
+        "height": 720,
+        "width": 1280,
+        "x": 0,
+        "y": 0
+      },
+      "height": 1440,
+      "width": 2560
+    },
+    "viewport": {
+      "dpr": 2,
+      "height": 720,
+      "width": 1280
+    }
+  },
+  "errors": [],
+  "scope": "Native Cocos build: paged battle log 1/3 to 3/3 and back; completed old-rule 304 and new-rule 304, result return, card window scroll and task switch. Deliberate delayed callback proven separately by source-method test; real operations produced no captured console errors."
+}

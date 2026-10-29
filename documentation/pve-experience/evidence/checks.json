@@ -1,0 +1,23 @@
+{
+  "nativeCreator": "3.8.8",
+  "verifiedSourceFiles": 25,
+  "actualClient": {
+    "pagedLog": true,
+    "pageCountAndReturn": true,
+    "sourceMethodDelayedCallbackCases": 2,
+    "oldAndV2BattleReturnWithoutCapturedConsoleErrors": true,
+    "actualRulesAndExplorationRewardVisible": true
+  },
+  "targetedChecks": [
+    "pve-experience.test.mjs",
+    "content.test.mjs",
+    "player-ui.test.mjs",
+    "test-chapter1-display-localization.mjs",
+    "test-hand-portrait-lifetime.mjs",
+    "deck-ui-integration.test.mjs",
+    "pve-systems existing task-view/source-task/settlement-hook tests"
+  ],
+  "scope": "Targeted source/API/native Cocos checks, not all content, devices, or user visual acceptance",
+  "noPersonalOrProductionDatabase": true,
+  "noPushMergeDeploy": true
+}

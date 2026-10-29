@@ -1,0 +1,215 @@
+{
+  "scope": "Offline original ordinary first-clear entry stats and owned decks, no richer late actor substitution. Not new real progression.",
+  "results": [
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 1088464256,
+      "policy": "basic-auto",
+      "winner": 0,
+      "turn": 22
+    },
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 1088464256,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 19
+    },
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 7,
+      "policy": "basic-auto",
+      "winner": 1,
+      "turn": 30
+    },
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 7,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 20
+    },
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 41,
+      "policy": "basic-auto",
+      "winner": 1,
+      "turn": 30
+    },
+    {
+      "node": 107,
+      "sourceBattle": "bc7f1bb3-b7fc-4068-8229-eee1dde3590c",
+      "sourcePlayerHp": 9,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001"
+      ],
+      "seed": 41,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 20
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 1817491547,
+      "policy": "basic-auto",
+      "winner": 1,
+      "turn": 29
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 1817491547,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 30
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 7,
+      "policy": "basic-auto",
+      "winner": 1,
+      "turn": 29
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 7,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 30
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 41,
+      "policy": "basic-auto",
+      "winner": 1,
+      "turn": 26
+    },
+    {
+      "node": 203,
+      "sourceBattle": "d81a8e68-52ee-4ff9-9db7-a132a7fce77f",
+      "sourcePlayerHp": 10,
+      "sourcePlayerDeck": [
+        "main:card:43",
+        "main:card:61",
+        "main:card:8",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:41001",
+        "main:card:50"
+      ],
+      "seed": 41,
+      "policy": "manual-placement",
+      "winner": 0,
+      "turn": 27
+    }
+  ]
+}

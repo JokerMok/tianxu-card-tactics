@@ -1,0 +1,29 @@
+{
+  "scope": "Offline ordinary early-203 snapshot, using the 2 extra Horseman awarded at 201; no 3rd chapter cards/stats",
+  "deck": [
+    "main:card:43",
+    "main:card:61",
+    "main:card:61",
+    "main:card:61",
+    "main:card:50",
+    "main:card:41001",
+    "main:card:41001"
+  ],
+  "results": [
+    {
+      "seed": 1817491547,
+      "winner": 1,
+      "turn": 29
+    },
+    {
+      "seed": 7,
+      "winner": 1,
+      "turn": 29
+    },
+    {
+      "seed": 41,
+      "winner": 1,
+      "turn": 32
+    }
+  ]
+}

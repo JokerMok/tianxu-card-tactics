@@ -1,0 +1,41 @@
+{
+  "scope": "Offline original ordinary 6-card/9HP winning entry, not fabricated level or assets; same proposed profile/rules",
+  "results": [
+    {
+      "seed": 1088464256,
+      "mode": "basic",
+      "winner": 1,
+      "turn": 31
+    },
+    {
+      "seed": 1088464256,
+      "mode": "front",
+      "winner": 1,
+      "turn": 31
+    },
+    {
+      "seed": 7,
+      "mode": "basic",
+      "winner": 1,
+      "turn": 30
+    },
+    {
+      "seed": 7,
+      "mode": "front",
+      "winner": 1,
+      "turn": 30
+    },
+    {
+      "seed": 41,
+      "mode": "basic",
+      "winner": 1,
+      "turn": 30
+    },
+    {
+      "seed": 41,
+      "mode": "front",
+      "winner": 1,
+      "turn": 30
+    }
+  ]
+}

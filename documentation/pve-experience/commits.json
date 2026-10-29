@@ -1,0 +1,50 @@
+{
+  "branch": "codex/chapter3-normal-pve",
+  "baseline": "9373a3e506579420ea610b904319f521abf30e11",
+  "implementation": "c989d9805e0e9fab412fd0664cb6ba8de6444b5f",
+  "documentation": "See current directory git history; recorded separately to avoid self-referential SHA",
+  "runtime": {
+    "url": "http://127.0.0.1:7469/?skin=sample&client=pve-v2",
+    "bundleSha256": "af1c6e719a898586e4faf074ca76daad5b63e4fd398b8d6646ada8e113ef594c",
+    "sourceHashes": {
+      "assets/scripts/a0/BattleA0Bootstrap.ts": "140343b0249c5df71b2b2c856eea05fc9a810f0d91e80a1e0d2f96c78e52bf9c",
+      "assets/scripts/game/ActionOutbox.ts": "980a2080a42456d0052faf290fb5b9e2c7b4eb6ffb7448666e3226e6a439ee79",
+      "assets/scripts/game/AdvancedGrowthWindows.ts": "3549a8e76398ab794d9db40b199fbb6edc980f6204585e5ff0d720e797c3075b",
+      "assets/scripts/game/ArtSkin.ts": "84d92b6a4a58dc24dfa2af03e20902caadb1b8243ce45daee6639dad93d943b2",
+      "assets/scripts/game/BattlePresentation.ts": "0caab0e38eb0a8adb0e352b92c80f1321dc2a61f321e8efa8ef02c2c1cc0f0be",
+      "assets/scripts/game/BattleSceneView.ts": "78fc3134ce34c85312075a1ea87c4bff5b221f1a76097a8de8bc5b86ef1932b2",
+      "assets/scripts/game/CardDeckWindow.ts": "cbd5f16609a10a69a1f00b6c2710c2ce89dc85a7055938e6c0a4e444eb4f9d3e",
+      "assets/scripts/game/CardManagementUi.ts": "90c49468e70a0636cebe159d69e776ca0fb0d9c5ae267bda3c7c8d3b7cc7f343",
+      "assets/scripts/game/CardScrollRegion.ts": "21fec24c1821b671a1365cb071d5d22949670b48080a0c36ff3b91e142ac08cf",
+      "assets/scripts/game/CocosUi.ts": "a53f509ac2e5f89b1e38a145d4cc2e49ee5a586da465930af2df8b430af4ca7d",
+      "assets/scripts/game/DeckDraft.ts": "b7c71102afc30ec22858b19326ac848ada3d394572b6e072dcdf3283c00d25b7",
+      "assets/scripts/game/GameAudio.ts": "fbdc36bd584318ea2301715ff4a80ea7c6df386f45a6dccdf93cb0b8770d4eb2",
+      "assets/scripts/game/GameContracts.ts": "861088208277c7f98e889bf9ed924e3d2bafabc36e95cc12af46b01810b483da",
+      "assets/scripts/game/GameText.ts": "bfd4a193e4457001535931cad108a73ef59af31938723c15ae19dfd290264c95",
+      "assets/scripts/game/GrowthWindows.ts": "23b950962fdfb4e28ee9199ea548e39c20e0c4298c8425eeb382479ed3818005",
+      "assets/scripts/game/OriginalUi.ts": "f13145202c3a028aef4a8fc3e0b4d99cc5292e1b967ed3e051a2bf9674021042",
+      "assets/scripts/game/RecoveredAnimation.ts": "4d81c9cc5e1afda21180f6aef0a40d606b9a2d8ad791f70fa9f7a010ad9e3f9a",
+      "assets/scripts/game/RecoveredContent.ts": "72efe1cc6fe8934ebc7100bf0752ec633aaa4b16b8ba14461c733939abb1d8ab",
+      "assets/scripts/game/RecoveredEffects.ts": "c50fd49eb9d7e354fd32c536fcc93a51221f315ffb2903487e07f3f6aafb5860",
+      "assets/scripts/game/RecoveredTimeline.ts": "8321922081c4cf5740ed7a18f2bf247325892d2ebeadf41501ea1fa3913df580",
+      "assets/scripts/game/SampleUnitAnimation.ts": "6db24b89e18f2700cd3e42bb7d28810bd686bf41b93dd880e2aa7627dfc5e680",
+      "assets/scripts/game/SecondaryWindows.ts": "ddc3b85de676c488f03f4f99a4fc250eb03f1cb34f5dc43ced3e208e3b8bb3f9",
+      "assets/scripts/game/StageScope.ts": "f708d210a2e80b1d2b8f23dfa8d4cb6e1af4d287e5e7707a4f770f4c22f74559",
+      "assets/scripts/game/TianxuGame.ts": "72e30a16e9a3be83fc33138e895cbe0b5aebfb536cea28e136b2ae6499728bce",
+      "assets/scripts/game/WorldMapWindow.ts": "cfeb7fcbfd0ad3f3ccd254224576e910d3d8f5735e51c8dd67cb11e8c79382a3"
+    },
+    "database": ".local/chapter3-normal/game.sqlite",
+    "growthDatabase": ".local/pve-experience/growth.sqlite"
+  },
+  "videos": {
+    "evidence/304-continuous-actions.mp4": {
+      "bytes": 9407599,
+      "sha256": "c2bc068aeb461624cd2e1fae64df6227c86b20ba4b826abc236ff9fb769fbe08"
+    },
+    "evidence/304-full-cocos.mp4": {
+      "bytes": 20625938,
+      "sha256": "a0968126721d82e1a6ac663020f78794a15fae728476fa98057b07495ea18e51"
+    }
+  },
+  "localOnly": true
+}
