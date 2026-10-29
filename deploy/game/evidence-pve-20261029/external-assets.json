@@ -1,0 +1,533 @@
+{
+  "method": "External HTTPS download with TLS validation and complete content digest matching",
+  "files": 75,
+  "bytes": 24674562,
+  "elapsedMs": 34200,
+  "results": [
+    {
+      "path": "/assets/internal/config.json",
+      "status": 200,
+      "bytes": 6567,
+      "ms": 54,
+      "ok": true
+    },
+    {
+      "path": "/application.js",
+      "status": 200,
+      "bytes": 3300,
+      "ms": 84,
+      "ok": true
+    },
+    {
+      "path": "/assets/internal/index.js",
+      "status": 200,
+      "bytes": 103562,
+      "ms": 25,
+      "ok": true
+    },
+    {
+      "path": "/assets/internal/import/06/06c6d8283.json",
+      "status": 200,
+      "bytes": 429569,
+      "ms": 37,
+      "ok": true
+    },
+    {
+      "path": "/assets/main/config.json",
+      "status": 200,
+      "bytes": 1091,
+      "ms": 11,
+      "ok": true
+    },
+    {
+      "path": "/assets/main/import/fd/fd8ec536-a354-4a17-9c74-4f3883c378c8.json",
+      "status": 200,
+      "bytes": 480,
+      "ms": 12,
+      "ok": true
+    },
+    {
+      "path": "/assets/main/import/ba/ba21476f-2866-4f81-9c4d-6e359316e448.json",
+      "status": 200,
+      "bytes": 192,
+      "ms": 14,
+      "ok": true
+    },
+    {
+      "path": "/assets/main/index.js",
+      "status": 200,
+      "bytes": 757256,
+      "ms": 109,
+      "ok": true
+    },
+    {
+      "path": "/assets/main/import/ff/ffbb08e3-cb62-46d3-82aa-b2ac55763131.json",
+      "status": 200,
+      "bytes": 1585,
+      "ms": 132,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/assets/spine-CC34fKUR.wasm",
+      "status": 200,
+      "bytes": 205175,
+      "ms": 799,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/_virtual_cc-Bblzxeqy.js",
+      "status": 200,
+      "bytes": 5932384,
+      "ms": 1469,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/cc.js",
+      "status": 200,
+      "bytes": 12000,
+      "ms": 78,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/spine-DfhiCve8.js",
+      "status": 200,
+      "bytes": 208,
+      "ms": 12,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/assets/spine.js.mem-pbmhlDdv.bin",
+      "status": 200,
+      "bytes": 19998,
+      "ms": 1031,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/spine.js-Daiw-Blo.js",
+      "status": 200,
+      "bytes": 217,
+      "ms": 14,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/spine.wasm-DkA192N3.js",
+      "status": 200,
+      "bytes": 44955,
+      "ms": 438,
+      "ok": true
+    },
+    {
+      "path": "/favicon.ico",
+      "status": 200,
+      "bytes": 1150,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/index.html",
+      "status": 200,
+      "bytes": 1684,
+      "ms": 14,
+      "ok": true
+    },
+    {
+      "path": "/index.js",
+      "status": 200,
+      "bytes": 608,
+      "ms": 13,
+      "ok": true
+    },
+    {
+      "path": "/release.json",
+      "status": 200,
+      "bytes": 16220,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/src/chunks/bundle.js",
+      "status": 200,
+      "bytes": 20927,
+      "ms": 17,
+      "ok": true
+    },
+    {
+      "path": "/src/effect.bin",
+      "status": 200,
+      "bytes": 5755,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/src/import-map.json",
+      "status": 200,
+      "bytes": 54,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/src/polyfills.bundle.js",
+      "status": 200,
+      "bytes": 14750,
+      "ms": 14,
+      "ok": true
+    },
+    {
+      "path": "/src/settings.json",
+      "status": 200,
+      "bytes": 22618,
+      "ms": 24,
+      "ok": true
+    },
+    {
+      "path": "/src/system.bundle.js",
+      "status": 200,
+      "bytes": 37157,
+      "ms": 29,
+      "ok": true
+    },
+    {
+      "path": "/style.css",
+      "status": 200,
+      "bytes": 691,
+      "ms": 13,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-compact-disabled-ed2373100a0e.png",
+      "status": 200,
+      "bytes": 4259,
+      "ms": 12,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-compact-normal-6aacda81f743.png",
+      "status": 200,
+      "bytes": 3783,
+      "ms": 20,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-compact-pressed-ab5584ff24be.png",
+      "status": 200,
+      "bytes": 2300,
+      "ms": 77,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-compact-selected-4d7fe224f303.png",
+      "status": 200,
+      "bytes": 4421,
+      "ms": 38,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-primary-disabled-ed2373100a0e.png",
+      "status": 200,
+      "bytes": 4259,
+      "ms": 16,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-primary-normal-09f651df4458.png",
+      "status": 200,
+      "bytes": 3759,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-primary-pressed-f940dab50c82.png",
+      "status": 200,
+      "bytes": 2459,
+      "ms": 12,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-primary-selected-83e2dde0886f.png",
+      "status": 200,
+      "bytes": 4310,
+      "ms": 23,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-secondary-disabled-ed2373100a0e.png",
+      "status": 200,
+      "bytes": 4259,
+      "ms": 19,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-secondary-normal-a4b8c8436eee.png",
+      "status": 200,
+      "bytes": 3569,
+      "ms": 79,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-secondary-pressed-3a15124090c6.png",
+      "status": 200,
+      "bytes": 2223,
+      "ms": 17,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/button-secondary-selected-3b255083fe7f.png",
+      "status": 200,
+      "bytes": 4373,
+      "ms": 13,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/control-locked-62ab65165d9f.png",
+      "status": 200,
+      "bytes": 1268,
+      "ms": 16,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/control-minus-6a7da52d2205.png",
+      "status": 200,
+      "bytes": 933,
+      "ms": 19,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/control-plus-78492f22ff4d.png",
+      "status": 200,
+      "bytes": 1173,
+      "ms": 16,
+      "ok": true
+    },
+    {
+      "path": "/cocos-js/spine.asm-CxUwFpAn.js",
+      "status": 200,
+      "bytes": 391765,
+      "ms": 1364,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/hud-draw-b9c13d8aa004.png",
+      "status": 200,
+      "bytes": 3479,
+      "ms": 19,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/hud-graveyard-b75fe1d66f7d.png",
+      "status": 200,
+      "bytes": 3899,
+      "ms": 18,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/hud-hand-276f28405742.png",
+      "status": 200,
+      "bytes": 4532,
+      "ms": 17,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/panel-2eacf473ca05.png",
+      "status": 200,
+      "bytes": 164830,
+      "ms": 270,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-0-5f3cb01cf5cc.png",
+      "status": 200,
+      "bytes": 8863,
+      "ms": 15,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-1-c23b53ca7072.png",
+      "status": 200,
+      "bytes": 8806,
+      "ms": 18,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/forest-map-1-f28d50c907f0.jpg",
+      "status": 200,
+      "bytes": 343478,
+      "ms": 445,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-3-be3ff2a7cdc2.png",
+      "status": 200,
+      "bytes": 9038,
+      "ms": 17,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-4-36715f65daa0.png",
+      "status": 200,
+      "bytes": 8971,
+      "ms": 17,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-5-05771767fb67.png",
+      "status": 200,
+      "bytes": 8790,
+      "ms": 18,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-6-904a8018cffa.png",
+      "status": 200,
+      "bytes": 9059,
+      "ms": 22,
+      "ok": true
+    },
+    {
+      "path": "/art/v2/quality-frame-2-943df56c10a9.png",
+      "status": 200,
+      "bytes": 8961,
+      "ms": 744,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/angel-788ba7ad6e28.webp",
+      "status": 200,
+      "bytes": 1369696,
+      "ms": 2946,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/bully-6e0f9ae116b5.webp",
+      "status": 200,
+      "bytes": 603280,
+      "ms": 3449,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/captain-89022357add6.webp",
+      "status": 200,
+      "bytes": 1074086,
+      "ms": 3212,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/elfin-230ad616fef0.webp",
+      "status": 200,
+      "bytes": 639406,
+      "ms": 2697,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/champion-82987f71c3a4.webp",
+      "status": 200,
+      "bytes": 1393422,
+      "ms": 6063,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/elven-hunter-86861df505a3-aa499c657474.webp",
+      "status": 200,
+      "bytes": 586268,
+      "ms": 2982,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/flame-26c82ed94e34.webp",
+      "status": 200,
+      "bytes": 1010884,
+      "ms": 3444,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/goblin-marauder-7aa44029e47a-ac5f465d6c63.webp",
+      "status": 200,
+      "bytes": 557582,
+      "ms": 1012,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/goblin-bandit-2d9929f96c2d-4598550dd25f.webp",
+      "status": 200,
+      "bytes": 486558,
+      "ms": 3517,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/horseman-e085efcf9726-67f7cd7c6a5c.webp",
+      "status": 200,
+      "bytes": 1103918,
+      "ms": 1798,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/guard-atlas-66fe5e2e27dd-630fcb486c5c.webp",
+      "status": 200,
+      "bytes": 576962,
+      "ms": 3925,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/ice-archer-2f1cbf00c315.webp",
+      "status": 200,
+      "bytes": 1106766,
+      "ms": 2916,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/lancer-535e44dd3d9a-e396f4d68575.webp",
+      "status": 200,
+      "bytes": 848696,
+      "ms": 4384,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/manifest.json",
+      "status": 200,
+      "bytes": 31064,
+      "ms": 18,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/lich-b67b94bb10b9.webp",
+      "status": 200,
+      "bytes": 882034,
+      "ms": 3292,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/ogre-destroyer-62e3b383197c.webp",
+      "status": 200,
+      "bytes": 770972,
+      "ms": 1802,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/ogre-marauder-c4edd710bea4.webp",
+      "status": 200,
+      "bytes": 649834,
+      "ms": 3694,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/sentinel-cc7e6067fe73.webp",
+      "status": 200,
+      "bytes": 909736,
+      "ms": 3575,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/skeleton-011a59a6b2a9.webp",
+      "status": 200,
+      "bytes": 801118,
+      "ms": 2575,
+      "ok": true
+    },
+    {
+      "path": "/art/v5/squire-10c34cd8249a-b65536e9c577.webp",
+      "status": 200,
+      "bytes": 610308,
+      "ms": 2261,
+      "ok": true
+    }
+  ]
+}

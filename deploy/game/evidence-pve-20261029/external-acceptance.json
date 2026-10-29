@@ -1,0 +1,115 @@
+{
+  "origin": "https://tianxu.shizibandu.icu",
+  "sourceCommit": "0ca61099f02f0fa073a2930a5f6e15beea68ffe1",
+  "method": "External HTTPS requests to official APIs, no engine rendering",
+  "initial": {
+    "level": 1,
+    "xp": 0,
+    "deck": [
+      "main:card:1",
+      "main:card:19",
+      "main:card:43",
+      "main:card:61"
+    ],
+    "currencies": {
+      "silver": 300,
+      "gold": 20,
+      "crystal": 0
+    }
+  },
+  "save": {
+    "real": true,
+    "replayed": true,
+    "deckEdits": 1
+  },
+  "gmPlayerDenied": {
+    "status": 403,
+    "code": "GM_FORBIDDEN"
+  },
+  "testWritesClosed": {
+    "status": 403,
+    "code": "TEST_ACTION_DISABLED"
+  },
+  "catalog": {
+    "etag": "\"aaa47965d8e59e96243174e7172df74ac295402db16b9a15c2932a0221b833c2\"",
+    "cache": "private, max-age=3600",
+    "revalidated304": true
+  },
+  "pve": {
+    "node": 101,
+    "commands": 5,
+    "turn": 4,
+    "rewards": {
+      "won": true,
+      "silver": 30,
+      "xp": 6,
+      "cards": [
+        {
+          "id": "main:card:5019",
+          "count": 1
+        }
+      ],
+      "extras": {
+        "items": [],
+        "cards": [],
+        "currencies": {},
+        "reputation": [],
+        "growth": {},
+        "xp": 0,
+        "randomGroups": [],
+        "preview": null
+      }
+    },
+    "progress": {
+      "sceneId": 1,
+      "clearedNodes": [
+        "main:scene:1:node:101"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001"
+      ],
+      "unlockedScenes": [
+        1
+      ],
+      "positionByScene": {}
+    },
+    "level": 1,
+    "xp": 6
+  },
+  "dismissed": true,
+  "persisted": {
+    "deck": [
+      "main:card:1",
+      "main:card:19",
+      "main:card:43",
+      "main:card:61"
+    ],
+    "currencies": {
+      "silver": 330,
+      "gold": 20,
+      "crystal": 0
+    },
+    "level": 1,
+    "xp": 6,
+    "stats": {
+      "battles": 1,
+      "pveWins": 1,
+      "coopWins": 0,
+      "pvpMatches": 0,
+      "deckEdits": 1
+    },
+    "progress": {
+      "sceneId": 1,
+      "clearedNodes": [
+        "main:scene:1:node:101"
+      ],
+      "clearedTriggers": [
+        "main:scene:1:node:101:trigger:101001"
+      ],
+      "unlockedScenes": [
+        1
+      ],
+      "positionByScene": {}
+    }
+  }
+}

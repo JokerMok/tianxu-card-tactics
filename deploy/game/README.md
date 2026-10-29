@@ -52,4 +52,4 @@ docker compose --env-file deploy/game/.env -f deploy/game/compose.yaml ps
 
 当前正式美术白名单为v5及其实际引用的47个文件，包含19张角色图集及复用的v2基础UI。原资源回退保留。母图、Blender源、录像和`cocos-client/experiments/rig/`不进入运行包。
 
-正式Creator入口不导入共享骨架实验。`stage-local.py`默认不注入本地诊断，`--diagnostics`只用于隔离QA构建；正式打包器会拒绝混入实验模块或本地录屏/测量脚本的Web输出。请选择干净的正式暂存目录，保留原QA构建，不将其直接用作发布前端。本轮仅本机验证发布边界，不执行部署。
+正式Creator入口不导入共享骨架实验。`stage-local.py`默认不注入本地诊断，`--diagnostics`只用于隔离QA构建；正式打包器会拒绝混入实验模块或本地录屏/测量脚本的Web输出。请选择干净的正式暂存目录，保留原QA构建，不将其直接用作发布前端。2026-10-29经用户授权已发布当前正式构建，版本与验收边界见[部署记录](validation-pve-20261029.md)。
